@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Doctrine · The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* ---- page-local styles (doctrine.html) ---- */
+  .quote-xl{font-size:19px; font-weight:700; font-style:italic; color:var(--ink); border-left-color:var(--gold)}
+  .quote-xl b{color:var(--gold)}
+  .toc{display:flex; flex-wrap:wrap; gap:6px; margin:14px 0 6px}
+  .lede{color:var(--muted); max-width:840px}
+
+  .may-list,.maynot-list{margin:6px 0 2px; padding-left:20px; font-size:13.5px}
+  .may-list li{margin:3px 0}
+  .maynot-list li{margin:3px 0}
+  .panel.may{border-left:3px solid var(--green)}
+  .panel.maynot{border-left:3px solid var(--red)}
+
+  details.fold{border:1px solid var(--line); border-radius:var(--radius); background:var(--panel); margin:8px 0}
+  details.fold>summary{cursor:pointer; padding:10px 15px; font-weight:700; font-size:13.5px; list-style-position:inside}
+  details.fold>summary:hover{color:var(--gold)}
+  details.fold[open]>summary{border-bottom:1px solid var(--line)}
+  details.fold .det-body{padding:10px 16px 14px; font-size:13.5px}
+  details.fold .det-body ul,details.fold .det-body ol{margin:4px 0; padding-left:20px}
+  details.fold .det-body li{margin:3px 0}
+
+  .steps12{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; counter-reset:step}
+  .steps12 .step{background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:10px 12px; font-size:12.5px; position:relative; counter-increment:step}
+  .steps12 .step::before{content:counter(step); display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%;
+    background:rgba(232,181,77,.14); border:1px solid var(--gold); color:var(--gold); font-weight:800; font-size:11px; margin-bottom:5px}
+  .steps12 .step .st-t{font-weight:800; color:var(--ink); margin-bottom:2px}
+  .steps12 .step .st-d{color:var(--muted); font-size:11.5px; line-height:1.4}
+  .steps12 .step.gate{border-color:rgba(232,181,77,.6)}
+  @media (max-width:900px){.steps12{grid-template-columns:repeat(2,1fr)}}
+
+  .vocab-warn{border:1px solid rgba(224,85,107,.55); background:rgba(224,85,107,.07); border-radius:var(--radius); padding:10px 14px; font-size:12.5px; color:#f0a9b4; margin:10px 0}
+  table.vocab td.never{color:var(--red); font-weight:600}
+  table.vocab td.canon{color:var(--ink); font-weight:700}
+  table.vocab td.note{color:var(--muted); font-size:12.5px}
+
+  table.weights td.w{text-align:right; font-weight:800; color:var(--gold); white-space:nowrap}
+  table.weights tr.total td{border-top:2px solid var(--line); color:#fff; font-weight:900}
+
+  .briefing{margin:16px 0}
+  .briefing .b-head{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:8px}
+  .briefing .b-title{font-size:16px; font-weight:900; color:#fff}
+  .rounds td{vertical-align:top}
+  .rounds .lift-up{color:var(--green); font-weight:800}
+  .cand .gate-rec{font-size:12.5px; margin-top:8px; padding:8px 10px; border:1px dashed var(--line); border-radius:var(--radius); background:var(--panel-2)}
+  .cand .gate-rec b{color:var(--gold)}
+  .cand .clear-link{font-size:11px; color:var(--soft); cursor:pointer; margin-left:8px}
+  .cand .clear-link:hover{color:var(--red)}
+  .src-list{font-size:12px; columns:2; column-gap:24px; padding-left:18px; margin:6px 0}
+  .src-list li{margin:2px 0; break-inside:avoid}
+  @media (max-width:780px){.src-list{columns:1}}
+
+  .elder-row.nsa{border-left:3px solid var(--gold); background:rgba(232,181,77,.05)}
+  .elder-row.reserved td{color:var(--soft); font-style:italic}
+  .triangle-fig{text-align:center}
+  .triangle-fig img{max-width:420px; width:100%; border-radius:var(--radius); border:1px solid var(--line)}
+  .triangle-fig figcaption{font-size:11.5px; color:var(--soft); margin-top:6px; font-style:italic}
+
+  .intensity tr.primal td{color:var(--gold); font-weight:800; background:rgba(232,181,77,.06)}
+  .loop6 li{margin:6px 0}
+  .data-fail{margin:8px 0}
+</style>
+</head>
+<body>
+<main>
+
+  <h1>The <b>Doctrine</b></h1>
+  <p class="lede v-tim">The rules engine of the HB1000 Operating System, rendered as a readable manifesto.
+    Every line below is doctrine, not decoration — each section is enforceable behaviour somewhere in this app.
+    Sources: the Mr &amp; Mrs Fix-It OS dossier, the AI Research Protocol + Ledger, the Standing Orders vault, and the GitHub vault canon.</p>
+  <p class="lede v-swiss">This document sets out the rules engine of the HB1000 Operating System. Every provision below is binding doctrine
+    rather than commentary; each section corresponds to enforceable behaviour elsewhere in this application.
+    Source instruments: the Mr &amp; Mrs Fix-It OS dossier, the AI Research Protocol and Ledger, the Standing Orders vault, and the GitHub vault canon.</p>
+
+  <!-- PRISM CONTRACT — core doctrine lines carry data-prism-id (resolved against data/spectra.json
+       by assets/prism.js). Verbatim canon: the prism expands FRAMING only; the quoted line is never
+       re-voiced. The id rides on both the v-tim and v-swiss twin so the ◇ survives every voice. -->
+  <blockquote class="quote-xl v-tim" data-prism-id="doc-intelligence-brilliance">The agents bring the intelligence. The <b>HB1000</b> brings the brilliance.</blockquote>
+  <blockquote class="v-swiss" data-prism-id="doc-intelligence-brilliance">Division of responsibility, stated formally: the agent fleet supplies analytical and executional capacity;
+    the human principal supplies judgment, vision, and final authority. Operating maxim, verbatim:
+    <b style="color:var(--gold)">“The agents bring the intelligence. The HB1000 brings the brilliance.”</b></blockquote>
+  <blockquote>Every HB1000 gets a tireless AI Fix-It Crew that works inside their authority lane, does the heavy lifting,
+    checks back when human brilliance is needed, and stays with the problem until it is fixed.</blockquote>
+
+  <div class="toc">
+    <a class="chip" href="#s-8020">80/20 Rule</a>
+    <a class="chip" href="#s-lanes">Authority Lanes</a>
+    <a class="chip" href="#s-twoshop">Two-Shop Test</a>
+    <a class="chip" href="#s-receipts">Receipts + Ledger</a>
+    <a class="chip" href="#s-research">AI Research Protocol</a>
+    <a class="chip" href="#s-ship">Ship-It-Ugly Gate</a>
+    <a class="chip" href="#s-safety">Safety &amp; HITL</a>
+    <a class="chip" href="#s-workflow">12-Step Workflow</a>
+    <a class="chip" href="#s-orders">Standing Orders</a>
+    <a class="chip" href="#s-council">Council of 9 Elders</a>
+    <a class="chip" href="#s-scorecards">The Three Scorecards</a>
+    <a class="chip" href="#s-vocab">Locked Vocabulary</a>
+    <a class="chip" href="#s-whitepapers">From the white papers</a>
+  </div>
+
+  <!-- ============================ 1. THE 80/20 RULE ============================ -->
+  <h2 class="sec-h" id="s-8020">1 · The <b>80/20</b> Rule</h2>
+  <div class="grid2">
+    <div class="panel">
+      <div class="ph">Agents do 80% of the work</div>
+      <p style="font-size:13.5px">Research, source review, drafting, analysis, data cleaning, script preparation, report repair,
+        schema generation, benchmark comparison, model second opinions, progress monitoring, receipt generation, and learning capture.</p>
+    </div>
+    <div class="panel">
+      <div class="ph">The HB1000 does the 20% only human brilliance can do</div>
+      <p style="font-size:13.5px">Sets the vivid vision, declares the purpose in eight words or less, protects core values, defines destiny,
+        supplies local context, approves sensitive gates, judges relationship impact, authorizes external actions, and signs off on completion.</p>
+    </div>
+  </div>
+  <blockquote class="v-tim" data-prism-id="doc-8020">Let the agents swing the hammers. The HB1000 holds the blueprint.</blockquote>
+  <blockquote class="v-swiss" data-prism-id="doc-8020">Execution is delegated to the agent fleet; architectural control and accountability remain with the human principal.
+    Operating maxim, verbatim: <b style="color:var(--gold)">“Let the agents swing the hammers. The HB1000 holds the blueprint.”</b></blockquote>
+  <div class="panel tight">
+    <p style="font-size:13px; margin-top:0">In the Dingo Card model, every activity square carries a <b style="color:var(--gold)">human/agent 80/20 slider</b> —
+      the rule is a UI element, not just prose. The covenant: if the human share creeps over 20%, the bar turns red and the Council triages.</p>
+    <div id="split-demo" style="max-width:420px"></div>
+    <p class="footnote" style="margin-bottom:0">Live demo of the shared split-bar component at the default 20% Caller share. Cyan = AI agents, gold = human. Computed, never asserted.</p>
+  </div>
+
+  <!-- ============================ 2. AUTHORITY LANES ============================ -->
+  <h2 class="sec-h" id="s-lanes">2 · Authority <b>Lanes</b> + out-of-lane suggestions</h2>
+  <blockquote class="quote-xl" data-prism-id="doc-lanes">Brilliance can suggest anywhere. <b>Authority can dispatch only in-lane.</b></blockquote>
+  <div class="grid2">
+    <div class="panel">
+      <div class="ph">How the lane works</div>
+      <ul style="font-size:13.5px; padding-left:20px; margin:4px 0">
+        <li>Every HB1000 can spot a problem. Not every HB1000 can dispatch agents everywhere.</li>
+        <li>If an HB1000 sees a problem <b>outside their role</b>, the system creates a <b>Fix-It Suggestion</b> and routes it to the responsible HB1000.
+          "This protects the organization from accidental overreach while still using the full brilliance of the HB1000 network."</li>
+        <li>The role-scope check is <b>Step 2 of the workflow</b>, before anything else happens: in-lane → create a Fix-It Ticket; out-of-lane → create a Fix-It Suggestion routed to the lane owner.</li>
+        <li>Authority status on every ticket: <code>in_lane</code> · <code>suggestion_only</code> · <code>admin_review</code>.</li>
+        <li>The <b>Prime HB1000</b> sees across all lanes and resolves routing conflicts. Business-unit HB1000s dispatch only within their lane
+          (examples: Pawn Princess HB1000, Kokanee Occupancy HB1000, BAFG Communications HB1000, Reports &amp; Data HB1000, AgNotice HB1000, Culture Chaser HB1000).</li>
+        <li>Fix-It Crew Agents "do the work but cannot exceed the authority granted in the work order."</li>
+        <li>Named political failure mode: "HB1000 suggestions feel like interference" → control = a <b>suggestion queue with owner approval</b>.
+          The lane owner accepts or declines suggestions; they are never auto-dispatched.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="ph">The lane lives in the HB1000 profile (exact keys)</div>
+<pre style="font-size:12px; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:12px; overflow-x:auto"><code>{
+  "purpose_8_words_or_less": "…",
+  "destiny_statement": "…",
+  "core_values": ["…"],
+  "can_dispatch_agents_for": ["…"],
+  "can_suggest_to": ["…"],
+  "approval_limits": {
+    "external_messages": "…",
+    "customer_contact": "…",
+    "spend": "…",
+    "legal_claims": "…",
+    "production_changes": "…"
+  },
+  "check_in_preference":
+    "blocker_only | daily | twice_daily | weekly"
+}</code></pre>
+      <p class="footnote">From the dossier §5.1 <code>hb1000_profile</code> — reused verbatim across the OS.</p>
+    </div>
+  </div>
+
+  <!-- ============================ 3. TWO-SHOP TEST ============================ -->
+  <h2 class="sec-h" id="s-twoshop">3 · The <b>Two-Shop</b> Test</h2>
+  <div class="grid2">
+    <div class="panel">
+      <div class="ph">Two independent diagnoses before serious work begins</div>
+      <p style="font-size:13.5px">"Like taking a car to Canadian Tire <i>and</i> a trusted local garage." The Two-Shop Test compares:</p>
+      <ul style="font-size:13.5px; padding-left:20px; margin:4px 0">
+        <li>where both assessments agree</li>
+        <li>where they disagree</li>
+        <li>what assumptions each made</li>
+        <li>what risk each sees</li>
+        <li>what specialist crew each recommends</li>
+        <li>what repair path the HB1000 should approve</li>
+      </ul>
+      <p style="font-size:13.5px">Model-agnostic pairings: ChatGPT + Claude, Claude + Gemini, Gemini + Grok, internal agent + external model,
+        or two specialist agents in the same model environment. <b data-prism-id="doc-two-shop">"The key is independence, not a fixed model brand."</b></p>
+      <div class="status-row warn"><span class="st">Known risk</span><span class="grow">"Two models agree but are both wrong → False confidence → Evidence budget, human review, source requirements."</span></div>
+    </div>
+    <div class="panel">
+      <div class="ph">Ticket data model (exact keys)</div>
+<pre style="font-size:12px; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:12px; overflow-x:auto"><code>"two_shop_test": {
+  "required": true,
+  "shop_a_model": "…",
+  "shop_a_diagnosis": "…",
+  "shop_b_model": "…",
+  "shop_b_diagnosis": "…",
+  "agreement": ["…"],
+  "disagreement": ["…"],
+  "recommended_repair_path": "…"
+}</code></pre>
+      <p class="footnote">Behavioural rule: when <code>two_shop_test.required</code>, the disagreement analysis is shown to the human
+        <i>before</i> the Approve Dispatch button enables.</p>
+    </div>
+  </div>
+
+  <!-- ============================ 4. RECEIPTS + LEARNING LEDGER ============================ -->
+  <h2 class="sec-h" id="s-receipts">4 · Fix-It <b>Receipts</b> + the Learning Ledger</h2>
+  <blockquote class="quote-xl">Before, AI Research found the answer. Now, Mr. &amp; Mrs. Fix-It finds the fix, assigns the mechanic,
+    tracks the repair, and <b>leaves a receipt.</b></blockquote>
+  <div class="grid2">
+    <div class="panel">
+      <div class="ph">The proof layer</div>
+      <ul style="font-size:13.5px; padding-left:20px; margin:4px 0">
+        <li><b>Every completed job produces a receipt and updates the learning system.</b> The receipt is the last two workflow steps:
+          Step 11 Fix-It Receipt → Step 12 Learning Ledger ("the pattern is saved for reuse").</li>
+        <li>A receipt proves what changed: deliverables, counts, compliance, and the learning captured. Real example (Pawn Princess):
+          "43 prospects identified, 18 qualified, 12 conversations booked, 10 completed, 3 converted, no unapproved claims, learning captured:
+          plain-language dignity frame outperformed technical loan language."</li>
+        <li>Every ticket carries <code>receipt_required: true</code> and a score block <code>{before, current, after, delta}</code> —
+          <b>the score delta is part of the receipt.</b></li>
+        <li>The learning ledger is <b>append-only</b> and doubles as the OS's memory. PII and financial data are redacted before any ledger write.</li>
+        <li>The signed receipt already exists in working code: ticket → agent loop → approval gate → <b>signed receipt (SHA256)</b> → append-only ledger
+          is the live loop in Mr &amp; Mrs Fix-It. See it on the <a href="fleet.html">Agent Fleet</a> page.</li>
+        <li>Vault-First mantra: <b>"If it is not in the vault, it does not exist."</b> Everything else is exhaust — it flows IN, not the other way around.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="ph">Mission Control supervision — the 12 gauges</div>
+      <p style="font-size:13px; margin-top:0">The supervision surface is the HB1000 Master Cockpit / Fix-It Mission Control — a car-dashboard interface:</p>
+      <div>
+        <span class="chip">North Star / GPS</span><span class="chip">RPM / Execution</span><span class="chip">Temperature / Risk</span>
+        <span class="chip">Fuel / Capacity</span><span class="chip">Oil Pressure / Culture</span><span class="chip">Transmission / Handoffs</span>
+        <span class="chip">Tires / Traction</span><span class="chip">Radio / Communication</span><span class="chip">Engine Bay / Agent Fleet</span>
+        <span class="chip">Two-Shop Test</span><span class="chip">Check Engine</span><span class="chip">Odometer / Learning Ledger</span>
+      </div>
+      <div class="status-row bad" style="margin-top:10px"><span class="st">Check Engine</span><span class="grow">"Critical blockers, authority violations, missing evidence."</span></div>
+      <div class="status-row ok"><span class="st">Odometer</span><span class="grow">= the Learning Ledger — "Receipts, deltas, reusable patterns, stale assumptions."</span></div>
+      <div class="status-row warn"><span class="st">Anti-theatre</span><span class="grow">"Dashboard becomes theatre — looks useful but does not control anything → Control: data contract, real tickets, receipts." Every gauge must be backed by real ticket data.</span></div>
+      <blockquote style="margin-bottom:0">One dashboard. Many gauges. <b>Every gauge has a mechanic.</b></blockquote>
+    </div>
+  </div>
+
+  <!-- ============================ 5. AI RESEARCH PROTOCOL ============================ -->
+  <h2 class="sec-h" id="s-research">5 · The <b>AI Research</b> Protocol — the daily "Best Practice Junkie" scan</h2>
+  <p class="lede" style="font-size:13.5px">Learning-Loop-grade. Cadence: <b style="color:var(--gold)">daily — the 6 AM "Morning AI Research" routine runs this protocol at Primal.</b>
+    Naming lock: it is <b>AI Research</b> — never the legacy term (see the <a href="#s-vocab">locked vocabulary</a>).
+    The human is the governor: <b>Approve / Modify / Decline are the only three verbs at a gate.</b> Never auto-apply.</p>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="ph">Intensity levels — set the bar before you start</div>
+      <table class="intensity" id="intensity-table">
+        <thead><tr><th>Level</th><th>Push to</th><th>Use for</th></tr></thead>
+        <tbody><tr><td colspan="3" class="muted">Loading data/ai-research-ledger.json…</td></tr></tbody>
+      </table>
+      <p class="footnote">"Default intensity for our dogfood = PRIMAL."</p>
+    </div>
+    <div class="panel">
+      <div class="ph">The 3 STOP rules — stop when ANY is true</div>
+      <div id="stop-rules"><p class="muted" style="font-size:13px">Loading…</p></div>
+      <div class="ph" style="margin-top:14px">What "good" looks like</div>
+      <ul style="font-size:13px; padding-left:20px; margin:4px 0">
+        <li>A <b>score and a baseline</b>, not a vibe. ("40 → 51 → 78 / 100," not "a 10%er.")</li>
+        <li>A <b>clear reason it stopped</b> (which of the three stop conditions fired).</li>
+        <li><b>1–4 candidate improvements</b>, each PENDING human approval.</li>
+        <li>Hunt for <b>1%</b>; bank the occasional <b>unicorn</b> when the 1% hunt turns one up.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:14px">
+    <div class="panel">
+      <div class="ph">The loop — every run, 6 steps</div>
+      <ol class="loop6" style="font-size:13.5px; padding-left:22px; margin:4px 0">
+        <li><b>Phase-0 gate</b> — declare the <b>Local North Star</b> for this run (what are we improving, and how does it rhyme with the Prime). <b>No North Star → halt.</b></li>
+        <li><b>Define the metric + baseline</b> — <i>before optimizing</i> (Standing Order #8). Score the current state <b>/100</b> across a few named dimensions. "Without it, a '10% lift' means nothing."</li>
+        <li><b>Run scored rounds</b> — each round = a focused scan; measure each candidate's <b>lift in points against the baseline.</b></li>
+        <li><b>The diminishing-returns STOP rule</b> — stop when any of the three stop conditions fires (see right).</li>
+        <li><b>Curate + surface</b> — present the scored candidates to the <b>human-in-the-loop</b> to <b>approve / modify / decline. Never auto-apply.</b></li>
+        <li><b>Log</b> — append a dated, scored briefing to the AI Research Ledger. <b>"Every output is a baseline, never final"</b> (Standing Order #7).</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <div class="ph">The Adversary pass — Anti-Kool-Aid (REQUIRED at Primal)</div>
+      <p style="font-size:13px; margin-top:0">Before any candidate is surfaced as worth approving, it must survive an external adversarial check —
+        "so we never grade our own homework or believe our own press releases":</p>
+      <ol style="font-size:13px; padding-left:20px; margin:4px 0">
+        <li><b>External reality check</b> — ground each claim in the outside world (real competitors, real tools, real market data). "If the market already does it better/cheaper, say so plainly."</li>
+        <li><b>Red-team pass</b> — a <b>hostile skeptic</b> (a dedicated red-team subagent prompted to <i>refute</i>) attacks each finding:
+          <i>"Where are we fooling ourselves? What would a competitor / auditor / skeptic say? What breaks at scale?"</i> <b>Default to refuted if uncertain.</b></li>
+        <li><b>Verdict</b> — every candidate carries an Adversary verdict:
+          <span class="pill good">SURVIVES</span> <span class="pill warn">WEAKENED</span> <span class="pill danger">REFUTED</span>.
+          "Refuted ones are NOT presented as wins."</li>
+        <li><b>(Future) External-model cross-check</b> — flash each claim at an external model for a second, different-brain opinion.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3 style="margin-top:24px">The live ledger — the 2 real PRIMAL briefings</h3>
+  <div class="panel tight" style="border-color:rgba(232,181,77,.4)">
+    <p style="font-size:12.5px; margin:0">🔒 The briefings below are <b style="color:var(--gold)">real ledger entries</b>, transcribed verbatim from
+      <code>AI-Research-Ledger.md</code> into <code>data/ai-research-ledger.json</code>. The Approve / Modify / Decline buttons record a decision
+      <b>to this browser only</b> (localStorage) — nothing auto-applies, nothing auto-sends. Approval just unlocks a candidate; a human still does the move.</p>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btn-export-gates" type="button">Export my gate decisions (JSON)</button>
+      <button class="btn" id="btn-import-gates" type="button">Import gate decisions</button>
+      <input type="file" id="file-import-gates" accept="application/json" style="display:none">
+      <span class="footnote" id="gates-count"></span>
+    </div>
+  </div>
+  <div id="briefings"><p class="muted">Loading the AI Research Ledger…</p></div>
+  <div id="inbound"></div>
+  <blockquote class="quote-xl" style="margin-top:16px" data-prism-id="doc-baseline">Every output is a <b>baseline</b>, never final.</blockquote>
+
+  <!-- ============================ 6. SHIP-IT-UGLY GATE ============================ -->
+  <h2 class="sec-h" id="s-ship">6 · The <b>Ship-It-Ugly</b> / "used yesterday" gate</h2>
+  <p class="lede" style="font-size:13.5px">The #1 documented risk is not technical — it is the pattern: "the beautiful grid tempts you to
+    <i>perfect and decorate</i> instead of <i>operate</i>. That's where the last 30 versions died."</p>
+  <blockquote class="quote-xl" data-prism-id="doc-ship-ugly"><b>Ship it ugly. Use it daily.</b> Success = "the card was used yesterday" — NOT "the card is complete."
+    One card, one Caller, used live for N consecutive days <b>before</b> any second card or any new feature is allowed.</blockquote>
+  <div class="grid3">
+    <div class="panel tight">
+      <div class="ph">The strategy in one sentence</div>
+      <p style="font-size:13px; margin:0">"Build ONE Dingo Card on the app you already have (Mr &amp; Mrs Fix-It), run it live on ONE real operation,
+        ship it ugly in 2–4 weeks. The only success metric: 'was the card used yesterday?'"</p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">Hold the line</div>
+      <p style="font-size:13px; margin:0"><b style="color:var(--gold)">"Hold the line. One card. One store. One resort. Used yesterday."</b><br><br>
+        The success-metric widget is binary: <i>used yesterday?</i> — an N-consecutive-days counter gates "create second card / enable new feature."</p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">Why the rule exists</div>
+      <p style="font-size:13px; margin:0">"That rule isn't just project hygiene — it's the OS teaching <i>you</i> the very thing it's built to teach
+        everyone: <b>sense of urgency over disciplined perfection.</b>"<br><br>
+        Trust rule: the Source-of-Truth number behind any gauge "must be <b>trusted and current</b> — if the noon reconciliation is late or massaged,
+        the ticker lies and the Caller stops believing the OS within days."</p>
+    </div>
+  </div>
+
+  <!-- ============================ 7. SAFETY & HITL ============================ -->
+  <h2 class="sec-h" id="s-safety">7 · Safety &amp; Human-in-the-Loop — the <b>MAY / MAY-NOT</b> table</h2>
+  <div class="grid2">
+    <div class="panel may">
+      <div class="ph" style="color:var(--green)">Agents MAY</div>
+      <ul class="may-list">
+        <li>research</li><li>draft</li><li>compare</li><li>clean</li><li>score</li>
+        <li>prepare</li><li>analyze</li><li>monitor</li><li>report</li>
+      </ul>
+    </div>
+    <div class="panel maynot">
+      <div class="ph" style="color:var(--red)">Agents MAY NOT, without HB1000 approval</div>
+      <ul class="maynot-list">
+        <li>contact customers</li>
+        <li>send external messages</li>
+        <li>spend money</li>
+        <li>make legal or financial claims</li>
+        <li>change production systems</li>
+        <li>file legal documents</li>
+        <li>sign contracts</li>
+        <li>publish allegations</li>
+        <li>use sensitive personal information beyond the ticket scope</li>
+        <li>act outside the HB1000's authority lane</li>
+      </ul>
+    </div>
+  </div>
+  <blockquote>The agent never sleeps, but it still stays inside the fence.</blockquote>
+  <div class="panel tight">
+    <p style="font-size:13px; margin:0"><b>MVP exclusions (hard):</b> no unsupervised external messaging, no spending, no legal filing,
+      no production-system changes, no live customer contact, no hidden surveillance.
+      <b>Default external posture: draft-only by default, approval locks</b> — e.g., the Seba pilot runs draft-only with a named human
+      approving every message; Gmail is draft-only, Tim sends. Denied actions create an approval-gate item; they never silently execute.</p>
+  </div>
+
+  <h3 style="margin-top:20px">The read-only financial stance + the Z-report rule</h3>
+  <div class="grid2">
+    <div class="panel">
+      <div class="ph">The security posture for any agent touching money</div>
+      <ul style="font-size:13.5px; padding-left:20px; margin:4px 0">
+        <li><b>Read-only / least-privilege</b> access to financial systems (Bravo POS + bank). <b>"The agent never writes to the POS."</b></li>
+        <li><b>PII / financial data redacted in the learning ledger</b> (reference: <code>cashout/redaction.py</code> — buckets dollar figures before logging).</li>
+        <li><b>Just-in-time, task-scoped credentials.</b></li>
+        <li>Read-only by construction: financial adapters expose no write methods, and carry a "never trigger source-system state changes" flag.</li>
+        <li>Cheap-correctness principle (Briefing #2, SURVIVES): <b>don't rebuild the general ledger</b> — reconcile against the source system's own
+          computed number and have the agent explain the variance.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="ph">The Z-report rule</div>
+      <blockquote style="margin-top:4px"><i>Consume</i> the existing Z-report, <b>never regenerate it</b> — "running Z again resets the counters
+        and destroys the audit trail."</blockquote>
+      <p style="font-size:13px">Generalized: agents consume existing system-of-record artifacts read-only; they never trigger state-changing
+        operations on the source system.</p>
+      <div class="status-row ok"><span class="st">Honest gate</span><span class="grow">Don't fabricate money logic while gated: the ledger records that the pawn-reconciliation
+        fix proposal was "deliberately not created — writing the pawn reconciliation fix requires the real Bravo over/short answer, and fabricating
+        it would bake a guess into money logic."</span></div>
+    </div>
+  </div>
+
+  <!-- ============================ 8. THE 12-STEP WORKFLOW ============================ -->
+  <h2 class="sec-h" id="s-workflow">8 · The <b>12-step</b> workflow — the doctrine as a state machine</h2>
+  <div class="steps12">
+    <div class="step"><div class="st-t">Spot the problem</div><div class="st-d">An HB1000 spots a problem anywhere.</div></div>
+    <div class="step gate"><div class="st-t">Role-scope check</div><div class="st-d">In-lane → Fix-It Ticket. Out-of-lane → Fix-It Suggestion routed to the lane owner.</div></div>
+    <div class="step gate"><div class="st-t">Twin North Star Gate</div><div class="st-d">(formerly the Vivid Vision Gate) Purpose ≤8 words, destiny, core values, beneficiary, definition of done, timing window, do-not-violate rules + the one-line "how this rhymes with the Prime" check. Hard halt, never a warning.</div></div>
+    <div class="step"><div class="st-t">AI Research diagnosis</div><div class="st-d">Classify the problem + set the evidence budget.</div></div>
+    <div class="step"><div class="st-t">Two-Shop Test</div><div class="st-d">Two independent diagnoses; agreement/disagreement analyzed.</div></div>
+    <div class="step"><div class="st-t">Work order</div><div class="st-d">Scope, agents, allowed tools, approval gates, definition of done.</div></div>
+    <div class="step gate"><div class="st-t">HB1000 approves dispatch</div><div class="st-d">No dispatch without the human's sign-off.</div></div>
+    <div class="step"><div class="st-t">Mission Control supervision</div><div class="st-d">Tracks progress, blockers, approvals, and score movement.</div></div>
+    <div class="step gate"><div class="st-t">Human approval gates</div><div class="st-d">Agents pause when human judgment is required.</div></div>
+    <div class="step"><div class="st-t">Completion verifier</div><div class="st-d">Definition of done met?</div></div>
+    <div class="step"><div class="st-t">Fix-It Receipt</div><div class="st-d">Deliverables, compliance, score before/after/delta.</div></div>
+    <div class="step"><div class="st-t">Learning Ledger</div><div class="st-d">Append-only; the pattern is saved for reuse.</div></div>
+  </div>
+  <p class="footnote">Ticket status machine: <code>draft | diagnosing | ready_to_dispatch | running | blocked | ready_for_review | complete</code> ·
+    Evidence budget scale on every ticket: <code>low | medium | high | high_stakes</code>. Gold-ringed steps are gates.</p>
+
+  <!-- ============================ 9. STANDING ORDERS ============================ -->
+  <h2 class="sec-h" id="s-orders">9 · The 10 <b>Standing Orders</b> + the 12 Constitutional Rules</h2>
+  <p class="lede" style="font-size:13.5px" id="orders-intro">Binding on every agent (Elder, worker, Wisdom Giant) operating in the OS. Loaded verbatim from <code>data/standing-orders.json</code>.</p>
+  <div id="standing-orders"><p class="muted">Loading Standing Orders…</p></div>
+
+  <h3 style="margin-top:18px">Transparency-is-Kindness addendum</h3>
+  <div id="transparency" class="panel tight"><p class="muted" style="margin:0">Loading…</p></div>
+
+  <!-- ============================ 10. COUNCIL OF 9 ELDERS ============================ -->
+  <h2 class="sec-h" id="s-council">10 · The <b>Council of Elders</b> — 9 Elders, NSA cross-cutting, 10th seat reserved</h2>
+  <div class="grid2">
+    <div>
+      <div id="council"><p class="muted">Loading the Council roster…</p></div>
+    </div>
+    <div>
+      <figure class="triangle-fig panel" style="margin:0">
+        <img src="assets/img/servant-leadership-triangle.webp" alt="The servant-leadership triangle — the leader at the bottom, serving the people doing the work">
+        <figcaption>The servant-leadership triangle. The Council serves the work; the human is the governor — Constitutional Rule #7.</figcaption>
+      </figure>
+      <div id="council-meta" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- ============================ 11. THE THREE SCORECARDS ============================ -->
+  <h2 class="sec-h" id="s-scorecards">11 · The three <b>scorecards</b> (exact weights)</h2>
+  <div class="grid3">
+    <div class="panel">
+      <div class="ph">Master Fix-It Score /100</div>
+      <table class="weights scorecard">
+        <tbody>
+          <tr><td>HB1000 / Vivid Vision alignment</td><td class="w" data-w="12">12</td></tr>
+          <tr><td>Evidence and grounding</td><td class="w" data-w="12">12</td></tr>
+          <tr><td>Two-Shop diagnostic agreement</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Agent match quality</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Role-scope / authority compliance</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Babel landing / communication clarity</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Risk and privacy control</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Execution readiness / DINGO clarity</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Completion proof / receipt quality</td><td class="w" data-w="8">8</td></tr>
+          <tr><td>Learning ledger / reusable pattern</td><td class="w" data-w="8">8</td></tr>
+          <tr class="total"><td>Total (computed)</td><td class="w sc-total">…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="ph">HB1000 Alignment Score (pre-dispatch)</div>
+      <table class="weights scorecard">
+        <tbody>
+          <tr><td>Vivid Vision clarity</td><td class="w" data-w="15">15</td></tr>
+          <tr><td>Purpose ≤8 words</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Core values protected</td><td class="w" data-w="15">15</td></tr>
+          <tr><td>Beneficiary clear</td><td class="w" data-w="15">15</td></tr>
+          <tr><td>Agent work properly scoped</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Human approval gates clear</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Definition of done clear</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Learning captured</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Check-in rhythm set</td><td class="w" data-w="5">5</td></tr>
+          <tr class="total"><td>Total (computed)</td><td class="w sc-total">…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="ph">Agent Execution Score (post-job)</div>
+      <table class="weights scorecard">
+        <tbody>
+          <tr><td>Correct agent matched</td><td class="w" data-w="15">15</td></tr>
+          <tr><td>Work order clarity</td><td class="w" data-w="15">15</td></tr>
+          <tr><td>Autonomy used safely</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Human approval gates respected</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Deliverable completed</td><td class="w" data-w="20">20</td></tr>
+          <tr><td>Risk reduced</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Score improved</td><td class="w" data-w="10">10</td></tr>
+          <tr><td>Learning captured</td><td class="w" data-w="10">10</td></tr>
+          <tr class="total"><td>Total (computed)</td><td class="w sc-total">…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================ 12. LOCKED VOCABULARY ============================ -->
+  <h2 class="sec-h" id="s-vocab">12 · The <b>locked vocabulary</b> — use exactly; never the legacy term</h2>
+  <div class="vocab-warn">⚠️ The right-hand "NEVER" column lists <b>forbidden legacy terms</b>. This table is the
+    <b>only place in the entire app</b> they are allowed to appear — and only so you know what not to say. Vocabulary is law, not style.</div>
+  <div class="panel" style="overflow-x:auto">
+    <table class="vocab">
+      <thead><tr><th>Canonical (use this)</th><th>NEVER (forbidden)</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td class="canon">DINGO = <i>Do It Now, Go</i></td><td class="never">Bingo</td><td class="note">total find-and-replace; "Disciplined Execution + Sense of Urgency" survives as philosophy only</td></tr>
+        <tr><td class="canon">The HB1000 Operating System</td><td class="never">Hard Hat Tour / Constellation Tour</td><td class="note">tagline: "Human Brilliance + AI, in service of Social Impact Capitalism"</td></tr>
+        <tr><td class="canon">Dingo City / Dingo card / Dingo squares (D1…D25)</td><td class="never">Bingo City / Bingo card</td><td class="note">5×5 = 25 activity squares</td></tr>
+        <tr><td class="canon">Dingo Caller (c-a-l-l-e-r)</td><td class="never">collar</td><td class="note">"the one neck to choke"</td></tr>
+        <tr><td class="canon">PTK — Promises to Keep</td><td class="never">"free square"</td><td class="note">the AI promise engine at centre (grid index 12)</td></tr>
+        <tr><td class="canon">Prime North Star (1) / Local North Stars (many)</td><td class="never">"North Star = Ruby Red"</td><td class="note">Ruby Red = one Local (Maven / Corner Banker / Pulse only)</td></tr>
+        <tr><td class="canon">Council of Elders — 9 Elders</td><td class="never">Rooftop Society / "8 Elders"</td><td class="note">NSA holds the 9th seat; 10th reserved</td></tr>
+        <tr><td class="canon">Twin North Star Gate</td><td class="never">Vivid-Vision Gate</td><td class="note">hard halt, never a warning</td></tr>
+        <tr><td class="canon">AI Research</td><td class="never">auto-research / autosearch / AutoSearch</td><td class="note">the daily 6 AM scan; naming lock</td></tr>
+        <tr><td class="canon">the 2D and 3D model views</td><td class="never">"Pearl('s) brain"</td><td class="note"></td></tr>
+        <tr><td class="canon">Learning Loop Protocol V13.0 — The Genie Release</td><td class="never">V8–V12.9.1 (archive), V14 behaviors</td><td class="note">V14 schema = data-model donor only</td></tr>
+        <tr><td class="canon">Voice = KIE.ai ONLY</td><td class="never">ElevenLabs</td><td class="note">Standing Order #1</td></tr>
+        <tr><td class="canon">Local 4 — Imperative</td><td class="never">Local 3</td><td class="note"></td></tr>
+        <tr><td class="canon">BHAG = 3–5 year, numbers in the sentence</td><td class="never">1–2 yr / 10–30 yr variants</td><td class="note">NSA Rhyme Test standard</td></tr>
+        <tr><td class="canon">Seba Hub</td><td class="never">SIBA</td><td class="note"></td></tr>
+        <tr><td class="canon">JTBD IS Clayton Christensen</td><td class="never">"NOT Christensen"</td><td class="note">the single most important Timmyisms correction</td></tr>
+        <tr><td class="canon">KEEP unchanged</td><td class="never">—</td><td class="note">JOY / JOY Substrate · Cloud Butterflies · Flypaper · Hunting Funnel · PEARL Diamond · Learning Loop · Blue Seal Prime/Local</td></tr>
+        <tr><td class="canon">Retired tagline</td><td class="never">"Put the Cult in Culture"</td><td class="note">do not use</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================ 13. FROM THE WHITE PAPERS ============================ -->
+  <h2 class="sec-h" id="s-whitepapers">13 · From the <b>white papers</b> — LDP · glossary · deployments registry</h2>
+  <p class="lede" style="font-size:13.5px">The deepest single document in the predecessor estate is the 18-page white paper
+    (<code>HB1000-Constellation-Tour/HB1000_White_Paper.pdf</code>, April 4, 2026) that shipped with the model tour (legacy) package,
+    alongside its master briefing <code>.md</code>. Three of its layers are surfaced here, read-only, as lineage — where its
+    April-2026 vocabulary has since been locked otherwise, the <a href="#s-vocab">locked vocabulary (§12)</a> wins.</p>
+
+  <details class="fold">
+    <summary>The Latimer Douglas Protocol (LDP) — the structural enforcement mechanism for SIC, in one paragraph</summary>
+    <div class="det-body">
+      <blockquote>“The Latimer Douglas Protocol (LDP) is the structural enforcement mechanism for SIC. It includes a non-negotiable
+        10% tithe of top-line revenue back to community, a Blue Seal verified integrity marker for participating businesses, and a
+        capital guarantee for entrepreneurs who operate within the protocol’s integrity standards. The LDP serves three pillars
+        simultaneously: an Economic Floor for the working poor, a Moral Infrastructure for businesses, and a Civic Accountability
+        layer for institutions.”</blockquote>
+      <div class="row" style="margin:8px 0">
+        <span class="pill gold">Pillar 1 — Economic Floor (the working poor)</span>
+        <span class="pill info">Pillar 2 — Moral Infrastructure (businesses)</span>
+        <span class="pill warn">Pillar 3 — Civic Accountability (institutions)</span>
+      </div>
+      <div class="status-row warn"><span class="st">Status</span><span class="grow">In the white paper’s own April-2026 initiative
+        registry (Group D — Accountability &amp; Governance), the LDP is recorded as <b>PENDING</b> — specced, not yet deployed.
+        Nothing in this app asserts it as live.</span></div>
+      <p class="footnote">Verbatim from the white paper, p.2. The “10%” figure is restored from the archive inventory notes
+        (<code>hb1000-os/hardhat-notes-saved.md</code>) — the PDF’s embedded font drops digits under text extraction.
+        Spelling note: the white paper itself spells it “Latimer Douglas Protocol.”</p>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary>Glossary of key terms — 24 of the 25 white-paper terms, verbatim</summary>
+    <div class="det-body">
+      <table>
+        <thead><tr><th>Term</th><th>White-paper definition (verbatim)</th></tr></thead>
+        <tbody>
+          <tr><td><b>SIC</b></td><td>Social Impact Capitalism — profit and purpose as force multipliers</td></tr>
+          <tr><td><b>HB1000</b></td><td>Human Brilliance 1000 — the human mind partnered with AI</td></tr>
+          <tr><td><b>Ruby Red</b></td><td>The canonical North Star persona — working poor household CFO <span class="footnote">(locked vocabulary: she is a <b>Local</b> North Star, never the Prime)</span></td></tr>
+          <tr><td><b>DINGO Card</b></td><td>Project accountability dashboard with War Room and North Star badges</td></tr>
+          <tr><td><b>POPE</b></td><td>Person of Primary Engagement — the project lead</td></tr>
+          <tr><td><b>PTK</b></td><td>Promises to Keep — trackable moral commitments</td></tr>
+          <tr><td><b>LDP</b></td><td>Latimer Douglas Protocol — structural integrity framework</td></tr>
+          <tr><td><b>Blue Seal</b></td><td>Verified integrity marker for LDP-compliant businesses</td></tr>
+          <tr><td><b>PFE</b></td><td>Persistent Foraging Engine — background question harvester</td></tr>
+          <tr><td><b>Move 37</b></td><td>Innovation scanner for orphaned solutions from other industries</td></tr>
+          <tr><td><b>Cloud Butterfly</b></td><td>An unconscious insight captured for processing</td></tr>
+          <tr><td><b>Trojan Horse</b></td><td>Embedded test to validate AI ethical reasoning</td></tr>
+          <tr><td><b>Séance Board</b></td><td>Grace’s primary interface — Zero Forms ritual space</td></tr>
+          <tr><td><b>Iron Brief</b></td><td>Core enforcement standard for all AI agents</td></tr>
+          <tr><td><b>The Watchman</b></td><td>Independent audit skill preventing drift</td></tr>
+          <tr><td><b>Race</b></td><td>Structured evaluation event with expert panel</td></tr>
+          <tr><td><b>North Star Proxy Test</b></td><td>“Would Ruby Red understand why this matters to her?”</td></tr>
+          <tr><td><b>Grace Godmother</b></td><td>Executive layer managing all Project Graces</td></tr>
+          <tr><td><b>Pearl</b></td><td>The Mother of All Graces — portfolio-level AI guardian</td></tr>
+          <tr><td><b>Vault</b></td><td>The GitHub repository — single source of truth</td></tr>
+          <tr><td><b>Format Gate</b></td><td>Schema enforcement layer blocking non-compliant commits</td></tr>
+          <tr><td><b>Wisdom Giants</b></td><td>Elders providing crystallized intelligence via voice/video</td></tr>
+          <tr><td><b>Honeybee Zone</b></td><td>Optimal SIC Matrix position — high profit AND high purpose</td></tr>
+          <tr><td><b>Nano Banana</b></td><td>Visual asset generation tool for emotionally resonant imagery</td></tr>
+        </tbody>
+      </table>
+      <p class="footnote" style="margin-top:8px">Verbatim from the white paper, pp.17–18. <b>One term is omitted</b> under the
+        locked vocabulary (§12): the white paper defined the predecessor card format under the forbidden legacy B-word; its successor
+        on every surface of this app is the <b>Dingo card</b>. Digits lost to the PDF’s font subsetting (HB<b>1000</b>, Move <b>37</b>)
+        are restored from the archive inventory notes — nothing else was altered.</p>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary>Deployments registry — the 8 sites the white paper recorded as deployed (April 4, 2026)</summary>
+    <div class="det-body">
+      <table>
+        <thead><tr><th>Site</th><th>URL (recorded April 2026)</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><b>DINGO Card Dashboard</b></td><td><a href="https://dingocard-8wvtkcrz.manus.space" target="_blank" rel="noopener">dingocard-8wvtkcrz.manus.space</a></td><td>Project accountability</td></tr>
+          <tr><td><b>Ruby Red Dash</b></td><td><a href="https://rubyredash-fdfpve3x.manus.space" target="_blank" rel="noopener">rubyredash-fdfpve3x.manus.space</a></td><td>Maven Grace app</td></tr>
+          <tr><td><b>Grace Ops V9.0</b></td><td><a href="https://graceprotocol-mc85vytk.manus.space" target="_blank" rel="noopener">graceprotocol-mc85vytk.manus.space</a></td><td>Grace operations PWA</td></tr>
+          <tr><td><b>PTK Alberta</b></td><td><a href="https://ptkalberta-bhzfppj5.manus.space" target="_blank" rel="noopener">ptkalberta-bhzfppj5.manus.space</a></td><td>Civic accountability</td></tr>
+          <tr><td><b>Destiny Dashboard</b></td><td><a href="https://destinydash-64k7khzp.manus.space" target="_blank" rel="noopener">destinydash-64k7khzp.manus.space</a></td><td>Ruby Red dashboard</td></tr>
+          <tr><td><b>Pearl Dashboard</b></td><td><a href="https://pearldash-4zl4u7rm.manus.space" target="_blank" rel="noopener">pearldash-4zl4u7rm.manus.space</a></td><td>PEARL Diamond KPI view</td></tr>
+          <tr><td><b>Pearl Map</b></td><td><a href="https://pearlmap-zjgmggcg.manus.space" target="_blank" rel="noopener">pearlmap-zjgmggcg.manus.space</a></td><td>3D spatial memory map</td></tr>
+          <tr><td><b>Intelligence Revolution</b></td><td><a href="https://intrevoul.manus.space" target="_blank" rel="noopener">intrevoul.manus.space</a></td><td>Philosophical manifesto</td></tr>
+        </tbody>
+      </table>
+      <div class="status-row warn" style="margin-top:8px"><span class="st">Honest gate</span><span class="grow">These rows are the
+        white paper’s record as of April 4, 2026 — <b>current live status is NOT verified by this app</b> and no LIVE badge is shown
+        (computed, never asserted). All eight are external Manus URLs we do not control; the never-rebuild rule applies: we link out,
+        we archive locally where we can (see <code>tour-archive/</code>), we never make a platform we can’t back up the system of record.</span></div>
+      <p class="footnote">URLs restored digit-perfect from the archive inventory notes (<code>hb1000-os/hardhat-notes-saved.md</code>);
+        the PDF’s embedded font drops digits under text extraction. The frozen external face itself stays at
+        <a href="https://learning-loop.manus.space" target="_blank" rel="noopener">learning-loop.manus.space</a>.</p>
+    </div>
+  </details>
+
+  <hr>
+  <p class="footnote">Doctrine sources: <code>mr_mrs_fixit_os_dossier_whitepaper.md</code> (v1.0 prototype doctrine) ·
+    <code>AI-Research-Protocol.md</code> + <code>AI-Research-Ledger.md</code> (the protocol running) ·
+    <code>CashOut-Assignment-Agent-Spec.md</code> (doctrine applied to a real money agent) ·
+    <code>Personal_AI_OS_Vault/08_STANDING_ORDERS/STANDING_ORDERS.md</code> · <code>HB1000-OS-Synthesis-and-MVP.md</code> ·
+    the GitHub vault canon (github.com/timjlatimer/personal-ai-os-vault). "If it is not in the vault, it does not exist."</p>
+
+</main>
+
+<script src="assets/shell.js"></script>
+<script src="assets/prism.js"></script><!-- Babel Bridge prism — attaches ◇ to the data-prism-id core lines above; no spectrum = no icon -->
+<script>
+(function () {
+  'use strict';
+  Shell.init('doctrine');
+
+  /* ---------- 80/20 live split-bar demo ---------- */
+  var demo = document.getElementById('split-demo');
+  if (demo) demo.innerHTML = Shell.splitBar(20);
+
+  /* ---------- scorecard totals (computed, never asserted) ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.scorecard'), function (t) {
+    var sum = 0;
+    Array.prototype.forEach.call(t.querySelectorAll('td[data-w]'), function (td) { sum += Number(td.getAttribute('data-w')) || 0; });
+    var out = t.querySelector('.sc-total');
+    if (out) out.textContent = '/' + sum;
+  });
+
+  /* ---------- localStorage gate decisions (Approve / Modify / Decline only) ---------- */
+  var LS_KEY = 'hb1000-ai-research-gates';
+  function loadGates() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch (e) { return {}; }
+  }
+  function saveGates(g) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(g)); } catch (e) { /* private mode etc. */ }
+  }
+  function gateCount() {
+    var g = loadGates(), n = 0, k;
+    for (k in g) if (Object.prototype.hasOwnProperty.call(g, k)) n++;
+    var el = document.getElementById('gates-count');
+    if (el) el.textContent = n ? (n + ' local decision' + (n === 1 ? '' : 's') + ' recorded in this browser') : 'No local decisions recorded yet';
+  }
+
+  function verdictPill(v) {
+    var s = String(v || '').toUpperCase();
+    var kind = 'info';
+    if (s.indexOf('SURVIVES') === 0 || s === 'APPROVED') kind = 'good';
+    else if (s.indexOf('WEAKENED') === 0 || s === 'MODIFIED' || s.indexOf('PARK') >= 0) kind = 'warn';
+    else if (s.indexOf('REFUTED') === 0 || s === 'DECLINED') kind = 'danger';
+    else if (s === 'N/A') kind = '';
+    return Shell.pill(v, kind);
+  }
+  function statusPill(s) {
+    var up = String(s || '').toUpperCase();
+    return Shell.pill(s, up.indexOf('PARK') >= 0 ? 'warn' : 'info');
+  }
+
+  /* ---------- data loads (each independent; graceful on file://) ---------- */
+  function failNote(elId, path) {
+    var el = document.getElementById(elId);
+    if (!el) return;
+    el.innerHTML = '<div class="status-row bad data-fail"><span class="st">Data</span><span class="grow">Could not load <code>' +
+      Shell.esc(path) + '</code>. If you opened this page directly from disk (file://), the browser blocks JSON fetches — serve the ' +
+      '<code>app/</code> folder over local HTTP (e.g. <code>python -m http.server</code>) and reload. The doctrine prose above/below is unaffected.</span></div>';
+  }
+
+  /* ===== AI Research Ledger ===== */
+  var LEDGER = null;
+
+  function renderRounds(rounds) {
+    var rows = rounds.map(function (r) {
+      var score = (r.score == null) ? '—' : ('<b>' + Shell.esc(String(r.score)) + '</b>');
+      var lift = (r.lift == null) ? '—' : ('<span class="lift-up">+' + Shell.esc(String(r.lift)) + '</span>');
+      return '<tr><td style="white-space:nowrap">' + Shell.esc(r.round) + '</td><td>' + Shell.esc(r.added) + '</td>' +
+             '<td class="num">' + score + '</td><td class="num">' + lift + '</td></tr>';
+    }).join('');
+    return '<table class="rounds"><thead><tr><th>Round</th><th>What it added</th><th>Score</th><th>Lift</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  function officialVerdictFor(briefing, n) {
+    var gd = briefing.gate_decision;
+    if (!gd || !gd.verdicts) return null;
+    for (var i = 0; i < gd.verdicts.length; i++) if (gd.verdicts[i].candidate === n) return gd.verdicts[i];
+    return null;
+  }
+
+  function renderCandidate(briefing, c) {
+    var key = briefing.id + ':' + c.n;
+    var html = '<div class="signal-card cand" data-key="' + Shell.esc(key) + '">' +
+      '<div class="sc-top"><span class="sc-title">#' + Shell.esc(String(c.n)) + ' · ' + Shell.esc(c.title) + '</span>';
+    if (c.adversary) html += '<span title="Adversary verdict">[Adversary: ' + verdictPill(c.adversary) + ']</span>';
+    else html += '<span class="footnote" title="Briefing #1 pre-dates the formalized per-candidate adversary verdict">[Adversary: pre-verdict run]</span>';
+    html += statusPill(c.status) + '</div>' +
+      '<div class="sc-body">' + Shell.esc(c.detail) + '</div>';
+
+    var official = officialVerdictFor(briefing, c.n);
+    var gates = loadGates();
+    var local = gates[key];
+
+    if (official) {
+      html += '<div class="gate-rec"><b>Gate decision (recorded in the ledger):</b> ' + verdictPill(official.verdict) +
+        (official.note ? ' — ' + Shell.esc(official.note) : '') +
+        ' <span class="footnote">· ' + Shell.esc(briefing.gate_decision.date) + ' · by ' + Shell.esc(briefing.gate_decision.by) + '</span></div>';
+    } else if (local) {
+      html += '<div class="gate-rec"><b>Your local decision:</b> ' + verdictPill(local.verdict) +
+        (local.note ? ' — ' + Shell.esc(local.note) : '') +
+        ' <span class="footnote">· ' + Shell.esc(local.date) + ' · ' + Shell.esc(local.by) + ' (localStorage only — nothing was applied or sent)</span>' +
+        '<span class="clear-link" data-clear="' + Shell.esc(key) + '">clear</span></div>';
+    } else {
+      html += '<div class="verdicts">' +
+        '<button class="btn approve" type="button" data-gate="APPROVED" data-key="' + Shell.esc(key) + '">Approve</button>' +
+        '<button class="btn modify" type="button" data-gate="MODIFIED" data-key="' + Shell.esc(key) + '">Modify</button>' +
+        '<button class="btn decline" type="button" data-gate="DECLINED" data-key="' + Shell.esc(key) + '">Decline</button>' +
+        '<span class="footnote">Recorded to this browser only. Approval unlocks — it never auto-applies.</span></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderBriefing(b, idx) {
+    var html = '<div class="panel briefing" id="' + Shell.esc(b.id) + '">';
+    html += '<div class="b-head">' +
+      '<div class="scoreRing" style="--val:' + (Number(b.readiness) || 0) + '"><div class="val">' + Shell.esc(String(b.readiness)) + '</div><div class="of">/100</div></div>' +
+      '<div style="flex:1; min-width:240px"><div class="b-title">Briefing #' + (idx + 1) + ' — ' + Shell.esc(b.date) + '</div>' +
+      '<div style="margin:4px 0">' + Shell.pill('Intensity: ' + b.intensity, 'gold') + ' ' + Shell.pill(b.metric.name, 'info') + '</div>' +
+      '<div style="font-size:13px; color:var(--muted)"><b style="color:var(--gold)">Local North Star:</b> ' + Shell.esc(b.local_north_star) + '</div></div></div>';
+
+    html += '<div class="row" style="margin:6px 0">' + b.metric.dimensions.map(function (d) {
+      return '<span class="chip">' + Shell.esc(d.dim) + ' <b style="color:var(--gold)">/' + Shell.esc(String(d.weight)) + '</b></span>';
+    }).join('') + '</div>';
+    if (b.metric.baseline_note) html += '<p class="footnote">' + Shell.esc(b.metric.baseline_note) + '</p>';
+
+    html += renderRounds(b.rounds);
+    html += '<div class="status-row warn" style="margin-top:10px"><span class="st">STOP</span><span class="grow">' + Shell.esc(b.stop_reason) + '</span></div>';
+
+    if (b.adversary_summary) {
+      html += '<details class="fold"><summary>Adversary pass — Anti-Kool-Aid summary (this run half-refuted our own shipped engine)</summary>' +
+        '<div class="det-body">' + Shell.esc(b.adversary_summary) + '</div></details>';
+    }
+
+    html += '<h3 style="margin-top:14px">Candidates — each PENDING the human gate</h3>';
+    html += '<div class="cands">' + b.candidates.map(function (c) { return renderCandidate(b, c); }).join('') + '</div>';
+
+    if (!b.gate_decision) {
+      html += '<div class="status-row warn"><span class="st">Gate</span><span class="grow">Gate decision in the ledger: <b>OPEN — awaiting Tim.</b> ' +
+        'Decisions you record above stay in this browser (exportable below) until they are written back to the real ledger by a human.</span></div>';
+    }
+
+    if (b.sources && b.sources.length) {
+      html += '<details class="fold"><summary>Sources (' + b.sources.length + ')</summary><div class="det-body"><ul class="src-list">' +
+        b.sources.map(function (s) {
+          return '<li><a href="' + Shell.esc(s.url) + '" target="_blank" rel="noopener">' + Shell.esc(s.label) + '</a></li>';
+        }).join('') + '</ul></div></details>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderLedger() {
+    var box = document.getElementById('briefings');
+    if (!LEDGER || !box) return;
+    box.innerHTML = LEDGER.briefings.map(renderBriefing).join('');
+
+    /* inbound */
+    var inb = document.getElementById('inbound');
+    if (inb && LEDGER.inbound && LEDGER.inbound.length) {
+      inb.innerHTML = LEDGER.inbound.map(function (i) {
+        return '<details class="fold"><summary>Inbound — ' + Shell.esc(i.date) + ' · ' + Shell.esc(i.title) + '</summary>' +
+          '<div class="det-body"><p>' + Shell.esc(i.summary) + '</p>' +
+          (i.replies || []).map(function (r) {
+            return '<blockquote style="font-size:12.5px">"' + Shell.esc(r.quote) + '"<br><span class="footnote">— ' + Shell.esc(r.from) + ', ' + Shell.esc(r.date) +
+              '. Read: ' + Shell.esc(r.read) + '</span></blockquote>';
+          }).join('') +
+          '<div class="status-row warn"><span class="st">Gated</span><span class="grow">' + Shell.esc(i.gated_state) + '</span></div>' +
+          '<p class="footnote">' + Shell.esc(i.action_taken) + '</p></div></details>';
+      }).join('');
+    }
+    gateCount();
+  }
+
+  /* gate button + clear-link handling (event delegation, re-render after change) */
+  document.addEventListener('click', function (ev) {
+    var t = ev.target;
+    if (t && t.getAttribute && t.getAttribute('data-gate')) {
+      var key = t.getAttribute('data-key');
+      var verdict = t.getAttribute('data-gate');
+      var note = '';
+      if (verdict === 'MODIFIED') {
+        note = window.prompt('Modify — describe the modification (recorded with your decision):', '') || '';
+      }
+      var gates = loadGates();
+      gates[key] = { verdict: verdict, note: note, date: new Date().toISOString().slice(0, 10), by: 'Tim (this browser)' };
+      saveGates(gates);
+      renderLedger();
+    } else if (t && t.getAttribute && t.getAttribute('data-clear')) {
+      var gates2 = loadGates();
+      delete gates2[t.getAttribute('data-clear')];
+      saveGates(gates2);
+      renderLedger();
+    }
+  });
+
+  /* export / import — nothing is trapped */
+  var btnExp = document.getElementById('btn-export-gates');
+  if (btnExp) btnExp.addEventListener('click', function () {
+    var blob = new Blob([JSON.stringify(loadGates(), null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'hb1000-ai-research-gates.json';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 300);
+  });
+  var btnImp = document.getElementById('btn-import-gates');
+  var fileImp = document.getElementById('file-import-gates');
+  if (btnImp && fileImp) {
+    btnImp.addEventListener('click', function () { fileImp.click(); });
+    fileImp.addEventListener('change', function () {
+      var f = fileImp.files && fileImp.files[0];
+      if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function () {
+        try {
+          var incoming = JSON.parse(rd.result);
+          var gates = loadGates(), k;
+          for (k in incoming) if (Object.prototype.hasOwnProperty.call(incoming, k)) gates[k] = incoming[k];
+          saveGates(gates);
+          renderLedger();
+        } catch (e) { window.alert('Import failed: not valid JSON.'); }
+        fileImp.value = '';
+      };
+      rd.readAsText(f);
+    });
+  }
+
+  Shell.loadJSON('data/ai-research-ledger.json').then(function (data) {
+    LEDGER = data;
+    /* intensity table */
+    var tbl = document.querySelector('#intensity-table tbody');
+    if (tbl && data.meta && data.meta.intensity_levels) {
+      tbl.innerHTML = data.meta.intensity_levels.map(function (l) {
+        var primal = /PRIMAL/.test(l.level) ? ' class="primal"' : '';
+        return '<tr' + primal + '><td>' + Shell.esc(l.level) + '</td><td>' + Shell.esc(l.push) + '</td><td>' + Shell.esc(l.use) + '</td></tr>';
+      }).join('');
+    }
+    /* stop rules */
+    var sr = document.getElementById('stop-rules');
+    if (sr && data.meta && data.meta.stop_rules) {
+      sr.innerHTML = data.meta.stop_rules.map(function (r, i) {
+        return '<div class="status-row warn"><span class="st">Stop ' + (i + 1) + '</span><span class="grow">' + Shell.esc(r) + '</span></div>';
+      }).join('');
+    }
+    renderLedger();
+  }).catch(function () {
+    failNote('briefings', 'data/ai-research-ledger.json');
+    var tbl = document.querySelector('#intensity-table tbody');
+    if (tbl) tbl.innerHTML = '<tr><td colspan="3" class="muted">Data unavailable — see notice below.</td></tr>';
+    var sr = document.getElementById('stop-rules');
+    if (sr) sr.innerHTML = '<p class="footnote">Data unavailable — see the notice in the ledger panel below.</p>';
+  });
+
+  /* ===== Standing Orders + Constitutional Rules ===== */
+  Shell.loadJSON('data/standing-orders.json').then(function (data) {
+    var box = document.getElementById('standing-orders');
+    if (!box) return;
+    var html = '';
+
+    html += data.standing_orders.map(function (o) {
+      var grp = o.group === 'SIC' ? Shell.pill('SIC', 'gold') : Shell.pill(o.group, 'info');
+      return '<details class="fold"><summary>Standing Order #' + Shell.esc(String(o.n)) + ' — ' + Shell.esc(o.title) + ' ' + grp + '</summary>' +
+        '<div class="det-body"><ul>' + o.rules.map(function (r) { return '<li>' + Shell.esc(r) + '</li>'; }).join('') + '</ul></div></details>';
+    }).join('');
+
+    var cr = data.constitutional_rules;
+    html += '<details class="fold"><summary>' + Shell.esc(cr.label) + '</summary><div class="det-body">' +
+      '<p class="footnote">' + Shell.esc(cr.intro) + '</p><ol>' +
+      cr.rules.map(function (r) { return '<li>' + Shell.esc(r) + '</li>'; }).join('') + '</ol></div></details>';
+
+    if (data.enforcement) {
+      html += '<details class="fold"><summary>' + Shell.esc(data.enforcement.label) + '</summary><div class="det-body"><p>' +
+        Shell.esc(data.enforcement.text) + '</p></div></details>';
+    }
+    if (data.meta && data.meta.amendment_pattern) {
+      html += '<p class="footnote">Amendment pattern: ' + Shell.esc(data.meta.amendment_pattern) + '</p>';
+    }
+    box.innerHTML = html;
+
+    var tp = document.getElementById('transparency');
+    if (tp && data.transparency_addendum) {
+      tp.innerHTML = '<ul style="font-size:13.5px; margin:0; padding-left:20px">' +
+        data.transparency_addendum.rules.map(function (r) { return '<li>' + Shell.esc(r) + '</li>'; }).join('') + '</ul>';
+    }
+  }).catch(function () {
+    failNote('standing-orders', 'data/standing-orders.json');
+    var tp = document.getElementById('transparency');
+    if (tp) tp.innerHTML = '<p class="footnote" style="margin:0">Data unavailable — see the notice above.</p>';
+  });
+
+  /* ===== Council of 9 Elders ===== */
+  Shell.loadJSON('data/elders.json').then(function (data) {
+    var box = document.getElementById('council');
+    if (!box) return;
+
+    var rows = data.elders.map(function (e) {
+      var cls = e.cross_cutting ? ' class="elder-row nsa"' : ' class="elder-row"';
+      var name = Shell.esc(e.name) + (e.cross_cutting ? ' ' + Shell.pill('cross-cutting', 'gold') : '');
+      return '<tr' + cls + '><td class="num">' + Shell.esc(String(e.seat)) + '</td><td><b>' + name + '</b></td>' +
+        '<td>' + Shell.esc(e.portfolio) + '</td><td style="font-style:italic; color:var(--muted)">"' + Shell.esc(e.cliche) + '"</td></tr>';
+    }).join('');
+
+    var tenth = data.tenth_seat;
+    rows += '<tr class="elder-row reserved"><td class="num">10</td><td><b>Reserved</b></td>' +
+      '<td>Candidates: ' + tenth.candidates.map(Shell.esc).join(' · ') + '</td><td>—</td></tr>';
+
+    var nsa = null;
+    data.elders.forEach(function (e) { if (e.cross_cutting) nsa = e; });
+
+    box.innerHTML = '<div class="panel" style="overflow-x:auto"><table>' +
+      '<thead><tr><th>Seat</th><th>Elder</th><th>Portfolio</th><th>Cliché</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      (nsa && nsa.notes ? '<p class="footnote" style="margin-top:10px"><b style="color:var(--gold)">NSA — the 9th Elder:</b> ' + Shell.esc(nsa.notes) + '</p>' : '') +
+      '</div>';
+
+    var meta = document.getElementById('council-meta');
+    if (meta && data.meta) {
+      var cov = (data.meta.covenant || []).map(function (c) {
+        return '<div class="status-row ok"><span class="st">Covenant</span><span class="grow">' + Shell.esc(c) + '</span></div>';
+      }).join('');
+      meta.innerHTML = '<div class="panel tight">' + cov +
+        '<blockquote style="font-size:12.5px">' + Shell.esc(data.meta.why_nsa_got_her_seat) + '</blockquote>' +
+        '<p class="footnote">' + Shell.esc(data.meta.voice) + '</p>' +
+        '<p class="footnote">' + Shell.esc(data.meta.governance) + '</p>' +
+        '<p class="footnote"><b style="color:var(--gold)">Bartender Briefing:</b> ' + Shell.esc(data.bartender_briefing) + '</p></div>';
+    }
+  }).catch(function () {
+    failNote('council', 'data/elders.json');
+  });
+})();
+</script>
+</body>
+</html>

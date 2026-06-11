@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dingo City — The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏙️</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* ---- Dingo City page-specific ---- */
+  [hidden]{display:none !important}
+  .citybar{display:flex; gap:26px; flex-wrap:wrap; align-items:center}
+  .citybar .kpi{display:flex; align-items:baseline; gap:9px}
+  .citybar .kpi .n{font-size:25px; font-weight:900; color:#fff}
+  .citybar .kpi.bad .n{color:var(--red)}
+  .citybar .kpi .l{font-size:12px; color:var(--muted); line-height:1.3}
+  .citybar .kpi .l small{display:block; color:var(--soft); font-size:10.5px}
+
+  .viewtabs{display:flex; gap:8px; margin:16px 0 12px}
+  .viewtabs .btn.on{border-color:var(--gold); color:var(--gold); background:rgba(232,181,77,.12)}
+
+  #stage3d{
+    position:relative; height:62vh; min-height:430px;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius-lg);
+    overflow:hidden; touch-action:none; cursor:grab;
+  }
+  #stage3d.dragging{cursor:grabbing}
+  #stage3d canvas{display:block}
+  .hint3d{
+    position:absolute; top:10px; left:12px; font-size:11px; color:var(--muted);
+    background:rgba(7,11,16,.7); border:1px solid var(--line); border-radius:999px;
+    padding:3px 12px; pointer-events:none; z-index:4;
+  }
+  #tip{
+    position:absolute; display:none; max-width:290px; z-index:5; pointer-events:none;
+    background:var(--panel); border:1px solid var(--gold); border-radius:8px;
+    padding:8px 11px; font-size:12px;
+  }
+  #tip .t{font-weight:800}
+  #tip .s{color:var(--muted); margin-top:2px}
+  #tip .k{color:var(--soft); font-size:10.5px; margin-top:4px; text-transform:uppercase; letter-spacing:.07em}
+  .legend3d{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px}
+
+  .flowstrip{display:flex; gap:7px; flex-wrap:wrap; align-items:center; font-size:12px; color:var(--muted); margin:6px 0 16px}
+  .flowstrip .step{background:var(--panel-2); border:1px solid var(--line); border-radius:999px; padding:2px 10px}
+  .flowstrip .arrow{color:var(--gold); font-weight:800}
+  .flowstrip .halt{color:var(--red); border-color:rgba(224,85,107,.5)}
+
+  @media (max-width:680px){ #stage3d{height:54vh; min-height:340px} }
+</style>
+</head>
+<body>
+<main>
+  <h1>Dingo <b>City</b> — the two-ring Living Portfolio</h1>
+  <p class="muted" style="max-width:920px">
+    Germinating <b style="color:var(--gold)">Cloud Butterflies</b> in the sky — the <b style="color:var(--ink)">Nursery (inner ring)</b>.
+    Assigned cards as <b style="color:var(--ink)">buildings on the ground (outer ring)</b>, each a literal standing Dingo card:
+    5 floors × 5 wide, all the same height, <b style="color:var(--gold)">PTK</b> glowing gold at the centre.
+    The <b style="color:var(--ink)">Hunting Funnel</b> is the descent between them.
+  </p>
+  <div class="flowstrip" aria-label="The graduation pipeline">
+    <span class="step">Capture — Flypaper</span><span class="arrow">→</span>
+    <span class="step">Nursery (inner ring)</span><span class="arrow">→</span>
+    <span class="step">Score /100 · Now·Next·Later·Park·Kill</span><span class="arrow">→</span>
+    <span class="step halt">Twin North Star Gate — or HALT</span><span class="arrow">→</span>
+    <span class="step">Assignment — named the Dingo Caller</span><span class="arrow">→</span>
+    <span class="step">“Yes, I accept this assignment”</span><span class="arrow">→</span>
+    <span class="step">Outer ring · Active</span><span class="arrow">→</span>
+    <span class="step">ships · scored · the Genie remembers</span>
+  </div>
+
+  <div class="panel tight citybar" id="counts"><span class="muted">computing from data…</span></div>
+
+  <div class="viewtabs" role="tablist">
+    <button class="btn on" id="tab3d" role="tab" aria-selected="true">3D City</button>
+    <button class="btn" id="tab2d" role="tab" aria-selected="false">2D Grid</button>
+  </div>
+
+  <div id="notice3d" class="status-row warn" hidden>
+    <span class="st">2D fallback</span><span class="grow" id="noticeMsg"></span>
+  </div>
+
+  <section id="view3d">
+    <div id="stage3d">
+      <div class="hint3d">Drag to Rotate · Scroll to Zoom · click a building or butterfly</div>
+      <div id="tip"></div>
+    </div>
+    <div class="legend3d">
+      <span class="pill gold">gold centre window = PTK — Promises to Keep</span>
+      <span class="pill good">green</span><span class="pill warn">yellow</span><span class="pill danger">red — square RYG</span>
+      <span class="pill">grey windows = no card JSON yet</span>
+      <span class="pill info">sky = the Nursery (inner ring)</span>
+      <span class="pill">funnel = the Hunting Funnel descent</span>
+      <span class="pill danger">red label = ORPHAN — no Dingo Caller</span>
+      <span class="pill ruby">ruby roof strip = Ruby Red fork</span>
+    </div>
+    <div class="legend3d" aria-label="Marketing piping legend">
+      <span class="pill gold">marketing piping — flow is computed from the card, never asserted</span>
+      <span class="pill" style="color:var(--teal); border-color:rgba(54,194,180,.5)">teal pipe = Financial SoT ring</span>
+      <span class="pill" style="color:var(--blue); border-color:rgba(116,166,255,.5)">blue pipe = Blue Seal ring</span>
+      <span class="pill danger">red pipe = Sales &amp; Marketing ring</span>
+      <span class="pill good">particles green + fast = healthy flow</span>
+      <span class="pill danger">red + slow + stuttering = trouble</span>
+      <span class="pill gold">gold tint = Caller-heavy (over the 20% covenant)</span>
+      <span class="pill">dim pipe · no particles = no card JSON yet</span>
+    </div>
+  </section>
+
+  <section id="view2d" hidden>
+    <div class="sec-h">Outer ring — <b>assigned &amp; active</b> · buildings on the ground</div>
+    <div class="hub-grid" id="gridBuildings"></div>
+    <div class="sec-h">Inner ring — <b>the Nursery</b> · Cloud Butterflies in the sky</div>
+    <div class="hub-grid" id="gridFlies"></div>
+  </section>
+
+  <div id="loadErr" class="status-row bad" hidden>
+    <span class="st">data</span>
+    <span class="grow">Could not load <code>data/portfolio.json</code> / <code>data/butterflies.json</code>.
+    If you opened this file directly from disk, serve the <code>app/</code> folder over HTTP (browsers block
+    <code>fetch()</code> from <code>file://</code>).</span>
+  </div>
+
+  <p class="footnote">
+    Counts, orphan badges and window colours are computed from <code>data/portfolio.json</code>,
+    <code>data/butterflies.json</code> and the three real card JSONs at render — never asserted.
+    Callers resolve from the card JSON when one exists, else the portfolio catalogue.
+    Orphan alerts firing at seed are correct behaviour (target 0).
+    The marketing piping connects the three locked service rings to every building; particle speed,
+    colour and stutter are computed at render from each card's ticker RYG mix and 80/20 roll-up
+    (slider overrides included — the city flow matches the card roll-up). Buildings without a card
+    JSON keep dormant pipes and no particles. The tube-and-particle technique is inherited from the
+    model tour (legacy) — here it finally carries real data.
+  </p>
+</main>
+
+<div class="drawer" id="drawer" role="dialog" aria-label="Building details"></div>
+
+<script src="assets/shell.js"></script>
+<!-- Three.js 0.160.0 — vendored locally for MVP robustness (assets/vendor/); pinned unpkg CDN as fallback -->
+<script src="assets/vendor/three.min.js"></script>
+<script>
+/* vendored copy missing or blocked? fall back to the same pinned build on the unpkg CDN */
+if (typeof THREE === 'undefined') {
+  document.write('<script src="https://unpkg.com/three@0.160.0/build/three.min.js" onerror="window.__THREE_FAILED=true"><\/script>');
+}
+</script>
+<script>
+'use strict';
+Shell.init('city');
+
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Shell.esc;
+  var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var CARD_FILES = [
+    'data/cards/pawn-princess-pp01.json',
+    'data/cards/seba-hub-occupancy.json',
+    'data/cards/door-to-door.json'
+  ];
+
+  var state = { nodes: [], flies: [], buildings: [], sky: [] };
+
+  function cardSafe(p) { return Shell.loadJSON(p).catch(function () { return null; }); }
+
+  Promise.all([
+    Shell.loadJSON('data/portfolio.json'),
+    Shell.loadJSON('data/butterflies.json'),
+    cardSafe(CARD_FILES[0]), cardSafe(CARD_FILES[1]), cardSafe(CARD_FILES[2])
+  ]).then(function (r) { build(r[0], r[1], r[2], r[3], r[4]); })
+    .catch(function (err) {
+      console.warn('Dingo City data load failed:', err);
+      $('loadErr').hidden = false;
+      $('counts').innerHTML = '<span class="muted">no data loaded</span>';
+    });
+
+  /* ---------- data shaping (computed, never asserted) ---------- */
+
+  function callerShort(c) {
+    if (!c) return null;
+    var s = String(c).trim();
+    if (/^TBD/i.test(s)) return null;
+    s = s.split('—')[0].split('(')[0].trim();
+    return s || null;
+  }
+
+  function shortName(s) {
+    var t = String(s || '').split('—')[0].split('(')[0].trim();
+    if (t.length > 24) t = t.slice(0, 23) + '…';
+    return t;
+  }
+
+  function trunc(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+
+  function build(portfolio, lib, ppCard, sebaCard, d2dCard) {
+    state.nodes = (portfolio && portfolio.nodes) || [];
+    state.flies = (lib && lib.butterflies) || [];
+    var cardMap = {};
+    cardMap[CARD_FILES[0]] = ppCard;
+    cardMap[CARD_FILES[1]] = sebaCard;
+    cardMap[CARD_FILES[2]] = d2dCard;
+
+    var active = state.nodes.filter(function (n) { return n.ring === 'active'; });
+
+    var buildings = active.map(function (n) {
+      var cd = n.card ? (cardMap[n.card] || null) : null;
+      return {
+        node: n, card: n.card || null, cardData: cd, superseded: false,
+        callerName: callerShort(cd && cd.caller) || callerShort(n.caller)
+      };
+    });
+
+    /* the third real card — early draft, superseded by the Seba Hub Occupancy Engine */
+    buildings.push({
+      node: {
+        id: 'door-to-door-card',
+        name: 'Door-to-Door Occupancy Drive (pilot)',
+        family: 'B', status: "spec'd", ring: 'active', fork: 'universal',
+        local_ns: { declared: false, value: null, status: 'none' },
+        caller: null,
+        one_liner: 'Early draft occupancy card — superseded by the Seba Hub Occupancy Engine. Kept for lineage.',
+        notes: 'One of the three real seed cards (byte-identical). Badge: superseded.'
+      },
+      card: CARD_FILES[2], cardData: d2dCard, superseded: true,
+      callerName: callerShort(d2dCard && d2dCard.caller)
+    });
+
+    /* card-backed buildings first, so they land at the front of the ring */
+    buildings.sort(function (a, b) { return (b.cardData ? 1 : 0) - (a.cardData ? 1 : 0); });
+
+    state.buildings = buildings;
+    state.sky = state.flies.filter(function (f) { return f.stage === 'nursery' || f.stage === 'scored'; });
+
+    renderCounts(active);
+    render2D();
+
+    var threeOK = !window.__THREE_FAILED && typeof THREE !== 'undefined' && webglOK();
+    if (threeOK) {
+      try { init3D(); }
+      catch (e) { console.warn('3D init failed:', e); fallback2D('The 3D scene failed to start in this browser.'); }
+    } else {
+      fallback2D(window.__THREE_FAILED || typeof THREE === 'undefined'
+        ? 'Three.js could not load from the CDN (offline?).'
+        : 'WebGL is unavailable in this browser.');
+    }
+  }
+
+  function webglOK() {
+    try {
+      var c = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+    } catch (e) { return false; }
+  }
+
+  function renderCounts(active) {
+    var orph = state.buildings.filter(function (b) { return !b.callerName; });
+    function kpi(n, l, s, bad) {
+      return '<div class="kpi' + (bad ? ' bad' : '') + '"><span class="n num">' + n + '</span>' +
+        '<span class="l">' + esc(l) + '<small>' + esc(s) + '</small></span></div>';
+    }
+    $('counts').innerHTML =
+      kpi(state.buildings.length, 'buildings on the ground', active.length + ' active + 1 superseded draft') +
+      kpi(state.sky.length, 'Cloud Butterflies in the sky', 'the Nursery — inner ring') +
+      kpi(orph.length, 'ORPHAN — no Dingo Caller', '“one neck to choke” unnamed · target 0', orph.length > 0);
+  }
+
+  /* ---------- view tabs ---------- */
+
+  function setView(v) {
+    var is3d = v === '3d';
+    $('view3d').hidden = !is3d;
+    $('view2d').hidden = is3d;
+    $('tab3d').className = 'btn' + (is3d ? ' on' : '');
+    $('tab2d').className = 'btn' + (is3d ? '' : ' on');
+    $('tab3d').setAttribute('aria-selected', is3d ? 'true' : 'false');
+    $('tab2d').setAttribute('aria-selected', is3d ? 'false' : 'true');
+    if (is3d && onResize3D) onResize3D();
+  }
+  $('tab3d').addEventListener('click', function () { if (!$('tab3d').disabled) setView('3d'); });
+  $('tab2d').addEventListener('click', function () { setView('2d'); });
+
+  function fallback2D(msg) {
+    $('noticeMsg').textContent = msg + ' Showing the 2D fallback grid.';
+    $('notice3d').hidden = false;
+    $('tab3d').disabled = true;
+    setView('2d');
+  }
+
+  /* ---------- 2D fallback grid ---------- */
+
+  function statusKind(s) {
+    return { operating: 'good', shipped: 'good', built: 'info', partial: 'info', "spec'd": 'warn' }[s] || '';
+  }
+
+  function pillRow(b) {
+    var n = b.node, out = [];
+    if (b.callerName) out.push(Shell.pill('Caller: ' + b.callerName, 'good'));
+    else out.push(Shell.pill('⚠ ORPHAN — assign a Dingo Caller', 'danger'));
+    out.push(Shell.pill(n.status, statusKind(n.status)));
+    if (n.fork === 'ruby-red') out.push(Shell.pill('Ruby Red fork', 'ruby'));
+    if (n.fork === 'ruby-red-confirm') out.push(Shell.pill('Ruby Red? confirm — Standing Order #2', 'warn'));
+    return out.join(' ');
+  }
+
+  function lnsText(n) {
+    var l = n.local_ns || {};
+    if (l.declared && l.value) return '✅ ' + esc(l.value) + (l.status ? ' <span class="muted">(' + esc(l.status) + ')</span>' : '');
+    if (l.status === 'worksheet') return '⏳ worksheet' + (l.value ? ' — ' + esc(l.value) : '') + ' <span class="muted">(11-question Local NS worksheet on the <a href="north-star.html">North Star Builder</a>)</span>';
+    if (l.status === 'foraging') return '⏳ foraging — <span class="muted">“Draft it for me” mode on the <a href="north-star.html">North Star Builder</a></span>';
+    return '— none declared yet <span class="muted">(the Twin North Star Gate will HALT activation)</span>';
+  }
+
+  function cardHref(b) { return 'card.html?card=' + encodeURIComponent(b.card.split('/').pop()); }
+
+  function render2D() {
+    var bWrap = $('gridBuildings'), fWrap = $('gridFlies');
+
+    bWrap.innerHTML = state.buildings.map(function (b) {
+      var n = b.node;
+      var href = b.card ? cardHref(b) : '#';
+      var cls = 'link-card' + (n.fork === 'ruby-red' ? ' ruby-accent' : '');
+      return '<a class="' + cls + '" data-id="' + esc(n.id) + '" href="' + esc(href) + '">' +
+        '<div class="lc-t">🏢 ' + esc(n.name) + (b.superseded ? ' <span class="badge-superseded">superseded</span>' : '') + '</div>' +
+        '<div style="margin:4px 0">' + pillRow(b) + '</div>' +
+        '<div class="lc-d">' + esc(trunc(n.one_liner || n.notes || '', 130)) + '</div>' +
+        '<div class="lc-k">' + (b.card ? 'open the Dingo card →' : 'details — no card JSON yet') + '</div></a>';
+    }).join('');
+
+    fWrap.innerHTML = state.sky.map(function (f) {
+      var score = (f.score && f.score.total != null)
+        ? Shell.pill(f.score.total + '/400', 'gold')
+        : Shell.pill('unscored (pre-rubric)', '');
+      var stage = f.stage === 'scored'
+        ? Shell.pill('scored — awaiting gate', 'warn')
+        : Shell.pill('Nursery — germinating', 'info');
+      var lean = f.lean_canvas_flag ? ' ' + Shell.pill('🏷️ LEAN CANVAS FLAG', 'gold') : '';
+      return '<a class="link-card" href="nursery.html?butterfly=' + encodeURIComponent(f.id) + '">' +
+        '<div class="lc-t">🦋 ' + esc(f.name) + '</div>' +
+        '<div style="margin:4px 0">' + score + ' ' + stage + lean + '</div>' +
+        '<div class="lc-d">' + esc(trunc(f.one_liner || '', 140)) + '</div>' +
+        '<div class="lc-k">first seen ' + esc(f.first_seen || '—') + ' → open in the Nursery</div></a>';
+    }).join('');
+
+    /* no-card buildings open the detail drawer instead of a dead link */
+    Array.prototype.forEach.call(bWrap.querySelectorAll('a[href="#"]'), function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var b = state.buildings.filter(function (x) { return x.node.id === a.getAttribute('data-id'); })[0];
+        if (b) openDrawer(b);
+      });
+    });
+  }
+
+  /* ---------- drawer (building detail when there is no card JSON yet) ---------- */
+
+  var drawer = $('drawer');
+
+  function openDrawer(b) {
+    var n = b.node;
+    var h = '<span class="d-x" id="dx" role="button" aria-label="Close">✕</span>' +
+      '<h2 style="margin-top:0">' + esc(n.name) + '</h2>' +
+      '<div class="row" style="margin:8px 0 12px">' + pillRow(b) + '</div>' +
+      (n.one_liner ? '<p>' + esc(n.one_liner) + '</p>' : '') +
+      '<div class="sec-h">Dingo Caller</div>' +
+      (b.callerName
+        ? '<p>' + esc(b.callerName) + ' — “one neck to choke”</p>'
+        : '<p>' + Shell.pill('⚠ ORPHAN — no named Dingo Caller', 'danger') + '</p>' +
+          '<p class="muted" style="font-size:12.5px">Assignment ends with the words <i>“Yes, I accept this assignment.”</i> ' +
+          'The one-click assign-a-Caller flow lives on the <a href="command.html">Command Deck</a>.</p>') +
+      (n.caller_candidate ? '<p class="muted" style="font-size:12.5px">Candidate: ' + esc(n.caller_candidate) + '</p>' : '') +
+      '<div class="sec-h">Local North Star</div><p>' + lnsText(n) + '</p>' +
+      (n.notes ? '<div class="sec-h">Notes</div><p class="muted" style="font-size:13px">' + esc(n.notes) + '</p>' : '') +
+      (n.live_link ? '<p><a href="' + esc(n.live_link) + '" target="_blank" rel="noopener">' + esc(n.live_link) + ' ↗</a></p>' : '');
+    if (b.card) {
+      h += '<p style="margin-top:16px"><a class="btn gold-cta" href="' + esc(cardHref(b)) + '">Open the Dingo card →</a></p>';
+    } else {
+      h += '<div class="sec-h">No Dingo card JSON yet</div>' +
+        '<p class="muted" style="font-size:13px">This operation is on the outer ring but its 5×5 card has not been populated. ' +
+        'The Dingo Card IS the operating system — its Caller populates the squares &amp; approves.</p>';
+    }
+    drawer.innerHTML = h;
+    drawer.classList.add('open');
+    $('dx').addEventListener('click', closeDrawer);
+  }
+  function closeDrawer() { drawer.classList.remove('open'); }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+
+  /* ==================== the 3D city ==================== */
+
+  var renderer, scene, camera, onResize3D = null;
+  var clickables = [], skySprites = [];
+  var BUILD_R = 58;
+
+  function init3D() {
+    var wrap = $('stage3d');
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+    wrap.appendChild(renderer.domElement);
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x070b10);
+    scene.fog = new THREE.Fog(0x070b10, 180, 380);
+
+    camera = new THREE.PerspectiveCamera(55, wrap.clientWidth / wrap.clientHeight, 0.1, 1000);
+
+    /* ground */
+    var ground = new THREE.Mesh(
+      new THREE.CircleGeometry(115, 64),
+      new THREE.MeshBasicMaterial({ color: 0x0a1019 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    scene.add(ground);
+
+    /* the three service rings — LOCKED inner→outer: Financial SoT (teal) → Blue Seal (blue) → Sales & Marketing (red) */
+    [[16, 0x36c2b4], [24, 0x74a6ff], [32, 0xe0556b]].forEach(function (rc) {
+      var ring = new THREE.Mesh(
+        new THREE.RingGeometry(rc[0] - 0.35, rc[0] + 0.35, 96),
+        new THREE.MeshBasicMaterial({ color: rc[1], transparent: true, opacity: 0.4, side: THREE.DoubleSide })
+      );
+      ring.rotation.x = -Math.PI / 2; ring.position.y = 0.06;
+      scene.add(ring);
+    });
+
+    /* faint outer ring where the buildings stand */
+    var oring = new THREE.Mesh(
+      new THREE.RingGeometry(BUILD_R - 8, BUILD_R + 8, 96),
+      new THREE.MeshBasicMaterial({ color: 0xe8b54d, transparent: true, opacity: 0.05, side: THREE.DoubleSide })
+    );
+    oring.rotation.x = -Math.PI / 2; oring.position.y = 0.04;
+    scene.add(oring);
+
+    /* the HB1000 sphere at dead centre — LOCKED orientation: blue-left / gold-right */
+    var core = new THREE.Group();
+    core.add(new THREE.Mesh(new THREE.SphereGeometry(4.2, 32, 24, 0, Math.PI),
+      new THREE.MeshBasicMaterial({ color: 0xe8b54d })));            /* gold half */
+    core.add(new THREE.Mesh(new THREE.SphereGeometry(4.2, 32, 24, Math.PI, Math.PI),
+      new THREE.MeshBasicMaterial({ color: 0x74a6ff })));            /* blue half */
+    core.rotation.y = Math.PI / 2;   /* from the default camera: blue on the left, gold on the right */
+    core.position.y = 5;
+    scene.add(core);
+
+    /* the Hunting Funnel — the descent from the Nursery sky to the ground */
+    var funnel = new THREE.Mesh(
+      new THREE.CylinderGeometry(23, 3, 27, 36, 5, true),
+      new THREE.MeshBasicMaterial({ color: 0xe8b54d, wireframe: true, transparent: true, opacity: 0.14, side: THREE.DoubleSide })
+    );
+    funnel.position.y = 23;
+    scene.add(funnel);
+
+    /* ── the Marketing Circulatory System — service-ring piping ──
+       Technique inherited from the model tour (legacy): CatmullRomCurve3
+       paths swept with TubeGeometry, particles flowing along the curve.
+       Completed here with real data: particle speed, colour and stutter
+       are computed at render from each card's ticker RYG mix and 80/20
+       roll-up. No card JSON → dormant pipe, no particles — no flow
+       asserted. prefers-reduced-motion → static pipes, no particles. */
+    buildPiping();
+
+    /* buildings — literal standing Dingo cards: 5 floors × 5 wide, all the same height */
+    var boxGeo = new THREE.BoxGeometry(10, 16, 10);
+    state.buildings.forEach(function (b, i) {
+      var a = angleOf(i);
+      var side = new THREE.MeshBasicMaterial({ map: makeFacade(b) });
+      var cap = new THREE.MeshBasicMaterial({ color: b.node.fork === 'ruby-red' ? 0xC4302B : 0x16202c });
+      var mesh = new THREE.Mesh(boxGeo, [side, side, cap, cap, side, side]);
+      mesh.position.set(Math.sin(a) * BUILD_R, 8, Math.cos(a) * BUILD_R);
+      mesh.rotation.y = a;
+      mesh.userData = { type: 'building', b: b };
+      scene.add(mesh); clickables.push(mesh);
+
+      var lab = makeLabel(b);
+      lab.position.set(mesh.position.x, 20.8, mesh.position.z);
+      lab.userData = { type: 'building', b: b };
+      scene.add(lab); clickables.push(lab);
+    });
+
+    /* Cloud Butterflies drifting in the sky — the Nursery, inner ring */
+    state.sky.forEach(function (f, i) {
+      var sp = makeButterfly(f, i);
+      scene.add(sp); clickables.push(sp); skySprites.push(sp);
+    });
+
+    initOrbit(wrap);
+    animate();
+  }
+
+  function angleOf(i) { return (i / state.buildings.length) * Math.PI * 2; }
+
+  function roundRect(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r);
+    g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  }
+
+  function makeFacade(b) {
+    var cv = document.createElement('canvas'); cv.width = 256; cv.height = 384;
+    var g = cv.getContext('2d');
+    g.fillStyle = '#101a26'; g.fillRect(0, 0, 256, 384);
+    /* roofline strip (ruby accent ONLY on the Ruby Red fork) */
+    g.fillStyle = b.node.fork === 'ruby-red' ? '#C4302B' : '#1b2836';
+    g.fillRect(0, 0, 256, 10);
+    /* ticker-tape band — between the top of the windows and the roofline */
+    g.fillStyle = '#0a0e14'; g.fillRect(0, 10, 256, 46);
+    var nm = shortName(b.node.name).toUpperCase(), fs = 20;
+    g.font = '800 ' + fs + 'px Inter, "Segoe UI", sans-serif';
+    while (g.measureText(nm).width > 236 && fs > 11) { fs--; g.font = '800 ' + fs + 'px Inter, "Segoe UI", sans-serif'; }
+    while (g.measureText(nm).width > 236 && nm.length > 4) { nm = nm.slice(0, nm.length - 2) + '…'; }
+    g.fillStyle = '#e8b54d'; g.textBaseline = 'middle';
+    g.fillText(nm, 10, 30);
+    if (b.superseded) {
+      g.fillStyle = '#5c768a'; g.font = '800 11px Inter, "Segoe UI", sans-serif';
+      g.fillText('SUPERSEDED', 10, 48);
+    }
+    /* 5×5 windows — colour = square RYG; PTK glows gold at the centre */
+    var sq = (b.cardData && Array.isArray(b.cardData.squares)) ? b.cardData.squares : null;
+    var RYG = { green: '#46c66d', yellow: '#e8c24d', red: '#e0556b' };
+    for (var r = 0; r < 5; r++) {
+      for (var c = 0; c < 5; c++) {
+        var x = 14 + c * 46, y = 66 + r * 60, col = '#1d2a37', glow = 0, ptk = false;
+        if (sq) {
+          var s = sq[r * 5 + c] || {};
+          if (s.ptk) { col = '#f5c76a'; glow = 18; ptk = true; }
+          else { col = RYG[s.ryg] || RYG.green; glow = 9; }
+        }
+        g.save();
+        if (glow) { g.shadowColor = col; g.shadowBlur = glow; }
+        g.fillStyle = col; g.fillRect(x, y, 34, 40);
+        if (ptk) { g.strokeStyle = '#fff3d6'; g.lineWidth = 2; g.strokeRect(x - 2, y - 2, 38, 44); }
+        g.restore();
+      }
+    }
+    var tex = new THREE.CanvasTexture(cv);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 4;
+    return tex;
+  }
+
+  function makeLabel(b) {
+    var cv = document.createElement('canvas'); cv.width = 512; cv.height = 128;
+    var g = cv.getContext('2d');
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.shadowColor = 'rgba(0,0,0,.85)'; g.shadowBlur = 6;
+    g.font = '600 26px Inter, "Segoe UI", sans-serif'; g.fillStyle = '#e9eef4';
+    var nm = shortName(b.node.name);
+    while (g.measureText(nm).width > 490 && nm.length > 4) nm = nm.slice(0, -2) + '…';
+    g.fillText(nm, 256, 32);
+    if (b.callerName) {
+      g.font = '800 32px Inter, "Segoe UI", sans-serif'; g.fillStyle = '#e8b54d';
+      g.fillText('Caller: ' + b.callerName, 256, 86);
+    } else {
+      g.font = '900 30px Inter, "Segoe UI", sans-serif';
+      var w = g.measureText('⚠ ORPHAN').width + 40;
+      g.shadowBlur = 0; g.fillStyle = '#e0556b';
+      roundRect(g, 256 - w / 2, 62, w, 48, 12); g.fill();
+      g.fillStyle = '#ffffff';
+      g.fillText('⚠ ORPHAN', 256, 87);
+    }
+    var tex = new THREE.CanvasTexture(cv);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+    sp.scale.set(19, 4.75, 1);
+    return sp;
+  }
+
+  function makeButterfly(f, i) {
+    var cols = ['#e8b54d', '#f5c76a', '#ff9fb2', '#ff8d86'];
+    var col = cols[i % cols.length];
+    var cv = document.createElement('canvas'); cv.width = 128; cv.height = 128;
+    var g = cv.getContext('2d');
+    g.translate(64, 64);
+    g.shadowColor = col; g.shadowBlur = 18; g.fillStyle = col;
+    [[-21, -13, 21, 14, -0.45], [21, -13, 21, 14, 0.45], [-15, 17, 14, 11, -0.3], [15, 17, 14, 11, 0.3]]
+      .forEach(function (w) {
+        g.beginPath(); g.ellipse(w[0], w[1], w[2], w[3], w[4], 0, Math.PI * 2); g.fill();
+      });
+    g.shadowBlur = 0; g.fillStyle = '#0d141d';
+    g.fillRect(-3, -28, 6, 56);
+    var tex = new THREE.CanvasTexture(cv);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+    var rad = 14 + Math.random() * 13, ang = Math.random() * Math.PI * 2, h = 37 + Math.random() * 16;
+    sp.userData = {
+      type: 'butterfly', f: f,
+      rad: rad, ang: ang, h: h,
+      speed: 0.05 + Math.random() * 0.09, phase: Math.random() * Math.PI * 2
+    };
+    sp.scale.set(4.2, 4.2, 1);
+    sp.position.set(Math.sin(ang) * rad, h, Math.cos(ang) * rad);
+    return sp;
+  }
+
+  /* ---------- the marketing piping (3D) — flow IS the KPI state ---------- */
+
+  var flowParticles = [];
+  /* LOCKED service-ring order & colours, inner→outer: Financial SoT (teal) →
+     Blue Seal (blue) → Sales & Marketing (red). Each ring feeds every building. */
+  var SERVICE_RINGS = [
+    { r: 16, color: 0x36c2b4, off: -2.3, entryY: 1.1 },
+    { r: 24, color: 0x74a6ff, off: 0,    entryY: 1.9 },
+    { r: 32, color: 0xe0556b, off: 2.3,  entryY: 2.7 }
+  ];
+
+  /* same slider-override law as card.html — the city roll-up matches the card roll-up */
+  var sliderOv = {};
+  try { sliderOv = JSON.parse(localStorage.getItem('hb1000-card-sliders')) || {}; } catch (e) {}
+
+  /* health ∈ 0..1 from the ticker RYG mix (primary) + square RYG mix; human = 80/20 roll-up.
+     Returns null when there is no card JSON — nothing computed, nothing asserted. */
+  function flowStats(b) {
+    var cd = b.cardData;
+    if (!cd || !Array.isArray(cd.squares)) return null;
+    var file = String(b.card || '').split('/').pop().replace(/\.json$/i, '');
+    var W = { green: 1, yellow: 0.5, red: 0 };
+    function wOf(x) { return W[x] === undefined ? 0.5 : W[x]; }
+    var tk = Array.isArray(cd.ticker) ? cd.ticker : [];
+    var th = tk.length ? tk.reduce(function (a, t) { return a + wOf(t.ryg); }, 0) / tk.length : null;
+    var sqs = cd.squares.filter(function (s) { return !s.ptk; });
+    var sh = sqs.length ? sqs.reduce(function (a, s) { return a + wOf(s.ryg || 'green'); }, 0) / sqs.length : null;
+    var health = th === null ? sh : (sh === null ? th : th * 0.7 + sh * 0.3);
+    if (health === null) return null;
+    var human = 20;
+    if (sqs.length) {
+      human = Math.round(sqs.reduce(function (a, s) {
+        var o = sliderOv[file + ':' + s.id];
+        var v = (o === undefined || o === null) ? (s.human === undefined ? 20 : s.human) : o;
+        return a + Math.max(0, Math.min(100, Number(v)));
+      }, 0) / sqs.length);
+    }
+    return { health: health, human: human };
+  }
+
+  /* encoding: red→yellow→green by health, then lerped toward gold as the
+     Caller share rises past the 20% covenant (gold = human-heavy). */
+  function flowColor(st) {
+    var c = st.health < 0.5
+      ? new THREE.Color(0xe0556b).lerp(new THREE.Color(0xe8c24d), st.health * 2)
+      : new THREE.Color(0xe8c24d).lerp(new THREE.Color(0x46c66d), (st.health - 0.5) * 2);
+    var g = Math.max(0, Math.min(1, (st.human - 20) / 40));
+    if (g > 0) c.lerp(new THREE.Color(0xe8b54d), g * 0.55);
+    return c;
+  }
+
+  /* point at radius `rad` along building angle `a`, pushed `toff` along the tangent */
+  function pipePoint(a, rad, toff, y) {
+    return new THREE.Vector3(
+      Math.sin(a) * rad + Math.cos(a) * toff,
+      y,
+      Math.cos(a) * rad - Math.sin(a) * toff
+    );
+  }
+
+  function buildPiping() {
+    var sphereGeo = new THREE.SphereGeometry(0.42, 6, 6);
+    state.buildings.forEach(function (b, i) {
+      var a = angleOf(i);
+      b.flow = flowStats(b);
+      SERVICE_RINGS.forEach(function (ring, k) {
+        var pts = [
+          pipePoint(a, ring.r, ring.off * 0.25, 0.12),
+          pipePoint(a, ring.r + (52 - ring.r) * 0.45, ring.off * 0.7, 0.6 + k * 0.25),
+          pipePoint(a, ring.r + (52 - ring.r) * 0.85, ring.off, ring.entryY * 0.75),
+          pipePoint(a, 53.8, ring.off, ring.entryY)   /* into the building's inner face */
+        ];
+        var curve = new THREE.CatmullRomCurve3(pts);
+        var live = !!b.flow;
+        var tube = new THREE.Mesh(
+          new THREE.TubeGeometry(curve, 28, live ? 0.26 : 0.15, 6, false),
+          new THREE.MeshBasicMaterial({
+            color: ring.color, transparent: true, opacity: live ? 0.5 : 0.16,
+            blending: THREE.AdditiveBlending, depthWrite: false
+          })
+        );
+        scene.add(tube);
+        if (live && !RM) {
+          var mat = new THREE.MeshBasicMaterial({
+            color: flowColor(b.flow), transparent: true, opacity: 0.95,
+            blending: THREE.AdditiveBlending, depthWrite: false
+          });
+          for (var p = 0; p < 6; p++) {
+            var m = new THREE.Mesh(sphereGeo, mat);
+            m.userData = {
+              curve: curve, t: p / 6,
+              speed: 0.05 + b.flow.health * 0.17,          /* green = fast · red = slow */
+              stutter: b.flow.health < 0.5,                /* trouble = the flow stutters */
+              phase: Math.random() * Math.PI * 2
+            };
+            m.position.copy(curve.getPointAt(m.userData.t));
+            scene.add(m);
+            flowParticles.push(m);
+          }
+        }
+      });
+    });
+  }
+
+  /* ---------- orbit (drag to rotate · scroll to zoom · pinch) ---------- */
+
+  var az = 0, polar = 1.05, dist = 150, target = null;
+  var pointers = {}, pCount = 0, moved = false, downXY = null, pinchD = 0;
+  var ray = null, mouseV = null;
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  function updateCam() {
+    camera.position.set(
+      target.x + dist * Math.sin(polar) * Math.sin(az),
+      target.y + dist * Math.cos(polar),
+      target.z + dist * Math.sin(polar) * Math.cos(az)
+    );
+    camera.lookAt(target);
+  }
+
+  function pinchDist() {
+    var ks = Object.keys(pointers);
+    if (ks.length < 2) return 0;
+    var a = pointers[ks[0]], b = pointers[ks[1]];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+
+  function initOrbit(wrap) {
+    target = new THREE.Vector3(0, 10, 0);
+    ray = new THREE.Raycaster();
+    mouseV = new THREE.Vector2();
+    updateCam();
+
+    var el = renderer.domElement;
+
+    el.addEventListener('pointerdown', function (e) {
+      el.setPointerCapture(e.pointerId);
+      pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      pCount = Object.keys(pointers).length;
+      if (pCount === 2) pinchD = pinchDist();
+      moved = false; downXY = { x: e.clientX, y: e.clientY };
+      wrap.classList.add('dragging');
+      hideTip();
+    });
+
+    el.addEventListener('pointermove', function (e) {
+      if (pointers[e.pointerId]) {
+        var p = pointers[e.pointerId];
+        if (pCount === 1) {
+          az -= (e.clientX - p.x) * 0.005;
+          polar = clamp(polar - (e.clientY - p.y) * 0.005, 0.25, 1.45);
+          updateCam();
+        }
+        p.x = e.clientX; p.y = e.clientY;
+        if (pCount === 2) {
+          var nd = pinchDist();
+          if (nd > 0 && pinchD > 0) { dist = clamp(dist * (pinchD / nd), 50, 260); updateCam(); }
+          pinchD = nd;
+        }
+        if (downXY && Math.hypot(e.clientX - downXY.x, e.clientY - downXY.y) > 5) moved = true;
+      } else {
+        hover(e);
+      }
+    });
+
+    function release(e) {
+      if (!pointers[e.pointerId]) return;
+      delete pointers[e.pointerId];
+      pCount = Object.keys(pointers).length;
+      if (pCount === 0) {
+        wrap.classList.remove('dragging');
+        if (!moved) clickAt(e);
+      }
+    }
+    el.addEventListener('pointerup', release);
+    el.addEventListener('pointercancel', release);
+    el.addEventListener('pointerleave', hideTip);
+
+    el.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      dist = clamp(dist * (e.deltaY > 0 ? 1.1 : 0.9), 50, 260);
+      updateCam();
+    }, { passive: false });
+
+    onResize3D = function () {
+      var w = wrap.clientWidth, h = wrap.clientHeight;
+      if (!w || !h) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    };
+    window.addEventListener('resize', onResize3D);
+  }
+
+  function pick(e) {
+    var r = renderer.domElement.getBoundingClientRect();
+    mouseV.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    mouseV.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(mouseV, camera);
+    var hit = ray.intersectObjects(clickables, false)[0];
+    return hit ? hit.object : null;
+  }
+
+  function hover(e) {
+    var obj = pick(e), tip = $('tip'), wrap = $('stage3d');
+    if (!obj) { hideTip(); wrap.style.cursor = 'grab'; return; }
+    wrap.style.cursor = 'pointer';
+    var u = obj.userData, html = '';
+    if (u.type === 'building') {
+      var b = u.b;
+      html = '<div class="t">🏢 ' + esc(b.node.name) + '</div>' +
+        '<div class="s">' + (b.callerName ? 'Dingo Caller: ' + esc(b.callerName) : '⚠ ORPHAN — no Dingo Caller') +
+        ' · ' + esc(b.node.status) + (b.superseded ? ' · superseded' : '') + '</div>' +
+        (b.flow
+          ? '<div class="s">marketing flow: ' + Math.round(b.flow.health * 100) + '% healthy · Caller ' + b.flow.human + '%' +
+            (b.flow.human > 20 ? ' — over the 20% covenant (gold tint)' : '') + '</div>'
+          : '<div class="s">pipes dormant — no card JSON yet, no flow asserted</div>') +
+        '<div class="k">' + (b.card ? 'click → the Dingo card' : 'click → details') + '</div>';
+    } else {
+      var f = u.f;
+      var sc = (f.score && f.score.total != null) ? f.score.total + '/400' : 'unscored (pre-rubric)';
+      html = '<div class="t">🦋 ' + esc(f.name) + '</div>' +
+        '<div class="s">' + esc(sc) + ' · ' + (f.stage === 'scored' ? 'scored — awaiting gate' : 'Nursery — germinating') + '</div>' +
+        '<div class="k">click → the Nursery</div>';
+    }
+    tip.innerHTML = html;
+    var wr = wrap.getBoundingClientRect();
+    tip.style.left = Math.min(e.clientX - wr.left + 14, wr.width - 300) + 'px';
+    tip.style.top = (e.clientY - wr.top + 12) + 'px';
+    tip.style.display = 'block';
+  }
+
+  function hideTip() { $('tip').style.display = 'none'; }
+
+  function clickAt(e) {
+    var obj = pick(e);
+    if (!obj) return;
+    var u = obj.userData;
+    if (u.type === 'building') {
+      if (u.b.card) window.location.href = cardHref(u.b);
+      else openDrawer(u.b);
+    } else if (u.type === 'butterfly') {
+      window.location.href = 'nursery.html?butterfly=' + encodeURIComponent(u.f.id);
+    }
+  }
+
+  var lastT = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!RM) {
+      var t = performance.now() / 1000;
+      var dt = Math.min(0.05, Math.max(0, t - lastT)); lastT = t;
+      for (var i = 0; i < skySprites.length; i++) {
+        var sp = skySprites[i], u = sp.userData;
+        u.ang += u.speed * 0.016;
+        sp.position.set(
+          Math.sin(u.ang) * u.rad,
+          u.h + Math.sin(t * 1.4 + u.phase) * 1.6,
+          Math.cos(u.ang) * u.rad
+        );
+        sp.material.rotation = Math.sin(t * 2 + u.phase) * 0.12;
+      }
+      /* marketing-flow particles — speed & stutter ARE the card's KPI state */
+      for (var j = 0; j < flowParticles.length; j++) {
+        var fp = flowParticles[j], fu = fp.userData;
+        var spd = fu.speed * (fu.stutter ? 0.25 + 0.75 * Math.max(0, Math.sin(t * 3.1 + fu.phase)) : 1);
+        fu.t = (fu.t + spd * dt) % 1;
+        fp.position.copy(fu.curve.getPointAt(fu.t));
+        fp.scale.setScalar(1 + 0.3 * Math.sin(t * 4 + fu.phase + fu.t * 7));
+      }
+    }
+    renderer.render(scene, camera);
+  }
+})();
+</script>
+</body>
+</html>

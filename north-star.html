@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>North Star Builder — The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ---------- North Star Builder page styles ---------- */
+button.chip{font-family:inherit;cursor:pointer}
+.scr-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+.scr-tabs .chip{font-size:13px;padding:8px 16px;font-weight:700}
+.hero{display:grid;grid-template-columns:1.35fr 1fr;gap:22px;align-items:center}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.hero figure{margin:0}
+.hero img{border-radius:var(--radius-lg);border:1px solid var(--line);display:block}
+.apex-star{font-size:30px;line-height:1}
+.prime-quote{font-size:16.5px;line-height:1.6;font-weight:600}
+.prime-strip{display:flex;gap:10px;align-items:flex-start;background:rgba(232,181,77,.06);
+  border:1px solid rgba(232,181,77,.4);border-radius:var(--radius);padding:10px 14px;
+  font-size:12.5px;margin:0 0 16px;position:sticky;top:0;z-index:5;backdrop-filter:blur(4px)}
+.prime-strip .star{font-size:16px}
+.prime-strip b{color:var(--gold)}
+
+/* gamified two-panel progress banner */
+.dd-banner{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:14px 0}
+@media (max-width:900px){.dd-banner{grid-template-columns:1fr}}
+.dd-banner h4{text-align:center;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 8px}
+.dd-banner .pane{position:relative}
+.dd-banner img{width:100%;display:block;border-radius:var(--radius-lg);border:1px solid var(--line)}
+.dd-banner .youhere img{filter:grayscale(60%) brightness(70%) opacity(.85)}
+.dd-banner .youhere svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.dd-banner .prog{position:absolute;left:0;right:0;bottom:10px;text-align:center}
+.dd-banner .prog span{display:inline-block;background:rgba(7,11,16,.85);border:1px solid rgba(232,181,77,.45);
+  border-radius:999px;padding:5px 16px;font-size:12.5px;font-weight:800;color:#fff}
+.dd-banner .prog small{display:block;color:var(--gold);font-weight:600}
+
+.qcard .qnum{display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--gold);color:#1a1206;
+  font-weight:900;align-items:center;justify-content:center;flex:0 0 auto}
+.qcard .qtext{font-size:16px;font-weight:700;line-height:1.4}
+.qcard textarea,.qcard input[type=text],.qcard input[type=number]{width:100%}
+.catchips{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0}
+.catchips .chip{font-size:10.5px;padding:2px 9px;cursor:default}
+.catchips .chip.done{border-color:var(--green);color:var(--green)}
+
+textarea,input[type=text],input[type=number],select{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--ink);
+  font-family:inherit;font-size:13.5px;padding:8px 11px}
+textarea{min-height:74px;resize:vertical}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--gold)}
+label.fld{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:12px 0 4px}
+label.fld .cnt{font-weight:600;text-transform:none;letter-spacing:0}
+label.fld .cnt.bad{color:var(--red)}
+label.fld .cnt.ok{color:var(--green)}
+
+/* hard-block gate fail box */
+.gate-fail{border:1px solid var(--red);background:rgba(224,85,107,.07);border-radius:var(--radius);padding:13px 16px;margin:12px 0}
+.gate-fail .gh{color:var(--red);font-weight:900;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px}
+.gate-fail li{margin:5px 0;font-size:13px}
+.gate-fail .fm{color:var(--orange);font-weight:700;font-size:11.5px}
+.gate-pass{border:1px solid var(--green);background:rgba(70,198,109,.07);border-radius:var(--radius);padding:13px 16px;margin:12px 0;color:var(--green);font-weight:700}
+
+/* Rhyme Test */
+.rhyme-check{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px}
+.rhyme-check:last-child{border-bottom:0}
+.rhyme-check .rc{font-size:15px;flex:0 0 auto}
+.flag-alignment{display:inline-block;padding:3px 12px;border-radius:6px;font-weight:900;font-size:11.5px;letter-spacing:.07em;
+  color:#1a1206;background:var(--orange);border:1px solid var(--orange)}
+
+/* Accordion Card — gold / navy, printable */
+.acc-card{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0}
+@media (max-width:900px){.acc-card{grid-template-columns:1fr}}
+.acc-panel{background:linear-gradient(180deg,#0d1b36,#091226);border:1px solid var(--gold);border-radius:var(--radius);
+  padding:13px 12px;min-height:190px}
+.acc-panel .at{color:var(--gold);font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:.13em;
+  border-bottom:1px solid rgba(232,181,77,.45);padding-bottom:6px;margin-bottom:8px}
+.acc-panel .ab{font-size:12px;line-height:1.5;color:#dce6f2}
+.acc-panel .ab .big{font-size:14.5px;font-weight:800;color:#fff}
+.acc-panel .ab ul{margin:4px 0;padding-left:16px}
+
+/* worksheet + forage */
+.ws-sec{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}
+.lns-card{border:1px solid var(--teal);border-radius:var(--radius-lg);padding:16px 18px;background:rgba(54,194,180,.04)}
+.lns-card h4{color:var(--teal);margin-bottom:8px}
+.lns-card dt{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-top:9px}
+.lns-card dd{margin:2px 0 0;font-size:13px}
+.conf{font-size:9.5px;font-weight:800;letter-spacing:.06em;padding:1px 6px;border-radius:4px;border:1px solid var(--line);vertical-align:middle}
+.conf.high{color:var(--green);border-color:rgba(70,198,109,.6)}
+.conf.med{color:var(--yellow);border-color:rgba(232,194,77,.6)}
+.conf.low{color:var(--red);border-color:rgba(224,85,107,.6)}
+.draft-tag{display:inline-block;background:rgba(232,194,77,.14);border:1px dashed var(--yellow);color:var(--yellow);
+  font-weight:900;font-size:11px;letter-spacing:.08em;border-radius:6px;padding:2px 10px}
+
+/* Twin North Star Gate */
+.gate-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:900px){.gate-cols{grid-template-columns:1fr}}
+.halt-box{border:2px solid var(--red);background:rgba(224,85,107,.08);border-radius:var(--radius-lg);padding:18px 20px;text-align:center}
+.halt-box .hb{font-size:21px;font-weight:900;color:var(--red);letter-spacing:.04em}
+.pass-box{border:2px solid var(--green);background:rgba(70,198,109,.08);border-radius:var(--radius-lg);padding:18px 20px;text-align:center}
+.pass-box .hb{font-size:19px;font-weight:900;color:var(--green)}
+.sigchip{cursor:pointer;user-select:none}
+.sigchip.signed{border-color:var(--green);color:var(--green);background:rgba(70,198,109,.08)}
+.ryg-strip td{font-size:13px}
+
+/* failure-mode table */
+.wef-table td:first-child{color:var(--muted)}
+.wef-table td:last-child{font-weight:800;color:var(--orange)}
+
+/* print: the Accordion Card doubles as the physical business card */
+@media print{
+  body.print-acc *{visibility:hidden}
+  body.print-acc #accPrintZone, body.print-acc #accPrintZone *{visibility:visible}
+  body.print-acc #accPrintZone{position:absolute;left:0;top:0;width:100%}
+  body.print-acc .acc-card{grid-template-columns:repeat(5,1fr)}
+  body.print-acc .acc-panel{background:#0d1b36 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #hb-sidebar,.guard-banner{display:none}
+  body.hb-shelled{padding-left:0}
+}
+</style>
+</head>
+<body>
+<main>
+
+  <h1>North Star <b>Builder</b></h1>
+  <p class="muted">Prime North Star (one, at the apex) · Local North Stars (many, each rhyming with the Prime) · a Vivid Vision for every Local / Dingo card — enforced by the <b style="color:var(--gold)">Twin North Star Gate</b> and the North Star Agent (NSA).</p>
+  <blockquote>"Measure twice, cut once. Get the North Star right and the project steers itself."</blockquote>
+
+  <div class="scr-tabs" role="tablist" aria-label="Builder screens">
+    <button class="chip on" data-scr="prime" role="tab">1 · Prime North Star</button>
+    <button class="chip" data-scr="local" role="tab">2 · Local North Stars</button>
+    <button class="chip" data-scr="vivid" role="tab">3 · Vivid Vision Builder</button>
+    <button class="chip" data-scr="gate" role="tab">4 · Twin North Star Gate</button>
+  </div>
+
+  <!-- ============================ SCREEN 1 — PRIME ============================ -->
+  <section id="scr-prime">
+    <div class="panel hero">
+      <div>
+        <div class="apex-star" aria-hidden="true">⭐</div>
+        <h2><b>PRIME NORTH STAR</b> — Your "Ding in the Universe" · Do-Before-I-Die.</h2>
+        <blockquote id="primeStatement" class="prime-quote">Loading the Prime verbatim from <code>data/north-stars.json</code>…</blockquote>
+        <p id="primeLitmus" class="muted footnote"></p>
+        <div class="row" style="margin-top:10px">
+          <span class="pill gold" id="primeVersionPill">Prime v2026.04 (default)</span>
+          <span class="pill" id="primeValuesPill"></span>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <a class="btn" href="purpose.html">Full "Do Before I Die" → Purpose DNA</a>
+          <button class="btn" id="btnEditPrime">Edit (local draft)</button>
+        </div>
+        <div id="primeEditWrap" hidden style="margin-top:12px">
+          <label class="fld" for="primeEditTa">Edit the Prime — saved as a LOCAL DRAFT only. The canon JSON never changes from here; Tim approves any change upstream.</label>
+          <textarea id="primeEditTa" rows="4"></textarea>
+          <div class="row" style="margin-top:8px">
+            <button class="btn approve" id="btnPrimeDraftSave">Save draft locally</button>
+            <button class="btn decline" id="btnPrimeDraftDiscard">Discard draft</button>
+          </div>
+        </div>
+        <div id="primeDraftNote" style="margin-top:8px"></div>
+      </div>
+      <figure>
+        <img src="assets/img/globe-north-star.webp" alt="Globe under the North Star — the Destiny Discovered banner imagery">
+        <figcaption class="footnote" style="margin-top:6px">North Star <b style="color:var(--gold)">UP — Aspirational</b>. ONE Prime per deployment, at the apex of the diamond. <a href="index.html">See it on the Model →</a></figcaption>
+      </figure>
+    </div>
+
+    <div class="sec-h">Two intake routes — <b>your choice</b> (Build-Your-Own-Life mode starts blank)</div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="ph">Route A — Quick stake (5 min)</div>
+        <p class="muted" style="font-size:13px">Free-text your "Do Before I Die" statement — two lines is enough to stake the claim.</p>
+        <textarea id="quickStakeTa" rows="3" placeholder="My Ding in the Universe is…"></textarea>
+        <blockquote style="font-size:12.5px">"If you can't say the 'Ding' it makes, keep refining it."</blockquote>
+        <div class="row">
+          <button class="btn approve" id="btnQuickStakeSave">Save my stake (locally)</button>
+          <span id="quickStakeNote" class="footnote"></span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph">Route B — Deep route · Destiny Discovered (30 questions)</div>
+        <p class="muted" style="font-size:13px">Based on 30 years of research studying over 1,600 biographies of great leaders. <i>"What makes the great, great is a sense of destiny."</i></p>
+        <p class="footnote">Tim's first pass took several months. Blanks are allowed — save-and-resume is on. Answers live only in this browser (localStorage).</p>
+        <div class="row">
+          <button class="btn gold-cta" id="btnStartDD">Begin / Resume the 30 questions</button>
+          <button class="btn" id="btnPrintBlank">Print blank questionnaire</button>
+          <button class="btn" id="btnPrintAnswers">Print my answers</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="ddWrap" hidden>
+      <div class="sec-h">Destiny <b>Discovered</b> — the gamified journey</div>
+      <div class="dd-banner">
+        <div class="pane">
+          <h4>The Destination</h4>
+          <img src="assets/img/globe-north-star.webp" alt="The Destination — your North Star, vibrant and bright">
+        </div>
+        <div class="pane youhere">
+          <h4>You Are Here</h4>
+          <img src="assets/img/globe-north-star.webp" alt="You Are Here — grayscale lifts as questions complete">
+          <svg id="ddClock" viewBox="0 0 400 400" aria-hidden="true"></svg>
+          <div class="prog"><span id="ddProgTxt">0/30 Questions Complete<small>0% of your journey</small></span></div>
+        </div>
+      </div>
+      <div class="catchips" id="ddCats"></div>
+      <div class="panel qcard" id="ddQCard"></div>
+      <div class="panel" style="margin-top:14px">
+        <div class="ph">AI synthesis — drafts only, you approve</div>
+        <p class="muted" style="font-size:13px">From your answers the system DRAFTS candidates: Q11 ("life should stand for") → purpose seeds · Q20 (six absolutes) → core-value seeds · Q12 ("not prepared to do") → do-not-violate seeds. <b>Never auto-applied</b> — autonomy is capped at 95%; the human is the governor.</p>
+        <button class="btn" id="btnSynth">Draft candidates from my answers</button>
+        <div id="synthOut"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ SCREEN 2 — LOCAL NORTH STARS ============================ -->
+  <section id="scr-local" hidden>
+    <div class="prime-strip"><span class="star" aria-hidden="true">⭐</span>
+      <span><b>THE PRIME (the rhyme target):</b> <span id="primeStripTxt">loading…</span></span>
+    </div>
+
+    <div class="panel hero">
+      <div>
+        <h2>Your <b>Local North Stars</b> — many, below the equator</h2>
+        <p class="muted" style="font-size:13.5px"><i>"The aligned work that rhymes with your Prime (your Dingo cards)."</i> Each project / card / operation declares ONE Local — usually a specific persona / beneficiary — plus its own Vivid Vision, harmonized ("rhyming") with the Prime.</p>
+        <p class="footnote">PEARL framing: Prime = "North Star UP — Aspirational" · Locals = "North Star DOWN — Operational."</p>
+        <p style="font-size:13px"><b style="color:var(--gold)">The lock:</b> <i>Ruby Red is NOT "the North Star."</i> Ruby Red is <b>one Local North Star</b> — the canonical SIC persona for Maven / Corner Banker / Pulse only (Standing Order #2). Every other project must declare its own Local explicitly.</p>
+      </div>
+      <figure>
+        <img src="assets/img/pearl-worldview.webp" alt="PEARL worldview — North Star UP Aspirational, North Star DOWN Operational">
+        <figcaption class="footnote" style="margin-top:6px">The PEARL 4-layer framework. The frozen external face lives at <a href="https://learning-loop.manus.space" target="_blank" rel="noopener">learning-loop.manus.space</a> — never rebuilt, always linked.</figcaption>
+      </figure>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <div class="panel" id="rubyPanel">
+        <div class="ph">Ruby Red — the canonical Local example</div>
+        <div id="rubyBody" class="muted" style="font-size:13px">loading…</div>
+      </div>
+      <div class="panel">
+        <div class="ph">Status legend + the campaign list</div>
+        <p style="font-size:13px"><span class="pill good">✅ Confirmed</span> <span class="pill warn">⏳ Worksheet needed</span> <span class="pill info">⏳ Foraging needed</span></p>
+        <p class="muted" style="font-size:12.5px" id="localsNote"></p>
+        <p class="footnote">The "no Local NS" filter doubles as the worksheet campaign list. Local confirmations made on this page persist to this browser only (localStorage) — the canon registry updates upstream.</p>
+      </div>
+    </div>
+
+    <div class="sec-h">Local North Star <b>registry</b> (from data/north-stars.json — computed badges, never asserted)</div>
+    <div class="row" id="lnsFilters" style="margin-bottom:8px">
+      <button class="chip on" data-f="all">All</button>
+      <button class="chip" data-f="confirmed">✅ Confirmed</button>
+      <button class="chip" data-f="worksheet">⏳ Worksheet</button>
+      <button class="chip" data-f="foraging">⏳ Foraging</button>
+      <button class="chip" data-f="none">🚨 No Local NS</button>
+    </div>
+    <div class="panel tight" style="overflow-x:auto">
+      <table id="lnsTable">
+        <thead><tr><th>Project</th><th>Local North Star</th><th>Persona note</th><th>Status</th><th>Source</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="grid2" style="margin-top:18px">
+      <div class="panel">
+        <div class="ph">The 11-question worksheet — voice-friendly, 10–15 min</div>
+        <p class="muted" style="font-size:13px">"The compressed sibling" of the 30 questions. One question at a time — answer out loud if you like (voice lane = KIE.ai only, Standing Order #1) and type what you said.</p>
+        <blockquote style="font-size:12.5px">"Measure twice, cut once. Get the North Star right and the project steers itself."</blockquote>
+        <div class="row">
+          <input type="text" id="wsProject" placeholder="Project name (pick from the registry or type new)" style="flex:1;min-width:200px">
+          <button class="btn gold-cta" id="btnStartWS">Start / resume worksheet</button>
+        </div>
+        <div id="wsWrap" style="margin-top:12px"></div>
+      </div>
+      <div class="panel">
+        <div class="ph">Foraging mode — "Draft it for me"</div>
+        <blockquote style="font-size:12.5px">"Don't wake the boss to ask what color the wall should be. Paint a swatch, then ask."</blockquote>
+        <p class="muted" style="font-size:12.5px">Produces a candidate Local NS card marked <span class="draft-tag">DRAFT</span> with per-section confidence + a "questions for Tim" gap list. One 5-minute confirm pass. <b>Autonomy Score capped at 95%</b> — the human is always in the loop for North Star sign-off. Vault-First Protocol: <i>"If it's not in the vault, it doesn't exist."</i></p>
+        <p class="footnote">🔒 Simulated in this static build: the draft below is scaffolded from registry rows + vault doctrine patterns — no live vault search, no web forage. Tier-1-source web foraging ("no marketing-deck-flavored persona templates — those drift from dignity") is the Phase-2 wiring.</p>
+        <div class="row">
+          <select id="forageSel" style="flex:1;min-width:200px"></select>
+          <button class="btn" id="btnForage">Draft it for me</button>
+        </div>
+        <div id="forageOut" style="margin-top:12px"></div>
+      </div>
+    </div>
+    <div id="wsCardOut" style="margin-top:14px"></div>
+  </section>
+
+  <!-- ============================ SCREEN 3 — VIVID VISION BUILDER ============================ -->
+  <section id="scr-vivid" hidden>
+    <div class="prime-strip"><span class="star" aria-hidden="true">⭐</span>
+      <span><b>THE PRIME (the rhyme target):</b> <span id="primeStripTxt2">loading…</span></span>
+    </div>
+
+    <h2>Vivid <b>Vision</b> Builder — per Local / per Dingo card / per ticket</h2>
+    <p class="muted" style="font-size:13.5px">Three pillars (Tim, verbatim): <b style="color:var(--gold)">Sense of Purpose</b> — 8 words or less, must contain a noble cause — framed as <b>"PURPOSE with PROFIT"</b>, <i>not</i> "profit and purpose" (early stage: "cash flow with purpose"; once profitable it flips to "purpose with profit") · <b style="color:var(--gold)">Sense of Destiny</b> = the BHAG (Big Hairy Audacious Goal — Jim Collins; 3–5 year, numbers in the sentence) · <b style="color:var(--gold)">Core Values</b> — 2 to 4, each driving a recognizable behaviour.</p>
+
+    <div class="grid2">
+      <div class="panel">
+        <div class="ph">The 8 gate fields (live keys from schemas.py — exact)</div>
+        <div class="row" style="margin-bottom:4px">
+          <span class="footnote">🎯 Pre-filled scenarios (lane defaults):</span>
+          <button class="btn" id="pfPawn" style="font-size:11.5px;padding:4px 10px">Pawn Princess Diamond Vault</button>
+          <button class="btn" id="pfMaven" style="font-size:11.5px;padding:4px 10px">Maven onboarding for Ruby Red</button>
+        </div>
+
+        <label class="fld" for="vvProject">Project / card this vision belongs to</label>
+        <input type="text" id="vvProject" placeholder="e.g., Pawn Princess — Store PP-01" style="width:100%">
+
+        <label class="fld" for="vvPurpose">Purpose (8 words or fewer) <span class="cnt" id="cntPurpose">0/8 words</span></label>
+        <input type="text" id="vvPurpose" placeholder="e.g., Relief today. Hope for tomorrow." style="width:100%">
+
+        <label class="fld" for="vvDestiny">Destiny statement <span class="cnt" id="cntDestiny"></span></label>
+        <input type="text" id="vvDestiny" placeholder="The bigger why" style="width:100%">
+
+        <label class="fld" for="vvBene">Beneficiary ("everyone" fails the gate)</label>
+        <div class="row">
+          <select id="vvBeneSel" style="min-width:170px"><option value="">Persona picker (from registry)…</option></select>
+          <input type="text" id="vvBene" placeholder="Name a specific person/persona — Ruby Red if applicable" style="flex:1;min-width:200px">
+        </div>
+
+        <label class="fld" for="vvValues">Core values (comma-separated, min 2) <span class="cnt" id="cntValues">0 values · 2–4 ideal</span></label>
+        <input type="text" id="vvValues" placeholder="Dignity, No shame, ..." style="width:100%">
+
+        <label class="fld" for="vvDoD">Definition of done</label>
+        <textarea id="vvDoD" rows="2"></textarea>
+
+        <label class="fld" for="vvTiming">Timing window</label>
+        <input type="text" id="vvTiming" placeholder="e.g., this week" style="width:100%">
+
+        <label class="fld" for="vvDNV">Do-not-violate rules (one per line, min 1)</label>
+        <textarea id="vvDNV" rows="3" placeholder="No predatory language&#10;No false urgency"></textarea>
+
+        <label class="fld" for="vvWIIFM">WIIFM — what's in it for the Dingo Caller?</label>
+        <input type="text" id="vvWIIFM" placeholder="Station WIIFM: the Caller's own win, named out loud" style="width:100%">
+
+        <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;margin:12px 0 4px;cursor:pointer">
+          <input type="checkbox" id="vvTrauma" style="margin-top:3px">
+          <span>I have considered the Ruby Red / trauma-informed impact <span class="footnote">(SAMHSA-informed gate — set true only when Ruby-Red-class impact has been considered. The 9pm-kitchen test: "Can [persona] read this at 9pm in the kitchen without feeling pressured or shamed?")</span></span>
+        </label>
+
+        <div class="row" style="margin-top:12px">
+          <button class="btn gold-cta" id="btnValidate">Run the gate validation</button>
+          <button class="btn" id="btnSaveVision" disabled>Save vision (locally)</button>
+          <button class="btn" id="btnExport">Export everything (JSON)</button>
+        </div>
+        <div id="vvResult"></div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <div class="ph">Rhyme Test — the NSA check above field validation</div>
+          <div id="rhymePanel"></div>
+          <label class="fld" for="vvRhyme">How this rhymes with the Prime (required at the Gate)</label>
+          <textarea id="vvRhyme" rows="2" placeholder="This vision serves the Prime because…"></textarea>
+          <p class="footnote">If any pillar wobbles or fails to rhyme: <span class="flag-alignment">[ALIGNMENT-FLAG]</span> + Wisdom Giant review. NSA cliché: <i>"The flag never droops on her watch."</i></p>
+        </div>
+
+        <div class="panel" style="margin-top:14px">
+          <div class="ph">When execution fails — missing pillar → named failure mode</div>
+          <!-- IMG-04 (Phase-4 harvest, Tim-approved) — replaces the white when-execution-fails.webp table -->
+          <img src="assets/img/execution-fails-dark.webp" alt="When Execution Fails — five vintage vignettes in gold-ruled frames, one per missing pillar: resistance, confusion, mistrust, frustration, false starts" style="border-radius:var(--radius);border:1px solid var(--line)">
+          <table class="wef-table" style="margin-top:8px">
+            <tbody>
+              <tr><td>Missing Purpose (Sense of Why)</td><td>Resistance</td></tr>
+              <tr><td>Missing BHAG</td><td>Confusion</td></tr>
+              <tr><td>Missing Core Values</td><td>Mistrust</td></tr>
+              <tr><td>Missing Sense of Urgency</td><td>Frustration</td></tr>
+              <tr><td>Missing Disciplined Execution</td><td>False Starts</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-h">The <b>Accordion Card</b> — printable output · the 60-second elevator speech · the physical business card</div>
+    <div class="panel">
+      <div class="row spread">
+        <p class="muted" style="font-size:12.5px;margin:0">Command alias: <code>"Render the Accordion Card for [project]"</code> — 5 panels, gold and navy.</p>
+        <div class="row">
+          <button class="btn" id="btnRenderAcc">Render the Accordion Card</button>
+          <button class="btn" id="btnPrintAcc" disabled>Print / PDF</button>
+        </div>
+      </div>
+      <div id="accPrintZone"><div id="accOut"></div></div>
+      <div id="elevatorOut"></div>
+    </div>
+
+    <div class="sec-h">Saved <b>visions</b> (this browser only — export so nothing is trapped)</div>
+    <div class="panel tight" id="savedVisions"><p class="muted" style="font-size:13px">No saved visions yet. A vision must pass the gate validation before it can be saved.</p></div>
+  </section>
+
+  <!-- ============================ SCREEN 4 — TWIN NORTH STAR GATE ============================ -->
+  <section id="scr-gate" hidden>
+    <h2>The <b>Twin North Star Gate</b> — the enforcement moment</h2>
+    <blockquote>No Dingo card is issued without the Caller <b>declaring its Local North Star and showing how it rhymes with the Prime North Star.</b> The gate captures the Local North Star and validates alignment before any work (or token) is spent.</blockquote>
+    <p class="footnote">Standing Order #10 makes the Local NS declaration a <b style="color:var(--red)">hard halt, not a warning</b>. Two checks, two signatures. "Measure twice, cut once."</p>
+
+    <div class="panel">
+      <div class="row">
+        <label class="fld" for="gateProject" style="margin:0">Project at the gate</label>
+        <select id="gateProject" style="min-width:220px"></select>
+        <label class="fld" for="gateVision" style="margin:0">Saved Vivid Vision</label>
+        <select id="gateVision" style="min-width:220px"><option value="">— none saved yet —</option></select>
+      </div>
+    </div>
+
+    <div class="gate-cols" style="margin-top:14px">
+      <div class="panel">
+        <div class="ph">Check 1 — the Prime check</div>
+        <p style="font-size:13.5px">Does this serve <b style="color:var(--gold)">Putting a Ding in the Universe / Social Impact Capitalism</b>?</p>
+        <p class="footnote" id="gatePrimeEcho"></p>
+        <div class="row">
+          <span class="chip sigchip" id="sigEE1">✍️ Empathy Enforcer signs</span>
+          <span class="chip sigchip" id="sigCM1">✍️ Compliance Marshal signs</span>
+        </div>
+        <p class="footnote">🔒 Simulated signatures — clicking records YOUR human judgment locally; no agent signs anything for real.</p>
+      </div>
+      <div class="panel">
+        <div class="ph">Check 2 — the Local check</div>
+        <p style="font-size:13.5px">Is there a <b>confirmed Local North Star card</b> for this project?</p>
+        <div id="gateLocalStatus"></div>
+        <div class="row"><span class="chip sigchip" id="sigEE2">✍️ Empathy Enforcer signs</span></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <div class="ph">The Ladder line (required) — NSA refuses to move a card to In Progress without it</div>
+      <div class="row">
+        <input type="text" id="ladPersona" placeholder="[Persona]" style="flex:1;min-width:130px">
+        <input type="text" id="ladAction" placeholder="[Action]" style="flex:2;min-width:170px">
+        <input type="text" id="ladOutcome" placeholder="[Outcome]" style="flex:2;min-width:170px">
+      </div>
+      <p style="font-size:13.5px;margin-top:8px" id="ladderPreview" class="muted">"this serves <b>[Persona]</b> by <b>[Action]</b>, putting a Ding in the Universe by <b>[Outcome]</b>"</p>
+      <label class="fld" for="gateRhyme">The rhyme line — how this Local rhymes with the Prime</label>
+      <textarea id="gateRhyme" rows="2" placeholder="One honest line. If it's fuzzy, the project may not belong in the portfolio."></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn gold-cta" id="btnRunGate">Run the Twin North Star Gate</button>
+      </div>
+    </div>
+
+    <div id="gateResult" style="margin-top:14px"></div>
+    <div id="gateVerdicts" style="margin-top:6px"></div>
+
+    <div class="sec-h">Rhyme <b>Integrity</b> — 🟢/🟡/🔴 per project (computed from registry status at render; feeds the weekly Bartender Briefing)</div>
+    <div class="panel tight" style="overflow-x:auto">
+      <table class="ryg-strip" id="rhymeStrip"><thead><tr><th></th><th>Project</th><th>Local North Star</th><th>Why</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="panel tight" style="margin-top:10px">
+      <p class="muted" style="font-size:12.5px"><b>After the gate:</b> anti-drift triggers (worksheet Q12) register with the North Star Agent. Escalation: <b>Aspirin</b> (inline nudge) → <b>Treatment</b> (formal citation, audit trail, Bartender Briefing) → <b>Fever</b> (agent paused, HIL ticket, Tim alerted within 10 min). Card without Local NS → Aspirin · missing Vivid Vision pillar → Treatment + ALIGNMENT-FLAG · output contradicting an anti-drift trigger → Fever · two projects with contradictory Locals → Treatment + Tim arbitration.</p>
+    </div>
+  </section>
+
+  <p class="footnote" style="margin-top:26px">Sources of record: <code>data/north-stars.json</code> (Prime verbatim + registry) · <code>Mr and Mrs Fixit/mvp-v1</code> (the live <code>_validate_vivid_vision</code> schema + form) · the 11-question Local NS worksheet · the Destiny Discovered 30-question instrument. The frozen PEARL Diamond stays at <a href="https://learning-loop.manus.space" target="_blank" rel="noopener">learning-loop.manus.space</a>.</p>
+</main>
+
+<script src="assets/shell.js"></script>
+<script>
+'use strict';
+Shell.init('north-star');
+var esc = Shell.esc;
+
+/* ============================ state (localStorage — export so nothing is trapped) ============================ */
+var LS_KEY = 'hb1000-north-star';
+var S = (function(){ try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e){ return {}; } })();
+S.dd = S.dd || { answers:{}, idx:0 };
+S.ws = S.ws || {};            // per-project worksheet answers
+S.visions = S.visions || {};  // per-project saved Vivid Visions
+S.localConfirm = S.localConfirm || {}; // project → 'confirmed' (local only)
+S.gates = S.gates || {};      // project → {verdict, when}
+S.flags = S.flags || [];      // ALIGNMENT-FLAG queue
+function save(){ try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch(e){} }
+
+/* ============================ data (real JSON; verbatim fallback for file:// where fetch is blocked) ============================ */
+var FALLBACK = {
+  prime: {
+    statement: "Help people get more out of life — not by force, but by example. Believe in abundance — of potential, of solutions, of impact. Put a Ding in the Universe through Social Impact Capitalism (S.I.C.) — Business as a Force for Good.",
+    litmus: "'Putting a Ding in the Universe' is the litmus test. If a project can't articulate its Ding, it's parked.",
+    core_value: "Attitude of Gratitude",
+    operational_values: ["Golden Rule","Transparency is Kindness"],
+    default_version: "v2026.04",
+    versions: { "v2026.04": { label: "Prime v2026.04 — the Apr 13, 2026 public version (render by default)" },
+                "v2025.04": { label: "Prime v2025.04 — the Apr 6, 2025 docx (master long-form; render as accordion)" } }
+  },
+  ruby_red: {
+    definition: "35-45yo mom of two. CFO of her household. Working poor. Unbanked/underbanked.",
+    daily_decisions: ["Put back the grocery item at checkout?","Afford the $30 extracurricular fee?","Pay for the flat tire so she gets to work tomorrow?"],
+    three_gangster_worlds: ["political","bureaucratic","greedy capitalist"],
+    core_philosophy: "\"It's expensive to be poor.\" That's the crime we fix.",
+    superpower: "Empathy. \"There but for the grace of God go I.\"",
+    operating_rules: ["Minimize cognitive load.","Short messages (Grace = 2-3 sentences max).","Never judge. Never assume she has a problem unless she says so.","We don't cut her off — we slow down."]
+  },
+  locals: [
+    {project:"Maven", local_ns:"Ruby Red", persona_note:"35-45yo working-poor mom, household CFO", status:"confirmed", source:"NORTH_STAR.md"},
+    {project:"Corner Banker", local_ns:"Ruby Red", persona_note:"same", status:"confirmed", source:"NORTH_STAR.md"},
+    {project:"Pulse", local_ns:"Ruby Red", persona_note:"same", status:"confirmed", source:"NORTH_STAR.md"},
+    {project:"Grace (AI)", local_ns:"Ruby Red", persona_note:"Grace serves Ruby in 2-3 sentences", status:"confirmed", source:"NORTH_STAR.md"},
+    {project:"Maven Grace App", local_ns:"Ruby Red", persona_note:"Séance Board, Pulse Zone", status:"confirmed", source:"the HB1000 model tour (source document)"},
+    {project:"Effn Duck", local_ns:"EVERYONE — optimizing for maximum social impact, human connection, and pure joy", persona_note:"NOT Ruby Red — Feb-2026 Local Directive declaration", status:"confirmed", source:"NORTH STAR FRAMEWORK V2.0, Feb 23 2026"},
+    {project:"Digger Cafe", local_ns:"Surprise & Delight Tourism Destination", persona_note:"NOT Ruby Red — Feb-2026 Local Directive declaration", status:"confirmed", source:"NORTH STAR FRAMEWORK V2.0, Feb 23 2026"},
+    {project:"Seba Hub & Activity Centre", local_ns:"Community at Seba Beach", persona_note:"Feb-decl: 'Vibrant Village for Growing Amazing Children'", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"CashCo Financial", local_ns:"Ruby Red (likely)", persona_note:"Feb-decl: 'Serve Ruby Red — The Poor Man's Bank with Dignity'", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Pawn Princess / Princess Collateral", local_ns:"Working poor (Ruby-adjacent)", persona_note:"Dignity-centred pawn model", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Culture Chaser (Tier 1, Talking Head Tim)", local_ns:"Tim's org / SIC team", persona_note:"Cultural alignment, dog-fooding", status:"worksheet", source:"Project instructions"},
+    {project:"Culture Chaser (Tier 2, white-label)", local_ns:"Client org's chosen persona", persona_note:"Configurable per client", status:"worksheet", source:"Project instructions"},
+    {project:"Freedom Cannabis", local_ns:"Mid-level cannabis consumer (BAFFG-aligned)", persona_note:"CEO John Frank Potestio", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Blue Seal", local_ns:"Global community / society at large", persona_note:"Do Good, Give Back, Starts Local", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Holding Properties", local_ns:"Family office stability", persona_note:"Low-risk, low-touch", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Stage Two", local_ns:"Growth-stage entrepreneurs", persona_note:"TBD", status:"foraging", source:"Master plan referenced"},
+    {project:"Mitsho & Groundswell", local_ns:"Indigenous communities + consumers", persona_note:"Ian Gladue leadership", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Game Changer Consultants", local_ns:"Mid-market business owners", persona_note:"Best practices + leadership", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"1-800-FRE²-RENT", local_ns:"Homeowners with unused basements", persona_note:"Reno-finance-manage model", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Tip the Maker / Tip the Grower", local_ns:"Global artisans + farmers", persona_note:"Direct-tip platform", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Hawaii by the Inch", local_ns:"Affordable luxury vacationers", persona_note:"Timeshare-by-the-inch model", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Seba Hub Petting Zoo", local_ns:"Families with kids", persona_note:"Goats on the roof", status:"worksheet", source:"Do-Before-I-Die statement"},
+    {project:"Conquer Cannabis", local_ns:null, persona_note:"No Local NS row anywhere in the estate — gap made visible", status:"foraging", source:"auto-created at seed"},
+    {project:"Cureleaf Ogden", local_ns:null, persona_note:"No Local NS row anywhere in the estate — gap made visible", status:"foraging", source:"auto-created at seed"},
+    {project:"Bunkie Village", local_ns:null, persona_note:"No Local NS row anywhere in the estate — gap made visible", status:"foraging", source:"auto-created at seed"},
+    {project:"In the Woods 2026", local_ns:null, persona_note:"No Local NS row anywhere in the estate — gap made visible", status:"foraging", source:"auto-created at seed"},
+    {project:"SIC Incubation School", local_ns:null, persona_note:"No Local NS row anywhere in the estate — gap made visible", status:"foraging", source:"auto-created at seed"},
+    {project:"CTS Freedman (legal)", local_ns:null, persona_note:"No Local NS row anywhere in the estate — gap made visible", status:"foraging", source:"auto-created at seed"}
+  ],
+  locals_note: "~12 more projects in the 32-portfolio get rows as Phase 1 ingestion surfaces them. Status legend: confirmed ✅ · worksheet ⏳ (11-question voice worksheet needed) · foraging ⏳ (agent-driven first pass, Tim confirms)."
+};
+var NS = FALLBACK; // replaced by the real JSON when fetch succeeds
+
+/* ============================ tabs ============================ */
+var TABS = document.querySelectorAll('.scr-tabs .chip');
+function showScr(id){
+  ['prime','local','vivid','gate'].forEach(function(s){
+    document.getElementById('scr-'+s).hidden = (s !== id);
+  });
+  TABS.forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-scr') === id); });
+  if (history.replaceState) history.replaceState(null,'','#'+id);
+}
+TABS.forEach(function(t){ t.addEventListener('click', function(){ showScr(t.getAttribute('data-scr')); }); });
+if (/^#(prime|local|vivid|gate)$/.test(location.hash)) showScr(location.hash.slice(1));
+
+/* ============================ Screen 1 — Prime ============================ */
+function renderPrime(){
+  var p = NS.prime;
+  document.getElementById('primeStatement').textContent = '"' + p.statement + '"';
+  document.getElementById('primeLitmus').textContent = p.litmus || '';
+  var dv = p.default_version || 'v2026.04';
+  var vlabel = (p.versions && p.versions[dv] && p.versions[dv].label) ? p.versions[dv].label : 'Prime ' + dv;
+  document.getElementById('primeVersionPill').textContent = vlabel.split(' — ')[0] + ' (default)';
+  var vals = [p.core_value].concat(p.operational_values || []).filter(Boolean);
+  document.getElementById('primeValuesPill').textContent = 'Values: ' + vals.join(' · ');
+  var stripTxt = '"' + p.statement + '"';
+  document.getElementById('primeStripTxt').textContent = stripTxt;
+  document.getElementById('primeStripTxt2').textContent = stripTxt;
+  document.getElementById('gatePrimeEcho').textContent = 'Prime, verbatim: ' + stripTxt;
+  renderPrimeDraftNote();
+}
+function renderPrimeDraftNote(){
+  var n = document.getElementById('primeDraftNote');
+  if (S.primeDraft) {
+    n.innerHTML = '<span class="draft-tag">LOCAL DRAFT (not canon)</span> <span class="muted" style="font-size:12.5px">' + esc(S.primeDraft) + '</span>';
+  } else { n.innerHTML = ''; }
+}
+document.getElementById('btnEditPrime').addEventListener('click', function(){
+  var w = document.getElementById('primeEditWrap');
+  w.hidden = !w.hidden;
+  if (!w.hidden) document.getElementById('primeEditTa').value = S.primeDraft || NS.prime.statement;
+});
+document.getElementById('btnPrimeDraftSave').addEventListener('click', function(){
+  S.primeDraft = document.getElementById('primeEditTa').value.trim(); save();
+  document.getElementById('primeEditWrap').hidden = true; renderPrimeDraftNote();
+});
+document.getElementById('btnPrimeDraftDiscard').addEventListener('click', function(){
+  delete S.primeDraft; save();
+  document.getElementById('primeEditWrap').hidden = true; renderPrimeDraftNote();
+});
+
+/* quick stake */
+var qsTa = document.getElementById('quickStakeTa');
+if (S.quickStake) { qsTa.value = S.quickStake; document.getElementById('quickStakeNote').textContent = 'Saved.'; }
+document.getElementById('btnQuickStakeSave').addEventListener('click', function(){
+  S.quickStake = qsTa.value.trim(); save();
+  document.getElementById('quickStakeNote').textContent = S.quickStake ? 'Saved to this browser. Every output is a baseline, never final.' : 'Nothing to save yet.';
+});
+
+/* ============================ Destiny Discovered — 30 questions ============================ */
+/* Categories per blueprint: Core Values (1,2,8) · Self-Awareness (3,4,5,7) · Worldview (6,19,22,23) ·
+   Purpose & Legacy (9,11,12,13) · Success Philosophy (10,18,24,25) · Action & Impact (15,16,17,29) ·
+   Absolutes & Beliefs (20,21) · Relationships (26,27,28) · Resource Perspective (14) · Success Attribution (30) */
+var DDQ = [
+ {n:1, c:'Core Values', t:'Beyond loved ones and health, what is the most important ingredient in life?', y:'text'},
+ {n:2, c:'Core Values', t:'What characteristic do you admire most in others that you would like to have?', y:'text'},
+ {n:3, c:'Self-Awareness', t:'What are three things you would change in your behavior?', y:'list', k:3},
+ {n:4, c:'Self-Awareness', t:'What influences in your life are out of your control?', y:'text'},
+ {n:5, c:'Self-Awareness', t:'What influences in your life are under your control?', y:'text'},
+ {n:6, c:'Worldview', t:'What are the three most driving and controlling influences determining the continuation of the universe?', y:'list', k:3},
+ {n:7, c:'Self-Awareness', t:'What are the three limiting factors in your life?', y:'list', k:3},
+ {n:8, c:'Core Values', t:'Rate in order of importance: body, mind, spirit.', y:'text', h:'e.g., Spirit – Mind – Body'},
+ {n:9, c:'Purpose & Legacy', t:'Your opportunity to develop a meaningful contribution is:', y:'choice', o:['Bad','Good','Excellent']},
+ {n:10, c:'Success Philosophy', t:'What are the three most important things you would advise for success?', y:'list', k:3},
+ {n:11, c:'Purpose & Legacy', t:'What are three things your life should stand for?', y:'list', k:3, h:'These seed your Purpose (8 words or less).'},
+ {n:12, c:'Purpose & Legacy', t:'What are three things you are not prepared to do?', y:'list', k:3, h:'These seed your do-not-violate fences.'},
+ {n:13, c:'Purpose & Legacy', t:'How would others rate your future possibility?', y:'choice', o:['Outstanding','Average','Poor']},
+ {n:14, c:'Resource Perspective', t:'How important is money / material wealth to you?', y:'choice', o:['Yes — important','No','Take it or leave it']},
+ {n:15, c:'Action & Impact', t:'List six measurable ways you could change the world WITHOUT money.', y:'list', k:6},
+ {n:16, c:'Action & Impact', t:'List six measurable ways you could change the world WITH money.', y:'list', k:6},
+ {n:17, c:'Action & Impact', t:'Do you feel an obligation to act on the points from questions 15 and 16? Which ones?', y:'text'},
+ {n:18, c:'Success Philosophy', t:'The success possibilities of your schemes / dreams are:', y:'choice', o:['Good','Fair','Bad']},
+ {n:19, c:'Worldview', t:'Do you hold limitations or preferences regarding culture, race, religion, or behavior patterns? (Yes/No — with your reasons)', y:'text'},
+ {n:20, c:'Absolutes & Beliefs', t:'What are the six absolutes that govern your thoughts and actions?', y:'list', k:6, h:'These seed your Core Values.'},
+ {n:21, c:'Absolutes & Beliefs', t:'How do you justify your absolutes?', y:'text'},
+ {n:22, c:'Worldview', t:'If you believe in God or a Superior Being — why? Advantages, disadvantages, evidence of existence.', y:'text'},
+ {n:23, c:'Worldview', t:'If you do not believe in God or a Superior Being — why? Advantages, disadvantages, evidence of existence.', y:'text'},
+ {n:24, c:'Success Philosophy', t:'How do you rate the times you live in for opportunity for success? (Excellent/Good/Fair/Bad) Give 3 reasons. Are others proving you right or wrong?', y:'text'},
+ {n:25, c:'Success Philosophy', t:'What makes successful people successful? (pick all that apply)', y:'multi', o:['Inherited wealth','Gifted mind','Unusual opportunities','Special assistance','Personal development','Hard work','Lucky break','Strong principles','Good plan','Good idea','Other factors']},
+ {n:26, c:'Relationships', t:'Name three people to assist in your life’s adventure — and why.', y:'list', k:3},
+ {n:27, c:'Relationships', t:'If let down in a personal relationship, what responsibility do you have to meet your obligations? (None/Some/Total/Other + why)', y:'text'},
+ {n:28, c:'Relationships', t:'If the other party does not fulfill an agreement in business, what is your obligation? (None/Some/Total/Other + why)', y:'text'},
+ {n:29, c:'Action & Impact', t:'Do you have an obligation to assist the truly disadvantaged? (Yes/No + why / how)', y:'text'},
+ {n:30, c:'Success Attribution', t:'Break your success factors into percentages totalling 100: Personal influence · Influence of others · Economic/social influences · Uncontrollable influences.', y:'pct', o:['Personal influence','Influence of others','Economic/social influences','Uncontrollable influences']}
+];
+var DD_CATS = ['Core Values','Self-Awareness','Worldview','Purpose & Legacy','Success Philosophy','Action & Impact','Absolutes & Beliefs','Relationships','Resource Perspective','Success Attribution'];
+
+function ddAnswered(q){
+  var a = S.dd.answers[q.n];
+  if (a == null) return false;
+  if (q.y === 'list') return Array.isArray(a) && a.some(function(x){ return (x||'').trim(); });
+  if (q.y === 'multi') return Array.isArray(a) && a.length > 0;
+  if (q.y === 'pct') return a && Object.keys(a).length > 0;
+  return String(a).trim().length > 0;
+}
+function ddCount(){ return DDQ.filter(ddAnswered).length; }
+
+function ddClock(){
+  var done = ddCount(), total = 30, svg = document.getElementById('ddClock'), parts = [];
+  for (var i = 0; i < total; i++){
+    var a0 = (i*360/total - 90) * Math.PI/180, a1 = ((i+1)*360/total - 90) * Math.PI/180;
+    var cx=200, cy=200, r=180, ri=160;
+    var d = 'M '+(cx+r*Math.cos(a0)).toFixed(1)+' '+(cy+r*Math.sin(a0)).toFixed(1)+
+            ' A '+r+' '+r+' 0 0 1 '+(cx+r*Math.cos(a1)).toFixed(1)+' '+(cy+r*Math.sin(a1)).toFixed(1)+
+            ' L '+(cx+ri*Math.cos(a1)).toFixed(1)+' '+(cy+ri*Math.sin(a1)).toFixed(1)+
+            ' A '+ri+' '+ri+' 0 0 0 '+(cx+ri*Math.cos(a0)).toFixed(1)+' '+(cy+ri*Math.sin(a0)).toFixed(1)+' Z';
+    var on = i < done;
+    parts.push('<path d="'+d+'" fill="'+(on?'rgba(232,181,77,.45)':'rgba(71,85,105,.3)')+'" stroke="'+(on?'rgba(232,181,77,.85)':'rgba(148,163,184,.4)')+'" stroke-width="1"/>');
+  }
+  svg.innerHTML = parts.join('');
+  var pct = Math.round(done/total*100);
+  document.getElementById('ddProgTxt').innerHTML = done + '/30 Questions Complete<small>' + pct + '% of your journey</small>';
+  document.querySelectorAll('#ddCats .chip').forEach(function(ch){
+    var cat = ch.getAttribute('data-cat');
+    var qs = DDQ.filter(function(q){ return q.c === cat; });
+    ch.classList.toggle('done', qs.length > 0 && qs.every(ddAnswered));
+  });
+}
+
+function ddInputHTML(q){
+  var a = S.dd.answers[q.n];
+  if (q.y === 'list'){
+    var rows = [];
+    for (var i=0;i<q.k;i++){
+      var v = (Array.isArray(a) && a[i]) ? a[i] : '';
+      rows.push('<input type="text" class="dd-in" data-i="'+i+'" value="'+esc(v)+'" placeholder="'+(i+1)+'." style="width:100%;margin:3px 0">');
+    }
+    return rows.join('');
+  }
+  if (q.y === 'choice'){
+    return q.o.map(function(o){
+      var on = a === o;
+      return '<label style="display:block;font-size:13.5px;margin:4px 0;cursor:pointer"><input type="radio" name="ddc" class="dd-in" value="'+esc(o)+'"'+(on?' checked':'')+'> '+esc(o)+'</label>';
+    }).join('');
+  }
+  if (q.y === 'multi'){
+    return q.o.map(function(o){
+      var on = Array.isArray(a) && a.indexOf(o) >= 0;
+      return '<label style="display:inline-block;font-size:13px;margin:3px 10px 3px 0;cursor:pointer"><input type="checkbox" class="dd-in" value="'+esc(o)+'"'+(on?' checked':'')+'> '+esc(o)+'</label>';
+    }).join('');
+  }
+  if (q.y === 'pct'){
+    return q.o.map(function(o){
+      var v = (a && a[o] != null) ? a[o] : '';
+      return '<label style="display:flex;gap:8px;align-items:center;font-size:13px;margin:4px 0">'+
+        '<input type="number" min="0" max="100" class="dd-in" data-k="'+esc(o)+'" value="'+esc(v)+'" style="width:80px">% — '+esc(o)+'</label>';
+    }).join('') + '<p class="footnote" id="pctSum"></p>';
+  }
+  return '<textarea class="dd-in" rows="3" placeholder="'+esc(q.h||'Your answer — blanks are allowed; come back any time.')+'">'+esc(a||'')+'</textarea>';
+}
+
+function ddRead(q){
+  var card = document.getElementById('ddQCard');
+  if (q.y === 'list'){
+    var vals = [];
+    card.querySelectorAll('.dd-in').forEach(function(el){ vals[Number(el.getAttribute('data-i'))] = el.value; });
+    return vals;
+  }
+  if (q.y === 'choice'){
+    var sel = card.querySelector('.dd-in:checked'); return sel ? sel.value : '';
+  }
+  if (q.y === 'multi'){
+    var out = []; card.querySelectorAll('.dd-in:checked').forEach(function(el){ out.push(el.value); }); return out;
+  }
+  if (q.y === 'pct'){
+    var obj = {}; card.querySelectorAll('.dd-in').forEach(function(el){ if (el.value !== '') obj[el.getAttribute('data-k')] = Number(el.value); }); return obj;
+  }
+  var ta = card.querySelector('.dd-in'); return ta ? ta.value : '';
+}
+
+function ddSaveCurrent(){
+  var q = DDQ[S.dd.idx];
+  S.dd.answers[q.n] = ddRead(q);
+  save();
+}
+
+function renderDD(){
+  var q = DDQ[S.dd.idx];
+  var card = document.getElementById('ddQCard');
+  card.innerHTML =
+    '<div class="row" style="margin-bottom:8px"><span class="qnum">'+q.n+'</span>'+
+    '<span class="pill gold">'+esc(q.c)+'</span><span class="footnote">Question '+(S.dd.idx+1)+' of 30 · save-and-resume is automatic</span></div>'+
+    '<div class="qtext">'+esc(q.t)+'</div>'+
+    (q.h ? '<p class="footnote">'+esc(q.h)+'</p>' : '')+
+    '<div style="margin:10px 0">'+ddInputHTML(q)+'</div>'+
+    '<div class="row">'+
+      '<button class="btn" id="ddPrev"'+(S.dd.idx===0?' disabled':'')+'>← Back</button>'+
+      '<button class="btn" id="ddSkip">Leave blank, next →</button>'+
+      '<button class="btn approve" id="ddNext">Save answer'+(S.dd.idx===29?' (last one)':' · next →')+'</button>'+
+    '</div>';
+  if (q.y === 'pct'){
+    var upd = function(){
+      var obj = ddRead(q), sum = 0; Object.keys(obj).forEach(function(k){ sum += obj[k]; });
+      var el = document.getElementById('pctSum');
+      if (el) el.textContent = 'Total: ' + sum + '% ' + (sum === 100 ? '✓' : '— must equal 100%');
+    };
+    card.querySelectorAll('.dd-in').forEach(function(el){ el.addEventListener('input', upd); }); upd();
+  }
+  document.getElementById('ddPrev').addEventListener('click', function(){ ddSaveCurrent(); S.dd.idx = Math.max(0, S.dd.idx-1); save(); renderDD(); ddClock(); });
+  document.getElementById('ddSkip').addEventListener('click', function(){ S.dd.idx = Math.min(29, S.dd.idx+1); save(); renderDD(); ddClock(); });
+  document.getElementById('ddNext').addEventListener('click', function(){ ddSaveCurrent(); S.dd.idx = Math.min(29, S.dd.idx+1); renderDD(); ddClock(); });
+  ddClock();
+}
+
+document.getElementById('ddCats').innerHTML = DD_CATS.map(function(c){
+  return '<span class="chip" data-cat="'+esc(c)+'">'+esc(c)+'</span>';
+}).join('');
+
+document.getElementById('btnStartDD').addEventListener('click', function(){
+  document.getElementById('ddWrap').hidden = false; renderDD();
+  document.getElementById('ddWrap').scrollIntoView({behavior:'smooth'});
+});
+
+/* print — blank questionnaire or current answers */
+function ddAnswerText(q){
+  var a = S.dd.answers[q.n];
+  if (!ddAnswered(q)) return '';
+  if (q.y === 'list') return '<ul>' + a.filter(Boolean).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('') + '</ul>';
+  if (q.y === 'multi') return esc(a.join(', '));
+  if (q.y === 'pct') return '<ul>' + Object.keys(a).map(function(k){ return '<li>'+esc(k)+': '+esc(a[k])+'%</li>'; }).join('') + '</ul>';
+  return esc(String(a)).replace(/\n/g,'<br>');
+}
+function printDD(withAnswers){
+  var w = window.open('', '_blank'); if (!w) return;
+  var rows = DDQ.map(function(q){
+    var ans = withAnswers
+      ? (ddAnswerText(q) ? '<div style="margin-top:8px;padding:9px;background:#f4f1e8;border-left:3px solid #b8860b">'+ddAnswerText(q)+'</div>' : '<p style="color:#999">— blank (allowed) —</p>')
+      : '<div style="margin-top:12px;border-bottom:1px solid #ccc;min-height:80px"></div>';
+    return '<div style="margin-bottom:26px;page-break-inside:avoid"><b>'+q.n+'. '+esc(q.t)+'</b>'+
+           '<div style="font-size:11px;color:#777">'+esc(q.c)+'</div>'+ans+'</div>';
+  }).join('');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Destiny Discovered — '+(withAnswers?'My Answers':'Blank Questionnaire')+'</title>'+
+    '<style>body{font-family:Georgia,serif;max-width:760px;margin:0 auto;padding:24px;color:#1f2937;line-height:1.55}@page{margin:20mm}</style></head><body>'+
+    '<h1 style="margin-bottom:2px">Destiny Discovered</h1><p style="color:#666">The 30-question Prime North Star deep route · take your time — deep reflection cannot be rushed. Printed '+new Date().toLocaleDateString()+'</p><hr>'+rows+'</body></html>');
+  w.document.close();
+  w.onload = function(){ w.print(); };
+}
+document.getElementById('btnPrintBlank').addEventListener('click', function(){ printDD(false); });
+document.getElementById('btnPrintAnswers').addEventListener('click', function(){ printDD(true); });
+
+/* synthesis — drafts only, never auto-applied */
+document.getElementById('btnSynth').addEventListener('click', function(){
+  var a11 = S.dd.answers[11], a20 = S.dd.answers[20], a12 = S.dd.answers[12];
+  var li = function(arr){ return (Array.isArray(arr)?arr:[]).filter(function(x){return (x||'').trim();}); };
+  var purpose = li(a11), values = li(a20), dnv = li(a12);
+  var out = document.getElementById('synthOut');
+  if (!purpose.length && !values.length && !dnv.length){
+    out.innerHTML = '<p class="footnote" style="margin-top:10px">Answer Q11, Q20 and Q12 first — the drafts are built from YOUR words, nothing invented.</p>';
+    return;
+  }
+  out.innerHTML =
+    '<div style="margin-top:12px"><span class="draft-tag">DRAFT — you approve, nothing auto-applies</span></div>'+
+    '<div class="grid3" style="margin-top:10px">'+
+      '<div class="panel tight"><div class="ph">Purpose seeds (Q11 → ≤8 words each)</div>'+ (purpose.length? '<ul style="font-size:13px">'+purpose.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>' : '<p class="footnote">Q11 blank.</p>') + '</div>'+
+      '<div class="panel tight"><div class="ph">Core-value seeds (Q20 absolutes)</div>'+ (values.length? '<ul style="font-size:13px">'+values.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>' : '<p class="footnote">Q20 blank.</p>') + '</div>'+
+      '<div class="panel tight"><div class="ph">Do-not-violate seeds (Q12)</div>'+ (dnv.length? '<ul style="font-size:13px">'+dnv.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>' : '<p class="footnote">Q12 blank.</p>') + '</div>'+
+    '</div>'+
+    '<p class="footnote">Carry the keepers into the Vivid Vision Builder (Screen 3). Every output is a baseline, never final.</p>';
+});
+
+/* ============================ Screen 2 — Local North Stars ============================ */
+function effStatus(row){
+  if (S.localConfirm[row.project]) return 'confirmed';
+  return row.status;
+}
+function statusPill(row){
+  var st = effStatus(row);
+  var localTag = (S.localConfirm[row.project] && row.status !== 'confirmed') ? ' (local)' : '';
+  if (!row.local_ns && st !== 'confirmed') return '<span class="pill danger">🚨 No Local NS</span>';
+  if (st === 'confirmed') return '<span class="pill good">✅ Confirmed'+localTag+'</span>';
+  if (st === 'worksheet') return '<span class="pill warn">⏳ Worksheet needed</span>';
+  return '<span class="pill info">⏳ Foraging needed</span>';
+}
+var lnsFilter = 'all';
+function renderRegistry(){
+  var tb = document.querySelector('#lnsTable tbody');
+  var rows = NS.locals.filter(function(r){
+    var st = effStatus(r);
+    if (lnsFilter === 'all') return true;
+    if (lnsFilter === 'none') return !r.local_ns && st !== 'confirmed';
+    return st === lnsFilter;
+  });
+  tb.innerHTML = rows.map(function(r){
+    var draft = S.ws[r.project] && S.ws[r.project].card;
+    return '<tr><td><b>'+esc(r.project)+'</b></td>'+
+      '<td>'+(r.local_ns ? esc(r.local_ns) : (draft ? '<span class="draft-tag">DRAFT</span>' : '<span class="soft">—</span>'))+'</td>'+
+      '<td class="muted">'+esc(r.persona_note||'')+'</td>'+
+      '<td>'+statusPill(r)+'</td>'+
+      '<td class="soft" style="font-size:11.5px">'+esc(r.source||'')+'</td></tr>';
+  }).join('') || '<tr><td colspan="5" class="muted">No rows match this filter.</td></tr>';
+}
+document.querySelectorAll('#lnsFilters .chip').forEach(function(ch){
+  ch.addEventListener('click', function(){
+    lnsFilter = ch.getAttribute('data-f');
+    document.querySelectorAll('#lnsFilters .chip').forEach(function(c){ c.classList.toggle('on', c === ch); });
+    renderRegistry();
+  });
+});
+function renderRuby(){
+  var r = NS.ruby_red;
+  document.getElementById('rubyBody').innerHTML =
+    '<p><b style="color:var(--ink)">'+esc(r.definition)+'</b></p>'+
+    '<p>Daily decisions: '+r.daily_decisions.map(esc).join(' · ')+'</p>'+
+    '<p>Three gangster worlds she navigates: <b>'+r.three_gangster_worlds.map(esc).join(' · ')+'</b></p>'+
+    '<p>Core philosophy: <i>'+esc(r.core_philosophy)+'</i></p>'+
+    '<p>Superpower: '+esc(r.superpower)+'</p>'+
+    '<ul style="font-size:12.5px">'+r.operating_rules.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>';
+}
+
+/* ---- the 11-question worksheet (exact text, one at a time) ---- */
+var WSQ = [
+ {s:'A · Project ID (30s)', q:'Q1 — Project name + aliases.'},
+ {s:'A · Project ID (30s)', q:'Q2 — What does it DO? (one sentence)'},
+ {s:'A · Project ID (30s)', q:'Q3 — Who is it FOR? (one sentence)'},
+ {s:'B · The Persona — the heart of the Local NS (3–5 min)', q:'Q4 — Picture a single, specific person. "Not a demographic — a person." Who are they?'},
+ {s:'B · The Persona — the heart of the Local NS (3–5 min)', q:'Q5 — "Walk me through their typical Tuesday… the flat tire, the grocery line, the $30 fee."'},
+ {s:'B · The Persona — the heart of the Local NS (3–5 min)', q:'Q6 — The three "worlds" they navigate. "Three is the magic number — it forces clarity."'},
+ {s:'C · The Empathy Principle (2 min)', q:'Q7 — The ONE cliché capturing the injustice we fix. (Ruby Red’s: "It’s expensive to be poor")'},
+ {s:'C · The Empathy Principle (2 min)', q:'Q8 — The empathy posture: fill in "There but for the grace of God ___."'},
+ {s:'D · JTBD & Prime Ladder (2–3 min)', q:'Q9 — The Job to Be Done in one sentence. (JTBD IS Clayton Christensen.)'},
+ {s:'D · JTBD & Prime Ladder (2–3 min)', q:'Q10 — "How does serving this person put a Ding in the Universe?" If the answer is fuzzy, the project may not belong in the portfolio.'},
+ {s:'E · Operating Rules (2 min)', q:'Q11 — Two-three dignity-protecting rules.'},
+ {s:'F · Anti-Drift Triggers (1 min, optional)', q:'Q12 — 2–3 red-flag behaviors → encoded as Watchman/NSA drift rules.'}
+];
+var wsProject = null;
+function renderWS(){
+  var wrap = document.getElementById('wsWrap');
+  if (!wsProject){ wrap.innerHTML = ''; return; }
+  var st = S.ws[wsProject] = S.ws[wsProject] || { idx:0, a:{} };
+  if (st.idx >= WSQ.length){ wrap.innerHTML = '<p class="footnote">Worksheet complete — card synthesized below. Edit any answer by restarting; answers are kept.</p>'; renderLNSCard(wsProject); return; }
+  var q = WSQ[st.idx];
+  wrap.innerHTML =
+    '<div class="ws-sec">'+esc(q.s)+'</div>'+
+    '<p style="font-size:14px;font-weight:700;margin:6px 0">'+esc(q.q)+'</p>'+
+    '<textarea id="wsTa" rows="3">'+esc(st.a[st.idx]||'')+'</textarea>'+
+    '<div class="row" style="margin-top:8px">'+
+      '<button class="btn" id="wsPrev"'+(st.idx===0?' disabled':'')+'>← Back</button>'+
+      '<button class="btn approve" id="wsNext">'+(st.idx===WSQ.length-1?'Finish → synthesize the card':'Save · next →')+'</button>'+
+      '<span class="footnote">'+(st.idx+1)+' / '+WSQ.length+' · '+esc(wsProject)+'</span>'+
+    '</div>';
+  document.getElementById('wsPrev').addEventListener('click', function(){ st.a[st.idx] = document.getElementById('wsTa').value; st.idx--; save(); renderWS(); });
+  document.getElementById('wsNext').addEventListener('click', function(){ st.a[st.idx] = document.getElementById('wsTa').value; st.idx++; save(); renderWS(); });
+}
+document.getElementById('btnStartWS').addEventListener('click', function(){
+  var p = document.getElementById('wsProject').value.trim();
+  if (!p){ alert('Name the project first.'); return; }
+  wsProject = p;
+  if (S.ws[p] && S.ws[p].idx >= WSQ.length) S.ws[p].idx = 0; /* restart pass keeps answers */
+  renderWS();
+});
+
+/* the synthesis template → the one-page Local North Star card + Bee Chart */
+function renderLNSCard(project){
+  var st = S.ws[project]; if (!st) return;
+  var a = st.a;
+  st.card = true; save(); renderRegistry();
+  var bee = st.bee = st.bee || { ee:'', pa:'' };
+  var out = document.getElementById('wsCardOut');
+  out.innerHTML =
+    '<div class="lns-card">'+
+      '<h4>Local North Star card — '+esc(project)+' <span class="footnote">(synthesized from the worksheet · saved in this browser)</span></h4>'+
+      '<dl style="margin:0">'+
+        '<dt>Persona</dt><dd>'+esc(a[3]||'—')+' '+esc(a[4]?(' · Typical Tuesday: '+a[4]):'')+'</dd>'+
+        '<dt>The three worlds</dt><dd>'+esc(a[5]||'—')+'</dd>'+
+        '<dt>Empathy Principle</dt><dd><i>'+esc(a[6]||'—')+'</i></dd>'+
+        '<dt>Empathy Posture</dt><dd>"There but for the grace of God '+esc(a[7]||'___')+'"</dd>'+
+        '<dt>JTBD (Clayton Christensen)</dt><dd>'+esc(a[8]||'—')+'</dd>'+
+        '<dt>Ladder to Prime</dt><dd>'+esc(a[9]||'—')+'</dd>'+
+        '<dt>Operating Rules</dt><dd>'+esc(a[10]||'—')+'</dd>'+
+        '<dt>Anti-Drift Triggers (→ Watchman/NSA rules)</dt><dd>'+esc(a[11]||'— (optional)')+'</dd>'+
+      '</dl>'+
+      '<div class="ph" style="margin-top:12px">SIC Matrix Coordinates (Bee Chart)</div>'+
+      '<div class="row">'+
+        '<label style="font-size:12.5px">Economic Engine <input type="number" id="beeEE" min="0" max="10" value="'+esc(bee.ee)+'" style="width:64px"> /10</label>'+
+        '<label style="font-size:12.5px">Purpose Alignment <input type="number" id="beePA" min="0" max="10" value="'+esc(bee.pa)+'" style="width:64px"> /10</label>'+
+        '<span id="beeBadge"></span>'+
+      '</div>'+
+      '<div class="row" style="margin-top:12px">'+
+        '<button class="btn approve" id="wsConfirm">Approve — confirm this Local NS (locally)</button>'+
+        '<button class="btn modify" id="wsModify">Modify — reopen the worksheet</button>'+
+        '<span class="footnote">No work starts without a North Star — unconfirmed = Parked.</span>'+
+      '</div>'+
+    '</div>';
+  function beeUpd(){
+    var ee = Number(document.getElementById('beeEE').value), pa = Number(document.getElementById('beePA').value);
+    bee.ee = document.getElementById('beeEE').value; bee.pa = document.getElementById('beePA').value; save();
+    var zone = (ee >= 7 && ee <= 8 && pa >= 7 && pa <= 8);
+    document.getElementById('beeBadge').innerHTML = (bee.ee!=='' && bee.pa!=='')
+      ? (zone ? '<span class="pill good">🐝 Honeybee Zone (7–8 on both): YES</span>' : '<span class="pill warn">Honeybee Zone (7–8 on both): no</span>')
+      : '<span class="footnote">score both axes /10</span>';
+  }
+  document.getElementById('beeEE').addEventListener('input', beeUpd);
+  document.getElementById('beePA').addEventListener('input', beeUpd);
+  beeUpd();
+  document.getElementById('wsConfirm').addEventListener('click', function(){
+    S.localConfirm[project] = true; save(); renderRegistry(); renderRhymeStrip(); fillGateProjects();
+    out.insertAdjacentHTML('beforeend','<p class="gate-pass" style="margin-top:10px">✅ Confirmed locally. The canon registry (data/north-stars.json) updates upstream — this page never writes it.</p>');
+  });
+  document.getElementById('wsModify').addEventListener('click', function(){
+    S.ws[project].idx = 0; save(); wsProject = project;
+    document.getElementById('wsProject').value = project; renderWS();
+    document.getElementById('wsWrap').scrollIntoView({behavior:'smooth'});
+  });
+}
+
+/* ---- Foraging mode — "Draft it for me" (clearly-labeled local draft) ---- */
+function fillForage(){
+  var sel = document.getElementById('forageSel');
+  var cands = NS.locals.filter(function(r){ return effStatus(r) !== 'confirmed'; });
+  sel.innerHTML = '<option value="">Pick a project to forage…</option>' +
+    cands.map(function(r){ return '<option value="'+esc(r.project)+'">'+esc(r.project)+(r.local_ns?'':' (no Local NS)')+'</option>'; }).join('');
+}
+document.getElementById('btnForage').addEventListener('click', function(){
+  var p = document.getElementById('forageSel').value;
+  var out = document.getElementById('forageOut');
+  if (!p){ out.innerHTML = '<p class="footnote">Pick a project first.</p>'; return; }
+  var row = NS.locals.filter(function(r){ return r.project === p; })[0] || {};
+  var rubyish = /ruby|working poor|cashco|pawn/i.test((row.local_ns||'') + ' ' + (row.persona_note||'') + ' ' + p);
+  var conf = function(level){ return '<span class="conf '+level+'">'+level.toUpperCase()+'</span>'; };
+  var qsForTim = [
+    'Who is the ONE specific person this serves? (a person, not a demographic)',
+    'What is the empathy cliché — the injustice we fix?',
+    'What is the JTBD in one sentence?',
+    'How does serving them put a Ding in the Universe? (the Ladder line)'
+  ];
+  out.innerHTML =
+    '<div class="lns-card" style="border-style:dashed">'+
+      '<div class="row spread"><h4 style="margin:0">'+esc(p)+'</h4><span class="draft-tag">DRAFT — candidate Local NS card</span></div>'+
+      '<dl style="margin:6px 0 0">'+
+        '<dt>Persona '+conf(row.persona_note ? 'med' : 'low')+'</dt><dd>'+esc(row.persona_note || 'Unknown — the vault has no persona for this project.')+'</dd>'+
+        '<dt>Candidate Local NS '+conf(row.local_ns ? 'med' : 'low')+'</dt><dd>'+esc(row.local_ns || 'NONE on file — this is exactly the gap the forage exposes.')+'</dd>'+
+        '<dt>Empathy Principle '+conf(rubyish ? 'med' : 'low')+'</dt><dd>'+(rubyish ? '<i>"It’s expensive to be poor."</i> (Ruby-adjacent pattern — confirm it actually fits)' : 'No vault candidate — name the injustice this project fixes.')+'</dd>'+
+        '<dt>Empathy Posture '+conf('high')+'</dt><dd>"There but for the grace of God go I." (doctrine — applies portfolio-wide)</dd>'+
+        '<dt>Operating-rule candidates '+conf(rubyish ? 'med' : 'low')+'</dt><dd>'+(rubyish ? 'Minimize cognitive load · short messages · never judge · "We don’t cut her off — we slow down."' : 'Draft 2–3 dignity-protecting rules with Tim.')+'</dd>'+
+      '</dl>'+
+      '<div class="ph" style="margin-top:10px">Questions for Tim (the gap list)</div>'+
+      '<ul style="font-size:12.5px">'+qsForTim.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'+
+      '<p class="footnote">One 5-minute confirm pass. Autonomy capped at 95% — the human signs off on every North Star.</p>'+
+      '<div class="row">'+
+        '<button class="btn approve" id="frApprove">Approve — confirm (locally)</button>'+
+        '<button class="btn modify" id="frModify">Modify — open the worksheet</button>'+
+        '<button class="btn decline" id="frDecline">Decline — discard draft</button>'+
+      '</div>'+
+    '</div>';
+  document.getElementById('frApprove').addEventListener('click', function(){
+    S.localConfirm[p] = true; save(); renderRegistry(); renderRhymeStrip(); fillGateProjects(); fillForage();
+    out.innerHTML = '<p class="gate-pass">✅ '+esc(p)+' confirmed locally from the foraged draft. Upstream canon updates via Tim.</p>';
+  });
+  document.getElementById('frModify').addEventListener('click', function(){
+    document.getElementById('wsProject').value = p; wsProject = p;
+    S.ws[p] = S.ws[p] || { idx:0, a:{} }; save(); renderWS();
+    document.getElementById('wsWrap').scrollIntoView({behavior:'smooth'});
+  });
+  document.getElementById('frDecline').addEventListener('click', function(){ out.innerHTML = '<p class="footnote">Draft discarded. Status unchanged — still Parked without a North Star.</p>'; });
+});
+
+/* ============================ Screen 3 — Vivid Vision Builder ============================ */
+function readVV(){
+  return {
+    project: document.getElementById('vvProject').value.trim(),
+    purpose_8_words: document.getElementById('vvPurpose').value.trim(),
+    destiny: document.getElementById('vvDestiny').value.trim(),
+    beneficiary: document.getElementById('vvBene').value.trim(),
+    core_values: document.getElementById('vvValues').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
+    definition_of_done: document.getElementById('vvDoD').value.trim(),
+    timing_window: document.getElementById('vvTiming').value.trim(),
+    do_not_violate: document.getElementById('vvDNV').value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean),
+    trauma_informed_check: document.getElementById('vvTrauma').checked,
+    wiifm: document.getElementById('vvWIIFM').value.trim(),
+    rhyme_line: document.getElementById('vvRhyme').value.trim()
+  };
+}
+
+/* _validate_vivid_vision — implemented EXACTLY (app.py); error strings are doctrine. HARD BLOCK. */
+function validateVividVision(vv){
+  var fails = [];
+  var p = vv.purpose_8_words;
+  if (!p) fails.push({ msg:'Purpose is empty', mode:'Resistance' });
+  else {
+    var n = p.split(/\s+/).filter(Boolean).length;
+    if (n > 8) fails.push({ msg:'Purpose is '+n+' words — must be 8 or fewer (HB1000 discipline)', mode:'Resistance' });
+  }
+  if (!vv.destiny || vv.destiny.length < 8) fails.push({ msg:'Destiny statement is missing or too short', mode:'Confusion' });
+  if (vv.core_values.length < 2) fails.push({ msg:'At least 2 core values required', mode:'Mistrust' });
+  var b = vv.beneficiary;
+  if (!b || b.length < 8) fails.push({ msg:'Beneficiary is missing or too vague', mode:null });
+  else if (['everyone','all users','the world','people'].indexOf(b.toLowerCase()) >= 0)
+    fails.push({ msg:'Beneficiary is too generic — name a specific person, persona, or group. Ruby Red rule: if this is for the working-poor household CFO, say so.', mode:null });
+  if (!vv.definition_of_done) fails.push({ msg:'Definition of done is missing — no DoD means no stop condition', mode:'False Starts' });
+  if (!vv.timing_window) fails.push({ msg:'Timing window is missing — no deadline means no urgency anchor', mode:'Frustration' });
+  if (vv.do_not_violate.length < 1) fails.push({ msg:'At least 1 do-not-violate rule required — the fence has to be named', mode:'Mistrust' });
+  return fails;
+}
+
+/* live counters */
+function updCounters(){
+  var p = document.getElementById('vvPurpose').value.trim();
+  var n = p ? p.split(/\s+/).filter(Boolean).length : 0;
+  var c = document.getElementById('cntPurpose');
+  c.textContent = n + '/8 words'; c.className = 'cnt ' + (n > 8 ? 'bad' : (n > 0 ? 'ok' : ''));
+  var vals = document.getElementById('vvValues').value.split(',').map(function(s){return s.trim();}).filter(Boolean).length;
+  var cv = document.getElementById('cntValues');
+  cv.textContent = vals + ' value' + (vals===1?'':'s') + ' · 2–4 ideal';
+  cv.className = 'cnt ' + (vals >= 2 && vals <= 4 ? 'ok' : (vals > 0 ? 'bad' : ''));
+  var d = document.getElementById('vvDestiny').value;
+  var cd = document.getElementById('cntDestiny');
+  if (d.trim() && !/\d/.test(d)) { cd.textContent = 'numbers in the sentence? (3–5 yr BHAG standard — soft nudge, not a block)'; cd.className = 'cnt'; }
+  else { cd.textContent = ''; }
+  renderRhymeTest();
+}
+['vvPurpose','vvDestiny','vvValues','vvBene','vvRhyme','vvTiming','vvDoD','vvDNV'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', updCounters);
+});
+
+/* Rhyme Test panel — NSA 4 checks */
+function renderRhymeTest(){
+  var vv = readVV();
+  var pn = vv.purpose_8_words ? vv.purpose_8_words.split(/\s+/).filter(Boolean).length : 0;
+  var checks = [
+    { ok: !!vv.purpose_8_words && pn <= 8, label:'Purpose — declared, ≤8 words, noble cause embedded?', note: vv.purpose_8_words ? (pn<=8?'≤8 words ✓ — noble cause is YOUR judgment':'over 8 words') : 'not declared' },
+    { ok: !!vv.destiny && /\d/.test(vv.destiny), label:'Destiny — 3–5 year BHAG with numbers in the sentence?', note: vv.destiny ? (/\d/.test(vv.destiny)?'numbers found ✓':'no numbers in the sentence') : 'not declared' },
+    { ok: vv.core_values.length >= 2 && vv.core_values.length <= 4, label:'Core Values — 2 to 4, each driving a recognizable behaviour?', note: vv.core_values.length + ' declared' },
+    { ok: vv.rhyme_line.length >= 12, label:'Rhyme — do the pillars rhyme with each other AND with the Prime?', note: vv.rhyme_line ? 'rhyme line written — confirm it holds' : 'rhyme line empty' }
+  ];
+  var allOk = checks.every(function(c){ return c.ok; });
+  document.getElementById('rhymePanel').innerHTML =
+    checks.map(function(c){
+      return '<div class="rhyme-check"><span class="rc">'+(c.ok?'✅':'⬜')+'</span><span style="flex:1">'+esc(c.label)+'<br><small class="soft">'+esc(c.note)+'</small></span></div>';
+    }).join('') +
+    (allOk ? '<p style="margin:8px 0 0"><span class="pill good">Rhyme Test: holding</span></p>'
+           : '<p style="margin:8px 0 0"><span class="flag-alignment">[ALIGNMENT-FLAG]</span> <span class="footnote">wobbly pillar — queued for Wisdom Giant review (recorded locally, nothing sends)</span></p>');
+  return allOk;
+}
+
+/* validation run — hard block, exact API shape echoed */
+var lastValidVV = null;
+document.getElementById('btnValidate').addEventListener('click', function(){
+  var vv = readVV();
+  var fails = validateVividVision(vv);
+  var res = document.getElementById('vvResult');
+  var rhymeOk = renderRhymeTest();
+  if (fails.length){
+    lastValidVV = null;
+    document.getElementById('btnSaveVision').disabled = true;
+    res.innerHTML =
+      '<div class="gate-fail"><div class="gh">⛔ vivid_vision_gate_failed — hard block, not a warning</div>'+
+      '<ul style="margin:0;padding-left:18px">'+fails.map(function(f){
+        return '<li>'+esc(f.msg)+(f.mode ? ' <span class="fm">→ courting: '+esc(f.mode)+'</span>' : '')+'</li>';
+      }).join('')+'</ul>'+
+      '<p style="margin:8px 0 0;font-size:12.5px"><b>"Ticket cannot progress until vision is sharpened."</b></p></div>';
+  } else {
+    lastValidVV = vv;
+    document.getElementById('btnSaveVision').disabled = false;
+    if (!rhymeOk && S.flags.indexOf(vv.project||'(unnamed)') < 0){ S.flags.push(vv.project||'(unnamed)'); save(); }
+    res.innerHTML = '<div class="gate-pass">✅ All 8 gate fields pass _validate_vivid_vision.'+
+      (vv.trauma_informed_check ? '' : ' <span style="color:var(--yellow);font-weight:600">trauma_informed_check is FALSE — set true only when Ruby-Red-class impact has been considered.</span>')+
+      (rhymeOk ? '' : ' <span style="color:var(--orange);font-weight:600">[ALIGNMENT-FLAG] queued — Rhyme Test wobbles.</span>')+
+      ' Save it, then take it to the Twin North Star Gate.</div>';
+  }
+});
+
+document.getElementById('btnSaveVision').addEventListener('click', function(){
+  if (!lastValidVV) return;
+  var key = lastValidVV.project || ('(unnamed ' + new Date().toISOString().slice(0,10) + ')');
+  S.visions[key] = lastValidVV; S.visions[key].saved = new Date().toISOString(); save();
+  renderSavedVisions(); fillGateVisions();
+  document.getElementById('vvResult').insertAdjacentHTML('beforeend','<p class="footnote">Saved locally as "'+esc(key)+'". Export JSON any time — nothing is trapped.</p>');
+});
+
+document.getElementById('btnExport').addEventListener('click', function(){
+  var blob = new Blob([JSON.stringify(S, null, 2)], { type:'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'hb1000-north-star-export.json';
+  document.body.appendChild(a); a.click(); a.remove();
+});
+
+function renderSavedVisions(){
+  var keys = Object.keys(S.visions);
+  var el = document.getElementById('savedVisions');
+  if (!keys.length){ el.innerHTML = '<p class="muted" style="font-size:13px">No saved visions yet. A vision must pass the gate validation before it can be saved.</p>'; return; }
+  el.innerHTML = '<table><thead><tr><th>Project</th><th>Purpose</th><th>Beneficiary</th><th>Timing</th><th>Saved</th></tr></thead><tbody>'+
+    keys.map(function(k){
+      var v = S.visions[k];
+      return '<tr><td><b>'+esc(k)+'</b></td><td style="color:var(--gold)">"'+esc(v.purpose_8_words)+'"</td><td>'+esc(v.beneficiary)+'</td><td>'+esc(v.timing_window)+'</td><td class="soft">'+esc((v.saved||'').slice(0,10))+'</td></tr>';
+    }).join('')+'</tbody></table>';
+}
+
+/* prefill scenarios — real lane defaults from Mr & Mrs Fix-It (lanes.json / app.js) */
+function setVV(o){
+  document.getElementById('vvProject').value = o.project||'';
+  document.getElementById('vvPurpose').value = o.purpose||'';
+  document.getElementById('vvDestiny').value = o.destiny||'';
+  document.getElementById('vvBene').value = o.bene||'';
+  document.getElementById('vvValues').value = o.values||'';
+  document.getElementById('vvDoD').value = o.dod||'';
+  document.getElementById('vvTiming').value = o.timing||'';
+  document.getElementById('vvDNV').value = o.dnv||'';
+  document.getElementById('vvWIIFM').value = o.wiifm||'';
+  document.getElementById('vvTrauma').checked = !!o.trauma;
+  updCounters();
+}
+document.getElementById('pfPawn').addEventListener('click', function(){
+  setVV({ project:'Pawn Princess — Diamond Vault',
+    purpose:'Relief today. Hope for tomorrow.',
+    destiny:'Dignity-first lending for the working poor.',
+    bene:'Ruby Red — working-poor household CFO needing fast, dignified cash',
+    values:'Dignity, No shame, No pressure, Clear terms',
+    dod:'10 qualified conversations. 0 unapproved claims. 0 predatory phrases. Receipt filed.',
+    timing:'this week',
+    dnv:'No predatory language\nNo false urgency\nNo hidden terms',
+    wiifm:'Lauren closes the month with the vault converting — without a single shame-adjacent line.',
+    trauma:true });
+});
+document.getElementById('pfMaven').addEventListener('click', function(){
+  setVV({ project:'Maven — onboarding',
+    purpose:'Ruby Red trusts Maven by minute three.',
+    destiny:'Maven Grace as the trusted financial OS.',
+    bene:'Ruby Red — working-poor household CFO, first-time Maven user',
+    values:'Trust before features, Trauma-informed, Plain language',
+    dod:'Onboarding completion +15% with trust signal preserved.',
+    timing:'this sprint',
+    dnv:'No dark patterns\nNo coerced data collection\nNo surprise steps',
+    wiifm:'The Caller sees activation climb without burning trust to get it.',
+    trauma:true });
+});
+
+/* persona picker from the registry */
+function fillBeneSel(){
+  var sel = document.getElementById('vvBeneSel');
+  var seen = {};
+  var opts = NS.locals.filter(function(r){ return r.local_ns && !seen[r.local_ns] && (seen[r.local_ns]=1); })
+    .map(function(r){ return '<option value="'+esc(r.local_ns)+'">'+esc(r.local_ns.length>46 ? r.local_ns.slice(0,44)+'…' : r.local_ns)+'</option>'; });
+  sel.innerHTML = '<option value="">Persona picker (from registry)…</option>' + opts.join('');
+  sel.addEventListener('change', function(){
+    if (sel.value){ document.getElementById('vvBene').value = sel.value; updCounters(); }
+  });
+}
+
+/* Accordion Card — 5 panels (Destiny · Core Values · Values · Sense of Purpose · Journey), gold/navy, printable */
+document.getElementById('btnRenderAcc').addEventListener('click', function(){
+  var vv = lastValidVV || readVV();
+  if (!vv.purpose_8_words && !vv.destiny){
+    document.getElementById('accOut').innerHTML = '<p class="footnote">Fill the builder first (or hit a prefill), then render.</p>'; return;
+  }
+  var vals = vv.core_values;
+  document.getElementById('accOut').innerHTML =
+    '<div class="acc-card">'+
+      '<div class="acc-panel"><div class="at">Destiny</div><div class="ab"><span class="big">'+esc(vv.destiny||'—')+'</span><p style="margin-top:6px">The BHAG — 3–5 year, numbers in the sentence (Jim Collins).</p></div></div>'+
+      '<div class="acc-panel"><div class="at">Core Values</div><div class="ab"><ul>'+(vals.length?vals.map(function(v){return '<li><b>'+esc(v)+'</b></li>';}).join(''):'<li>—</li>')+'</ul><p>2 to 4 — each driving a recognizable behaviour.</p></div></div>'+
+      '<div class="acc-panel"><div class="at">Values — the fences</div><div class="ab"><ul>'+(vv.do_not_violate.length?vv.do_not_violate.map(function(v){return '<li>'+esc(v)+'</li>';}).join(''):'<li>—</li>')+'</ul><p>Do-not-violate: the fence has to be named.</p></div></div>'+
+      '<div class="acc-panel"><div class="at">Sense of Purpose</div><div class="ab"><span class="big">"'+esc(vv.purpose_8_words||'—')+'"</span><p style="margin-top:6px">For: '+esc(vv.beneficiary||'—')+'</p>'+(vv.wiifm?'<p>WIIFM: '+esc(vv.wiifm)+'</p>':'')+'</div></div>'+
+      '<div class="acc-panel"><div class="at">Journey</div><div class="ab"><p><b>Timing:</b> '+esc(vv.timing_window||'—')+'</p><p><b>Done means:</b> '+esc(vv.definition_of_done||'—')+'</p>'+(vv.rhyme_line?'<p><b>Rhymes with the Prime:</b> '+esc(vv.rhyme_line)+'</p>':'')+'</div></div>'+
+    '</div>';
+  document.getElementById('elevatorOut').innerHTML =
+    '<div class="ph" style="margin-top:10px">The 60-second elevator speech</div>'+
+    '<blockquote style="font-size:13.5px">We exist to put "'+esc(vv.purpose_8_words)+'" into the world — for '+esc(vv.beneficiary||'[beneficiary]')+'. '+
+    'Our destiny: '+esc(vv.destiny||'[BHAG]')+'. We live by '+esc(vals.join(', ')||'[core values]')+'. '+
+    'We will never cross these fences: '+esc(vv.do_not_violate.join('; ')||'[do-not-violate]')+'. '+
+    'Done means: '+esc(vv.definition_of_done||'[DoD]')+' — and the clock is real: '+esc(vv.timing_window||'[timing]')+'.</blockquote>';
+  document.getElementById('btnPrintAcc').disabled = false;
+});
+document.getElementById('btnPrintAcc').addEventListener('click', function(){
+  document.body.classList.add('print-acc');
+  window.print();
+  setTimeout(function(){ document.body.classList.remove('print-acc'); }, 400);
+});
+
+/* ============================ Screen 4 — the Twin North Star Gate ============================ */
+var sigs = { ee1:false, cm1:false, ee2:false };
+['sigEE1','sigCM1','sigEE2'].forEach(function(id, i){
+  var key = ['ee1','cm1','ee2'][i];
+  document.getElementById(id).addEventListener('click', function(){
+    sigs[key] = !sigs[key];
+    document.getElementById(id).classList.toggle('signed', sigs[key]);
+  });
+});
+['ladPersona','ladAction','ladOutcome'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', function(){
+    var p = document.getElementById('ladPersona').value.trim() || '[Persona]';
+    var a = document.getElementById('ladAction').value.trim() || '[Action]';
+    var o = document.getElementById('ladOutcome').value.trim() || '[Outcome]';
+    document.getElementById('ladderPreview').innerHTML = '"this serves <b>'+esc(p)+'</b> by <b>'+esc(a)+'</b>, putting a Ding in the Universe by <b>'+esc(o)+'</b>"';
+  });
+});
+
+function fillGateProjects(){
+  var sel = document.getElementById('gateProject');
+  sel.innerHTML = '<option value="">Pick a project…</option>' +
+    NS.locals.map(function(r){ return '<option value="'+esc(r.project)+'">'+esc(r.project)+'</option>'; }).join('');
+}
+function fillGateVisions(){
+  var sel = document.getElementById('gateVision');
+  var keys = Object.keys(S.visions);
+  sel.innerHTML = keys.length
+    ? '<option value="">Pick a saved vision…</option>' + keys.map(function(k){ return '<option value="'+esc(k)+'">'+esc(k)+'</option>'; }).join('')
+    : '<option value="">— none saved yet —</option>';
+}
+document.getElementById('gateProject').addEventListener('change', function(){
+  var p = this.value;
+  var el = document.getElementById('gateLocalStatus');
+  if (!p){ el.innerHTML = ''; return; }
+  var row = NS.locals.filter(function(r){ return r.project === p; })[0];
+  var ok = row && effStatus(row) === 'confirmed';
+  el.innerHTML = ok
+    ? '<div class="status-row ok"><span class="st">OK</span><span class="grow">Confirmed Local NS on file: <b>'+esc(row.local_ns || '(confirmed locally via worksheet/forage)')+'</b></span></div>'
+    : '<div class="status-row bad"><span class="st">FAIL</span><span class="grow">No confirmed Local North Star card for this project — run the worksheet or Foraging on Screen 2 first.</span></div>';
+});
+
+document.getElementById('btnRunGate').addEventListener('click', function(){
+  var p = document.getElementById('gateProject').value;
+  var res = document.getElementById('gateResult');
+  var verd = document.getElementById('gateVerdicts');
+  verd.innerHTML = '';
+  if (!p){ res.innerHTML = '<p class="footnote">Pick the project at the gate first.</p>'; return; }
+  var row = NS.locals.filter(function(r){ return r.project === p; })[0];
+  var localOk = row && effStatus(row) === 'confirmed';
+  var primeOk = sigs.ee1 && sigs.cm1;
+  var sigLocalOk = sigs.ee2;
+  var lad = ['ladPersona','ladAction','ladOutcome'].every(function(id){ return document.getElementById(id).value.trim(); });
+  var rhyme = document.getElementById('gateRhyme').value.trim().length >= 12;
+  var missing = [];
+  if (!primeOk) missing.push('Prime check unsigned — Empathy Enforcer + Compliance Marshal must both sign.');
+  if (!localOk) missing.push('Local check FAILED — no confirmed Local North Star card.');
+  if (localOk && !sigLocalOk) missing.push('Local check unsigned — Empathy Enforcer must sign.');
+  if (!lad) missing.push('Ladder line incomplete — NSA refuses to move a card to In Progress without it.');
+  if (!rhyme) missing.push('Rhyme line missing — show how this rhymes with the Prime.');
+  if (missing.length){
+    res.innerHTML =
+      '<div class="halt-box"><div class="hb">⛔ HALT → PARK</div>'+
+      '<p style="font-weight:800;color:var(--red);margin:6px 0">"No tokens burned, no agent spawned."</p>'+
+      '<p class="muted" style="font-size:13px">"Measure twice, cut once." This is a hard halt, never a warning (Standing Order #10).</p>'+
+      '<ul style="text-align:left;font-size:13px;margin:10px auto;max-width:560px">'+missing.map(function(m){ return '<li>'+esc(m)+'</li>'; }).join('')+'</ul>'+
+      '<p style="font-size:13px">Project goes to <a href="nursery.html">the Nursery → Park bucket</a> until both checks pass.</p></div>';
+    S.gates[p] = { verdict:'PARK', when:new Date().toISOString() }; save();
+    return;
+  }
+  res.innerHTML =
+    '<div class="pass-box"><div class="hb">✅ Both checks hold — Tim, the gate is yours.</div>'+
+    '<p class="muted" style="font-size:13px">Prime check signed (Empathy Enforcer + Compliance Marshal) · Local check signed (Empathy Enforcer) · Ladder line declared · rhyme line written. The only verbs at a gate: Approve / Modify / Decline.</p></div>';
+  verd.innerHTML =
+    '<div class="verdicts" style="justify-content:center">'+
+      '<button class="btn approve" id="gApprove">Approve — issue the Dingo card</button>'+
+      '<button class="btn modify" id="gModify">Modify — back to the Vivid Vision Builder</button>'+
+      '<button class="btn decline" id="gDecline">Decline — Park it</button>'+
+    '</div>';
+  document.getElementById('gApprove').addEventListener('click', function(){
+    S.gates[p] = { verdict:'APPROVED', when:new Date().toISOString() }; save();
+    verd.innerHTML = '<div class="pass-box"><div class="hb">🟢 GATE PASSED — recorded locally.</div>'+
+      '<p style="font-size:13.5px">Next: name the Dingo Caller, get the "Yes, I accept this assignment," and the card goes live. '+
+      '<a href="card.html">Open the Dingo Card →</a> · its PTK — Promises to Keep centre square wires to <a href="ptk.html">the dual ledger</a>.</p>'+
+      '<p class="footnote">Anti-drift triggers from the worksheet now register with the North Star Agent (Aspirin → Treatment → Fever).</p></div>';
+  });
+  document.getElementById('gModify').addEventListener('click', function(){
+    S.gates[p] = { verdict:'MODIFY', when:new Date().toISOString() }; save();
+    showScr('vivid'); window.scrollTo({top:0, behavior:'smooth'});
+  });
+  document.getElementById('gDecline').addEventListener('click', function(){
+    S.gates[p] = { verdict:'PARK', when:new Date().toISOString() }; save();
+    verd.innerHTML = '<div class="halt-box"><div class="hb">⛔ Declined → PARK</div><p style="font-weight:800;color:var(--red)">"No tokens burned, no agent spawned."</p><p style="font-size:13px">It waits in <a href="nursery.html">the Nursery</a> — ideas merge, they never die.</p></div>';
+  });
+});
+
+/* Rhyme Integrity strip — computed from registry status at render, never asserted */
+function renderRhymeStrip(){
+  var tb = document.querySelector('#rhymeStrip tbody');
+  tb.innerHTML = NS.locals.map(function(r){
+    var st = effStatus(r);
+    var light, why;
+    if (st === 'confirmed'){ light = '🟢'; why = 'Local NS confirmed — rhyme holds'; }
+    else if (!r.local_ns){ light = '🔴'; why = 'No Local NS anywhere — card without Local NS → Aspirin'; }
+    else { light = '🟡'; why = st === 'worksheet' ? 'Worksheet needed — pillar unconfirmed' : 'Foraging needed — draft-first pass pending'; }
+    return '<tr><td>'+light+'</td><td><b>'+esc(r.project)+'</b></td><td>'+esc(r.local_ns||'—')+'</td><td class="muted" style="font-size:12px">'+why+'</td></tr>';
+  }).join('');
+}
+
+/* ============================ boot — real JSON first, verbatim fallback for file:// ============================ */
+function renderAll(){
+  renderPrime(); renderRuby(); renderRegistry(); fillForage();
+  fillBeneSel(); renderSavedVisions(); fillGateProjects(); fillGateVisions(); renderRhymeStrip();
+  document.getElementById('localsNote').textContent = NS.locals_note || '';
+}
+Shell.loadJSON('data/north-stars.json').then(function(data){
+  NS = data; renderAll();
+}).catch(function(){
+  /* file:// blocks fetch in some browsers — render the embedded verbatim fallback and say so */
+  NS = FALLBACK; renderAll();
+  var note = document.createElement('p');
+  note.className = 'footnote';
+  note.textContent = '⚠ data/north-stars.json could not be fetched (file:// mode?) — rendering the embedded verbatim copy. Serve over HTTP for the live JSON.';
+  document.querySelector('main').insertBefore(note, document.querySelector('.scr-tabs'));
+});
+</script>
+</body>
+</html>

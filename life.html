@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build Your Own Life — the agnostic mode · The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+.hero-life{margin:8px 0 20px}
+.hero-life .kicker{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
+.hero-life h1{font-size:36px}
+.hero-life .sub{font-size:15px;color:var(--muted);max-width:720px}
+@media (max-width:900px){.hero-life h1{font-size:28px}}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 6px}
+.savestate{font-size:12px;color:var(--soft);margin-left:auto}
+
+label.f{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:12px 0 4px}
+input.f,textarea.f,select.f{
+  width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
+  color:var(--ink);font-family:inherit;font-size:14px;padding:8px 11px;
+}
+input.f:focus,textarea.f:focus,select.f:focus{outline:none;border-color:var(--gold)}
+textarea.f{min-height:90px;resize:vertical;line-height:1.55}
+
+.geometry{display:grid;grid-template-columns:1.15fr 1fr;gap:20px;align-items:center}
+@media (max-width:900px){.geometry{grid-template-columns:1fr}}
+.geometry svg{width:100%;height:auto;display:block}
+
+.locals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:900px){.locals-grid{grid-template-columns:1fr}}
+.local-panel .lp-h{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;margin-bottom:4px}
+.local-panel .lp-h .ico{font-size:17px}
+
+/* personal Dingo card */
+.card-head{display:grid;grid-template-columns:1fr 280px;gap:18px;align-items:start}
+@media (max-width:900px){.card-head{grid-template-columns:1fr}}
+.sq input{width:100%;background:transparent;border:0;border-bottom:1px dashed var(--line);color:var(--ink);font-family:inherit;font-size:11px;padding:1px 0;margin:1px 0}
+.sq input:focus{outline:none;border-bottom-color:var(--gold)}
+.sq input.lbl{font-weight:700;font-size:11.5px}
+.sq input.kpi-in{color:var(--muted);font-size:10.5px}
+.sq .hwrap{display:flex;align-items:center;gap:3px;font-size:9.5px;color:var(--soft);margin-top:3px}
+.sq .hwrap input{width:34px;border-bottom:1px dashed var(--line);font-size:10px;text-align:right;margin:0}
+.sq .dotbtn{position:absolute;top:5px;right:5px;background:none;border:0;cursor:pointer;padding:3px;line-height:0}
+.sq.ptk textarea{
+  width:100%;background:transparent;border:0;border-bottom:1px dashed rgba(232,181,77,.5);
+  color:var(--gold-glass);font-family:inherit;font-size:11px;resize:none;min-height:34px;line-height:1.35;
+}
+.sq.ptk textarea:focus{outline:none;border-bottom-color:var(--gold)}
+.wc-pill{margin-left:8px}
+
+.dod{margin-top:14px}
+.nursery-add{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.nursery-add input{flex:1;min-width:200px}
+.bfly{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:9px 12px;margin:6px 0;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius)}
+.bfly .bt{flex:1;min-width:160px;font-size:13.5px;font-weight:600}
+.bfly select{width:auto;font-size:12px;padding:4px 8px}
+.bfly .del{background:none;border:0;color:var(--soft);cursor:pointer;font-size:15px;padding:2px 6px}
+.bfly .del:hover{color:var(--red)}
+.empty-note{font-size:12.5px;color:var(--soft);font-style:italic;padding:6px 0}
+
+/* ---------------- PRINT STYLESHEET (the printable blank scaffold) ---------------- */
+@media print{
+  #hb-sidebar,.guard-banner,#hb-nav-toggle,.no-print{display:none!important}
+  body,body.hb-shelled{padding-left:0;background:#fff;color:#000}
+  main{padding:0;max-width:none}
+  h1,h2,h3,.hero-life h1{color:#000}
+  h1 b,h2 b{color:#000}
+  .panel,.card,.sq,.bfly,.local-panel{background:#fff;border-color:#888;color:#000;box-shadow:none}
+  .panel:hover,.card:hover{border-color:#888}
+  .sec-h,.ph,label.f,.muted,.footnote,.hero-life .sub,.hero-life .kicker{color:#333}
+  input.f,textarea.f,select.f,.sq input,.sq.ptk textarea{background:#fff;border-color:#888;color:#000}
+  .sq.ptk{background:#f3e6c2;border-color:#8a6d1f}
+  .sq.ptk .label,.sq.ptk .kpi{color:#5c4517}
+  blockquote{background:#f5f5f5;color:#000;border-left-color:#555}
+  .pill{color:#000;border-color:#888;background:#fff}
+  .splitbar{border-color:#888}
+  .splitwrap .legend{color:#333}
+  a{color:#000;text-decoration:underline}
+  .grid5{gap:4px}
+  .sq{min-height:80px;page-break-inside:avoid}
+  section{page-break-inside:avoid}
+  svg text{fill:#000!important}
+}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- ======================= HERO ======================= -->
+  <header class="hero-life">
+    <div class="kicker">The agnostic mode · the adoption wedge</div>
+    <h1>Build <b>Your Own Life</b></h1>
+    <p class="sub">The identical geometry, blank. <i>"Anyone can put themselves at the center as the
+      HB1000 of their own life"</i> — your own Prime (your personal Ding), your own Locals, your own
+      personal Dingo card with PTK at the centre, your own Nursery.
+      <i>"The clearest teaching device — a blank scaffold explains the structure better than the dense
+      filled one."</i></p>
+    <p class="footnote">This deployment points the same engine at Social Impact Capitalism with Tim as
+      the HB1000 moderator. Tim's Prime ships as the worked example —
+      <a href="purpose.html">see "Do Before I Die"</a>.</p>
+  </header>
+
+  <!-- ======================= TOOLBAR ======================= -->
+  <div class="toolbar no-print">
+    <button class="btn" id="btn-print">🖨 Print the blank scaffold</button>
+    <button class="btn" id="btn-export">⬇ Export JSON</button>
+    <button class="btn" id="btn-import">⬆ Import JSON</button>
+    <input type="file" id="import-file" accept=".json,application/json" style="display:none">
+    <button class="btn decline" id="btn-reset">Reset</button>
+    <span class="savestate" id="savestate">Nothing saved yet — everything you type stays in this browser (localStorage) only.</span>
+  </div>
+
+  <!-- ======================= THE GEOMETRY, BLANK ======================= -->
+  <section class="panel" style="margin:14px 0">
+    <div class="ph">The geometry — a diamond split by the equator, blank</div>
+    <div class="geometry">
+      <svg viewBox="0 0 700 560" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="The blank diamond: your Prime at the apex, the WHY above the equator, you at the centre, the HOW below, your personal Dingo card building at the base, your Nursery butterflies in the sky">
+        <!-- nursery butterflies in the sky -->
+        <text x="80" y="70" font-size="15" opacity=".85">🦋</text>
+        <text x="135" y="40" font-size="12" opacity=".7">🦋</text>
+        <text x="595" y="58" font-size="14" opacity=".8">🦋</text>
+        <text x="545" y="92" font-size="11" opacity=".6">🦋</text>
+        <text x="78" y="92" font-size="10" fill="var(--soft)">your Nursery —</text>
+        <text x="78" y="105" font-size="10" fill="var(--soft)">Cloud Butterflies in the sky</text>
+
+        <!-- diamond outline -->
+        <polygon points="350,28 648,265 350,540 52,265" fill="none" stroke="var(--gold)" stroke-width="1.4" opacity=".55"/>
+
+        <!-- apex star + label -->
+        <text x="350" y="22" font-size="18" text-anchor="middle">⭐</text>
+        <text x="350" y="52" font-size="13" font-weight="800" text-anchor="middle" fill="var(--gold)">YOUR PRIME NORTH STAR</text>
+        <text x="350" y="68" font-size="10.5" text-anchor="middle" fill="var(--muted)">your “Ding in the Universe” · your Do-Before-I-Die</text>
+
+        <!-- WHY bands -->
+        <text x="350" y="115" font-size="11" text-anchor="middle" fill="var(--ink)">Your Vivid Vision — Purpose ≤8 words · BHAG · Core Values</text>
+        <text x="350" y="150" font-size="11" text-anchor="middle" fill="var(--ink)">Your cause · your give-back (Blue Seal)</text>
+        <text x="350" y="185" font-size="11" text-anchor="middle" fill="var(--ink)">Your origin story — the WHY people get behind</text>
+
+        <!-- equator -->
+        <line x1="52" y1="265" x2="648" y2="265" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="7 6"/>
+        <text x="62" y="252" font-size="10" fill="var(--gold)">ABOVE = the WHY (vision)</text>
+        <text x="62" y="284" font-size="10" fill="var(--gold)">BELOW = the HOW (execution &amp; accountability)</text>
+
+        <!-- HB1000 sphere: blue-left / gold-right (LOCKED orientation) -->
+        <path d="M350,229 A36,36 0 0 0 350,301 Z" fill="var(--blue)"/>
+        <path d="M350,229 A36,36 0 0 1 350,301 Z" fill="var(--gold)"/>
+        <circle cx="350" cy="265" r="36" fill="none" stroke="var(--ink)" stroke-width="1" opacity=".5"/>
+        <text x="350" y="325" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ink)">YOU at the centre — the HB1000 of your own life</text>
+        <text x="350" y="340" font-size="9.5" text-anchor="middle" fill="var(--muted)">human brilliance (gold) married to the AI fleet (blue) · 80/20</text>
+
+        <!-- service rings, inner→outer: Financial SoT (teal) → Blue Seal (blue) → Sales & Marketing (red) -->
+        <path d="M 270,265 A 80,80 0 0 0 430,265" fill="none" stroke="var(--teal)" stroke-width="2" opacity=".7"/>
+        <path d="M 235,265 A 115,115 0 0 0 465,265" fill="none" stroke="var(--blue)" stroke-width="2" opacity=".6"/>
+        <path d="M 200,265 A 150,150 0 0 0 500,265" fill="none" stroke="var(--red)" stroke-width="2" opacity=".55"/>
+        <text x="350" y="372" font-size="9.5" text-anchor="middle" fill="var(--teal)">Financial Source of Truth — your money truth, “off the rocks”</text>
+        <text x="350" y="397" font-size="9.5" text-anchor="middle" fill="var(--blue)">Blue Seal — your give-back, hooked up</text>
+        <text x="350" y="430" font-size="9.5" text-anchor="middle" fill="var(--red)">Sales &amp; Marketing — how your story reaches people</text>
+
+        <!-- the personal Dingo card "building" at the base: 5×5, PTK gold centre -->
+        <g transform="translate(318,448)">
+          <rect x="-4" y="-12" width="72" height="84" fill="var(--panel-2)" stroke="var(--line)"/>
+          <rect x="-4" y="-12" width="72" height="8" fill="var(--gold)" opacity=".55"/>
+        </g>
+        <g id="mini-grid"></g>
+        <text x="350" y="552" font-size="9.5" text-anchor="middle" fill="var(--muted)">your personal Dingo card “building” — 5 floors × 5 wide, PTK at the centre</text>
+      </svg>
+      <div>
+        <p style="font-size:14px">The vertical spine, pointed at one life:</p>
+        <ol style="font-size:13.5px;line-height:1.8;padding-left:20px">
+          <li><b style="color:var(--gold)">Your Prime</b> — your own Ding in the Universe.</li>
+          <li><b>Twin North Star Gate</b> — every personal project answers <i>"What's the Ding?"</i> Prime check + Local check, or HALT → Park.</li>
+          <li><b>You</b> — the HB1000 of your own life, at the equator. Agents 80%, you 20%.</li>
+          <li><b>Your Locals</b> — Partner · Parent · Health · Work · Community · Money.</li>
+          <li><b>Your personal Dingo card</b> — 25 squares, PTK (Promises to Keep) at the centre.</li>
+          <li><b>Your Nursery</b> — your Cloud Butterflies, landed on Flypaper, waiting to graduate.</li>
+        </ol>
+        <blockquote style="font-size:13px">"The Dingo Card IS the operating system. Everything else is a field on it, a feed into it, or a score from it."</blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 1 · YOUR PRIME ======================= -->
+  <section class="panel" style="margin:14px 0">
+    <div class="ph">1 · Your Prime North Star — ONE per life</div>
+    <p class="muted" style="font-size:13px">Your "Ding in the Universe" — your own Do-Before-I-Die.
+      The litmus: if a project can't articulate its Ding, it's parked.
+      Worked example: <a href="purpose.html">Tim's Prime</a>.</p>
+    <label class="f" for="prime-ding">Your Ding in the Universe (one line)</label>
+    <input class="f" id="prime-ding" data-k="prime.ding" placeholder="What dent do you want to leave?">
+    <label class="f" for="prime-statement">Your Do-Before-I-Die statement (long form — write it like you mean it)</label>
+    <textarea class="f" id="prime-statement" data-k="prime.statement" placeholder="I have been given the opportunity to…"></textarea>
+    <label class="f" for="prime-gratitude">Your core value (Tim's is Attitude of Gratitude — name yours)</label>
+    <input class="f" id="prime-gratitude" data-k="prime.coreValue" placeholder="The one value above all others">
+  </section>
+
+  <!-- ======================= 2 · YOUR LOCALS ======================= -->
+  <section class="panel" style="margin:14px 0">
+    <div class="ph">2 · Your Local North Stars — many, each must rhyme with your Prime</div>
+    <p class="muted" style="font-size:13px">Six lanes of one life. A Local is one sentence: who you serve
+      in that lane and what "winning" looks like. Not identical to the Prime — <b>rhyming</b> with it.</p>
+    <div class="locals-grid" id="locals"></div>
+  </section>
+
+  <!-- ======================= 3 · YOUR PERSONAL DINGO CARD ======================= -->
+  <section class="panel" style="margin:14px 0">
+    <div class="ph">3 · Your personal Dingo card — blank, PTK at the centre</div>
+    <div class="card-head">
+      <div>
+        <label class="f" for="card-caller">Dingo Caller (that's you — "one neck to choke")</label>
+        <input class="f" id="card-caller" data-k="card.caller" placeholder="Your name">
+        <label class="f" for="card-purpose">Vivid Vision — Sense of Purpose (≤8 words, with a noble cause) <span class="wc-pill" id="wc"></span></label>
+        <input class="f" id="card-purpose" data-k="card.purpose" placeholder="Eight words or fewer">
+        <label class="f" for="card-bhag">Vivid Vision — BHAG (3–5 year, numbers in the sentence)</label>
+        <input class="f" id="card-bhag" data-k="card.bhag" placeholder="The big hairy audacious goal, with numbers">
+        <label class="f" for="card-values">Vivid Vision — Core Values (comma-separated, at least one)</label>
+        <input class="f" id="card-values" data-k="card.values" placeholder="e.g. Honesty, Showing up, Gratitude">
+        <label class="f" for="card-wiifm">WIIFM — what's in it for you</label>
+        <input class="f" id="card-wiifm" data-k="card.wiifm" placeholder="Why this card is worth your 20%">
+      </div>
+      <div>
+        <div class="ph" style="margin-bottom:6px">80/20 roll-up <span style="color:var(--soft);text-transform:none;letter-spacing:0">(computed, never asserted)</span></div>
+        <div id="rollup"></div>
+        <p class="footnote" style="margin-top:8px">Mean of your share over the 24 non-PTK squares.
+          Over 20% turns the bar red — the covenant: agents 80%, you 20%.</p>
+        <div class="dod">
+          <div class="ph" style="margin-bottom:6px">Card "complete" checklist <span style="color:var(--soft);text-transform:none;letter-spacing:0">(computed)</span></div>
+          <div id="dod"></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid5" id="grid" style="margin-top:16px"></div>
+    <p class="footnote" style="margin-top:10px">Dingo Caller — "one neck to choke" populates the squares
+      &amp; approves · 20% | AI agent fleet — does the work · 80%. Centre square = PTK — Promises to Keep,
+      the AI promise engine — track your promises in <a href="ptk.html">the PTK dual ledger</a>.</p>
+  </section>
+
+  <!-- ======================= 4 · YOUR PERSONAL NURSERY ======================= -->
+  <section class="panel" style="margin:14px 0">
+    <div class="ph">4 · Your personal Nursery — Cloud Butterflies, inner ring</div>
+    <p class="muted" style="font-size:13px">Ideas land here first (Flypaper). Score them later; only
+      "Now" graduates to a card. Buckets: Nursery → Now / Next / Later / Park / Kill (a Kill gets a
+      eulogy + a lesson — ideas merge, they never die).</p>
+    <div class="nursery-add no-print">
+      <input class="f" id="bfly-title" placeholder="A new Cloud Butterfly — one line, verbatim as it landed">
+      <button class="btn gold-cta" id="bfly-add">Add to the Nursery</button>
+    </div>
+    <div id="nursery"></div>
+  </section>
+
+  <!-- ======================= CTA ======================= -->
+  <section style="margin:22px 0">
+    <div class="sec-h">Go deeper</div>
+    <div class="hub-grid">
+      <a class="link-card" href="purpose.html">
+        <div class="lc-t">The worked <b>example</b></div>
+        <div class="lc-d">Tim's "Do Before I Die" — the Prime this deployment runs on.</div>
+        <div class="lc-k">purpose.html</div>
+      </a>
+      <a class="link-card" href="north-star.html">
+        <div class="lc-t">North Star <b>Builder</b></div>
+        <div class="lc-d">The full toolkit: Vivid Vision validation, Rhyme Test, the 30-question Destiny Discovered route.</div>
+        <div class="lc-k">north-star.html</div>
+      </a>
+      <a class="link-card" href="index.html">
+        <div class="lc-t">The <b>Model</b></div>
+        <div class="lc-d">The filled-in diamond — the same geometry pointed at Social Impact Capitalism.</div>
+        <div class="lc-k">index.html</div>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/shell.js"></script>
+<script>
+'use strict';
+Shell.init('life');
+
+/* =======================================================================
+   Build Your Own Life — Phase 1: static/printable + localStorage.
+   No fetch needed: the scaffold is blank by design; YOUR data is the data.
+   Persistence: localStorage key 'hb1000-life-v1'. Export/import so nothing
+   is trapped. All roll-ups computed at render, never asserted.
+======================================================================= */
+var KEY = 'hb1000-life-v1';
+var esc = Shell.esc;
+
+var LOCAL_LANES = [
+  { id: 'partner',   ico: '💞', label: 'Partner'   },
+  { id: 'parent',    ico: '🌱', label: 'Parent'    },
+  { id: 'health',    ico: '❤️', label: 'Health'    },
+  { id: 'work',      ico: '🛠', label: 'Work'      },
+  { id: 'community', ico: '🏘', label: 'Community' },
+  { id: 'money',     ico: '🪙', label: 'Money'     }
+];
+var BUCKETS = ['Nursery', 'Now', 'Next', 'Later', 'Park', 'Kill'];
+
+function defaultState(){
+  var squares = [];
+  for (var i = 0; i < 25; i++){
+    if (i === 12) squares.push({ id: 'PTK', ptk: true, promise: '' });
+    else squares.push({ id: 'D' + (i + 1), label: '', kpi: '', ryg: '', human: 20 }); /* D13 slot is PTK */
+  }
+  var locals = {};
+  LOCAL_LANES.forEach(function(l){ locals[l.id] = { ns: '', declared: false }; });
+  return {
+    v: 1,
+    prime: { ding: '', statement: '', coreValue: '' },
+    locals: locals,
+    card: { caller: '', purpose: '', bhag: '', values: '', wiifm: '', squares: squares },
+    nursery: []
+  };
+}
+
+function loadState(){
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (!raw) return defaultState();
+    var s = JSON.parse(raw);
+    var d = defaultState();
+    /* shallow-merge over defaults so older exports still load */
+    s = s && typeof s === 'object' ? s : {};
+    d.prime  = Object.assign(d.prime, s.prime || {});
+    if (s.locals) LOCAL_LANES.forEach(function(l){ if (s.locals[l.id]) d.locals[l.id] = Object.assign(d.locals[l.id], s.locals[l.id]); });
+    if (s.card){
+      d.card = Object.assign(d.card, s.card);
+      if (!Array.isArray(d.card.squares) || d.card.squares.length !== 25) d.card.squares = defaultState().card.squares;
+      d.card.squares[12] = Object.assign({ id: 'PTK', ptk: true, promise: '' }, d.card.squares[12], { id: 'PTK', ptk: true });
+    }
+    d.nursery = Array.isArray(s.nursery) ? s.nursery : [];
+    return d;
+  } catch (e) { return defaultState(); }
+}
+
+var state = loadState();
+var saveTimer = null;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+      var t = new Date();
+      var hh = ('0' + t.getHours()).slice(-2), mm = ('0' + t.getMinutes()).slice(-2);
+      document.getElementById('savestate').textContent = 'Saved to this browser ✓ ' + hh + ':' + mm + ' — yours only, nothing sends.';
+    } catch (e) {
+      document.getElementById('savestate').textContent = 'Could not save (localStorage unavailable) — use Export JSON.';
+    }
+  }, 350);
+}
+
+function getPath(obj, path){
+  return path.split('.').reduce(function(o, k){ return o == null ? o : o[k]; }, obj);
+}
+function setPath(obj, path, val){
+  var ks = path.split('.'), o = obj;
+  for (var i = 0; i < ks.length - 1; i++) o = o[ks[i]];
+  o[ks[ks.length - 1]] = val;
+}
+
+/* ---------- simple field binding (data-k="dot.path") ---------- */
+function bindFields(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-k]'), function(inp){
+    var k = inp.getAttribute('data-k');
+    var v = getPath(state, k);
+    if (v != null) inp.value = v;
+    inp.addEventListener('input', function(){
+      setPath(state, k, inp.value);
+      if (k === 'card.purpose') renderWordCount();
+      if (k.indexOf('card.') === 0) renderDoD();
+      save();
+    });
+  });
+}
+
+/* ---------- word count on Purpose (≤8 words, north-star rule) ---------- */
+function wordCount(s){
+  s = String(s || '').trim();
+  return s ? s.split(/\s+/).length : 0;
+}
+function renderWordCount(){
+  var n = wordCount(state.card.purpose);
+  var elw = document.getElementById('wc');
+  if (n === 0) { elw.innerHTML = ''; return; }
+  elw.innerHTML = Shell.pill(n + '/8 words', n <= 8 ? 'good' : 'danger');
+}
+
+/* ---------- Locals ---------- */
+function renderLocals(){
+  var host = document.getElementById('locals');
+  host.innerHTML = LOCAL_LANES.map(function(l){
+    var d = state.locals[l.id];
+    return '<div class="panel tight local-panel">' +
+      '<div class="lp-h"><span class="ico">' + l.ico + '</span>' + esc(l.label) +
+        '<span style="margin-left:auto" id="lp-pill-' + l.id + '">' + Shell.pill(d.declared ? '✅ declared' : '⏳ drafting', d.declared ? 'good' : 'warn') + '</span></div>' +
+      '<input class="f" id="lp-in-' + l.id + '" placeholder="Your ' + esc(l.label) + ' Local North Star — one sentence">' +
+      '<label style="display:flex;gap:7px;align-items:center;font-size:12px;color:var(--muted);margin-top:8px;cursor:pointer">' +
+        '<input type="checkbox" id="lp-ck-' + l.id + '"' + (d.declared ? ' checked' : '') + '> I declare this Local — it rhymes with my Prime' +
+      '</label>' +
+    '</div>';
+  }).join('');
+  LOCAL_LANES.forEach(function(l){
+    var inp = document.getElementById('lp-in-' + l.id);
+    var ck  = document.getElementById('lp-ck-' + l.id);
+    inp.value = state.locals[l.id].ns || '';
+    inp.addEventListener('input', function(){ state.locals[l.id].ns = inp.value; save(); });
+    ck.addEventListener('change', function(){
+      state.locals[l.id].declared = ck.checked;
+      document.getElementById('lp-pill-' + l.id).innerHTML = Shell.pill(ck.checked ? '✅ declared' : '⏳ drafting', ck.checked ? 'good' : 'warn');
+      save();
+    });
+  });
+}
+
+/* ---------- the personal 5×5 ---------- */
+var RYG_CYCLE = ['', 'green', 'yellow', 'red'];
+function renderGrid(){
+  var host = document.getElementById('grid');
+  host.innerHTML = state.card.squares.map(function(sq, i){
+    if (sq.ptk){
+      return '<div class="sq ptk" data-i="12">' +
+        '<div class="id">PTK · centre</div>' +
+        '<div class="label">PTK — Promises to Keep</div>' +
+        '<textarea id="ptk-promise" placeholder="Your focal promise — one line" aria-label="Your focal promise"></textarea>' +
+        '<div class="kpi">the AI promise engine at the centre of the card</div>' +
+      '</div>';
+    }
+    var h = Math.max(0, Math.min(100, Number(sq.human == null ? 20 : sq.human)));
+    return '<div class="sq" data-i="' + i + '">' +
+      '<div class="id">' + esc(sq.id) + '</div>' +
+      '<button class="dotbtn" data-i="' + i + '" title="Cycle status: unset → green → yellow → red" aria-label="Cycle RYG status">' + Shell.rygDot(sq.ryg) + '</button>' +
+      '<input class="lbl" data-i="' + i + '" data-f="label" placeholder="name this square" value="' + esc(sq.label) + '">' +
+      '<input class="kpi-in" data-i="' + i + '" data-f="kpi" placeholder="its KPI" value="' + esc(sq.kpi) + '">' +
+      '<div class="hwrap">you <input type="number" min="0" max="100" data-i="' + i + '" data-f="human" value="' + h + '" aria-label="Your share percent">%</div>' +
+      '<div class="agentbar" style="width:' + (100 - h) + '%"></div>' +
+    '</div>';
+  }).join('');
+
+  /* square inputs */
+  Array.prototype.forEach.call(host.querySelectorAll('input[data-f]'), function(inp){
+    inp.addEventListener('input', function(){
+      var i = Number(inp.getAttribute('data-i'));
+      var f = inp.getAttribute('data-f');
+      var sq = state.card.squares[i];
+      if (f === 'human'){
+        var v = Math.max(0, Math.min(100, Number(inp.value || 0)));
+        sq.human = v;
+        var bar = inp.closest('.sq').querySelector('.agentbar');
+        if (bar) bar.style.width = (100 - v) + '%';
+        renderRollup();
+      } else {
+        sq[f] = inp.value;
+      }
+      save();
+    });
+  });
+  /* RYG cycle buttons */
+  Array.prototype.forEach.call(host.querySelectorAll('.dotbtn'), function(btn){
+    btn.addEventListener('click', function(){
+      var i = Number(btn.getAttribute('data-i'));
+      var sq = state.card.squares[i];
+      var next = RYG_CYCLE[(RYG_CYCLE.indexOf(sq.ryg || '') + 1) % RYG_CYCLE.length];
+      sq.ryg = next;
+      btn.innerHTML = Shell.rygDot(next);
+      save();
+    });
+  });
+  /* PTK promise */
+  var pt = document.getElementById('ptk-promise');
+  pt.value = state.card.squares[12].promise || '';
+  pt.addEventListener('input', function(){ state.card.squares[12].promise = pt.value; save(); });
+}
+
+/* ---------- computed roll-up (mean human over 24 non-PTK squares) ---------- */
+function renderRollup(){
+  var sqs = state.card.squares.filter(function(s){ return !s.ptk; });
+  var sum = sqs.reduce(function(a, s){ return a + Math.max(0, Math.min(100, Number(s.human == null ? 20 : s.human))); }, 0);
+  var mean = sqs.length ? Math.round(sum / sqs.length) : 20;
+  document.getElementById('rollup').innerHTML = Shell.splitBar(mean);
+}
+
+/* ---------- computed "complete" checklist (BLUEPRINT §3.2 validation) ---------- */
+function renderDoD(){
+  var c = state.card;
+  var values = String(c.values || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+  var checks = [
+    { ok: wordCount(c.purpose) > 0 && wordCount(c.purpose) <= 8, label: 'Purpose ≤8 words, with a noble cause' },
+    { ok: !!String(c.bhag || '').trim(),   label: 'BHAG written' },
+    { ok: values.length >= 1,              label: '≥1 core value' },
+    { ok: !!String(c.wiifm || '').trim(),  label: 'WIIFM written' },
+    { ok: !!String(c.caller || '').trim(), label: 'Named Dingo Caller (you)' }
+  ];
+  document.getElementById('dod').innerHTML = checks.map(function(ch){
+    return '<div class="status-row ' + (ch.ok ? 'ok' : 'warn') + '">' +
+      '<span class="st">' + (ch.ok ? 'OK' : 'TODO') + '</span>' +
+      '<span class="grow">' + esc(ch.label) + '</span></div>';
+  }).join('');
+}
+
+/* ---------- personal Nursery ---------- */
+function renderNursery(){
+  var host = document.getElementById('nursery');
+  if (!state.nursery.length){
+    host.innerHTML = '<div class="empty-note">No butterflies yet — the Nursery is waiting. Anyone can add a concept; that includes you.</div>';
+    return;
+  }
+  host.innerHTML = state.nursery.map(function(b, i){
+    return '<div class="bfly">' +
+      '<span aria-hidden="true">🦋</span>' +
+      '<span class="bt">' + esc(b.title) + '</span>' +
+      '<select class="f" data-i="' + i + '" aria-label="Bucket">' +
+        BUCKETS.map(function(bk){ return '<option' + (b.bucket === bk ? ' selected' : '') + '>' + bk + '</option>'; }).join('') +
+      '</select>' +
+      (b.bucket === 'Kill'
+        ? '<input class="f" style="flex:1;min-width:150px" data-i="' + i + '" data-f="lesson" placeholder="eulogy + the lesson" value="' + esc(b.lesson || '') + '">'
+        : '') +
+      '<button class="del no-print" data-i="' + i + '" title="Remove" aria-label="Remove butterfly">✕</button>' +
+    '</div>';
+  }).join('');
+  Array.prototype.forEach.call(host.querySelectorAll('select'), function(sel){
+    sel.addEventListener('change', function(){
+      var i = Number(sel.getAttribute('data-i'));
+      state.nursery[i].bucket = sel.value;
+      save(); renderNursery();
+    });
+  });
+  Array.prototype.forEach.call(host.querySelectorAll('input[data-f="lesson"]'), function(inp){
+    inp.addEventListener('input', function(){
+      state.nursery[Number(inp.getAttribute('data-i'))].lesson = inp.value; save();
+    });
+  });
+  Array.prototype.forEach.call(host.querySelectorAll('.del'), function(btn){
+    btn.addEventListener('click', function(){
+      state.nursery.splice(Number(btn.getAttribute('data-i')), 1);
+      save(); renderNursery();
+    });
+  });
+}
+document.getElementById('bfly-add').addEventListener('click', function(){
+  var inp = document.getElementById('bfly-title');
+  var t = inp.value.trim();
+  if (!t) return;
+  state.nursery.push({ title: t, bucket: 'Nursery', added: new Date().toISOString().slice(0, 10) });
+  inp.value = '';
+  save(); renderNursery();
+});
+document.getElementById('bfly-title').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') document.getElementById('bfly-add').click();
+});
+
+/* ---------- toolbar ---------- */
+document.getElementById('btn-print').addEventListener('click', function(){ window.print(); });
+
+document.getElementById('btn-export').addEventListener('click', function(){
+  var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'my-hb1000-life.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+});
+
+document.getElementById('btn-import').addEventListener('click', function(){
+  document.getElementById('import-file').click();
+});
+document.getElementById('import-file').addEventListener('change', function(){
+  var f = this.files && this.files[0];
+  if (!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    try {
+      var s = JSON.parse(rd.result);
+      localStorage.setItem(KEY, JSON.stringify(s));
+      state = loadState();
+      renderAll(); save();
+    } catch (e) {
+      document.getElementById('savestate').textContent = 'Import failed — not valid JSON.';
+    }
+  };
+  rd.readAsText(f);
+  this.value = '';
+});
+
+document.getElementById('btn-reset').addEventListener('click', function(){
+  if (!confirm('Reset your whole life scaffold on this device? (Export JSON first if you want a copy.)')) return;
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  state = defaultState();
+  renderAll();
+  document.getElementById('savestate').textContent = 'Reset — blank scaffold restored.';
+});
+
+/* ---------- mini 5×5 in the SVG (decorative, PTK gold centre) ---------- */
+function renderMiniGrid(){
+  var g = document.getElementById('mini-grid');
+  var out = '';
+  for (var r = 0; r < 5; r++){
+    for (var c = 0; c < 5; c++){
+      var isPtk = (r === 2 && c === 2);
+      out += '<rect x="' + (320 + c * 13) + '" y="' + (442 + r * 14) + '" width="11" height="12" ' +
+        (isPtk ? 'fill="var(--gold)"' : 'fill="none" stroke="var(--line)" stroke-width="1"') + '/>';
+    }
+  }
+  g.innerHTML = out;
+}
+
+/* ---------- boot ---------- */
+function renderAll(){
+  bindFields();
+  renderWordCount();
+  renderLocals();
+  renderGrid();
+  renderRollup();
+  renderDoD();
+  renderNursery();
+  renderMiniGrid();
+}
+renderAll();
+if (localStorage.getItem(KEY)) {
+  document.getElementById('savestate').textContent = 'Loaded your saved scaffold from this browser.';
+}
+</script>
+</body>
+</html>

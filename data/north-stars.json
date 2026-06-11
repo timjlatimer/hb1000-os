@@ -1,0 +1,171 @@
+{
+  "meta": {
+    "title": "North Stars — Prime (verbatim, versioned) + Local North Stars registry",
+    "sources": [
+      "Personal_AI_OS_Vault/00_NORTH-STARS/PRIME_NORTH_STAR.md",
+      "Personal_AI_OS_Vault/00_NORTH-STARS/LOCAL_NORTH_STARS_INDEX.md",
+      "hb1000-os/blueprint/purpose-dna.md (Apr 6 2025 docx verbatim + Apr 13 2026 live-site verbatim)",
+      "hb1000-os/blueprint/north-star-builder.md",
+      "hb1000-os/blueprint/github-vault-canon.md §4.1 (Feb-2026 Local Directive declarations)"
+    ],
+    "rules": [
+      "ONE Prime per deployment; Local North Stars are many — each must RHYME with the Prime.",
+      "Ruby Red is NOT 'the North Star.' Ruby Red is one Local — Maven / Corner Banker / Pulse only (Standing Order #2).",
+      "Never paraphrase the North Star sentence, the Reward sentence, or 'Who gets to do this?' — the trilayer (Barstool / Cliché / Wisdom-Giant) is the only sanctioned restatement pattern.",
+      "Twin North Star Gate: Prime check + Local check before any token is spent. If either fails: Park. 'No tokens burned, no agent spawned.'"
+    ]
+  },
+  "prime": {
+    "default_version": "v2026.04",
+    "statement": "Help people get more out of life — not by force, but by example. Believe in abundance — of potential, of solutions, of impact. Put a Ding in the Universe through Social Impact Capitalism (S.I.C.) — Business as a Force for Good.",
+    "core_value": "Attitude of Gratitude",
+    "operational_values": ["Golden Rule", "Transparency is Kindness"],
+    "bhag": "Transform capitalism from 'profit-at-any-cost' to 'purpose-with-profit' and help build a $1 billion social impact business from a single desk.",
+    "litmus": "'Putting a Ding in the Universe' is the litmus test. If a project can't articulate its Ding, it's parked.",
+    "versions": {
+      "v2026.04": {
+        "label": "Prime v2026.04 — the Apr 13, 2026 public version (render by default)",
+        "source": "timjlatimer/tim-talks-website index.html view t9 · live at https://baaffg.netlify.app/ · 'Story · Legacy · Apr 13, 2026 · ≈ 5 min read'",
+        "resolving_question": "The resolving question is 'Who gets to do this?' The answer — I do, everybody does, so go — turns a life into significance rather than success. If not you, who? If not now, when?",
+        "resolving_question_long": "'Who gets to do this?' is a saying I often repeat to remind myself that this life is a great adventure — one I'm privileged to be on. Everybody gets to do it, and I get to do it too. It's a simple nudge to stay present, to see the wonder in the journey, and to embrace the shared opportunity of living fully.",
+        "thatcher_challenge": "Margaret Thatcher's challenge — 'If not you, who? If not now, when?' — drives me to act. To launch the pilot. To certify the first three Blue Seal businesses. To prove the model. To pass the work on. That's what's on the list. That's what I'd like to do before I die.",
+        "legacy_businesses": [
+          { "n": 1, "name": "Business As A Force For Good", "line": "the main family office, the cornerstone." },
+          { "n": 2, "name": "CashCo Financial", "line": "micro-loans for the left out, the left behind, and the working poor." },
+          { "n": 3, "name": "Seba Hub & Activity Centre", "line": "a 1-for-2 community model where the haves help cover the cost for the have-nots." },
+          { "n": 4, "name": "Freedom Cannabis", "line": "the goal is to become an ethical platform for cannabis services for Canada and overseas." },
+          { "n": 5, "name": "Pawn Princess Solutions", "line": "a modern, dignity-centred pawn model. The \"poor man's bank.\"" },
+          { "n": 6, "name": "Blue Seal", "line": "Do Good. Give Back. Starts Local. The vehicle for global impact." },
+          { "n": 7, "name": "Holding Properties", "line": "the stable, low-risk asset base." },
+          { "n": 8, "name": "Building a Vivid Vision", "line": "the Kokanee Village / Lifetime Land Use Rights initiative that grows amazing children in a summer village." }
+        ],
+        "trilayer": {
+          "barstool": "Who gets to do this? I do. Everybody does. So go. My reward isn't success — it's significance.",
+          "cliche": "If not you, who? If not now, when? A borrowed line, lived hard enough to make it true.",
+          "wisdom_giant": "A written, testable purpose statement functions as a decision-resolving invariant: it converts open-ended ambition into a constraint set against which every venture, hire, and trade-off can be adjudicated — and makes intergenerational impact, not personal accumulation, the optimisation target."
+        },
+        "reward_milestones": ["Launch the pilot", "Certify the first three Blue Seal businesses", "Prove the model", "Pass the work on"]
+      },
+      "v2025.04": {
+        "label": "Prime v2025.04 — the Apr 6, 2025 docx (master long-form; render as accordion)",
+        "source": "Do be Die Before I die Purpose statement/Do Before I Die Purpose Statement April 6 2025 PM.docx — living document Tim has refined for ~10 years. Spelling and idiosyncrasies preserved exactly — they are part of the voice.",
+        "prologue": "This document is a reflection of my life's journey, a guide to how I choose to live, lead, and leave a lasting impact. It is an evolving statement of purpose — one that captures my deepest values, my commitments, and my vision for the legacy I aim to create. This is not just a declaration of intent but a roadmap for those who will walk this path with me, now and in the future.",
+        "north_star": "I have been given the opportunity to create, to lead, and to inspire both myself personally, my wife, my family, friends, and those in my circle of influence. My mission is simple yet profound: to help people get more out of life, not by force, but by example. I believe in abundance — of potential, of solutions, and of impact.",
+        "gratitude": "Above all, I embrace and practice gratitude in all situations — both ordinary and extraordinary. Gratitude transforms perspectives, strengthens relationships, and builds a life of abundance.",
+        "roles": [
+          { "role": "First Tim Principle: Living With Intention", "lines": ["Prioritize Joy — Pursue hobbies and interests that bring fulfillment.", "Invest in Relationships — Deepen connections with lifelong friends.", "Optimize Health — Exercise meaningfully to extend both lifespan and health span.", "Achieve may PhD in S.I.C. (Social Impact Capitalism) — Evangelize the fusion of profit and purpose to drive systemic change."] },
+          { "role": "Best Husband: Love in Action", "lines": ["Embody Love as a Verb — Show love through daily action, not just words.", "Lead with Sharon — Together, set the tone for family leadership, legacy, and connection.", "Practice the 'Let Her - Let Me' — (personalized from 'Let Them - Let Me' by Mel Robbins)"] },
+          { "role": "Family: Raising Interdependent Leaders", "lines": ["Guide My Children — Move them from dependency to independence to interdependence.", "Equip Them for Impact — Provide tools for meaningful, productive lives, both personally and professionally."] }
+        ],
+        "legacy_intro": "I believe 'it takes a village to grow a child, a family, and to create intergenerational change through business as a force for good.' My goal is to leave a legacy that embodies the principles of S.I.C. (Social Impact Capitalism) — businesses that balance purpose with profit, demonstrating best practices and inspiring others to do the same.",
+        "legacy_businesses_2025": [
+          { "name": "CashCo Financial", "text": "A financial institution that serves the left-out, left-behind, and working poor by providing micro-loans, both secured and unsecured, within the regulations of provincial and federal laws in Canada. To give this business the best chance to succeed in the future the family office does not need to be the 100 percent equity owner or perhaps even any equity. This may become a Hobby business." },
+          { "name": "Seba Hub & Activity Centre", "text": "A large-scale activity and RV center, fostering community engagement through entertainment, sports, and educational programs. This includes Kokanee Village Initiatives and the Chapel in the Woods, a venue designed for events, banquets, and retreat-style accommodations." },
+          { "name": "Freedom Cannabis", "text": "A mid-level market grower in the Canadian cannabis industry. If operations succeed under the leadership of CEO John Frank Potestio, Freedom Cannabis has the potential to become a significant legacy business that exemplifies Business as a Force for Good — balancing sustainable growth, social responsibility, and industry leadership." },
+          { "name": "Pawn Princess Solutions dba as Princess Collateral Solutions", "text": "A modern take on the traditional pawn model, Pawn Princess Solutions operates under Princess Collateral Solutions, offering dignity-centered financial alternatives to underserved populations. This high-tech, centralized network of brick-and-mortar micro-loan centers aims to become the \"poor man's bank\" — providing respectful, accessible services to the left out, left behind, and working poor. The initiative plans to open 50 locations in five years, beginning with its flagship branch in Spruce Grove, Alberta." },
+          { "name": "Blue Seal", "text": "This is the vehicle to have global impact. It the 'Blue Seal — Do Good Give Back - Starts Local'. My desire is to great a movement that changes the way capitalism is practiced around the globe. Before community and civil unrest and prosperity is ruined for all in the village by the greed embedded in the current rules of capitalism in todays sociality. Blue Seal is a rebalancing of the global 'classes' haves and have nots in society." },
+          { "name": "Holding Properties", "text": "A portfolio of investment properties strategically managed to balance financial risk while operating various businesses. These are designed to be low-risk, low-maintenance, and require minimal direct management, ensuring stability while maintaining social impact goals." }
+        ],
+        "degrees": {
+          "heading": "My degrees in the School of Hard Knocks",
+          "current": ["F.F.B. (2 Fires and a Bankruptcy)", "C.A3. (3 Class Actions)"],
+          "next": "PhD in S.I.C. — Tuition Fee $10m US, prepaid with Smart Financial investment"
+        },
+        "sic": ["Transform Capitalism — Being a champion of shifting business from \"capitalism, capitalism\" (profit-driven at any cost) to Social Impact Capitalism (profit and purpose intertwined).", "Global Reach — Leave a worldwide impact by helping others scale social impact businesses.", "Mentorship at Scale — Help build a $1 billion social impact business from a single desk."],
+        "reward": "If I am able to live by these values and fulfill these roles, my reward will not be measured in money or accolades, but in impact: I will have built something that outlives me — a thriving community of businesses, relationships, and ideas that continue to make a difference long after I am gone. I will have inspired others — to embrace gratitude, service, and meaningful capitalism. I will leave a roadmap — for future generations to build upon. My reward is not success, but significance — knowing that my life mattered, and that my work will continue to change lives long after I take my last breath.",
+        "reward_parenthetical": "(this is known to me to be only my illusion and has no real bearing on the meaning of my life or the that I need any recognition to validate my a legacy. Its rather a simple illusionary hashmark, a KPI, a way for me to play the game of life as an adventure, the journey is the adventure and these are only road signs on that adventure and not monuments to me having existed)",
+        "reward_close": "My greatest reward will be to say: I touched the hand, the mind, and the heart, I touch the soul of someone who changed the world. To know that I made a difference — that I had a part to play.",
+        "hobby_businesses": [
+          "Mitsho & Groundswell — Indigenous-led food/product company (Ian Gladue) + dried-meat snack producer.",
+          "Game Changer Consultants — best practices, leadership, daily strategy meetings.",
+          "1-800-FRE²-RENT — basement reno + rental management, 50/50 income split after $250 admin fee.",
+          "Tip the Maker / Tip the Grower — scan a code, tip the artisan/farmer behind the product directly.",
+          "Hawaii by the Inch — buy an inch of resort property, monthly selection pool, butler/chef/concierge, first-class flights covered.",
+          "Seba Hub Petting Zoo — goats on the roof, bridge over the highway, cantilevered structures."
+        ],
+        "final_gift": "1. A Mind that seeks truth — Never stops learning questioning and growing. 2. A heart that loves deeply — Cherishes relationships and cultivates compassion. 3. A legacy that matters — Build something that outlives you. — If this document is being read after I am gone, know this: My life was imperfect but beautiful. I lived fully, loved deeply, and failed often — but I got back up every single time. I leave behind lessons, laughter, and a legacy of belief in people. Please use this document to guide your own journey. Let it serve as a compass for courage, clarity, and compassion. This is my final gift. With love, — Tim"
+      }
+    },
+    "signature_line": "Tim J Latimer, FFB, CA3, SIC — \"(I have written my - 'Do Before I Die Purpose Statement'. Its my moral ambition. Happy to share upon request)\"",
+    "degree_journey": {
+      "label": "Stages of My Life — the School of Hard Knocks Degree Journey",
+      "confirm_flag": "PENDING TIM'S CONFIRMATION — is the Degree Journey the canonical 'Stages of My Life', or is there a separate document not yet in the estate? Do not silently invent stages.",
+      "stages": [
+        { "degree": "F.F.B.", "meaning": "2 Fires and a Bankruptcy", "status": "earned" },
+        { "degree": "C.A3.", "meaning": "3 Class Actions", "status": "earned" },
+        { "degree": "PhD in S.I.C.", "meaning": "Social Impact Capitalism — champion & spokesperson. 'Tuition Fee $10m US, prepaid with Smart Financial investment.'", "status": "YOU ARE HERE — in progress. The HB1000 OS is the PhD thesis." }
+      ]
+    },
+    "review": {
+      "label": "AI Research — the Prime, reviewed autoresearch-style",
+      "guard": "(respectful; suggestions only — NEVER auto-apply)",
+      "protocol_note": "Run per the portable autoresearch protocol: every output is a baseline; adversarial scrutiny; actionable synthesis.",
+      "source": "hb1000-os/blueprint/purpose-dna.md §8",
+      "strengths": [
+        { "title": "It is a decision-resolving invariant, not a vibe.", "text": "The Wisdom-Giant layer on the live site says it precisely: the statement converts open-ended ambition into a constraint set. The Twin North Star Gate already operationalizes it — rare for a personal purpose statement to be machine-checkable." },
+        { "title": "The reward clause is psychologically sophisticated.", "text": "The parenthetical (\"this is known to me to be only my illusion… a way for me to play the game of life as an adventure\") inoculates the whole document against ego-capture. Few purpose statements audit themselves." },
+        { "title": "It rhymes top to bottom.", "text": "Prime → 8 legacy businesses → Ruby Red → DINGO cards is a coherent single song. The 2026 site version visibly evolved (resolving question, Thatcher, 8 businesses) — the \"living document\" claim is true in practice." }
+      ],
+      "tensions": [
+        { "title": "Version drift between canon copies.", "text": "Docx (Apr 2025): 6 legacy businesses, CashCo \"may become a Hobby business.\" Site (Apr 2026): 8 businesses, CashCo unambiguous, Freedom Cannabis reframed as \"ethical platform,\" adds BAFFG-cornerstone + Kokanee Vivid Vision. PRIME_NORTH_STAR.md (May 2026) is a third, mostly-docx-shaped list. The app needs ONE rendered canon with a version history, or agents will gate against different Primes." },
+        { "title": "The \"Stages of My Life\" surface is implied, never written.", "text": "Tim signs every email FFB, CA3 — the degree journey is clearly how he narrates his life — but no document declares it as the stages framework, and the only formal five-stage spec in the estate belongs to Ruby, not Tim." },
+        { "title": "The reward KPI is unmeasurable as written.", "text": "\"Touched the soul of someone who changed the world\" cannot be tracked; meanwhile the OS doctrine says \"no metric = no optimization = no ship.\" The Prime is currently exempt from its own rule (this may be intentional — a Prime perhaps should outrun its metrics — but it is a tension)." }
+      ],
+      "suggestions": [
+        { "title": "SUGGESTION 1 — Declare a single canonical version with a changelog.", "text": "Adopt the Apr 13, 2026 site version (8 businesses + resolving question) as \"Prime v2026.04,\" keep the Apr 6, 2025 docx as \"Prime v2025.04 (master long-form),\" and have the app render v2026.04 by default with one-click access to the long-form. Agents gate against the declared version only." },
+        { "title": "SUGGESTION 2 — Formalize \"Stages of My Life\" as the School of Hard Knocks Degree Journey.", "text": "One page: FFB → CA3 → PhD in S.I.C. (current, in progress), with the Confessions narrative arc as the story layer and a \"thesis progress\" tie-in to live HB1000 OS milestones (e.g., Blue Seal first-three certifications = PhD defense milestones). 15-minute voice session with Tim to confirm names and add any missing early stages." },
+        { "title": "SUGGESTION 3 — Give the Reward a proxy metric without deflating it.", "text": "Keep \"significance, not success\" as unmeasured poetry, but add the trackable leading indicator Tim already named in the site version: launch the pilot, certify the first three Blue Seal businesses, prove the model, pass the work on — four checkboxes the dashboard can actually show." }
+      ],
+      "gossip_protocol": "The purpose statement already contains its own enforcement mechanism — the \"Who gets to do this?\" question + Twin North Star Gate. The app shouldn't display the Prime; it should ask the Prime's question at every project spawn."
+    }
+  },
+  "ruby_red": {
+    "label": "Ruby Red — canonical Local North Star persona (Maven / Corner Banker / Pulse ONLY — Standing Order #2)",
+    "definition": "35-45yo mom of two. CFO of her household. Working poor. Unbanked/underbanked.",
+    "daily_decisions": [
+      "Put back the grocery item at checkout?",
+      "Afford the $30 extracurricular fee?",
+      "Pay for the flat tire so she gets to work tomorrow?"
+    ],
+    "three_gangster_worlds": ["political", "bureaucratic", "greedy capitalist"],
+    "core_philosophy": "\"It's expensive to be poor.\" That's the crime we fix.",
+    "superpower": "Empathy. \"There but for the grace of God go I.\"",
+    "operating_rules": [
+      "Minimize cognitive load.",
+      "Short messages (Grace = 2-3 sentences max).",
+      "Never judge. Never assume she has a problem unless she says so.",
+      "We don't cut her off — we slow down."
+    ]
+  },
+  "locals": [
+    { "project": "Maven", "local_ns": "Ruby Red", "persona_note": "35-45yo working-poor mom, household CFO", "status": "confirmed", "source": "maven-grace-state-mar20-2026/context/NORTH_STAR.md" },
+    { "project": "Corner Banker", "local_ns": "Ruby Red", "persona_note": "same", "status": "confirmed", "source": "maven-grace-state-mar20-2026/context/NORTH_STAR.md" },
+    { "project": "Pulse", "local_ns": "Ruby Red", "persona_note": "same", "status": "confirmed", "source": "maven-grace-state-mar20-2026/context/NORTH_STAR.md" },
+    { "project": "Grace (AI)", "local_ns": "Ruby Red", "persona_note": "Grace serves Ruby in 2-3 sentences", "status": "confirmed", "source": "maven-grace-state-mar20-2026/context/NORTH_STAR.md" },
+    { "project": "Maven Grace App", "local_ns": "Ruby Red", "persona_note": "Séance Board, Pulse Zone", "status": "confirmed", "source": "the HB1000 model tour (source document)" },
+    { "project": "Effn Duck", "local_ns": "EVERYONE — optimizing for maximum social impact, human connection, and pure joy", "persona_note": "NOT Ruby Red — Feb-2026 Local Directive declaration", "status": "confirmed", "source": "COMPLETE NORTH STAR FRAMEWORK V2.0 (CORRECTED), Feb 23 2026", "feb_declaration": true },
+    { "project": "Digger Cafe", "local_ns": "Surprise & Delight Tourism Destination", "persona_note": "NOT Ruby Red — Feb-2026 Local Directive declaration", "status": "confirmed", "source": "COMPLETE NORTH STAR FRAMEWORK V2.0 (CORRECTED), Feb 23 2026", "feb_declaration": true },
+    { "project": "Seba Hub & Activity Centre", "local_ns": "Community at Seba Beach", "persona_note": "Kokanee Village, Chapel in the Woods. Feb-decl: 'Vibrant Village for Growing Amazing Children'", "status": "worksheet", "source": "Do-Before-I-Die statement", "feb_declaration": true },
+    { "project": "CashCo Financial", "local_ns": "Ruby Red (likely)", "persona_note": "Left-out + left-behind + working poor. Feb-decl: 'Serve Ruby Red — The Poor Man's Bank with Dignity'", "status": "worksheet", "source": "Do-Before-I-Die statement", "feb_declaration": true },
+    { "project": "Pawn Princess / Princess Collateral", "local_ns": "Working poor (Ruby-adjacent)", "persona_note": "Dignity-centred pawn model", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "Culture Chaser (Tier 1, Talking Head Tim)", "local_ns": "Tim's org / SIC team", "persona_note": "Cultural alignment, dog-fooding", "status": "worksheet", "source": "Project instructions" },
+    { "project": "Culture Chaser (Tier 2, white-label)", "local_ns": "Client org's chosen persona", "persona_note": "Configurable per client", "status": "worksheet", "source": "Project instructions" },
+    { "project": "Freedom Cannabis", "local_ns": "Mid-level cannabis consumer (BAFFG-aligned)", "persona_note": "CEO John Frank Potestio", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "Blue Seal", "local_ns": "Global community / society at large", "persona_note": "Do Good, Give Back, Starts Local", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "Holding Properties", "local_ns": "Family office stability", "persona_note": "Low-risk, low-touch", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "Stage Two", "local_ns": "Growth-stage entrepreneurs", "persona_note": "TBD", "status": "foraging", "source": "Master plan referenced" },
+    { "project": "Mitsho & Groundswell", "local_ns": "Indigenous communities + consumers", "persona_note": "Ian Gladue leadership", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "Game Changer Consultants", "local_ns": "Mid-market business owners", "persona_note": "Best practices + leadership", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "1-800-FRE²-RENT", "local_ns": "Homeowners with unused basements", "persona_note": "Reno-finance-manage model", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "Tip the Maker / Tip the Grower", "local_ns": "Global artisans + farmers", "persona_note": "Direct-tip platform", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "Hawaii by the Inch", "local_ns": "Affordable luxury vacationers", "persona_note": "Timeshare-by-the-inch model", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "Seba Hub Petting Zoo", "local_ns": "Families with kids", "persona_note": "Goats on the roof", "status": "worksheet", "source": "Do-Before-I-Die statement" },
+    { "project": "Conquer Cannabis", "local_ns": null, "persona_note": "No Local NS row anywhere in the estate — gap made visible", "status": "foraging", "source": "auto-created at seed (gap-scale-to-100 build note 11)", "auto_created": true },
+    { "project": "Cureleaf Ogden", "local_ns": null, "persona_note": "No Local NS row anywhere in the estate — gap made visible", "status": "foraging", "source": "auto-created at seed (gap-scale-to-100 build note 11)", "auto_created": true },
+    { "project": "Bunkie Village", "local_ns": null, "persona_note": "No Local NS row anywhere in the estate — gap made visible", "status": "foraging", "source": "auto-created at seed (gap-scale-to-100 build note 11)", "auto_created": true },
+    { "project": "In the Woods 2026", "local_ns": null, "persona_note": "No Local NS row anywhere in the estate — gap made visible", "status": "foraging", "source": "auto-created at seed (gap-scale-to-100 build note 11)", "auto_created": true },
+    { "project": "SIC Incubation School", "local_ns": null, "persona_note": "No Local NS row anywhere in the estate — gap made visible", "status": "foraging", "source": "auto-created at seed (gap-scale-to-100 build note 11)", "auto_created": true },
+    { "project": "CTS Freedman (legal)", "local_ns": null, "persona_note": "No Local NS row anywhere in the estate — gap made visible", "status": "foraging", "source": "auto-created at seed (gap-scale-to-100 build note 11)", "auto_created": true }
+  ],
+  "locals_note": "~12 more projects in the 32-portfolio get rows as Phase 1 ingestion surfaces them (Manus / Grok / Replit). Status legend: confirmed ✅ · worksheet ⏳ (11-question voice worksheet needed) · foraging ⏳ (agent-driven first pass, Tim confirms). The 'no Local NS' filter doubles as the worksheet campaign list."
+}

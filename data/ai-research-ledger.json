@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "title": "AI Research Ledger — eating our own dog food (the 2 real PRIMAL briefings)",
+    "source": "AI-Research-Ledger.md (project root) — transcribed verbatim 2026-06-10",
+    "method": "Declare the Local North Star → define a metric + baseline (/100) → run scored research rounds → stop when a round adds < ~1% lift (diminishing returns) OR the lever shifts from research to human input → surface 1–4 candidate improvements for human-in-the-loop approve / modify / decline (never auto-apply). Every output is a baseline, never final. Full method: AI-Research-Protocol.md.",
+    "naming_lock": "AI Research — the canonical name; the legacy compound names are retired (see the Doctrine vocabulary table).",
+    "intensity_levels": [
+      { "level": "Casual", "push": "~25%", "use": "a quick sanity check" },
+      { "level": "Standard", "push": "~50%", "use": "routine work" },
+      { "level": "Intense", "push": "~75%", "use": "important deliverables" },
+      { "level": "Legendary", "push": "~90%", "use": "high-stakes" },
+      { "level": "PRIMAL+", "push": "~95–100%", "use": "our own OS build — the default" }
+    ],
+    "stop_rules": [
+      "a round adds < ~1% lift (true diminishing returns)",
+      "the intensity ceiling is hit (~95–100 at Primal)",
+      "the lever shifts — the remaining lift requires human input or a build step, not more research"
+    ],
+    "adversary_pass": "Anti-Kool-Aid (REQUIRED at Primal): external reality check + a hostile red-team subagent prompted to refute ('Where are we fooling ourselves? Default to refuted if uncertain') + verdict per candidate: SURVIVES / WEAKENED / REFUTED. Refuted ones are NOT presented as wins.",
+    "signature": "Every output is a baseline, never final."
+  },
+  "briefings": [
+    {
+      "id": "briefing-1",
+      "date": "2026-06-07",
+      "intensity": "PRIMAL",
+      "local_north_star": "Ship the cash-out agent — Mr & Mrs Fix-It on the Cash-Out Assignment for the 4 Pawn Princess stores.",
+      "metric": {
+        "name": "Cash-Out Agent Plan Readiness / 100",
+        "dimensions": [
+          { "dim": "Data access", "weight": 20 },
+          { "dim": "Cash-out routine understood", "weight": 20 },
+          { "dim": "Stage-2/bank reconciliation understood", "weight": 20 },
+          { "dim": "Agent design/pattern", "weight": 20 },
+          { "dim": "Risk mitigation", "weight": 20 }
+        ]
+      },
+      "rounds": [
+        { "round": "Baseline (this morning)", "added": "MVP plan exists; operational specifics thin; data access = #1 unknown", "score": 40, "lift": null },
+        { "round": "Round 1", "added": "Bravo is open (daily cash-flow + variance reports, exports, accounting sync); AI-recon 80/20 pattern validated", "score": 51, "lift": 11 },
+        { "round": "Round 2", "added": "Bravo data-warehouse + partner integrations; the full X/Z-out close algorithm; proven agent design pattern; financial-data security posture", "score": 78, "lift": 27 },
+        { "round": "Round 3 (web)", "added": "Not run — the remaining ~22 pts (exact Bravo export + Samantha's Stage-2 process) are gated on the email replies, not more search. Research lever exhausted → diminishing returns. STOP.", "score": null, "lift": null }
+      ],
+      "readiness": 78,
+      "stop_reason": "Stopped per the Primal diminishing-returns rule — the next lift comes from humans, not Google. Path to ~95 = the Bravo/Samantha email replies + the build.",
+      "candidates": [
+        { "n": 1, "title": "Sharpen the Bravo email.", "detail": "Ask specifically about: the enterprise data-warehouse export + partner/integration API, the daily cash-flow / cash-variance report and its export formats, and whether the Sage / Microsoft Dynamics sync can be our data conduit. (Biggest single de-risker.)", "adversary": null, "status": "PENDING" },
+        { "n": 2, "title": "Adopt the proven cash-out agent pattern.", "detail": "Read the Z-report (never trigger a re-run), reconcile (cash count − starting float vs. cash-sales total), auto-match the bulk + produce a clean exceptions list, with schema-enforced output (already in Mr & Mrs Fix-It), a validator self-correct step, a step budget, and HITL escalation when it can't find the air → hand a clean trail to Stage 2.", "adversary": null, "status": "PENDING" },
+        { "n": 3, "title": "Lock the security posture now (it's financial data).", "detail": "Read-only / least-privilege access to Bravo + bank (the agent never writes to the POS), PII/financial redaction in the learning ledger, just-in-time credentials.", "adversary": null, "status": "PENDING" },
+        { "n": 4, "title": "Build constraint — \"never run the Z-report twice.\"", "detail": "Running Z again resets the counters and destroys the audit trail. The agent must consume the existing Z-report, never regenerate it.", "adversary": null, "status": "PENDING" }
+      ],
+      "gate_decision": {
+        "date": "2026-06-07",
+        "by": "Tim",
+        "verdicts": [
+          { "candidate": 1, "verdict": "N/A", "note": "Bravo email already sent; fold the warehouse/API/Sage questions into the follow-up only if the reply leaves the data path unclear." },
+          { "candidate": 2, "verdict": "APPROVED", "note": "Folded into CashOut-Assignment-Agent-Spec.md." },
+          { "candidate": 3, "verdict": "APPROVED", "note": "Folded into CashOut-Assignment-Agent-Spec.md." },
+          { "candidate": 4, "verdict": "APPROVED", "note": "Folded into CashOut-Assignment-Agent-Spec.md." }
+        ]
+      },
+      "sources": [
+        { "label": "Bravo reporting", "url": "https://www.bravostoresystems.com/reporting" },
+        { "label": "Bravo partners/integrations", "url": "https://www.bravostoresystems.com/partners-integrations-associations" },
+        { "label": "Pawn/retail EOD cash-drawer reconciliation (X vs Z report)", "url": "https://spendnote.app/cash-drawer-reconciliation" },
+        { "label": "HI-Tech Pawn drawer balancing", "url": "https://hitechpawn.com/wp-content/support/docs/HTP_Drawer_Balancing_Using_Bank_Account.pdf" },
+        { "label": "HITL agent patterns (validator, step budget, escalation)", "url": "https://medium.com/@vishwa.jith360/building-a-human-in-the-loop-hitl-ai-agent-with-langchain-fastapi-29d037bd4be6" },
+        { "label": "Least-privilege/read-only for AI agents on financial data", "url": "https://agentnode.net/blog/ai-agent-permission-models-least-privilege" }
+      ]
+    },
+    {
+      "id": "briefing-2",
+      "date": "2026-06-08",
+      "intensity": "PRIMAL",
+      "local_north_star": "Unchanged — ship the cash-out agent (Mr & Mrs Fix-It on the Cash-Out Assignment) for the 4 Pawn Princess stores. Since #1, the BUILD-NOW block shipped (cashout/ engine + tests, 2026-06-07), so today's research turned from 'plan the build' to 'stress-test what we built.' The adversary pass earned its keep — it half-refuted our own engine (see Candidate 1).",
+      "metric": {
+        "name": "Cash-Out Agent Plan Readiness / 100",
+        "dimensions": [
+          { "dim": "Data access", "weight": 20 },
+          { "dim": "Cash-out routine understood", "weight": 20 },
+          { "dim": "Stage-2/bank reconciliation understood", "weight": 20 },
+          { "dim": "Agent design/pattern", "weight": 20 },
+          { "dim": "Risk mitigation", "weight": 20 }
+        ],
+        "baseline_note": "Baseline carried from #1 = 78 (the v0.1 build going in is offset by a pawn-correctness defect this run uncovered — net honest carry)."
+      },
+      "rounds": [
+        { "round": "Baseline (carry #1)", "added": "v0.1 reconciliation engine built + tested; but pawn-specific correctness never verified", "score": 78, "lift": null },
+        { "round": "R1 — Bravo data path", "added": "Bravo has no public API; offers 36 standard reports × 10 export formats → the adapter should target a scheduled file/report export (CSV/Excel), not an API; reframes the Bravo email.", "score": 81, "lift": 3 },
+        { "round": "R2 — reconciliation identity", "added": "A pawn drawer is multi-tender & bidirectional (cash OUT: loans disbursed, buys/forfeits; cash IN: redemptions w/ interest, layaway down/partial pmts, retail sales, extensions). Our v0.1 check (count − float) vs cash-sales is structurally incomplete → would mislabel every redemption/loan as an 'exception.' Correct & cheaper move per adversary: consume Bravo's own end-of-day expected-drawer / over-short figure and explain it, rather than rebuild the GL.", "score": 89, "lift": 8 },
+        { "round": "R3 — fraud-control layer", "added": "Upgrade the exceptions list into a control: flag skim/fraud red-flags (directional shorts by shift/cashier, elevated no-sale / void / post-sale-void / refund frequency). Adversary WEAKENED it → premature & HR-hazardous at MVP scope, needs cashier/void event data we may not have.", "score": 90, "lift": 1 },
+        { "round": "R4 — regression eval", "added": "Institutionalize 'every output is a baseline': 5–10 hand-labeled real cash-out days, scored before each change. Adversary WEAKENED it → don't bake the broken v0.1 identity into 'golden' labels; sequence after R2.", "score": 91, "lift": 1 },
+        { "round": "R5 (web)", "added": "Not run. Remaining lift = exact Bravo report contents + Samantha's Stage-2 process + read credentials + the R2 rebuild itself — all gated on human input or a build step, not search. Lever shifts → STOP.", "score": null, "lift": null }
+      ],
+      "readiness": 91,
+      "stop_reason": "Stopped on the lever-shift rule (remaining lift is human + build, not research) — and each further web round now adds < ~1%.",
+      "candidates": [
+        { "n": 1, "title": "Fix the reconciliation identity for pawn — and do it the cheap way.", "detail": "Our shipped v0.1 (count − float) vs cash-sales is wrong for a pawnshop (it ignores redemptions, loans out, layaway, forfeits). Don't rebuild the general ledger — instead reconcile against Bravo's own computed expected-drawer / over-short number and have the agent explain the variance + localize the air. This is less code than v0.1, not more, and it's the biggest single correctness gain.", "adversary": "SURVIVES", "status": "PENDING" },
+        { "n": 2, "title": "Lock the data path as a file export, and sharpen the Bravo email.", "detail": "No Bravo API exists; the conduit is a scheduled report export. Email should ask the precise question: which of the 36 standard reports (and which export format) carries the daily expected-drawer / over-short figure and/or per-tender, per-direction cash detail? Coupled to #1 — we can't finalize the adapter until we know which report exposes that number.", "adversary": "SURVIVES (weakly)", "status": "PENDING" },
+        { "n": 3, "title": "Defer the fraud/skim-detection layer.", "detail": "Good instinct, wrong time: 4 stores over a few weeks is too little data to separate a 'directional short' from noise, it risks false accusations (HR/legal landmine), and it needs cashier/void event data we haven't confirmed. Park until the basic reconciliation is trusted daily and event-level data is verified.", "adversary": "WEAKENED", "status": "PENDING — recommend PARK" },
+        { "n": 4, "title": "Start a tiny regression set — after #1, not before.", "detail": "Hand-label 5–10 real cash-out days (balanced / short-with-air / balances-but-wrong / multi-tender) and re-run them before every change. Skip the full precision/recall harness for now — and don't build it on the broken v0.1 identity (fix #1 first, or you version-control the bug).", "adversary": "WEAKENED", "status": "PENDING" }
+      ],
+      "adversary_summary": "External reality check + a hostile red-team subagent run on all 4. Verdicts: 2 SURVIVE (the two that matter — #1 identity, #2 data path), 2 WEAKENED (#3 fraud, #4 eval), 0 refuted. Kill-shot the red-team surfaced: candidates 2/3/4 all silently depend on #1, and #1 refutes the engine we already shipped — so the honest headline isn't '4 wins,' it's 'our v0.1 reconciliation logic is wrong for pawn; fix it by leaning on Bravo's own over/short number.' External reality: full multi-tender drawer reconciliation is table-stakes in every pawn POS (Bravo, PawnMaster, CompuPawn) and skim-detection is a solved LP category (Appriss/Auror) — our edge is the explain-the-variance + clean Stage-2 handoff agent, not re-deriving accounting Bravo already does.",
+      "gate_decision": null,
+      "sources": [
+        { "label": "Bravo included features (cash drawer mgmt, payment recon)", "url": "https://www.bravostoresystems.com/included-features-in-bravo-pos-software" },
+        { "label": "Bravo reporting (36 reports, 10 export formats)", "url": "https://www.bravostoresystems.com/reporting" },
+        { "label": "Bravo on GetApp (no API)", "url": "https://www.getapp.com/retail-consumer-services-software/a/bravo-pawn-systems/" },
+        { "label": "Pawnbroker cash flows: loan/redemption/layaway (Wikipedia)", "url": "https://en.wikipedia.org/wiki/Pawnbroker" },
+        { "label": "Cash-drawer skimming red flags (Agilence)", "url": "https://blog.agilenceinc.com/how-to-determine-if-employees-are-skimming-cash" },
+        { "label": "Register discrepancy / void & no-sale analysis (Appriss Retail)", "url": "https://apprissretail.com/blog/getting-to-the-bottom-of-register-discrepancies/" },
+        { "label": "Golden datasets for AI eval", "url": "https://www.trustevals.ai/resources/golden-datasets-for-ai-evaluation" },
+        { "label": "Building AI agents for reconciliations (ChatFin)", "url": "https://chatfin.ai/blog/step-by-step-guide-building-ai-agents-for-reconciliations/" }
+      ]
+    }
+  ],
+  "inbound": [
+    {
+      "id": "inbound-2026-06-08",
+      "date": "2026-06-08",
+      "title": "Inbound from Pawn Princess team (acknowledgments only — no answers yet)",
+      "summary": "Tim's 'An AI helper for the nightly cash-out — a few questions to build it' email (sent 2026-06-07, to Diana, Jarrett, Lauren + Samantha) drew two enthusiastic replies, but neither answers the 10 questions yet.",
+      "replies": [
+        { "from": "Lauren LaBossiere (Pawn Princess)", "date": "2026-06-07", "quote": "This is a great idea! With all stores on bravo it should be simple to pull the information needed. I'll sit down tonight to jump into these questions, let's get on this right away.", "read": "Confirms all 4 stores are on Bravo (Q9, directionally: same POS) and commits to detailed answers 'tonight.' No report name, no over/short answer, no routine, no manager list yet." },
+        { "from": "Diana Machado", "date": "2026-06-08", "quote": "Lauren, Do you think this is I'll be able to link to bravo and auto pull the data to avoid human error? This would be so exciting!!", "read": "Engagement + an open question about auto-pull (which R1 already answered internally: no Bravo API → scheduled file/report export is the conduit). No new data." }
+      ],
+      "gated_state": "Still gated. The single most important answer — does Bravo produce its own end-of-day expected-drawer / over-short figure, and which report + export format carries it — has NOT arrived. Likewise still pending: per-tender / per-direction breakdown, the step-by-step routine, common imbalance sources, the four store managers + emails, the read-only access path, and Samantha's Stage-2 process (chart of accounts, entry rules, format).",
+      "action_taken": "None to the spec or money-logic. The CashOut-Assignment-Agent-Spec.md GATED items are left untouched and CASHOUT-FIX-PROPOSAL.md was deliberately not created — writing the pawn reconciliation fix requires the real Bravo over/short answer, and fabricating it would bake a guess into money logic. The fix proposal gets drafted the moment Lauren's detailed reply lands."
+    }
+  ]
+}

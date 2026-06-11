@@ -1,0 +1,44 @@
+{
+  "store": "Seba Hub — Occupancy Engine (every empty night is lost revenue)",
+  "caller": "Casey — one neck to choke (sales & marketing lead)",
+  "vivid_vision": {
+    "purpose": "Fill what we already have — no empty night, no empty seat",
+    "bhag": "Every weekend a wedding, every cabin full, every season alive at Seba Hub",
+    "values": ["Hospitality", "Stewardship", "Dignity"]
+  },
+  "wiifm": "Rep: warm intros to people already looking. Seba: perishable capacity stops leaking — empty nights become revenue.",
+  "ticker": [
+    {"k": "Weekday fill (Sun–Thu)", "v": "0%", "ryg": "red"},
+    {"k": "Weekend fill", "v": "~25%", "ryg": "red"},
+    {"k": "Perishable nights", "v": "leaking", "ryg": "red"},
+    {"k": "Propane competitors", "v": "0 local", "ryg": "green"},
+    {"k": "Caller", "v": "Casey", "ryg": "green"}
+  ],
+  "squares": [
+    {"id": "L1", "label": "Wedding venue", "kpi": "weekends ~25% → 100%", "ryg": "yellow", "human": 70},
+    {"id": "L2", "label": "Midweek events", "kpi": "0% Sun–Thu = the gap", "ryg": "red", "human": 60},
+    {"id": "L3", "label": "RV rental sites", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L4", "label": "Cabins (day-to-day)", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L5", "label": "Geodomes", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L6", "label": "Bunkie cabins", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L7", "label": "Insta-cabins", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L8", "label": "Summer kids camp", "kpi": "up to 500", "ryg": "green", "human": 60},
+    {"id": "L9", "label": "Driving range", "kpi": "special events", "ryg": "yellow", "human": 60},
+    {"id": "L10", "label": "Propane fill", "kpi": "0 local competitors", "ryg": "green", "human": 80},
+    {"id": "L11", "label": "Treasure hunt", "kpi": "sell entries", "ryg": "yellow", "human": 40},
+    {"id": "L12", "label": "In-the-Woods festival", "kpi": "up to 5,000 tix", "ryg": "yellow", "human": 40},
+    {"id": "PTK", "ptk": true},
+    {"id": "E1", "label": "SENSE", "kpi": "scan all socials", "ryg": "green", "human": 15},
+    {"id": "E2", "label": "SCORE", "kpi": "confidence + sizzle", "ryg": "green", "human": 15},
+    {"id": "E3", "label": "ROUTE", "kpi": "Golden Age fleet", "ryg": "green", "human": 20},
+    {"id": "E4", "label": "DRAFT knock", "kpi": "draft-only", "ryg": "green", "human": 20},
+    {"id": "E5", "label": "HUMAN approve", "kpi": "Casey decides", "ryg": "green", "human": 90},
+    {"id": "E6", "label": "CONNECT", "kpi": "warm rep", "ryg": "green", "human": 80},
+    {"id": "E7", "label": "OFFER", "kpi": "book / reserve / ticket", "ryg": "green", "human": 60},
+    {"id": "E8", "label": "OUTCOME log", "kpi": "filled or not", "ryg": "green", "human": 30},
+    {"id": "E9", "label": "LEARN", "kpi": "what fills", "ryg": "green", "human": 20},
+    {"id": "E10", "label": "Trust ledger", "kpi": "no creepiness", "ryg": "green", "human": 40},
+    {"id": "O1", "label": "Calendar fill %", "kpi": "wkdy 0% · wknd 25%", "ryg": "red", "human": 25},
+    {"id": "O2", "label": "Daily close-out", "kpi": "to Casey", "ryg": "green", "human": 30}
+  ]
+}

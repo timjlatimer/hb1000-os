@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "title": "The Golden Age Fleet — 10 trust archetypes (the routing library + the conscience layer)",
+    "source": "intent-engine/INTENT-HARVESTING-ENGINE_FULL-EXPORT.md (verbatim ChatGPT export 2026-06-07) + showme/golden-age-fleet.html + showme/feed.json, via hb1000-os/blueprint/agent-fleet-layer.md §3",
+    "header": "The Golden Age Fleet — your routing library. 10 historical trust archetypes the Intent Harvesting Engine routes to. Each card carries its playbook, golden kernel, shadow side / abuses, the consumer protection it triggered, and the existential risk if AI gets it wrong — the conscience layer.",
+    "card_spec": "Each agent is specced with: essence · core move · best for · playbook · digital equivalent · shadow side/abuse · guardrail · tone · handoff triggers · success metric. The full per-card detail lives on the strategy-card PNGs (assets/img/01…10).",
+    "shadow_doctrine": "Every trust mechanism can become a manipulation mechanism when scaled without conscience.",
+    "counter_principle": "Use AI to expand care, not to automate predation.",
+    "existential_risks_if_ai_gets_it_wrong": [
+      "AI imitates friendship to exploit intimacy",
+      "turns community into covert selling",
+      "uses inferred distress to pressure the vulnerable",
+      "industrializes persistence into harassment",
+      "gamifies self-worth",
+      "turns humans into monetized nodes",
+      "converts service into surveillance"
+    ],
+    "channel_gate_invariant": "Every signal is tagged channel_class: green_public_declared | green_own_account | amber_inferred_public | red_individual_private. INVARIANT: red_individual_private can ONLY produce a public post, NEVER a message to a person — any phase, no override. No override field exists in this schema by design.",
+    "pipeline": "SENSE → SCORE → SORT → ROUTE → DRAFT → HUMAN APPROVES → CONNECT → OFFER → OUTCOME → LEARN"
+  },
+  "archetypes": [
+    {
+      "n": 1,
+      "id": "fuller_brush",
+      "archetype": "Fuller Brush Man",
+      "persona": "Frank \"Give-First\" Fuller",
+      "essence": "give first",
+      "guardrail": "The gift must be useful even if they never buy.",
+      "img": "assets/img/01-fuller-brush-man.webp"
+    },
+    {
+      "n": 2,
+      "id": "avon_lady",
+      "archetype": "Avon Lady",
+      "persona": "Ava \"Neighbor-Trust\" Avon",
+      "essence": "neighbor trust",
+      "guardrail": "Do not imitate friendship/intimacy not earned.",
+      "img": "assets/img/02-avon-lady.webp"
+    },
+    {
+      "n": 3,
+      "id": "route_man",
+      "archetype": "Route Man",
+      "persona": "Walter \"Always-There\" Watkins",
+      "essence": "be there at the moment of need",
+      "guardrail": "Every cadence has a visible stop/pause/opt-out.",
+      "img": "assets/img/03-route-man.webp"
+    },
+    {
+      "n": 4,
+      "id": "tupperware_hostess",
+      "archetype": "Tupperware Hostess",
+      "persona": "Brownie \"Living-Room Leader\" Wise",
+      "essence": "community proof",
+      "guardrail": "Community must stay useful even if nobody buys/recruits.",
+      "img": "assets/img/04-tupperware-hostess.webp"
+    },
+    {
+      "n": 5,
+      "id": "kirby_demonstrator",
+      "archetype": "Kirby Demonstrator",
+      "persona": "Kirby \"Proof-First\" Kane",
+      "essence": "proof / demonstration",
+      "guardrail": "Clarify choice, don't manufacture fear.",
+      "img": "assets/img/05-kirby-demonstrator.webp"
+    },
+    {
+      "n": 6,
+      "id": "electrolux_advisor",
+      "archetype": "Electrolux Advisor",
+      "persona": "Elsie \"Professional Calm\" Electrolux",
+      "essence": "professional calm",
+      "guardrail": "Authority earned with clarity/substantiation.",
+      "img": "assets/img/06-electrolux-advisor.webp"
+    },
+    {
+      "n": 7,
+      "id": "family_future_counselor",
+      "archetype": "Family Future Counselor",
+      "persona": "Professor \"Future-First\" Briar",
+      "essence": "protect tomorrow",
+      "guardrail": "Protect agency, don't weaponize fear/guilt.",
+      "img": "assets/img/07-family-future-counselor.webp"
+    },
+    {
+      "n": 8,
+      "id": "southwestern_scout",
+      "archetype": "Southwestern Scout",
+      "persona": "Sam \"Territory-Math\" Southwestern",
+      "essence": "territory math",
+      "guardrail": "Process never overrides a clear no.",
+      "img": "assets/img/08-southwestern-scout.webp"
+    },
+    {
+      "n": 9,
+      "id": "mary_kay_mentor",
+      "archetype": "Mary Kay Mentor",
+      "persona": "Mary \"Recognition-Runs\" Mentor",
+      "essence": "recognition & dignity",
+      "guardrail": "Affirm the person, don't exploit insecurity.",
+      "img": "assets/img/09-mary-kay-mentor.webp"
+    },
+    {
+      "n": 10,
+      "id": "network_builder",
+      "archetype": "Network Builder",
+      "persona": "Nick \"Law-of-250\" Networker",
+      "essence": "law of 250",
+      "guardrail": "Never value recruiting above real customer value.",
+      "img": "assets/img/10-network-builder.webp"
+    }
+  ],
+  "routeSignal": {
+    "comment": "Routing logic sketch (verbatim, intent-engine export §24): signal pattern → archetype id(s). default → fuller_brush.",
+    "rules": [
+      { "signal": "declared + high", "route": ["route_man", "specialist"] },
+      { "signal": "inferred + high-creepiness", "route": ["fuller_brush", "content_studio"] },
+      { "signal": "tools + high", "route": ["kirby_demonstrator", "specialist", "family_future_counselor"] },
+      { "signal": "shame / nervous", "route": ["mary_kay_mentor", "avon_lady"] },
+      { "signal": "family / kids", "route": ["family_future_counselor", "fuller_brush"] },
+      { "signal": "repeat_need", "route": ["route_man"] },
+      { "signal": "referral", "route": ["network_builder"] },
+      { "signal": "group_social / event", "route": ["tupperware_hostess", "route_man"] },
+      { "signal": "default", "route": ["fuller_brush"] }
+    ]
+  },
+  "confidence_bands": [
+    { "range": "90–100", "meaning": "declared / explicit / high-fit" },
+    { "range": "70–89", "meaning": "strong inferred" },
+    { "range": "50–69", "meaning": "Watch Queue" },
+    { "range": "<50", "meaning": "noise unless pattern repeats" }
+  ],
+  "scoring_dimensions": ["intent confidence", "urgency", "fit", "emotional sizzle", "creepiness risk", "public-value opportunity", "handoff readiness", "relationship potential"]
+}

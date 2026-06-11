@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Command Deck — The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎛️</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ---------- Command Deck page styles (tokens from theme.css only) ---------- */
+.masthead{margin-bottom:6px}
+.masthead .kicker{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.counts{
+  display:flex;flex-wrap:wrap;gap:4px 0;align-items:center;margin:12px 0 4px;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:10px 14px;font-size:13.5px;color:var(--muted);
+}
+.counts .seg b{color:#fff;font-weight:800}
+.counts .seg.bad b{color:var(--red)}
+.counts .seg.good b{color:var(--green)}
+.counts .sep{margin:0 10px;color:var(--soft)}
+.chrome-line{font-size:12px;color:var(--soft);font-style:italic;margin:4px 0 0}
+
+.gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:16px 0 18px}
+@media(max-width:1100px){.gauges{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.gauges{grid-template-columns:1fr}}
+.gauge-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px 16px}
+.gauge-card:hover{border-color:rgba(232,181,77,.55)}
+.gauge-card .gnote{margin-top:8px;font-size:11.5px;color:var(--soft);line-height:1.4}
+
+.deck-cols{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+@media(max-width:1100px){.deck-cols{grid-template-columns:1fr}}
+
+/* filters */
+#filters .fgroup{margin:7px 0}
+#filters .fgl{display:inline-block;min-width:86px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--soft);vertical-align:middle}
+#filters .chip{font-size:11.5px;padding:2px 9px}
+.sortnote{font-size:11px;color:var(--soft);font-style:italic;margin-top:8px}
+
+/* heatmap districts + tiles */
+.district{margin:0 0 18px}
+.district .dh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+.district .dh .dt{font-size:13px;font-weight:800;color:#fff}
+.district .dh .dt b{color:var(--gold)}
+.district .dh .dc{font-size:11px;color:var(--soft)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(198px,1fr));gap:8px}
+.tile{
+  position:relative;background:var(--panel-2);border:1px solid var(--line);border-left-width:4px;
+  border-radius:var(--radius);padding:8px 10px 9px;font-size:11.5px;cursor:pointer;overflow:hidden;
+  transition:border-color .15s;
+}
+.tile:hover,.tile:focus{border-color:var(--gold);outline:none}
+.tile .t-name{font-weight:700;color:var(--ink);line-height:1.3;margin-right:12px}
+.tile .t-meta{margin-top:3px;color:var(--soft);font-size:10.5px;line-height:1.5}
+.tile .t-meta .sc{color:var(--gold);font-weight:700}
+.tile .t-call{margin-top:2px;font-size:10.5px;color:var(--muted)}
+.tile .t-call .orph{color:var(--red);font-weight:800}
+.tile .dot{position:absolute;top:9px;right:9px;width:9px;height:9px}
+.tile.c-red{border-left-color:var(--red)}
+.tile.c-yellow{border-left-color:var(--yellow)}
+.tile.c-green{border-left-color:var(--green)}
+.tile.c-ship{border-left-color:var(--green)}
+.tile.c-found{border-left-color:var(--gold)}
+.tile.c-grey{border-left-color:var(--soft)}
+.tile.conv{opacity:.62}
+.tile.closedn{opacity:.5}
+.tile.fk-ruby::after,.tile.fk-ruby-confirm::after{
+  content:'';position:absolute;top:0;right:0;border:7px solid transparent;
+  border-top-color:var(--ruby);border-right-color:var(--ruby);
+}
+.tile.fk-ruby-confirm::after{opacity:.55}
+.legend-strip{font-size:11px;color:var(--soft);margin:6px 0 14px;line-height:1.7}
+.legend-strip .dot{width:8px;height:8px;margin:0 3px}
+.legend-strip .rubysq{display:inline-block;width:8px;height:8px;background:var(--ruby);margin:0 3px;vertical-align:middle}
+
+/* exception rail */
+.rail .panel{margin:0 0 14px;padding:14px 16px}
+.rail .ph .cnt{float:right;font-weight:900}
+.rail .ph .cnt.bad{color:var(--red)}
+.rail .ph .cnt.good{color:var(--green)}
+.rail .ph .cnt.warn{color:var(--yellow)}
+.covline{font-size:11px;color:var(--soft);font-style:italic;margin:0 0 8px;line-height:1.45}
+.rail .signal-card{padding:11px 13px;margin:8px 0}
+.rail .sc-title{font-size:13px}
+.rail .sc-body{font-size:12px;margin:4px 0 6px}
+.verdict-done{margin-top:8px;font-size:12px}
+.verdict-done .undo{margin-left:8px;font-size:11px;color:var(--soft);cursor:pointer;text-decoration:underline}
+.mod-box{margin-top:8px}
+.mod-box textarea{
+  width:100%;min-height:56px;background:var(--panel-2);color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--radius);padding:7px 9px;
+  font-family:inherit;font-size:12.5px;box-sizing:border-box;
+}
+.orow{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:7px 10px;margin:5px 0;
+  background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:var(--radius);font-size:12px}
+.orow .on{font-weight:700;color:var(--ink)}
+.orow .om{font-size:10.5px;color:var(--soft)}
+.orow .btn{padding:4px 10px;font-size:11.5px;flex:0 0 auto}
+.showmore{font-size:11.5px;color:var(--cyan);cursor:pointer;margin-top:6px;display:inline-block}
+.alarm-row{padding:8px 10px;margin:6px 0;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);font-size:12px}
+.alarm-row .ar-t{display:flex;justify-content:space-between;font-weight:700;margin-bottom:5px}
+.alarm-row .ar-t .pct{color:var(--red)}
+.ptk-row{padding:8px 10px;margin:6px 0;background:var(--panel-2);border:1px solid rgba(224,85,107,.45);border-radius:var(--radius);font-size:12px;line-height:1.5}
+.ptk-row .sugg{display:block;margin-top:4px;font-size:11px;color:var(--yellow)}
+.watch-row{padding:7px 10px;margin:5px 0;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);font-size:12px;color:var(--muted)}
+.io-btns{margin:6px 0 2px}
+.io-btns .btn{padding:3px 10px;font-size:11px;margin-right:6px}
+
+/* briefing */
+#briefing ol{margin:8px 0 14px;padding-left:22px}
+#briefing ol li{margin:7px 0;font-size:13.5px;line-height:1.55}
+.headlines{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px}
+.headline{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:8px 11px;font-size:12px}
+.headline .hn{font-weight:800;color:var(--gold);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.headline .hl{color:var(--muted);margin-top:2px;line-height:1.45}
+
+/* drawer extras */
+.drawer h3 b{color:var(--gold)}
+.drawer .dl{font-size:12.5px;margin:5px 0;color:var(--muted)}
+.drawer .dl b{color:var(--ink);font-weight:700}
+.drawer .assign{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.drawer .assign input{
+  width:100%;box-sizing:border-box;background:var(--panel-2);color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--radius);padding:8px 10px;font-family:inherit;font-size:13px;margin:7px 0;
+}
+.drawer .assign .btn{margin:3px 6px 3px 0}
+.boot-fail{margin-top:16px}
+</style>
+</head>
+<body>
+<main>
+  <!-- ======================= MASTHEAD ======================= -->
+  <header class="masthead">
+    <div class="kicker">Scale-to-100 · exception-first · the aggregation layer over Dingo City</div>
+    <h1>Command <b>Deck</b></h1>
+    <blockquote><b>You do not have 55 projects. You have ONE operating system and 55 things to run inside it.</b></blockquote>
+    <div class="counts num" id="counts">
+      <span class="seg">loading the honest counts from <code>data/portfolio.json</code>…</span>
+    </div>
+    <p class="chrome-line">“One dashboard. Many gauges. Every gauge has a mechanic.” — every number on this page is computed from the seed JSON at render, never asserted.</p>
+  </header>
+
+  <div id="boot"></div>
+
+  <!-- ======================= FOUR GAUGES ======================= -->
+  <div class="sec-h">The <b>Four Gauges</b> — from the vault DASHBOARD canon</div>
+  <section class="gauges" id="gauges" aria-label="The Four Gauges"></section>
+
+  <div class="deck-cols">
+    <!-- ======================= HEATMAP COLUMN ======================= -->
+    <section aria-label="RYG portfolio heatmap">
+      <div class="spread">
+        <div class="sec-h" style="margin:0">The <b>City Heatmap</b> — every initiative a node, six families as districts</div>
+        <div style="font-size:11.5px">
+          <a href="city.html">Open the Dingo City render →</a>
+          <span class="soft"> · </span>
+          <a href="https://learning-loop.manus.space" target="_blank" rel="noopener">the frozen PEARL Diamond face ↗</a>
+        </div>
+      </div>
+
+      <div class="panel tight" id="filters" style="margin-top:10px"></div>
+
+      <div class="legend-strip" id="legend">
+        Colour is computed, never hand-set: nodes with a live Dingo card roll up
+        <span class="dot r"></span>R if any red square · <span class="dot y"></span>Y if any yellow or an OVERDUE PTK · <span class="dot g"></span>G otherwise.
+        Shipped nodes show <span class="dot g"></span>+ badge. Nursery, converged, foundational and closed nodes render grey/gold by ring —
+        no live card wired means <span class="dot grey"></span>no RYG is asserted. <span class="rubysq"></span>ruby corner = ruby-red fork only (Standing Order #2).
+        Converged nodes grey out with an arrow to what absorbed them — ideas merge, they never die.
+      </div>
+
+      <div id="heatmap"></div>
+    </section>
+
+    <!-- ======================= EXCEPTION RAIL ======================= -->
+    <aside class="rail" id="rail" aria-label="Exception Rail">
+      <div class="panel tight">
+        <div class="ph">The Exception Rail — the product</div>
+        <p class="covline" style="margin:0">Only items needing a human render here. A 100-node city is wallpaper unless the view surfaces only what needs a decision.
+        <a href="#briefing">Bartender Briefing ↓</a></p>
+        <div class="io-btns">
+          <button class="btn" id="btn-export">Export decisions (JSON)</button>
+          <label class="btn" style="display:inline-block">Import<input type="file" id="inp-import" accept=".json" style="display:none"></label>
+        </div>
+      </div>
+      <div id="rail-hil"></div>
+      <div id="rail-acceptance"></div>
+      <div id="rail-butterflies"></div>
+      <div id="rail-check"></div>
+      <div id="rail-orphans"></div>
+      <div id="rail-8020"></div>
+      <div id="rail-ptk"></div>
+      <div id="rail-watch"></div>
+    </aside>
+  </div>
+
+  <!-- ======================= BARTENDER BRIEFING ======================= -->
+  <section class="panel" id="briefing" style="margin-top:8px">
+    <div class="ph">Bartender Briefing — Monday synthesis</div>
+    <p class="muted" style="font-size:13px;font-style:italic">“Five sentences from The Town Crier. Five minutes to read. What happened, what's working, what's stuck, what needs Tim, what comes next.”</p>
+    <ol id="briefing-lines"></ol>
+    <div class="sec-h" style="margin-top:10px">Council <b>Headlines</b> — one line per Elder (<a href="doctrine.html">full roster on the Doctrine page</a>)</div>
+    <div class="headlines" id="headlines"></div>
+  </section>
+
+  <p class="footnote" style="margin-top:18px">
+    Anti-theatre covenant: “Dashboard becomes theatre — looks useful but does not control anything → Control: data contract, real tickets, receipts.”
+    Triage principle: “A butterfly with a 280/400 score but a closing regulatory window goes before a 340/400 butterfly with no timing pressure” —
+    until the Right-Time trigger lines are wired into the seed, timing pressure is computed as exception weight (red card &gt; orphan &gt; 80/20 breach &gt; OVERDUE PTK), then score.
+    Verdicts and Caller assignments persist to <code>localStorage</code> only — 🔒 draft-only, nothing sends; the human approves every move.
+  </p>
+</main>
+
+<!-- node detail drawer -->
+<div class="drawer" id="drawer" role="dialog" aria-label="Initiative detail">
+  <span class="d-x" id="drawer-x" title="Close">✕</span>
+  <div id="drawer-body"></div>
+</div>
+
+<script src="assets/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  Shell.init('command');
+
+  var esc = Shell.esc;
+  var TODAY = new Date();
+  var DAY = 86400000;
+
+  /* ---------- localStorage (decisions persist; everything else recomputes) ---------- */
+  var LS_HIL = 'hb1000-command-hil';
+  var LS_CALLERS = 'hb1000-command-callers';
+  function lsLoad(k) { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch (e) { return {}; } }
+  function lsSave(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable — session-only */ } }
+
+  var state = {
+    portfolio: null, cards: {}, ptk: null, signals: null, elders: null,
+    hil: lsLoad(LS_HIL),            // {itemId:{v,note,at}}
+    callers: lsLoad(LS_CALLERS),    // {nodeId:{caller,acceptedAt}}
+    filters: { family: [], ring: [], status: [], fork: [], lns: [], bucket: [], caller: [], exception: [], swarm: false },
+    showAllOrphans: false,
+    assignDraft: null               // {nodeId, name} mid-flow
+  };
+
+  var FAMILY_NAMES = {
+    A: 'The Flagship Product', B: 'The Operating Businesses & Ventures', C: 'The AI-Agent Fleets & Personas',
+    D: 'The Engines & Protocols', E: 'The Frameworks & Wisdom', F: 'The OS / Memory Plumbing'
+  };
+  var RING_LABEL = {
+    'nursery-unscored': 'Nursery · unscored', 'nursery-scored': 'Nursery · scored', 'active': 'Active building',
+    'shipped': 'Shipped badge', 'converged': 'Converged', 'foundational': 'Foundational', 'closed': 'Closed'
+  };
+
+  /* ================================================================
+     LOAD — all real seed data; nothing rendered below is hand-set
+     ================================================================ */
+  Promise.all([
+    Shell.loadJSON('data/portfolio.json'),
+    Shell.loadJSON('data/cards/pawn-princess-pp01.json'),
+    Shell.loadJSON('data/cards/seba-hub-occupancy.json'),
+    Shell.loadJSON('data/cards/door-to-door.json'),
+    Shell.loadJSON('data/ptk-seed.json'),
+    Shell.loadJSON('data/signals.json'),
+    Shell.loadJSON('data/elders.json')
+  ]).then(function (r) {
+    state.portfolio = r[0];
+    state.cards = {
+      'pawn-princess-pp01': { json: r[1], file: 'pawn-princess-pp01.json', superseded: false, nodeId: 'pawn-princess' },
+      'seba-hub-occupancy': { json: r[2], file: 'seba-hub-occupancy.json', superseded: false, nodeId: 'seba-hub' },
+      'door-to-door':       { json: r[3], file: 'door-to-door.json', superseded: true, nodeId: null }
+    };
+    state.ptk = r[4];
+    state.signals = r[5];
+    state.elders = r[6];
+    readURL();
+    renderAll();
+  }).catch(function (err) {
+    document.getElementById('boot').innerHTML =
+      '<div class="status-row bad boot-fail"><span class="st">Data not loaded</span><span class="grow">' +
+      esc(String(err && err.message ? err.message : err)) +
+      ' — if you opened this page via <code>file://</code>, the browser may block local JSON fetches. ' +
+      'Serve the <code>app/</code> folder over HTTP (e.g. <code>python -m http.server</code>) or use a browser that allows local file fetch.</span></div>';
+  });
+
+  /* ================================================================
+     COMPUTATIONS — computed, never asserted (anti-theatre covenant)
+     ================================================================ */
+  function nodes() { return state.portfolio.nodes; }
+
+  function effCaller(n) {
+    if (state.callers[n.id] && state.callers[n.id].caller) return state.callers[n.id].caller;
+    return n.caller || null;
+  }
+  function isOrphan(n) { return n.ring === 'active' && !effCaller(n); }
+
+  function cardKeyOf(n) {
+    if (!n.card) return null;
+    var f = String(n.card).split('/').pop().replace('.json', '');
+    return state.cards[f] ? f : null;
+  }
+
+  function rollup(cardKey) {
+    var c = state.cards[cardKey].json;
+    var sqs = c.squares.filter(function (s) { return !s.ptk; });
+    var sum = 0, reds = 0, yellows = 0;
+    sqs.forEach(function (s) {
+      sum += (s.human == null ? 20 : Number(s.human));
+      var r = s.ryg || 'green';
+      if (r === 'red') reds++; else if (r === 'yellow') yellows++;
+    });
+    return { human: Math.round(sum / sqs.length), reds: reds, yellows: yellows, n: sqs.length };
+  }
+
+  function daysLate(p) {
+    if (!p.dueDate) return 0;
+    if (p.status !== 'promised' && p.status !== 'in_progress') return 0;
+    return Math.floor((TODAY - new Date(p.dueDate + 'T00:00:00')) / DAY);
+  }
+  function overdueAll() {
+    return state.ptk.promises
+      .map(function (p) { return { p: p, days: daysLate(p) }; })
+      .filter(function (x) { return x.days >= 7; })
+      .sort(function (a, b) { return b.days - a.days; });
+  }
+  function overdueForCard(cardKey) {
+    return overdueAll().filter(function (x) { return x.p.card === cardKey; });
+  }
+
+  function cardRYG(cardKey) {
+    var r = rollup(cardKey);
+    if (r.reds > 0) return 'red';
+    if (r.yellows > 0 || overdueForCard(cardKey).length > 0) return 'yellow';
+    return 'green';
+  }
+
+  /* swarm signal: 3+ first-sightings inside any 7-day window (computed from real first_seen dates) */
+  var _swarms = null;
+  function swarmOf(nodeId) {
+    if (!_swarms) {
+      _swarms = {};
+      var dated = nodes().filter(function (n) { return n.first_seen && n.first_seen.length >= 10; })
+        .map(function (n) { return { id: n.id, t: new Date(n.first_seen + 'T00:00:00').getTime(), d: n.first_seen }; })
+        .sort(function (a, b) { return a.t - b.t; });
+      var i = 0;
+      while (i < dated.length) {
+        var grp = [dated[i]], j = i + 1;
+        while (j < dated.length && dated[j].t - dated[i].t <= 6 * DAY) { grp.push(dated[j]); j++; }
+        if (grp.length >= 3) {
+          var label = '🦋 swarm · wk of ' + grp[0].d + ' (' + grp.length + ' sightings)';
+          grp.forEach(function (g) { _swarms[g.id] = label; });
+        }
+        i = j;
+      }
+    }
+    return _swarms[nodeId] || null;
+  }
+
+  function exceptionsOf(n) {
+    var ex = [];
+    if (isOrphan(n)) ex.push('orphan');
+    var ck = cardKeyOf(n);
+    if (ck && !state.cards[ck].superseded) {
+      if (rollup(ck).human > 20) ex.push('80-20');
+      if (overdueForCard(ck).length) ex.push('overdue-ptk');
+      if (cardRYG(ck) === 'red') ex.push('red-card');
+    }
+    if (n.fork === 'ruby-red-confirm') ex.push('check-engine');
+    if (n.revive_candidate) ex.push('watchlist');
+    return ex;
+  }
+  function pressure(n) {
+    var ex = exceptionsOf(n), w = 0;
+    if (ex.indexOf('red-card') >= 0) w += 4;
+    if (ex.indexOf('orphan') >= 0) w += 3;
+    if (ex.indexOf('80-20') >= 0) w += 2;
+    if (ex.indexOf('overdue-ptk') >= 0) w += 2;
+    if (ex.indexOf('check-engine') >= 0) w += 1;
+    if (ex.indexOf('watchlist') >= 0) w += 1;
+    return w;
+  }
+  function scoreOf(n) { return (n.score4 && n.score4.total) ? n.score4.total : null; }
+  function bucketOf(n) {
+    // /100 buckets live in the Nursery rubric; no node carries a /100 score in this seed → 'unscored'
+    if (n.ring === 'nursery-unscored' || n.ring === 'nursery-scored') return 'unscored';
+    return null;
+  }
+
+  /* ---------- HIL queue: the ONLY decision inbox. Cap 10, hard. ---------- */
+  function hilItems() {
+    var items = [];
+    (state.signals.signals || []).forEach(function (s) {
+      if (s.channel === 'red_individual_private') return; // gate-blocked → Check Engine, never the inbox
+      items.push({
+        id: 'sig-' + s.id, kind: 'signal',
+        title: s.move, source: s.source, agent: s.agent, channel: s.channel,
+        raw: s.raw, sizzle: s.sizzle, urgency: s.urgency, score: s.confidence,
+        draft: (s.drafts && s.drafts[0]) || null, nDrafts: (s.drafts || []).length
+      });
+    });
+    (state.portfolio.meta.open_decisions || []).forEach(function (d, i) {
+      items.push({ id: 'dec-' + i, kind: 'decision', title: d, urgency: null, score: null });
+    });
+    var rank = { high: 3, medium: 2, low: 1 };
+    items.sort(function (a, b) {
+      return (rank[b.urgency] || 0) - (rank[a.urgency] || 0) || (b.score || 0) - (a.score || 0);
+    });
+    return items;
+  }
+  function hilPending() { return hilItems().filter(function (i) { return !state.hil[i.id]; }); }
+  function hilDecided() { return hilItems().filter(function (i) { return state.hil[i.id]; }); }
+
+  /* ---------- portfolio-level 80/20 (live, non-superseded cards) ---------- */
+  function liveCardKeys() {
+    return Object.keys(state.cards).filter(function (k) { return !state.cards[k].superseded; });
+  }
+  function portfolioHumanShare() {
+    var ks = liveCardKeys();
+    if (!ks.length) return null;
+    var sum = 0;
+    ks.forEach(function (k) { sum += rollup(k).human; });
+    return Math.round(sum / ks.length);
+  }
+
+  /* ================================================================
+     FILTERS (URL-addressable, multi-select)
+     ================================================================ */
+  var FILTER_GROUPS = [
+    { key: 'family', label: 'Family', opts: ['A', 'B', 'C', 'D', 'E', 'F'] },
+    { key: 'bucket', label: 'Bucket', opts: ['now', 'next', 'later', 'park', 'kill', 'unscored'] },
+    { key: 'caller', label: 'Caller', opts: null }, // dynamic
+    { key: 'status', label: 'Status', opts: ['idea', "spec'd", 'partial', 'built', 'shipped', 'operating'] },
+    { key: 'fork', label: 'Fork', opts: ['universal', 'ruby-red', 'ruby-red-confirm'] },
+    { key: 'ring', label: 'Ring', opts: ['nursery-unscored', 'nursery-scored', 'active', 'shipped', 'converged', 'foundational', 'closed'] },
+    { key: 'lns', label: 'Local NS', opts: ['confirmed', 'worksheet', 'foraging', 'none'] },
+    { key: 'exception', label: 'Exception', opts: ['orphan', '80-20', 'overdue-ptk', 'red-card', 'check-engine', 'watchlist'] }
+  ];
+
+  function callerOptions() {
+    var set = {};
+    nodes().forEach(function (n) {
+      var c = effCaller(n);
+      if (c) set[c.split('(')[0].trim()] = true;
+    });
+    return ['ORPHAN'].concat(Object.keys(set).sort());
+  }
+
+  function matchesFilters(n) {
+    var f = state.filters;
+    if (f.family.length && f.family.indexOf(n.family) < 0) return false;
+    if (f.ring.length && f.ring.indexOf(n.ring) < 0) return false;
+    if (f.status.length && f.status.indexOf(n.status) < 0) return false;
+    if (f.fork.length && f.fork.indexOf(n.fork) < 0) return false;
+    if (f.lns.length) {
+      var st = (n.local_ns && n.local_ns.status) || 'none';
+      if (f.lns.indexOf(st) < 0) return false;
+    }
+    if (f.bucket.length) {
+      var b = bucketOf(n);
+      if (!b || f.bucket.indexOf(b) < 0) return false;
+    }
+    if (f.caller.length) {
+      var hit = false, c = effCaller(n);
+      f.caller.forEach(function (sel) {
+        if (sel === 'ORPHAN') { if (isOrphan(n)) hit = true; }
+        else if (c && c.indexOf(sel) === 0) hit = true;
+      });
+      if (!hit) return false;
+    }
+    if (f.exception.length) {
+      var ex = exceptionsOf(n), hitE = false;
+      f.exception.forEach(function (sel) { if (ex.indexOf(sel) >= 0) hitE = true; });
+      if (!hitE) return false;
+    }
+    if (f.swarm && !swarmOf(n.id)) return false;
+    return true;
+  }
+
+  function readURL() {
+    var q = new URLSearchParams(location.search);
+    Object.keys(state.filters).forEach(function (k) {
+      if (k === 'swarm') { state.filters.swarm = q.get('swarm') === '1'; return; }
+      var v = q.get(k);
+      state.filters[k] = v ? v.split(',').map(decodeURIComponent).filter(Boolean) : [];
+    });
+  }
+  function writeURL() {
+    var q = new URLSearchParams();
+    Object.keys(state.filters).forEach(function (k) {
+      if (k === 'swarm') { if (state.filters.swarm) q.set('swarm', '1'); return; }
+      if (state.filters[k].length) q.set(k, state.filters[k].map(encodeURIComponent).join(','));
+    });
+    var qs = q.toString();
+    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+  }
+
+  /* ================================================================
+     RENDER
+     ================================================================ */
+  function renderAll() {
+    _swarms = null; // recompute caches
+    renderCounts();
+    renderGauges();
+    renderFilters();
+    renderHeatmap();
+    renderRail();
+    renderBriefing();
+  }
+
+  /* ---------- honest counts bar ---------- */
+  function fmtMonthDay(iso) {
+    var d = new Date(iso + 'T00:00:00');
+    return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate();
+  }
+  function renderCounts() {
+    var h = state.portfolio.meta.honesty;
+    var seeded = nodes().length;
+    var active = nodes().filter(function (n) { return n.ring === 'active'; }).length;
+    var shipped = nodes().filter(function (n) { return n.ring === 'shipped'; }).length;
+    var orphans = nodes().filter(isOrphan).length;
+    document.getElementById('counts').innerHTML =
+      '<span class="seg"><b>' + esc(h.raw_captured_estimate) + '</b> raw captured</span><span class="sep">·</span>' +
+      '<span class="seg">YTD <b>' + h.ytd_confirmed + '</b> confirmed (' + esc(fmtMonthDay(h.ytd_confirmed_as_of)) + ')</span><span class="sep">·</span>' +
+      '<span class="seg"><b>' + seeded + '</b> seeded</span><span class="sep">·</span>' +
+      '<span class="seg"><b>' + active + '</b> active</span><span class="sep">·</span>' +
+      '<span class="seg good"><b>' + shipped + '</b> shipped</span><span class="sep">·</span>' +
+      '<span class="seg' + (orphans > 0 ? ' bad' : ' good') + '"><b>' + orphans + '</b> orphans</span>';
+  }
+
+  /* ---------- Four Gauges ---------- */
+  function ringHTML(val, of, cls, noData) {
+    var v = noData ? 0 : Math.max(0, Math.min(100, val));
+    return '<div class="scoreRing ' + (cls || '') + '" style="--val:' + v + '">' +
+      '<div style="text-align:center"><div class="val">' + (noData ? '—' : esc(String(val))) + '</div>' +
+      '<div class="of">' + esc(of) + '</div></div></div>';
+  }
+  function renderGauges() {
+    var ks = liveCardKeys();
+    var human = portfolioHumanShare();
+    var humanCls = human == null ? '' : (human > 25 ? 'red' : (human > 20 ? 'yellow' : 'green'));
+
+    var active = nodes().filter(function (n) { return n.ring === 'active'; });
+    var orphans = active.filter(isOrphan).length;
+    var orphanRate = active.length ? Math.round(orphans / active.length * 100) : 0;
+
+    var pending = hilPending();
+    var depth = Math.min(pending.length, 10);
+    var overflow = Math.max(0, pending.length - 10);
+    var hilCls = depth >= 10 ? 'red' : (depth >= 7 ? 'yellow' : 'green');
+
+    var over = overdueAll();
+
+    document.getElementById('gauges').innerHTML =
+      g('80/20 Gauge', ringHTML(human == null ? 0 : human, '% human', humanCls, human == null),
+        'Target ≤20% · red flag &gt;25% sustained 2 weeks. Mean of ' + ks.length + ' live card roll-ups (' +
+        ks.map(function (k) { return esc(state.cards[k].json.store.split('—')[0].trim()) + ' ' + rollup(k).human + '%'; }).join(' · ') +
+        '). Over 20% → red → Council triages.') +
+      g('Monetization Meter', ringHTML(0, 'no feed', '', true),
+        'Cash in/out per week, runway, 90-day rent check — the Financial Source of Truth feed (Samantha, noon reconciliation) is not wired yet. Reads blind; shown as no-data, never invented.') +
+      g('DINGO Board', ringHTML(orphans, 'orphans · target 0', orphans > 0 ? 'red' : 'green'),
+        active.length + ' active buildings · ' + Object.keys(state.cards).length + ' cards seeded · orphan rate ' + orphanRate + '%. “Card orphans (no caller) — target 0.” The open/in-progress/blocked ticket feed is the drill-down terminal, not this view.') +
+      g('Human-in-the-Loop Queue', ringHTML(depth, '/ 10 pending', hilCls),
+        (overflow > 0 ? overflow + ' more wait with the Council · ' : '') +
+        'oldest: n/a (no timestamps in seed). “HIL queue capped at 10 items. Full queue = Council triages before anything reaches Tim.”');
+
+    function g(label, ring, note) {
+      return '<div class="gauge-card"><div class="gauge">' + ring +
+        '<div><div class="glabel">' + esc(label) + '</div></div></div><div class="gnote">' + note + '</div></div>';
+    }
+  }
+
+  /* ---------- filters ---------- */
+  function renderFilters() {
+    var html = '<div class="ph" style="margin-bottom:4px">Filters — compose, multi-select, URL-addressable</div>';
+    FILTER_GROUPS.forEach(function (gr) {
+      var opts = gr.opts || callerOptions();
+      html += '<div class="fgroup"><span class="fgl">' + esc(gr.label) + '</span>';
+      opts.forEach(function (o) {
+        var on = state.filters[gr.key].indexOf(o) >= 0;
+        html += '<span class="chip' + (on ? ' on' : '') + '" data-fk="' + esc(gr.key) + '" data-fv="' + esc(o) + '">' + esc(o) + '</span>';
+      });
+      html += '</div>';
+    });
+    html += '<div class="fgroup"><span class="fgl">Swarm</span>' +
+      '<span class="chip' + (state.filters.swarm ? ' on' : '') + '" data-fk="swarm" data-fv="1">🦋 Swarm Signal — 3+ sightings / 7 days</span>' +
+      '<span class="chip" data-fk="clear" data-fv="1" style="float:right">✕ clear all</span></div>' +
+      '<div class="sortnote">Sort inside every district and list: timing pressure, then score — “a butterfly with a 280/400 score but a closing regulatory window goes before a 340/400 butterfly with no timing pressure.”</div>';
+    var el = document.getElementById('filters');
+    el.innerHTML = html;
+    el.querySelectorAll('.chip').forEach(function (ch) {
+      ch.addEventListener('click', function () {
+        var k = ch.getAttribute('data-fk'), v = ch.getAttribute('data-fv');
+        if (k === 'clear') {
+          Object.keys(state.filters).forEach(function (kk) { state.filters[kk] = kk === 'swarm' ? false : []; });
+        } else if (k === 'swarm') {
+          state.filters.swarm = !state.filters.swarm;
+        } else {
+          var arr = state.filters[k], i = arr.indexOf(v);
+          if (i >= 0) arr.splice(i, 1); else arr.push(v);
+        }
+        writeURL(); renderFilters(); renderHeatmap();
+      });
+    });
+  }
+
+  /* ---------- heatmap ---------- */
+  function tileColorClass(n) {
+    var ck = cardKeyOf(n);
+    if (ck) return 'c-' + cardRYG(ck);
+    if (n.ring === 'shipped') return 'c-ship';
+    if (n.ring === 'foundational') return 'c-found';
+    return 'c-grey';
+  }
+  function tileDot(n) {
+    var ck = cardKeyOf(n);
+    if (ck) return Shell.rygDot(cardRYG(ck));
+    if (n.ring === 'shipped') return Shell.rygDot('green');
+    return Shell.rygDot(null);
+  }
+  function nameOf(id) {
+    var hit = nodes().filter(function (n) { return n.id === id; })[0];
+    return hit ? hit.name : id;
+  }
+
+  function renderHeatmap() {
+    var byFam = { A: [], B: [], C: [], D: [], E: [], F: [] };
+    nodes().forEach(function (n) { if (matchesFilters(n)) byFam[n.family].push(n); });
+    var html = '';
+    ['A', 'B', 'C', 'D', 'E', 'F'].forEach(function (fam) {
+      var list = byFam[fam];
+      var total = nodes().filter(function (n) { return n.family === fam; }).length;
+      list.sort(function (a, b) {
+        return pressure(b) - pressure(a) || (scoreOf(b) || 0) - (scoreOf(a) || 0) || a.name.localeCompare(b.name);
+      });
+      var exCount = list.filter(function (n) { return exceptionsOf(n).length > 0; }).length;
+      html += '<div class="district"><div class="dh">' +
+        '<span class="dt">Family <b>' + fam + '</b> — ' + esc(FAMILY_NAMES[fam]) + '</span>' +
+        '<span class="dc">' + list.length + ' of ' + total + ' shown · ' + exCount + ' with exceptions</span></div>';
+      if (!list.length) {
+        html += '<div class="footnote">No nodes match the current filters in this district' +
+          (state.filters.bucket.length ? ' — note: no node carries a /100 score yet; scoring happens in <a href="nursery.html">the Nursery</a>.' : '.') + '</div>';
+      } else {
+        html += '<div class="tiles">';
+        list.forEach(function (n) { html += tileHTML(n); });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    var el = document.getElementById('heatmap');
+    el.innerHTML = html;
+    el.querySelectorAll('.tile').forEach(function (t) {
+      var open = function () { openDrawer(t.getAttribute('data-id')); };
+      t.addEventListener('click', open);
+      t.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    });
+  }
+
+  function tileHTML(n) {
+    var cls = ['tile', tileColorClass(n)];
+    if (n.fork === 'ruby-red') cls.push('fk-ruby');
+    if (n.fork === 'ruby-red-confirm') cls.push('fk-ruby-confirm');
+    if (n.ring === 'converged') cls.push('conv');
+    if (n.ring === 'closed') cls.push('closedn');
+
+    var meta = [];
+    meta.push(esc(n.status));
+    meta.push(esc(RING_LABEL[n.ring] || n.ring));
+    var sc = scoreOf(n);
+    if (sc) meta.push('<span class="sc">' + sc + '/400</span>');
+    else if (n.ring === 'nursery-unscored' || n.ring === 'nursery-scored') meta.push('unscored (pre-rubric)');
+
+    var caller = '';
+    if (n.ring === 'active') {
+      var c = effCaller(n);
+      caller = '<div class="t-call">' + (c ? 'Dingo Caller: <b>' + esc(c) + '</b>' : '<span class="orph">⚠ ORPHAN — no Dingo Caller</span>') + '</div>';
+    }
+
+    var badges = [];
+    if (n.ring === 'converged' && n.merged_into) badges.push('<span class="soft">→ merged into ' + esc(nameOf(n.merged_into)) + '</span>');
+    if (n.ring === 'closed') badges.push('<span class="soft">closed · eulogy banked</span>');
+    var sw = swarmOf(n.id);
+    if (sw) badges.push('<span title="' + esc(sw) + '">🦋</span>');
+    if (n.live_link) badges.push('<span class="soft">live ↗</span>');
+    if (cardKeyOf(n)) badges.push('<span style="color:var(--gold)">▦ card</span>');
+    if (n.fork === 'ruby-red-confirm') badges.push('<span class="pill ruby" style="font-size:9.5px;padding:0 6px">confirm</span>');
+
+    return '<div class="' + cls.join(' ') + '" data-id="' + esc(n.id) + '" tabindex="0" role="button" aria-label="' + esc(n.name) + '">' +
+      tileDot(n) +
+      '<div class="t-name">' + esc(n.name) + '</div>' +
+      '<div class="t-meta">' + meta.join(' · ') + '</div>' +
+      caller +
+      (badges.length ? '<div class="t-meta">' + badges.join(' ') + '</div>' : '') +
+      '</div>';
+  }
+
+  /* ---------- Exception Rail ---------- */
+  function renderRail() {
+    renderHIL();
+    renderAcceptance();
+    renderButterflies();
+    renderCheckEngine();
+    renderOrphans();
+    render8020();
+    renderPTK();
+    renderWatchlist();
+    document.getElementById('btn-export').onclick = exportDecisions;
+    document.getElementById('inp-import').onchange = importDecisions;
+  }
+
+  function verdictButtons(id) {
+    return '<div class="verdicts">' +
+      '<button class="btn approve" data-act="approve" data-id="' + esc(id) + '">Approve</button>' +
+      '<button class="btn modify" data-act="modify" data-id="' + esc(id) + '">Modify</button>' +
+      '<button class="btn decline" data-act="decline" data-id="' + esc(id) + '">Decline</button></div>' +
+      '<div class="mod-box" id="mod-' + esc(id) + '" style="display:none">' +
+      '<textarea placeholder="What changes? Recorded as a draft note — nothing sends."></textarea>' +
+      '<button class="btn modify" data-act="modify-save" data-id="' + esc(id) + '">Record modification (draft)</button></div>';
+  }
+  function verdictDone(id) {
+    var v = state.hil[id];
+    var label = { approve: '✅ Approved', modify: '✏️ Modified', decline: '⛔ Declined' }[v.v] || v.v;
+    return '<div class="verdict-done">' + esc(label) + ' · recorded locally ' + esc(new Date(v.at).toLocaleString()) +
+      (v.note ? '<div class="footnote">note: ' + esc(v.note) + '</div>' : '') +
+      '<span class="undo" data-act="undo" data-id="' + esc(id) + '">undo</span></div>';
+  }
+
+  function hilItemHTML(it, decided) {
+    var pills = [];
+    if (it.kind === 'signal') {
+      pills.push(Shell.pill(it.urgency + ' urgency', it.urgency === 'high' ? 'danger' : 'warn'));
+      pills.push(Shell.pill('confidence ' + it.score, 'info'));
+      pills.push(Shell.pill(it.channel, 'good'));
+    } else {
+      pills.push(Shell.pill('open decision — Tim to decide', 'gold'));
+    }
+    var body = '';
+    if (it.kind === 'signal') {
+      body = '<div class="sc-body">“' + esc(it.raw) + '”<br><span class="soft">sizzle: ' + esc(it.sizzle) + ' · agent: ' + esc(it.agent) + ' · ' + esc(it.source) + '</span></div>' +
+        (it.draft ? '<div class="draft"><div class="dh">Draft 1 of ' + it.nDrafts + ' — ' + esc(it.draft.style) + ' · 🔒 draft-only, Tim/Caller sends</div>' + esc(it.draft.text) + '</div>' : '');
+    } else {
+      body = '<div class="sc-body soft">Surfaced in UI, never silently resolved. A verdict here is a local note for the decision log.</div>';
+    }
+    return '<div class="signal-card"><div class="sc-top">' + pills.join(' ') + '</div>' +
+      '<div class="sc-title">' + esc(it.title) + '</div>' + body +
+      (decided ? verdictDone(it.id) : verdictButtons(it.id)) + '</div>';
+  }
+
+  function renderHIL() {
+    var pending = hilPending();
+    var queue = pending.slice(0, 10);
+    var overflow = pending.length - queue.length;
+    var decided = hilDecided();
+    var html = '<div class="panel tight"><div class="ph">HIL Queue — the single decision inbox ' +
+      '<span class="cnt ' + (queue.length >= 10 ? 'bad' : (queue.length >= 7 ? 'warn' : 'good')) + '">' + queue.length + '/10</span></div>' +
+      '<p class="covline">“HIL queue capped at 10 items. Full queue = Council triages before anything reaches Tim.” Approve / Modify / Decline are the only three verbs.' +
+      (overflow > 0 ? ' <b style="color:var(--yellow)">' + overflow + ' more wait with the Council.</b>' : '') + '</p>' +
+      '<p class="covline">Lane: ' + esc(state.signals.lane) + '</p>';
+    queue.forEach(function (it) { html += hilItemHTML(it, false); });
+    if (decided.length) {
+      html += '<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--muted)">Decided (' + decided.length + ')</summary>';
+      decided.forEach(function (it) { html += hilItemHTML(it, true); });
+      html += '</details>';
+    }
+    html += '</div>';
+    var el = document.getElementById('rail-hil');
+    el.innerHTML = html;
+    wireVerdicts(el);
+  }
+
+  function wireVerdicts(scope) {
+    scope.querySelectorAll('[data-act]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var act = b.getAttribute('data-act'), id = b.getAttribute('data-id');
+        if (act === 'approve' || act === 'decline') {
+          state.hil[id] = { v: act, at: new Date().toISOString() };
+          lsSave(LS_HIL, state.hil); renderGauges(); renderHIL(); renderBriefing();
+        } else if (act === 'modify') {
+          var box = document.getElementById('mod-' + id);
+          if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        } else if (act === 'modify-save') {
+          var box2 = document.getElementById('mod-' + id);
+          var note = box2 ? box2.querySelector('textarea').value : '';
+          state.hil[id] = { v: 'modify', note: note, at: new Date().toISOString() };
+          lsSave(LS_HIL, state.hil); renderGauges(); renderHIL(); renderBriefing();
+        } else if (act === 'undo') {
+          delete state.hil[id];
+          lsSave(LS_HIL, state.hil); renderGauges(); renderHIL(); renderBriefing();
+        }
+      });
+    });
+  }
+
+  /* ================================================================
+     CEREMONY SIGN-OFFS — the Acceptance Ceremony desk (Phase 4.5).
+     Reads localStorage hb1000-acceptance (the contract + append-only
+     rounds[]) + hb1000-review-queue (acceptance-signoff items pushed
+     by ceremony.html). Verdicts use the SAME three verbs and write
+     the state machine: Approve → active · Modify (note required) →
+     negotiated, round returns to the Caller · Decline → declined →
+     this rail's orphan note. Append-only: verdicts append a moderator
+     round; there is no undo — a Modify round reopens negotiation.
+     Spec: ACCEPTANCE-CEREMONY-SPEC.md §3.
+     ================================================================ */
+  var LS_ACC = 'hb1000-acceptance';
+  var LS_RQ = 'hb1000-review-queue';
+  function accLoad() { return lsLoad(LS_ACC); }
+  function accSave(m) { lsSave(LS_ACC, m); }
+  function rqLoad() { try { return JSON.parse(localStorage.getItem(LS_RQ)) || []; } catch (e) { return []; } }
+  function rqSave(a) { try { localStorage.setItem(LS_RQ, JSON.stringify(a)); } catch (e) { /* session-only */ } }
+  function accStoreName(cardId) {
+    if (state.cards[cardId]) return state.cards[cardId].json.store.split('—')[0].trim();
+    return cardId;
+  }
+  function accPendingEdits(entry) {
+    var latest = {};
+    (entry.rounds || []).forEach(function (r) {
+      (r.edits || []).forEach(function (ed) { latest[ed.path] = ed; });
+    });
+    return (entry.pending_paths || []).map(function (p) {
+      return latest[p] || { path: p, from: '', to: '', why: '' };
+    });
+  }
+  function fmtMonD(iso) {
+    var d = new Date(iso);
+    return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate() + ' ' + d.getFullYear();
+  }
+  function renderAcceptance() {
+    var acc = accLoad();
+    var ids = Object.keys(acc);
+    var pending = ids.filter(function (id) { return acc[id].state === 'accepted-pending-signoff'; });
+    var declined = ids.filter(function (id) { return acc[id].state === 'declined'; });
+    var waiting = ids.filter(function (id) { return ['offered', 'briefed', 'negotiated'].indexOf(acc[id].state) >= 0; });
+    var el = document.getElementById('rail-acceptance');
+    if (!ids.length) { el.innerHTML = ''; return; }
+
+    var html = '<div class="panel tight"><div class="ph">Ceremony sign-offs — acceptance at the gate ' +
+      '<span class="cnt ' + (pending.length ? 'warn' : 'good') + '">' + pending.length + '</span></div>' +
+      '<p class="covline">“The human is the governor. Never auto-apply.” Counter-proposals from the Acceptance Ceremony land here as standard HIL items — Approve / Modify / Decline, the only three verbs. Verdicts append to the contract history (<code>hb1000-acceptance</code>) — append-only, no undo; a Modify returns the round to the Caller.</p>';
+
+    pending.forEach(function (id) {
+      var e = acc[id];
+      var edits = accPendingEdits(e);
+      var rq = rqLoad().filter(function (r) { return r.type === 'acceptance-signoff' && r.cardId === id && !r.resolved; });
+      var flags = rq.length ? (rq[rq.length - 1].flags || []) : [];
+      var pills = [Shell.pill('acceptance-signoff', 'gold'),
+        edits.length ? Shell.pill(edits.length + ' edit' + (edits.length === 1 ? '' : 's'), 'warn')
+                     : Shell.pill('rubber-stamp — no Caller modifications', 'good')];
+      var body = '<div class="sc-body">Signed: <b style="color:var(--ink)">' + esc(e.signature ? e.signature.name : e.caller) + '</b>' +
+        (e.signature ? ' · ' + esc(new Date(e.signature.at).toLocaleString()) : '') +
+        ' · <a href="ceremony.html?card=' + esc(id) + '">open the Ceremony summary →</a></div>';
+      edits.forEach(function (ed) {
+        body += '<div class="status-row warn" style="font-size:12px"><span class="st">EDIT</span><span class="grow"><b>' + esc(ed.path) + '</b>: ' +
+          esc(String(ed.from === '' ? '∅' : ed.from)) + ' → <b>' + esc(String(ed.to)) + '</b>' +
+          (ed.why ? '<br><span class="soft">why: ' + esc(ed.why) + '</span>' : '') + '</span></div>';
+      });
+      flags.forEach(function (f) {
+        body += '<div class="status-row warn" style="font-size:12px"><span class="st">FLAG</span><span class="grow">[ALIGNMENT-FLAG] ' + esc(f) + '</span></div>';
+      });
+      html += '<div class="signal-card"><div class="sc-top">' + pills.join(' ') + '</div>' +
+        '<div class="sc-title">Acceptance — ' + esc(e.caller) + ' on ' + esc(accStoreName(id)) + ': ' + edits.length + ' edit' + (edits.length === 1 ? '' : 's') + '</div>' +
+        body +
+        '<div class="verdicts">' +
+        '<button class="btn approve" data-acc="approve" data-card="' + esc(id) + '">Approve</button>' +
+        '<button class="btn modify" data-acc="modify" data-card="' + esc(id) + '">Modify</button>' +
+        '<button class="btn decline" data-acc="decline" data-card="' + esc(id) + '">Decline</button></div>' +
+        '<div class="mod-box" id="accmod-' + esc(id) + '" style="display:none">' +
+        '<textarea placeholder="The note travels with the verdict — required for Modify (the round returns to the Caller)."></textarea>' +
+        '<button class="btn modify" data-acc="modify-save" data-card="' + esc(id) + '">Send the round back (Modify)</button> ' +
+        '<button class="btn decline" data-acc="decline-save" data-card="' + esc(id) + '">Confirm decline</button></div></div>';
+    });
+
+    declined.forEach(function (id) {
+      var e = acc[id];
+      html += '<div class="orow"><div><div class="on">' + esc(accStoreName(id)) + ' — assignment DECLINED by ' + esc(e.caller) + '</div>' +
+        '<div class="om">back on the orphan rail (target 0) · ' + (e.decline_note ? '“' + esc(e.decline_note) + '”' : 'no reason given — the No still counts') + '</div></div>' +
+        '<button class="btn" data-acc="reoffer" data-card="' + esc(id) + '">Re-offer</button></div>';
+    });
+
+    if (waiting.length) {
+      html += '<p class="covline" style="margin-top:8px">' + waiting.length + ' offer' + (waiting.length === 1 ? '' : 's') + ' out with the Caller (' +
+        waiting.map(function (id) { return esc(acc[id].caller) + ' · ' + esc(acc[id].state); }).join(' — ') + ') — nothing for Tim yet.</p>';
+    }
+    html += '</div>';
+    el.innerHTML = html;
+
+    el.querySelectorAll('[data-acc]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var act = b.getAttribute('data-acc'), id = b.getAttribute('data-card');
+        var map = accLoad(), e = map[id];
+        if (!e) return;
+        var now = new Date().toISOString();
+        function resolveRQ(v) {
+          var rq = rqLoad();
+          rq.forEach(function (r) { if (r.type === 'acceptance-signoff' && r.cardId === id && !r.resolved) r.resolved = { v: v, at: now }; });
+          rqSave(rq);
+        }
+        if (act === 'approve') {
+          var nEdits = accPendingEdits(e).length;
+          e.state = 'active';
+          e.signoff = { by: 'Tim', verdict: 'approve', note: '', at: now };
+          e.terms_line = 'Accepted ' + fmtMonD(now) + ' · ' + nEdits + ' negotiated edit' + (nEdits === 1 ? '' : 's') + ' · signed ' + (e.signature ? e.signature.name : e.caller);
+          e.pending_paths = [];
+          e.rounds.push({ at: now, by: 'moderator', verb: 'accept', edits: [], note: 'Prime sign-off — approved. ' + e.terms_line });
+          accSave(map); resolveRQ('approve'); renderAcceptance();
+        } else if (act === 'modify' || act === 'decline') {
+          var box = document.getElementById('accmod-' + id);
+          if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        } else if (act === 'modify-save') {
+          var box2 = document.getElementById('accmod-' + id);
+          var note = box2 ? box2.querySelector('textarea').value.trim() : '';
+          if (!note) { if (box2) box2.querySelector('textarea').focus(); return; } /* note required — the round returns with a reason */
+          e.state = 'negotiated';
+          e.rounds.push({ at: now, by: 'moderator', verb: 'modify', edits: [], note: note });
+          accSave(map); resolveRQ('modify'); renderAcceptance();
+        } else if (act === 'decline-save') {
+          var box3 = document.getElementById('accmod-' + id);
+          var note3 = box3 ? box3.querySelector('textarea').value.trim() : '';
+          e.state = 'declined';
+          e.declined_at = now;
+          if (note3) e.decline_note = note3;
+          e.signoff = { by: 'Tim', verdict: 'decline', note: note3, at: now };
+          e.rounds.push({ at: now, by: 'moderator', verb: 'decline', edits: [], note: note3 || 'Declined at Prime sign-off' });
+          accSave(map); resolveRQ('decline'); renderAcceptance();
+        } else if (act === 'reoffer') {
+          e.state = 'offered';
+          e.signature = null; e.signoff = null; e.pending_paths = [];
+          e.rounds.push({ at: now, by: 'moderator', verb: 'offer', edits: [], note: 'Re-offered after decline — the history travels with the card' });
+          accSave(map); renderAcceptance();
+        }
+      });
+    });
+  }
+
+  /* ================================================================
+     BUTTERFLY REVIEW — the Flypaper's capture flags (Phase 4.5).
+     Reads localStorage hb1000-review-queue ADDITIVELY (FLYPAPER-
+     LANDING-SPEC §8): every capture is flagged for Tim's review.
+     Render-only on the capture store — the raw verbatim text stays
+     immutable in hb1000-flypaper and the butterfly stays in the
+     Library either way; a verdict here only marks the queue entry
+     resolved (a local routing note — draft-only, nothing sends).
+     Same three verbs: Approve / Modify / Decline.
+     ================================================================ */
+  function renderButterflies() {
+    var el = document.getElementById('rail-butterflies');
+    var all = rqLoad();
+    var items = [], resolved = [];
+    all.forEach(function (r, i) {
+      if (!r || r.type !== 'butterfly-review') return;
+      (r.resolved ? resolved : items).push({ r: r, i: i });
+    });
+    if (!items.length && !resolved.length) { el.innerHTML = ''; return; }
+    var html = '<div class="panel tight"><div class="ph">Butterfly review — fresh from the Flypaper ' +
+      '<span class="cnt ' + (items.length ? 'warn' : 'good') + '">' + items.length + '</span></div>' +
+      '<p class="covline">“📋 REVIEW QUEUE — every capture is flagged for Tim’s review.” A verdict is a local routing note; the butterfly stays in the <a href="library.html">Library</a> either way — ideas merge, never die. Raw text is immutable.</p>';
+    items.forEach(function (it) {
+      var r = it.r;
+      html += '<div class="signal-card"><div class="sc-top">' + Shell.pill('butterfly-review', 'info') + ' ' +
+        Shell.pill((r.total != null ? r.total : '—') + '/400 · self-scored', 'gold') + '</div>' +
+        '<div class="sc-title">🦋 ' + esc(r.id) + ' — ' + esc(r.title) + '</div>' +
+        '<div class="sc-body soft">caught ' + esc(r.at ? new Date(r.at).toLocaleString() : '—') +
+        ' · verbatim raw text lives on the <a href="library.html">Library</a> / <a href="flypaper.html">Flypaper</a></div>' +
+        '<div class="verdicts">' +
+        '<button class="btn approve" data-bfr="approve" data-i="' + it.i + '">Approve</button>' +
+        '<button class="btn modify" data-bfr="modify" data-i="' + it.i + '">Modify</button>' +
+        '<button class="btn decline" data-bfr="decline" data-i="' + it.i + '">Decline</button></div>' +
+        '<div class="mod-box" id="bfrmod-' + it.i + '" style="display:none">' +
+        '<textarea placeholder="Routing note — recorded locally as a draft; nothing sends."></textarea>' +
+        '<button class="btn modify" data-bfr="modify-save" data-i="' + it.i + '">Record note (draft)</button></div></div>';
+    });
+    if (resolved.length) {
+      html += '<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--muted)">Reviewed (' + resolved.length + ')</summary>' +
+        resolved.map(function (it) {
+          var v = it.r.resolved;
+          return '<div class="status-row ' + (v.v === 'decline' ? 'bad' : 'ok') + '"><span class="st">' + esc(String(v.v).toUpperCase()) + '</span><span class="grow"><b>' +
+            esc(it.r.id) + '</b> — ' + esc(it.r.title) + (v.note ? ' · note: ' + esc(v.note) : '') +
+            ' <span class="soft">' + esc(new Date(v.at).toLocaleString()) + '</span></span></div>';
+        }).join('') + '</details>';
+    }
+    html += '</div>';
+    el.innerHTML = html;
+    el.querySelectorAll('[data-bfr]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var act = b.getAttribute('data-bfr'), i = Number(b.getAttribute('data-i'));
+        if (act === 'modify') {
+          var box = document.getElementById('bfrmod-' + i);
+          if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+          return;
+        }
+        var q = rqLoad();
+        if (!q[i] || q[i].type !== 'butterfly-review') return;
+        var now = new Date().toISOString();
+        if (act === 'approve' || act === 'decline') {
+          q[i].resolved = { v: act, at: now };
+        } else if (act === 'modify-save') {
+          var box2 = document.getElementById('bfrmod-' + i);
+          q[i].resolved = { v: 'modify', note: box2 ? box2.querySelector('textarea').value.trim() : '', at: now };
+        }
+        rqSave(q);
+        renderButterflies();
+      });
+    });
+  }
+
+  function renderCheckEngine() {
+    var rows = [];
+    // 1. live security blocker from the PTK seed (real item)
+    state.ptk.promises.forEach(function (p) {
+      if (p.id === 'ptk-010' && p.status !== 'kept') {
+        rows.push(row('bad', 'BLOCKER', esc(p.promise) + ' — due ' + esc(p.dueDate) + ' (security hygiene, flagged on the Show Me feed). <a href="ptk.html">PTK ledger →</a>'));
+      }
+    });
+    // 2. channel-gate enforcement (the gate holding is the system working — shown, never hidden)
+    (state.signals.signals || []).forEach(function (s) {
+      if (s.channel === 'red_individual_private') {
+        rows.push(row('warn', 'GATE HELD', '<b>' + esc(s.id) + '</b> — red_individual_private: a person-directed message was BLOCKED; content only, no override exists in the schema. “' + esc(s.raw) + '”'));
+      }
+    });
+    // 3. superseded card with an unassigned Caller line
+    rows.push(row('warn', 'EVIDENCE', 'door-to-door card reads “' + esc(state.cards['door-to-door'].json.caller) + '” and is badged <span class="badge-superseded">superseded</span> — superseded by the Seba Hub Occupancy Engine; kept for the record.'));
+    // 4. Standing Order #2 — ruby-red (confirm) forks
+    var confirms = nodes().filter(function (n) { return n.fork === 'ruby-red-confirm'; });
+    if (confirms.length) {
+      rows.push(row('warn', 'SO #2', confirms.length + ' nodes carry <b>ruby-red (confirm)</b>: ' +
+        confirms.map(function (n) { return esc(n.name.split('—')[0].split('/')[0].trim()); }).join(' · ') +
+        '. Ruby Red is the Local North Star for Maven / Corner Banker / Pulse ONLY — confirm scope or re-fork.'));
+    }
+    // 5. missing feed
+    rows.push(row('warn', 'NO FEED', 'Financial Source of Truth not wired — the Monetization Meter reads blind. “The number behind any gauge must be trusted and current — if the noon reconciliation is late or massaged, the ticker lies.”'));
+
+    document.getElementById('rail-check').innerHTML =
+      '<div class="panel tight"><div class="ph">Check Engine <span class="cnt warn">' + rows.length + '</span></div>' +
+      '<p class="covline">“Critical blockers, authority violations, missing evidence.”</p>' + rows.join('') + '</div>';
+
+    function row(kind, st, html) {
+      return '<div class="status-row ' + kind + '"><span class="st">' + st + '</span><span class="grow">' + html + '</span></div>';
+    }
+  }
+
+  function renderOrphans() {
+    var orphans = nodes().filter(isOrphan).sort(function (a, b) {
+      return pressure(b) - pressure(a) || (scoreOf(b) || 0) - (scoreOf(a) || 0) || a.name.localeCompare(b.name);
+    });
+    var shown = state.showAllOrphans ? orphans : orphans.slice(0, 6);
+    var html = '<div class="panel tight"><div class="ph">Orphan-card alert <span class="cnt ' + (orphans.length ? 'bad' : 'good') + '">' + orphans.length + '</span></div>' +
+      '<p class="covline">“Card orphans (no caller) — target 0.” Most operating businesses fire this at seed — that is the truth, and assigning Callers is this view’s first campaign. One click → name the Dingo Caller → “Yes, I accept this assignment.”</p>';
+    shown.forEach(function (n) {
+      html += '<div class="orow"><div><div class="on">' + esc(n.name) + '</div><div class="om">Family ' + esc(n.family) + ' · ' + esc(n.status) +
+        (n.caller_candidate ? ' · candidate: ' + esc(n.caller_candidate) : '') + '</div></div>' +
+        '<button class="btn" data-assign="' + esc(n.id) + '">Assign Caller</button></div>';
+    });
+    if (orphans.length > 6) {
+      html += '<span class="showmore" id="orph-more">' + (state.showAllOrphans ? '▲ show fewer' : '▼ show all ' + orphans.length + ' orphans') + '</span>';
+    }
+    html += '</div>';
+    var el = document.getElementById('rail-orphans');
+    el.innerHTML = html;
+    el.querySelectorAll('[data-assign]').forEach(function (b) {
+      b.addEventListener('click', function () { openDrawer(b.getAttribute('data-assign')); });
+    });
+    var more = document.getElementById('orph-more');
+    if (more) more.addEventListener('click', function () { state.showAllOrphans = !state.showAllOrphans; renderOrphans(); });
+  }
+
+  function render8020() {
+    var rows = '';
+    var count = 0;
+    Object.keys(state.cards).forEach(function (k) {
+      var c = state.cards[k];
+      var r = rollup(k);
+      if (r.human > 20) {
+        count++;
+        rows += '<div class="alarm-row' + (c.superseded ? '" style="opacity:.55' : '') + '">' +
+          '<div class="ar-t"><span>' + esc(c.json.store.split('—')[0].trim()) +
+          (c.superseded ? ' <span class="badge-superseded">superseded</span>' : '') +
+          '</span><span class="pct num">' + r.human + '% human</span></div>' +
+          Shell.splitBar(r.human) +
+          '<div class="footnote" style="margin-top:4px"><a href="card.html?card=' + esc(c.file) + '">open the Dingo card →</a>' +
+          (c.superseded ? ' · excluded from the portfolio gauge' : '') + '</div></div>';
+      }
+    });
+    document.getElementById('rail-8020').innerHTML =
+      '<div class="panel tight"><div class="ph">80/20 covenant alarms <span class="cnt ' + (count ? 'bad' : 'good') + '">' + count + '</span></div>' +
+      '<p class="covline">Agents 80%, human 20%; any card whose human share &gt;20% turns red and the Council triages. Computed as the mean of <code>human</code> over the non-PTK squares — never asserted.</p>' +
+      (rows || '<div class="status-row ok"><span class="st">OK</span><span class="grow">No card over the 20% line.</span></div>') + '</div>';
+  }
+
+  function renderPTK() {
+    var over = overdueAll();
+    var rows = '';
+    over.forEach(function (x) {
+      var p = x.p;
+      var line = p.direction === 'gave'
+        ? '📤 PTK OVERDUE: You promised ' + esc(p.counterparty) + ' you’d ' + esc(p.promise) + ' — now <b>' + x.days + '</b> days'
+        : '🔴 PTK OVERDUE (Ghost Buster): ' + esc(p.counterparty) + ' promised you “' + esc(p.promise) + '” — now <b>' + x.days + '</b> days';
+      rows += '<div class="ptk-row">' + line +
+        (p.direction === 'received' && x.days >= 14 ? '<span class="sugg">14+ days silent → suggest 🚨 URGENT nudge (3 pre-written tones on the PTK page — drafts only, Tim sends)</span>' : '') +
+        '</div>';
+    });
+    document.getElementById('rail-ptk').innerHTML =
+      '<div class="panel tight"><div class="ph">OVERDUE PTKs <span class="cnt ' + (over.length ? 'bad' : 'good') + '">' + over.length + '</span></div>' +
+      '<p class="covline">Promises 7+ days past due, both directions — computed from <code>dueDate</code> at render, never stored. <a href="ptk.html">Open the dual ledger →</a></p>' +
+      (rows || '<div class="status-row ok"><span class="st">OK</span><span class="grow">Nothing 7+ days overdue.</span></div>') + '</div>';
+  }
+
+  function renderWatchlist() {
+    var rows = '';
+    var count = 0;
+    nodes().filter(function (n) { return n.revive_candidate; }).forEach(function (n) {
+      count++;
+      var days = n.first_seen && n.first_seen.length >= 10 ? Math.floor((TODAY - new Date(n.first_seen + 'T00:00:00')) / DAY) : null;
+      rows += '<div class="watch-row"><b style="color:var(--ink)">' + esc(n.name) + '</b> — flagged revive candidate' +
+        (days != null ? '; first seen ' + days + ' days ago' : '') + '. ' + (n.one_liner ? esc(n.one_liner) : '') + '</div>';
+    });
+    count++;
+    rows += '<div class="watch-row"><b style="color:var(--ink)">Door-to-Door Occupancy Drive card</b> <span class="badge-superseded">superseded</span> — early draft kept for the record; superseded by the Seba Hub Occupancy Engine. <a href="card.html?card=door-to-door.json">view →</a></div>';
+    document.getElementById('rail-watch').innerHTML =
+      '<div class="panel tight"><div class="ph">Watchlist <span class="cnt warn">' + count + '</span></div>' +
+      '<p class="covline">Anything inactive 5+ days = orphan-idea candidate. The last-activity feed is not wired yet — showing the seed’s flagged revive candidates and superseded drafts (honest scope, not theatre).</p>' +
+      rows + '</div>';
+  }
+
+  /* ---------- Bartender Briefing (five computed sentences) ---------- */
+  function renderBriefing() {
+    var N = nodes().length;
+    var active = nodes().filter(function (n) { return n.ring === 'active'; }).length;
+    var shipped = nodes().filter(function (n) { return n.ring === 'shipped'; }).length;
+    var nursery = nodes().filter(function (n) { return n.ring === 'nursery-unscored' || n.ring === 'nursery-scored'; }).length;
+    var orphans = nodes().filter(isOrphan).length;
+    var over = overdueAll();
+    var human = portfolioHumanShare();
+    var pending = hilPending();
+    var depth = Math.min(pending.length, 10);
+    var overflow = Math.max(0, pending.length - 10);
+    var top = pending[0];
+    var scored = nodes().filter(function (n) { return scoreOf(n); });
+    var topScorer = scored.sort(function (a, b) { return scoreOf(b) - scoreOf(a); })[0];
+    var gaps = nodes().filter(function (n) { var s = (n.local_ns && n.local_ns.status) || 'none'; return n.ring === 'active' && s !== 'confirmed'; }).length;
+
+    var lines = [
+      '<b>What happened:</b> ' + N + ' initiatives are seeded across the six families — ' + active + ' active buildings, ' + shipped + ' carrying a shipped badge, ' + nursery + ' germinating in the Nursery.',
+      '<b>What’s working:</b> ' + scored.length + ' nodes carry real /400 scores' + (topScorer ? ' — top scorer ' + esc(topScorer.name) + ' at ' + scoreOf(topScorer) + '/400' + (topScorer.lean_canvas_flag ? ' 🏷️' : '') : '') + ', and the live links ship traffic today.',
+      '<b>What’s stuck:</b> ' + orphans + ' active cards have no Dingo Caller (target 0), the 80/20 covenant reads ' + (human == null ? 'no data' : human + '% human — over the 20% line, Council triages') + ', and ' + over.length + ' PTKs are 7+ days overdue' + (over.length ? ' (oldest ' + over[0].days + ' days: ' + esc(over[0].p.counterparty) + ')' : '') + '.',
+      '<b>What needs Tim:</b> the HIL queue holds ' + depth + '/10 pending decisions' + (overflow ? ' with ' + overflow + ' more at the Council' : '') + (top ? ' — top item: ' + esc(top.title) : '') + '.',
+      '<b>What comes next:</b> drive card orphans to zero via the one-click assign → “Yes, I accept this assignment” flow, and close the ' + gaps + ' Local North Star gaps through the 11-question worksheet campaign on <a href="north-star.html">the North Star Builder</a>.'
+    ];
+    document.getElementById('briefing-lines').innerHTML = lines.map(function (l) { return '<li>' + l + '</li>'; }).join('');
+
+    // Council Headlines — one line per Elder, each computed from the live dataset
+    var partials = nodes().filter(function (n) { return n.status === 'partial'; }).length;
+    var confirms = nodes().filter(function (n) { return n.fork === 'ruby-red-confirm'; }).length;
+    var confirmedLNS = nodes().filter(function (n) { return n.local_ns && n.local_ns.status === 'confirmed'; }).length;
+    var greenSignals = (state.signals.signals || []).filter(function (s) { return s.channel !== 'red_individual_private'; }).length;
+    var lineByElder = {
+      'The Quartermaster': 'personal-ai-os-vault shipped — the data spine. “If it is not in the vault, it does not exist.”',
+      'The Cartographer': N + ' nodes catalogued; ' + scored.length + ' carry real /400 scores; ' + nursery + ' await the /100 rubric.',
+      'The Banker': 'Monetization Meter reads blind — Financial Source of Truth feed (noon reconciliation) not wired.',
+      'The Foreman': partials + ' partial builds in flight; the omni-app shell (THIS BUILD) is one of them.',
+      'The Pitchman': greenSignals + ' green-lane Seba signals drafted and waiting in the HIL queue — drafts only, nothing sends.',
+      'The Compliance Marshal': confirms + ' ruby-red (confirm) forks await Standing Order #2 confirmation.',
+      'The Town Crier': 'This briefing — five sentences, computed live from the seed JSON.',
+      'The Empathy Enforcer': gaps + ' active cards lack a confirmed Local North Star — the worksheet campaign list.',
+      'The North Star Agent (NSA)': confirmedLNS + ' confirmed Local North Stars across the portfolio; the Twin North Star Gate halts everything else.'
+    };
+    document.getElementById('headlines').innerHTML = (state.elders.elders || []).map(function (e) {
+      return '<div class="headline"><div class="hn">' + esc(e.name) + ' · seat ' + e.seat + '</div>' +
+        '<div class="hl">' + (lineByElder[e.name] || esc(e.portfolio)) + '</div></div>';
+    }).join('');
+  }
+
+  /* ---------- drawer (drill-in + assign-Caller flow) ---------- */
+  function openDrawer(nodeId) {
+    var n = nodes().filter(function (x) { return x.id === nodeId; })[0];
+    if (!n) return;
+    var ck = cardKeyOf(n);
+    var html = '<h3>' + esc(n.name) + '</h3>';
+    html += '<div class="row" style="margin-bottom:8px">' +
+      Shell.pill('Family ' + n.family, 'info') + Shell.pill(n.status, 'gold') + Shell.pill(RING_LABEL[n.ring] || n.ring) +
+      (n.fork !== 'universal' ? Shell.pill(n.fork, 'ruby') : Shell.pill('universal')) + '</div>';
+    if (n.one_liner) html += '<p style="font-size:13px">' + esc(n.one_liner) + '</p>';
+    var lns = n.local_ns || {};
+    var lnsIcon = lns.status === 'confirmed' ? '✅' : (lns.status === 'none' || !lns.status ? '—' : '⏳');
+    html += '<div class="dl"><b>Local North Star:</b> ' + lnsIcon + ' ' + esc(lns.value || 'none declared — gap') + ' (' + esc(lns.status || 'none') + ')' +
+      (lns.feb_declaration ? '<br><span class="soft">Feb declaration: “' + esc(lns.feb_declaration) + '”</span>' : '') + '</div>';
+    var c = effCaller(n);
+    html += '<div class="dl"><b>Dingo Caller:</b> ' + (c ? esc(c) : '<span style="color:var(--red);font-weight:800">ORPHAN — no Caller named</span>') + '</div>';
+    var sc = scoreOf(n);
+    if (sc) {
+      var s4 = n.score4;
+      html += '<div class="dl"><b>Cloud Butterfly Score:</b> <span style="color:var(--gold);font-weight:800">' + sc + '/400</span>' +
+        (s4.humanity != null ? ' — H ' + s4.humanity + ' · B ' + s4.business + ' · F ' + s4.fun + ' · WTH ' + s4.wth : ' <span class="soft">(total-only record)</span>') +
+        (n.lean_canvas_flag ? ' · 🏷️ LEAN CANVAS FLAG' : '') + '</div>';
+    } else if (n.ring === 'nursery-unscored' || n.ring === 'nursery-scored') {
+      html += '<div class="dl"><b>Score:</b> unscored (pre-rubric) — score it in <a href="nursery.html">the Nursery</a></div>';
+    }
+    if (n.first_seen) html += '<div class="dl"><b>First seen:</b> ' + esc(n.first_seen) + (swarmOf(n.id) ? ' · ' + esc(swarmOf(n.id)) : '') + '</div>';
+    if (n.owner_asks) html += '<div class="dl"><b>Owner asks:</b> ' + n.owner_asks.map(function (o) { return esc(o.owner) + ' — ' + esc(o.ask); }).join(' · ') + '</div>';
+    if (n.merged_into) html += '<div class="dl"><b>Converged →</b> merged into ' + esc(nameOf(n.merged_into)) + ' — ideas merge, they never die.</div>';
+    if (n.absorbs) html += '<div class="dl"><b>Absorbs:</b> ' + n.absorbs.map(esc).join(' · ') + '</div>';
+    if (n.cluster_parent) html += '<div class="dl"><b>Cluster parent:</b> ' + esc(nameOf(n.cluster_parent)) + '</div>';
+    if (n.notes) html += '<div class="dl soft">' + esc(n.notes) + '</div>';
+    if (ck) {
+      var r = rollup(ck);
+      html += '<div class="dl"><b>Card roll-up (computed):</b> ' + Shell.rygDot(cardRYG(ck)) + ' ' + cardRYG(ck).toUpperCase() +
+        ' · ' + r.reds + ' red / ' + r.yellows + ' yellow squares · Caller ' + r.human + '% · AI agents ' + (100 - r.human) + '%</div>' + Shell.splitBar(r.human);
+    }
+    html += '<div class="row" style="margin-top:12px">';
+    if (ck) html += '<a class="btn gold-cta" href="card.html?card=' + esc(state.cards[ck].file) + '">Open the Dingo card →</a>';
+    if (n.live_link) html += '<a class="btn" href="' + esc(n.live_link) + '" target="_blank" rel="noopener">live link ↗</a>';
+    html += '</div>';
+
+    // assign-Caller flow (graduation wizard steps 3–4) for active nodes
+    if (n.ring === 'active') {
+      html += '<div class="assign"><div class="ph">Dingo Caller — “one neck to choke”</div>';
+      if (state.callers[n.id]) {
+        html += '<div class="dl">Assigned locally: <b>' + esc(state.callers[n.id].caller) + '</b> · accepted ' + esc(new Date(state.callers[n.id].acceptedAt).toLocaleString()) +
+          '</div><button class="btn decline" id="assign-remove">Remove assignment</button>' +
+          '<div class="footnote">Recorded in localStorage only — acceptance must be spoken by the named human; nothing sends.</div>';
+      } else if (state.assignDraft && state.assignDraft.nodeId === n.id) {
+        html += '<div class="dl">Named: <b>' + esc(state.assignDraft.name) + '</b> — the assignment stands only when the human says it:</div>' +
+          '<button class="btn approve" id="assign-accept">“Yes, I accept this assignment”</button> ' +
+          '<button class="btn decline" id="assign-cancel">Decline</button>';
+      } else {
+        html += '<input id="assign-name" placeholder="Name the Dingo Caller' + (n.caller_candidate ? ' — candidate: ' + esc(n.caller_candidate) : '') + '">' +
+          '<button class="btn modify" id="assign-name-btn">Name the Dingo Caller</button>' +
+          '<div class="footnote">Step 3–4 of the graduation wizard: name the Caller, then the acceptance verb. Local record only.</div>';
+      }
+      html += '</div>';
+    }
+
+    var body = document.getElementById('drawer-body');
+    body.innerHTML = html;
+    document.getElementById('drawer').classList.add('open');
+
+    var nameBtn = document.getElementById('assign-name-btn');
+    if (nameBtn) nameBtn.addEventListener('click', function () {
+      var v = (document.getElementById('assign-name').value || '').trim();
+      if (!v) return;
+      state.assignDraft = { nodeId: n.id, name: v };
+      openDrawer(n.id);
+    });
+    var accBtn = document.getElementById('assign-accept');
+    if (accBtn) accBtn.addEventListener('click', function () {
+      state.callers[n.id] = { caller: state.assignDraft.name, acceptedAt: new Date().toISOString() };
+      state.assignDraft = null;
+      lsSave(LS_CALLERS, state.callers);
+      renderAll(); openDrawer(n.id);
+    });
+    var canBtn = document.getElementById('assign-cancel');
+    if (canBtn) canBtn.addEventListener('click', function () { state.assignDraft = null; openDrawer(n.id); });
+    var remBtn = document.getElementById('assign-remove');
+    if (remBtn) remBtn.addEventListener('click', function () {
+      delete state.callers[n.id];
+      lsSave(LS_CALLERS, state.callers);
+      renderAll(); openDrawer(n.id);
+    });
+  }
+  document.getElementById('drawer-x').addEventListener('click', function () {
+    document.getElementById('drawer').classList.remove('open');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') document.getElementById('drawer').classList.remove('open');
+  });
+
+  /* ---------- export / import (nothing is trapped) ---------- */
+  function exportDecisions() {
+    var blob = new Blob([JSON.stringify({ exported: new Date().toISOString(), hil_verdicts: state.hil, caller_assignments: state.callers }, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'hb1000-command-decisions.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function importDecisions(e) {
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var d = JSON.parse(rd.result);
+        if (d.hil_verdicts) { state.hil = d.hil_verdicts; lsSave(LS_HIL, state.hil); }
+        if (d.caller_assignments) { state.callers = d.caller_assignments; lsSave(LS_CALLERS, state.callers); }
+        renderAll();
+      } catch (err) {
+        document.getElementById('boot').innerHTML =
+          '<div class="status-row bad"><span class="st">Import failed</span><span class="grow">' + esc(String(err.message || err)) + '</span></div>';
+      }
+    };
+    rd.readAsText(f);
+  }
+})();
+</script>
+</body>
+</html>

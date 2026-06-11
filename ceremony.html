@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acceptance Ceremony — The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤝</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* =====================================================================
+   THE ASSIGNMENT ACCEPTANCE CEREMONY — first-login front door (Phase 4.5)
+   Spec: hb1000-os/ACCEPTANCE-CEREMONY-SPEC.md (A1–A8 amendments apply).
+   Tone law: fun in the chrome, canon in the terms. The locked vocabulary,
+   the Prime, KPI targets, dates and the acceptance verb render VERBATIM.
+   State machine (localStorage hb1000-acceptance, rounds[] APPEND-ONLY):
+   none → offered → briefed → negotiated → accepted-pending-signoff → active
+   decline = terminal → the orphan rail (honest, never Park).
+   ===================================================================== */
+.masthead .kicker{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+
+/* stepper */
+.stepper{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 16px}
+.stepper .stp{
+  flex:1;min-width:120px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--panel-2);color:var(--muted);font-size:12.5px;font-weight:800;cursor:pointer;
+  font-family:inherit;text-align:left;letter-spacing:.02em;
+}
+.stepper .stp .sub{display:block;font-size:10.5px;font-weight:500;color:var(--soft);letter-spacing:0}
+.stepper .stp.on{border-color:var(--gold);color:var(--gold);background:rgba(232,181,77,.1)}
+.stepper .stp:disabled{opacity:.45;cursor:not-allowed}
+@media (max-width:640px){
+  .stepper{gap:4px}
+  .stepper .stp{min-width:0;padding:7px 6px;text-align:center}
+  .stepper .stp .sub{display:none}
+}
+
+/* screen 1 — mission briefing */
+.briefing{
+  position:relative;background:linear-gradient(165deg,#0a0f15,#101720 55%,#141b25);
+  border:1px solid var(--line);border-radius:var(--radius-lg);padding:30px 30px 26px;overflow:hidden;
+}
+.briefing::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.briefing .bk{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:var(--gold)}
+.briefing h2{font-size:30px;font-weight:900;color:#fff;margin:8px 0 14px;letter-spacing:-.01em}
+.briefing .open-line{font-size:16px;line-height:1.65;color:var(--ink);max-width:760px}
+.briefing .open-line b{color:var(--gold)}
+.brief-panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 4px}
+@media (max-width:760px){.brief-panels{grid-template-columns:1fr}.briefing{padding:20px 16px}}
+.bpanel{background:rgba(7,11,16,.55);border:1px solid var(--line);border-radius:var(--radius);padding:13px 15px;font-size:13.5px;line-height:1.6;color:var(--muted)}
+.bpanel .bt{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:5px}
+.bpanel b{color:var(--ink)}
+
+/* mini read-only card */
+.minicard{margin:18px 0 6px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel-2);padding:13px 15px}
+.minicard .mc-store{font-weight:800;color:var(--ink);font-size:15px}
+.minicard .mc-line{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55}
+.minicard .mc-line b{color:var(--gold)}
+.minicard .mc-line .wf{color:var(--teal)}
+.mini-ticker{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.mini-ticker .mt{font-size:11px;color:var(--muted);display:inline-flex;gap:5px;align-items:center}
+.mini-ticker .mt .v{font-weight:800;color:var(--ink)}
+.minigrid{display:grid;grid-template-columns:repeat(25,1fr);gap:2px;margin-top:10px;max-width:430px}
+.minigrid i{display:block;aspect-ratio:1;border-radius:2px;opacity:.85}
+
+/* screen 2 — prime tablet + local NS */
+.tablet{
+  border:1px solid rgba(232,181,77,.45);border-radius:var(--radius-lg);
+  background:linear-gradient(170deg,rgba(232,181,77,.06),rgba(232,181,77,.015) 60%);
+  padding:20px 22px;margin:0 0 16px;
+}
+.tablet .tq{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.18em;color:var(--gold)}
+.tablet h3{font-size:21px;color:#fff;margin:6px 0 10px}
+.tablet .prime-text{font-size:14.5px;line-height:1.7;color:var(--ink);font-style:italic}
+.tablet .litmus{margin-top:10px;font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:9px}
+.tablet .lockline{margin-top:8px;font-size:10.5px;color:var(--soft);text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.nsform label{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:14px 2px 5px}
+.nsform input[type=text],.nsform textarea,.terms textarea,.terms input[type=text]{
+  width:100%;box-sizing:border-box;background:var(--panel-2);color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--radius);padding:9px 12px;
+  font-family:inherit;font-size:14px;
+}
+.nsform textarea{min-height:70px;resize:vertical}
+.qchips{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 2px}
+@media (max-width:640px){
+  .qchips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;
+    -webkit-mask-image:linear-gradient(90deg,#000 92%,transparent);mask-image:linear-gradient(90deg,#000 92%,transparent)}
+}
+.gatebox{margin-top:14px}
+.gatebox .status-row{font-size:12.5px}
+.hardblock{margin-top:8px;padding:10px 13px;border:1px solid rgba(224,85,107,.55);background:rgba(224,85,107,.08);
+  border-radius:var(--radius);font-size:13px;color:var(--red);font-weight:700}
+
+/* screen 3 — the terms */
+.terms table{margin:4px 0 6px}
+.terms td{vertical-align:top}
+.terms .tk-k{font-weight:700;color:var(--ink)}
+.terms .tk-v{font-weight:800}
+.terms tr.pending td:first-child{border-left:3px solid var(--yellow);padding-left:8px}
+.terms tr.removed .tk-k,.terms tr.removed .tk-v{text-decoration:line-through;opacity:.6}
+.pbtn{background:none;border:1px solid var(--line);border-radius:7px;color:var(--muted);cursor:pointer;
+  font-family:inherit;font-size:11.5px;font-weight:700;padding:3px 10px}
+.pbtn:hover{border-color:var(--gold);color:var(--gold)}
+.difftag{display:block;font-size:10.5px;color:var(--yellow);margin-top:3px}
+.freebadge{display:inline-block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--teal);border:1px solid rgba(54,194,180,.5);border-radius:4px;padding:1px 7px;margin-left:8px}
+.judge{border:1px solid rgba(232,181,77,.5);background:rgba(232,181,77,.07);border-radius:var(--radius);padding:2px 8px;
+  font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--gold);text-transform:uppercase}
+.sqtable{width:100%;font-size:12px}
+.sqtable input[type=text]{padding:5px 8px;font-size:12px}
+.sqtable input[type=number]{width:62px;padding:5px 6px;font-size:12px;background:var(--panel-2);color:var(--ink);
+  border:1px solid var(--line);border-radius:7px;font-family:inherit}
+.sqtable tr.ptkrow td{background:rgba(232,181,77,.07);color:var(--gold);font-weight:800}
+.dnv-row{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px 10px;margin:4px 0;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);font-size:12.5px}
+.toolrow{display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;margin:6px 0}
+@media (max-width:640px){.toolrow{grid-template-columns:1fr}}
+
+/* propose-change editor — inline panel on desktop, bottom drawer ≤640px (house rule) */
+#propWrap{position:fixed;inset:0;z-index:240;display:none;background:rgba(2,5,9,.6)}
+#propWrap.open{display:flex;align-items:center;justify-content:center;padding:20px}
+#propBox{width:520px;max-width:96vw;max-height:88vh;overflow-y:auto;background:var(--panel);
+  border:1px solid rgba(232,181,77,.5);border-radius:var(--radius-lg);padding:18px 20px}
+#propBox h4{margin:0 0 8px;color:#fff;font-size:15px}
+#propBox .fromline{font-size:12.5px;color:var(--muted);background:var(--panel-2);border:1px dashed var(--line);
+  border-radius:var(--radius);padding:7px 10px;margin:6px 0}
+#propBox label{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:11px 2px 4px}
+#propBox input,#propBox textarea{width:100%;box-sizing:border-box;background:var(--panel-2);color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--radius);padding:9px 12px;font-family:inherit;font-size:14px}
+#propBox textarea{min-height:64px;resize:vertical}
+#propBox .perr{display:none;font-size:12px;color:var(--red);margin-top:7px;font-weight:700}
+#propBox .perr.show{display:block}
+@media (max-width:640px){
+  #propWrap.open{align-items:flex-end;padding:0}
+  #propBox{width:100%;max-width:100%;border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:0}
+}
+
+/* screen 4 — acceptance */
+.sumstrip{border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--panel);padding:16px 18px;margin-bottom:14px}
+.sumstrip .ss-line{font-size:15px;color:var(--ink)}
+.sumstrip .ss-line b{color:var(--gold)}
+.editrow{font-size:12.5px;color:var(--muted);padding:6px 10px;margin:5px 0;background:var(--panel-2);
+  border:1px solid var(--line);border-left:3px solid var(--yellow);border-radius:var(--radius)}
+.editrow b{color:var(--ink)}
+.editrow .why{display:block;font-size:11.5px;color:var(--soft);font-style:italic;margin-top:2px}
+.sigblock{margin:18px 0 6px}
+.sigblock label{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 2px 6px}
+.sigblock input{
+  width:100%;max-width:430px;box-sizing:border-box;background:transparent;color:var(--ink);
+  border:0;border-bottom:1px solid var(--gold);border-radius:0;padding:9px 4px;
+  font-family:inherit;font-size:18px; /* ≥16px — no iOS zoom */
+}
+.sigblock input:focus{outline:none;border-bottom-width:2px}
+.cta-dock{position:sticky;bottom:0;padding:14px 0 10px;background:linear-gradient(180deg,transparent,var(--bg) 35%)}
+.cta-dock .btn.gold-cta{min-height:56px;font-size:16px;padding:14px 34px}
+@media (max-width:640px){.cta-dock .btn.gold-cta{width:100%}}
+.declinewrap{margin-top:26px;padding-top:14px;border-top:1px dashed var(--line)}
+.btn.ghost-decline{background:transparent;border:1px solid var(--line);color:var(--soft)}
+.btn.ghost-decline:hover{border-color:var(--red);color:var(--red);background:rgba(224,85,107,.06)}
+@media (max-width:640px){.btn.ghost-decline{width:100%;text-align:center}}
+.honesty{margin-top:18px;font-size:11.5px;color:var(--soft);font-style:italic}
+
+/* summary / pending / declined views */
+.bigpill{display:inline-block;padding:6px 16px;border-radius:999px;font-size:13px;font-weight:800;letter-spacing:.04em}
+.bigpill.pending{color:#1a1206;background:var(--yellow)}
+.bigpill.active{color:#06170c;background:var(--green)}
+.bigpill.declined{color:#fff;background:var(--red)}
+.roundrow{padding:8px 11px;margin:6px 0;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);font-size:12.5px}
+.roundrow .rr-t{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-weight:700;color:var(--ink)}
+.roundrow .rr-t .at{font-weight:500;color:var(--soft);font-size:11px}
+.roundrow .rr-note{color:var(--muted);font-style:italic;margin-top:2px}
+
+/* toast — the send-off */
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:320;
+  width:560px;max-width:92vw;background:var(--panel);border:1px solid var(--gold);border-radius:var(--radius-lg);
+  padding:16px 20px;font-size:14px;line-height:1.6;color:var(--ink);opacity:0;pointer-events:none;
+  box-shadow:0 18px 60px rgba(0,0,0,.7);transition:opacity .3s,transform .3s}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#toast b{color:var(--gold)}
+
+/* decline confirm overlay */
+#declWrap{position:fixed;inset:0;z-index:260;display:none;background:rgba(2,5,9,.7);align-items:center;justify-content:center;padding:20px}
+#declWrap.open{display:flex}
+#declBox{width:480px;max-width:96vw;background:var(--panel);border:1px solid rgba(224,85,107,.55);
+  border-radius:var(--radius-lg);padding:18px 20px}
+#declBox h4{color:#fff;margin:0 0 8px}
+#declBox textarea{width:100%;box-sizing:border-box;min-height:70px;background:var(--panel-2);color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--radius);padding:9px 12px;font-family:inherit;font-size:14px;resize:vertical}
+
+.screen{display:none}
+.screen.on{display:block}
+.navrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px}
+.tim-countered{margin:0 0 14px;padding:10px 14px;border:1px solid rgba(232,194,77,.55);background:rgba(232,194,77,.08);
+  border-radius:var(--radius);font-size:13px;color:var(--yellow)}
+</style>
+</head>
+<body>
+<main>
+  <header class="masthead">
+    <div class="kicker">MVP front door · first login per card · the contract never hides</div>
+    <h1>Acceptance <b>Ceremony</b></h1>
+    <p class="muted" style="font-size:13px;max-width:760px">The card as a contract: Tim proposes, the Caller declares, Tim signs off.
+      Approve / Modify / Decline are the only three verbs at a gate — in both directions.
+      <span class="soft">“Accountability is explicit and opt-in.”</span></p>
+  </header>
+
+  <div id="boot"></div>
+  <div id="stage"></div>
+</main>
+
+<div id="propWrap" role="dialog" aria-label="Propose a change"><div id="propBox"></div></div>
+<div id="declWrap" role="dialog" aria-label="Decline this assignment"><div id="declBox"></div></div>
+<div id="toast" role="status"></div>
+
+<script src="assets/shell.js"></script>
+<!-- Babel Bridge prism widget — optional garnish on the 80/20 deal line only.
+     No spectrum authored = no icon; the page degrades gracefully (PRISM CONTRACT). -->
+<script src="assets/prism.js"></script>
+<script>
+'use strict';
+Shell.init('ceremony');
+
+(function () {
+  var esc = Shell.esc;
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- localStorage (the contract persists; everything else recomputes) ---------- */
+  var LS_ACC   = 'hb1000-acceptance';      // { <cardId>: entry } — the contract + append-only rounds[]
+  var LS_RQ    = 'hb1000-review-queue';    // shared HIL feed (Flypaper spec) — command.html renders it
+  var LS_TOOLS = 'hb1000-tool-inventory';  // A4 seam — Tool Squares v1 reads this
+  function lsLoad(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return (v === null || v === undefined) ? d : v; } catch (e) { return d; } }
+  function lsSave(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode — session only */ } }
+
+  /* ---------- the five approved mission-briefing tone lines (VERBATIM, research §4.2) ---------- */
+  var LINE1_PRE  = "Your assignment, should you choose to accept it: ";
+  var LINE1_POST = ". Accountability here is explicit and opt-in — the button is real, and so is the No.";
+  var LINE2 = "The agents bring the intelligence. You bring the brilliance. The fleet does 80% and never sleeps — your 20% is the part only a human can do.";
+  var LINE3 = "One card. One Caller. One neck to choke — wear it like a medal, not a noose. Everyone will know exactly who to thank.";
+  var LINE4 = "Don't like the targets? Good — say so. Counter-proposals go straight to Tim's desk. Transparency is kindness; silence is how cards die.";
+  var LINE5 = "Nothing here self-destructs — it ships. DINGO: Do It Now, Go. Tell us the destination is right, and the fleet finds the road.";
+  /* the locked acceptance verb — always, exactly: */
+  var ACCEPT_VERB = "Yes, I accept this assignment.";
+
+  /* ---------- the 11-question worksheet chips (north-star-builder.md §4 Tier B) ---------- */
+  var QCHIPS = ['Q1 Name', 'Q2 What it does', 'Q3 Who for', 'Q4 One person', 'Q5 Their Tuesday',
+    'Q6 Three worlds', 'Q7 The injustice', 'Q8 Grace of God', 'Q9 JTBD', 'Q10 Ding ladder', 'Q11 Rules'];
+
+  /* ---------- boot: ?card= routed exactly like card.html ---------- */
+  var rawParam = new URLSearchParams(location.search).get('card') || '';
+  var ch = Shell.cardholder();
+  if (!rawParam && ch && ch.card) rawParam = ch.card;
+  var cardId = rawParam.replace(/\.json$/i, '').replace(/[^a-zA-Z0-9\-_]/g, '');
+
+  var card = null, northStars = null;
+  var accMap = lsLoad(LS_ACC, {});
+  var screenNo = 1;
+
+  if (!cardId) {
+    $('stage').innerHTML =
+      '<div class="panel"><div class="ph">Which card is being offered?</div>' +
+      '<p class="muted" style="font-size:13px">The Ceremony runs per card — open it as <code>ceremony.html?card=&lt;id&gt;</code>. Live seed cards:</p>' +
+      '<div class="row" style="margin-top:8px">' +
+      '<a class="btn" href="ceremony.html?card=seba-hub-occupancy">Seba Hub Occupancy Engine</a>' +
+      '<a class="btn" href="ceremony.html?card=pawn-princess-pp01">Pawn Princess PP-01</a></div></div>';
+    return;
+  }
+
+  Promise.all([
+    Shell.loadJSON('data/cards/' + cardId + '.json'),
+    Shell.loadJSON('data/north-stars.json')
+  ]).then(function (r) {
+    card = r[0]; northStars = r[1];
+    var m = /^#([1-4])$/.exec(location.hash || '');
+    if (m) screenNo = Number(m[1]);
+    route();
+  }).catch(function (err) {
+    $('boot').innerHTML = '<div class="status-row bad"><span class="st">Data not loaded</span><span class="grow">' +
+      esc(String(err && err.message ? err.message : err)) +
+      ' — serve the <code>app/</code> folder over HTTP (the MVP runs at <code>:8140</code>).</span></div>';
+  });
+
+  /* ================================================================
+     STATE MACHINE — entry shape per ACCEPTANCE-CEREMONY-SPEC.md §1.
+     rounds[] is APPEND-ONLY: verbs accept | modify | decline are the
+     gate verdicts (the only three); lifecycle rows use verbs
+     offer | briefed | log | signoff so the audit trail reads honestly.
+     ================================================================ */
+  function entry() { return accMap[cardId] || null; }
+  function save() { lsSave(LS_ACC, accMap); }
+  function nowISO() { return new Date().toISOString(); }
+  function addRound(by, verb, edits, note) {
+    var e = entry();
+    e.rounds.push({ at: nowISO(), by: by, verb: verb, edits: edits || [], note: note || '' });
+  }
+  function callerNameOf(c) {
+    /* "Casey — one neck to choke (sales & marketing lead)" → "Casey" — computed, never asserted */
+    return String(c.caller || '').split('—')[0].split('(')[0].trim() || 'TBD';
+  }
+  function termsSnapshot(c) {
+    return {
+      local_north_star: c.local_north_star || '',
+      rhymes_with_prime: c.rhymes_with_prime || '',
+      wiifm: c.wiifm || '',
+      ticker: JSON.parse(JSON.stringify(c.ticker || [])),
+      dates: {
+        timing_window: c.timing_window || '',
+        definition_of_done: c.definition_of_done || '',
+        prediction_90d: c.prediction_90d || c.prediction_90day || ''
+      },
+      do_not_violate: JSON.parse(JSON.stringify(c.do_not_violate || [])),
+      squares: (c.squares || []).map(function (s) {
+        return s.ptk ? { id: s.id || 'PTK', ptk: true }
+          : { id: s.id, label: s.label || '', kpi: s.kpi || '', human: (s.human == null ? 20 : Number(s.human)) };
+      })
+    };
+  }
+  function createOffer() {
+    accMap[cardId] = {
+      state: 'offered',
+      offered_by: 'Tim (HB1000 moderator)',
+      offered_at: nowISO(),
+      caller: callerNameOf(card),
+      rounds: [{ at: nowISO(), by: 'moderator', verb: 'offer',
+        edits: [], note: 'Offer created from the live card seed — assignment proposed to ' + callerNameOf(card) }],
+      pending_paths: [],
+      signature: null,
+      signoff: null,
+      terms_line: '',
+      terms: termsSnapshot(card)
+    };
+    save(); route();
+  }
+  function toBriefed() {
+    var e = entry();
+    if (e.state !== 'offered') return;
+    e.state = 'briefed';
+    addRound('caller', 'briefed', [], 'Mission briefing opened — the terms are on the table');
+    save();
+  }
+  function toNegotiated(note) {
+    var e = entry();
+    if (e.state === 'briefed') { e.state = 'negotiated'; addRound('caller', 'log', [], note || 'Negotiation round open'); save(); }
+    else if (e.state === 'negotiated') { /* already there */ }
+  }
+  function markPending(path) {
+    var e = entry();
+    if (e.pending_paths.indexOf(path) < 0) e.pending_paths.push(path);
+  }
+  /* a Caller edit. signoffNeeded per the §3.2 permission table. */
+  function recordEdit(path, from, to, why, signoffNeeded, noteHint) {
+    var e = entry();
+    if (String(from) === String(to)) return false;
+    addRound('caller', 'modify', [{ path: path, from: from, to: to, why: why || '' }],
+      noteHint || 'the why travels with the edit');
+    if (signoffNeeded) markPending(path);
+    if (e.state === 'briefed' || e.state === 'offered') e.state = 'negotiated';
+    save();
+    return true;
+  }
+  function latestEdit(path) {
+    var hit = null;
+    (entry().rounds || []).forEach(function (r) {
+      (r.edits || []).forEach(function (ed) { if (ed.path === path) hit = ed; });
+    });
+    return hit;
+  }
+  function pendingEdits() {
+    var e = entry();
+    return (e.pending_paths || []).map(function (p) {
+      var ed = latestEdit(p);
+      return ed || { path: p, from: '', to: '', why: '' };
+    });
+  }
+
+  /* ================================================================
+     GATE VALIDATION — fires LIVE on the Caller's screen (never waste
+     Tim's queue slot). Error strings VERBATIM from north-star-builder
+     §2.3 + the nursery gate. Items the Caller can fix inside this
+     ceremony HARD-BLOCK; read-only card fields (purpose) raise an
+     [ALIGNMENT-FLAG] that travels with the acceptance to Tim's desk —
+     the Prime holder rules on what the Caller cannot edit here.
+     ================================================================ */
+  var GENERIC_BENEFICIARY = ['everyone', 'all users', 'the world', 'people'];
+  function gateCheck() {
+    var e = entry(), t = e.terms, hard = [], flags = [];
+    if (!String(t.local_north_star).trim() || !String(t.rhymes_with_prime).trim()) {
+      hard.push('Both the Local North Star and the rhyme are required — the gate captures the declaration before any work (or token) is spent.');
+    } else {
+      var lns = String(t.local_north_star).trim();
+      if (GENERIC_BENEFICIARY.indexOf(lns.toLowerCase()) >= 0) {
+        hard.push('Beneficiary is too generic — name a specific person, persona, or group. Ruby Red rule: if this is for the working-poor household CFO, say so.');
+      } else if (lns.length < 8) {
+        hard.push('Beneficiary is missing or too vague');
+      }
+    }
+    if (!String(t.dates.definition_of_done).trim()) hard.push('Definition of done is missing — no DoD means no stop condition');
+    if (!String(t.dates.timing_window).trim()) hard.push('Timing window is missing — no deadline means no urgency anchor');
+    if (!(t.do_not_violate && t.do_not_violate.filter(function (r) { return !r.proposed_remove; }).length >= 1)) {
+      hard.push('At least 1 do-not-violate rule required — the fence has to be named');
+    }
+    /* purpose ≤8 words — computed from the card seed; read-only in this ceremony → flag, not block */
+    var vv = card.vivid_vision || {};
+    var words = String(vv.purpose || '').trim().split(/\s+/).filter(function (w) { return /[A-Za-z0-9]/.test(w); }).length;
+    if (!vv.purpose) flags.push('Purpose is empty');
+    else if (words > 8) flags.push('Purpose is ' + words + ' words — must be 8 or fewer (HB1000 discipline)');
+    return { hard: hard, flags: flags };
+  }
+
+  /* ================================================================
+     ROUTER — which face the Ceremony shows
+     ================================================================ */
+  function route() {
+    var e = entry();
+    var st = e ? e.state : 'none';
+    if (!e || st === 'none')                       renderNoOffer();
+    else if (st === 'offered' || st === 'briefed' || st === 'negotiated') renderStepper();
+    else if (st === 'accepted-pending-signoff')    renderSummary('pending');
+    else if (st === 'active')                      renderSummary('active');
+    else if (st === 'declined')                    renderDeclined();
+    if (window.Prism && typeof window.Prism.scan === 'function') {
+      try { window.Prism.scan($('stage')); } catch (err) { /* prism must never break the ceremony */ }
+    }
+  }
+
+  function honestyLine() {
+    return '<p class="honesty">Recorded locally — acceptance must be spoken by the named human; nothing sends. Export travels via the Command Deck.</p>';
+  }
+
+  /* ---------- no offer yet ---------- */
+  function renderNoOffer() {
+    var reduced = ch && ch.role !== 'admin';
+    var html = '<div class="panel"><div class="ph">No offer on file — state: none</div>' +
+      '<p class="muted" style="font-size:13.5px">No assignment offer exists for <b style="color:var(--ink)">' + esc(card.store) + '</b> in this browser. ' +
+      'Offers are created on Tim&rsquo;s side of the table — the Nursery graduation wizard (step 3) or the Command Deck orphan rail.</p>';
+    if (!reduced) {
+      html += '<div class="sec-h">Tim&rsquo;s desk — <b>create the offer</b> (the moderator&rsquo;s verb)</div>' +
+        '<p class="footnote">localStorage is single-browser in the MVP, so both halves of the handshake can run here. ' +
+        'The offer snapshots the live card seed as the proposed terms; the Caller answers at first login.</p>' +
+        '<button class="btn gold-cta" id="mkOffer">Create the offer → ' + esc(callerNameOf(card)) + '</button>';
+    } else {
+      html += '<p class="footnote">Signed in as ' + esc(ch.name) + ' — ask the HB1000 moderator to issue the offer; it lands at your next login.</p>';
+    }
+    html += honestyLine() + '</div>';
+    $('stage').innerHTML = html;
+    var b = $('mkOffer');
+    if (b) b.addEventListener('click', createOffer);
+  }
+
+  /* ================================================================
+     THE FOUR SCREENS (one page, stepper top)
+     ================================================================ */
+  function stepperHTML() {
+    var labels = [
+      ['1 Briefing', 'the mission'], ['2 North Star', 'Prime locked · Local yours'],
+      ['3 The Terms', 'the card as a contract'], ['4 Acceptance', 'the verb that matters']
+    ];
+    return '<div class="stepper" role="tablist" aria-label="Ceremony steps">' + labels.map(function (l, i) {
+      return '<button type="button" class="stp' + (screenNo === i + 1 ? ' on' : '') + '" data-go="' + (i + 1) + '" role="tab" aria-selected="' + (screenNo === i + 1) + '">' +
+        esc(l[0]) + '<span class="sub">' + esc(l[1]) + '</span></button>';
+    }).join('') + '</div>';
+  }
+
+  function identityGuard() {
+    /* acceptance must be spoken by the named human */
+    var e = entry();
+    if (ch && ch.role !== 'admin' && ch.name.toLowerCase() !== String(e.caller).toLowerCase()) {
+      return 'You are signed in as <b>' + esc(ch.name) + '</b>; this assignment is offered to <b>' + esc(e.caller) +
+        '</b>. Acceptance must be spoken by the named human.';
+    }
+    return null;
+  }
+
+  function renderStepper() {
+    var e = entry();
+    if (e.state === 'offered' && screenNo === 1) toBriefed();
+    if (screenNo === 3 && e.state === 'briefed') toNegotiated('Terms table opened — Screen 3');
+    try { history.replaceState(null, '', location.pathname + location.search + '#' + screenNo); } catch (err) { /* fine */ }
+
+    var html = stepperHTML();
+
+    /* Tim countered? — last moderator verdict round was a modify */
+    var lastVerdict = null;
+    (e.rounds || []).forEach(function (r) { if (r.by === 'moderator' && (r.verb === 'modify' || r.verb === 'accept' || r.verb === 'decline')) lastVerdict = r; });
+    if (e.state === 'negotiated' && lastVerdict && lastVerdict.verb === 'modify') {
+      html += '<div class="tim-countered">✏️ <b>Tim countered.</b> ' + esc(lastVerdict.note || '') +
+        ' — the round is back with you; rework the terms and accept (or decline) again.</div>';
+    }
+
+    html += '<section class="screen' + (screenNo === 1 ? ' on' : '') + '" id="scr1">' + screen1HTML() + '</section>';
+    html += '<section class="screen' + (screenNo === 2 ? ' on' : '') + '" id="scr2">' + screen2HTML() + '</section>';
+    html += '<section class="screen' + (screenNo === 3 ? ' on' : '') + '" id="scr3">' + screen3HTML() + '</section>';
+    html += '<section class="screen' + (screenNo === 4 ? ' on' : '') + '" id="scr4">' + screen4HTML() + '</section>';
+    $('stage').innerHTML = html;
+    wireStepper();
+    wireScreen2();
+    wireScreen3();
+    wireScreen4();
+  }
+
+  function go(n) {
+    screenNo = Math.max(1, Math.min(4, n));
+    renderStepper();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.Prism && typeof window.Prism.scan === 'function') {
+      try { window.Prism.scan($('stage')); } catch (err) { /* never break */ }
+    }
+  }
+  function wireStepper() {
+    document.querySelectorAll('.stp').forEach(function (b) {
+      b.addEventListener('click', function () { go(Number(b.getAttribute('data-go'))); });
+    });
+  }
+
+  /* ---------- Screen 1 — MISSION BRIEFING (the chrome; canon stays canon) ---------- */
+  function miniCardHTML() {
+    var vv = card.vivid_vision || {};
+    var RYGCLS = { green: '#46c66d', yellow: '#e8c24d', red: '#e0556b' };
+    var tick = (card.ticker || []).map(function (t) {
+      return '<span class="mt"><span class="dot ' + ({ green: 'g', yellow: 'y', red: 'r' }[t.ryg] || 'grey') + '"></span>' +
+        esc(t.k) + ' <span class="v">' + esc(t.v) + '</span></span>';
+    }).join('');
+    var grid = (card.squares || []).map(function (s) {
+      var col = s.ptk ? 'var(--gold)' : (RYGCLS[s.ryg || 'green'] || '#46c66d');
+      return '<i style="background:' + col + '" title="' + esc(s.ptk ? 'PTK — Promises to Keep (index 12)' : (s.id + ' · ' + s.label)) + '"></i>';
+    }).join('');
+    return '<div class="minicard" aria-label="The card as offered, read-only miniature">' +
+      '<div class="mc-store">' + esc(card.store) + '</div>' +
+      '<div class="mc-line"><b>VIVID VISION</b> — ' + esc(vv.purpose || '') + ' · <i>' + esc(vv.bhag || '') + '</i> · ' + esc((vv.values || []).join(' / ')) + '</div>' +
+      '<div class="mc-line"><span class="wf"><b style="color:var(--teal)">WIIFM:</b> ' + esc(card.wiifm || '') + '</span></div>' +
+      '<div class="mc-line">Caller: ' + esc(card.caller || '—') + '</div>' +
+      '<div class="mini-ticker">' + tick + '</div>' +
+      '<div class="minigrid">' + grid + '</div>' +
+      '<div class="footnote" style="margin-top:7px">read-only miniature — the live card opens after the verb</div></div>';
+  }
+  function screen1HTML() {
+    var e = entry();
+    return '<div class="briefing">' +
+      '<div class="bk">Mission briefing · offered by ' + esc(e.offered_by) + '</div>' +
+      '<h2>' + esc(card.store) + '</h2>' +
+      '<p class="open-line">' + esc(LINE1_PRE) + '<b>' + esc(card.store.split('—')[0].trim()) + '</b>' + esc(LINE1_POST) + '</p>' +
+      '<div class="brief-panels">' +
+        '<div class="bpanel"><div class="bt">The deal — 80/20</div><span data-prism-id="ceremony:deal-8020">' + esc(LINE2) + '</span></div>' +
+        '<div class="bpanel"><div class="bt">The Caller — ' + esc(e.caller) + '</div>' + esc(LINE3) + '</div>' +
+      '</div>' +
+      miniCardHTML() +
+      '<div class="navrow"><button class="btn gold-cta" data-nav="2">Read the terms →</button></div>' +
+      '</div>' + honestyLine();
+  }
+
+  /* ---------- Screen 2 — THE PRIME (read-only) + LOCAL NORTH STAR (edit) ---------- */
+  function registrySuggestion() {
+    /* computed helper from north-stars.json locals — shown as a sourced note, never silently prefilled */
+    var first = card.store.toLowerCase().split('—')[0].trim().split(/\s+/).slice(0, 2).join(' ');
+    var hit = null;
+    (northStars.locals || []).forEach(function (l) {
+      if (hit) return;
+      if (l.project && l.project.toLowerCase().indexOf(first) === 0) hit = l;
+    });
+    return hit;
+  }
+  function screen2HTML() {
+    var e = entry(), t = e.terms;
+    var prime = northStars.prime || {};
+    var sugg = registrySuggestion();
+    var chips = QCHIPS.map(function (q, i) {
+      var ret = encodeURIComponent('ceremony.html?card=' + cardId + '#2');
+      return '<a class="chip" href="north-star.html?return=' + ret + '#q' + (i + 1) + '">' + esc(q) + '</a>';
+    }).join('');
+    return '' +
+      /* the Prime — a stone tablet; framed as the question per north-stars.json meta */
+      '<div class="tablet">' +
+        '<div class="tq">The Prime North Star — read-only · ' + esc(prime.default_version || '') + '</div>' +
+        '<h3>What&rsquo;s the <b style="color:var(--gold)">Ding</b>?</h3>' +
+        '<p class="prime-text">' + esc(prime.statement || '') + '</p>' +
+        '<div class="litmus">' + esc(prime.litmus || '') + '</div>' +
+        '<div class="lockline">🔒 one Prime per deployment — the rhyme is checked against something visible</div>' +
+      '</div>' +
+      '<div class="panel nsform">' +
+        '<div class="ph">Your Local North Star — negotiable, and the gate is real</div>' +
+        (sugg ? '<p class="footnote">Registry note (computed from <code>data/north-stars.json</code>): <b style="color:var(--muted)">' + esc(sugg.project) + '</b> → Local NS &ldquo;' + esc(sugg.local_ns || 'none declared') + '&rdquo; · status: ' + esc(sugg.status || '—') + '</p>' : '') +
+        '<label for="lns">Local North Star — one sentence (who this is FOR)</label>' +
+        '<input type="text" id="lns" value="' + esc(t.local_north_star) + '" placeholder="A specific person, persona, or community — never &quot;everyone&quot;">' +
+        '<label for="rhyme">How it rhymes with the Prime</label>' +
+        '<textarea id="rhyme" placeholder="this serves [Persona] by [Action], putting a Ding in the Universe by [Outcome]">' + esc(t.rhymes_with_prime) + '</textarea>' +
+        '<div class="sec-h" style="margin-top:14px">The 11-question worksheet — shortcuts</div>' +
+        '<div class="qchips">' + chips + '</div>' +
+        '<p class="footnote">10–15 minutes by voice. One question at a time.</p>' +
+        '<div class="gatebox" id="gatebox"></div>' +
+      '</div>' +
+      '<div class="navrow"><button class="btn" data-nav="1">← Briefing</button><button class="btn gold-cta" data-nav="3">Continue to the terms →</button></div>' +
+      honestyLine();
+  }
+  function renderGatebox() {
+    var g = gateCheck();
+    var rows = '';
+    g.hard.forEach(function (m) { rows += '<div class="status-row bad"><span class="st">GATE</span><span class="grow">' + esc(m) + '</span></div>'; });
+    g.flags.forEach(function (m) {
+      rows += '<div class="status-row warn"><span class="st">FLAG</span><span class="grow">' + esc(m) +
+        ' <span class="soft">— [ALIGNMENT-FLAG] · read-only here; travels to Tim&rsquo;s desk with your acceptance</span></span></div>';
+    });
+    if (!g.hard.length && !g.flags.length) rows = '<div class="status-row ok"><span class="st">GATE OPEN</span><span class="grow">Local North Star declared, rhyme shown, stop condition + urgency anchor + fence named.</span></div>';
+    if (g.hard.length) rows += '<div class="hardblock">Ticket cannot progress until vision is sharpened.</div>';
+    var box = $('gatebox');
+    if (box) box.innerHTML = '<div class="sec-h" style="margin:4px 0 6px">Twin North Star Gate — validates live, hard halt, never a warning</div>' + rows;
+  }
+  function wireScreen2() {
+    renderGatebox();
+    var lns = $('lns'), rhyme = $('rhyme');
+    if (!lns) return;
+    lns.addEventListener('change', function () {
+      var e = entry();
+      if (recordEdit('local_north_star', e.terms.local_north_star, lns.value.trim(), '', true,
+        'Local North Star declared by the Caller — the Twin North Star Gate re-enters at sign-off')) {
+        e.terms.local_north_star = lns.value.trim(); save();
+      }
+      renderGatebox();
+    });
+    rhyme.addEventListener('change', function () {
+      var e = entry();
+      if (recordEdit('rhymes_with_prime', e.terms.rhymes_with_prime, rhyme.value.trim(), '', true,
+        'Rhyme with the Prime — declared by the Caller')) {
+        e.terms.rhymes_with_prime = rhyme.value.trim(); save();
+      }
+      renderGatebox();
+    });
+  }
+
+  /* ---------- Screen 3 — THE TERMS TABLE (propose-changes per row) ---------- */
+  function pendingTag(path) {
+    var ed = latestEdit(path);
+    if (!ed) return '';
+    return '<span class="difftag">pending Prime sign-off: ' + esc(String(ed.from || '∅')) + ' → ' + esc(String(ed.to || '∅')) + '</span>';
+  }
+  function screen3HTML() {
+    var e = entry(), t = e.terms;
+    var isPend = function (p) { return e.pending_paths.indexOf(p) >= 0; };
+
+    /* §1 ticker KPIs — counter-propose targets; add/remove chips; sign-off YES */
+    var tickRows = t.ticker.map(function (tk, i) {
+      var p = 'ticker[' + i + '].v';
+      var cls = (tk.proposed_remove ? 'removed ' : '') + (isPend(p) || isPend('ticker[' + i + ']') ? 'pending' : '');
+      return '<tr class="' + cls + '"><td class="tk-k">' + esc(tk.k) + (isPend(p) ? pendingTag(p) : (isPend('ticker[' + i + ']') ? pendingTag('ticker[' + i + ']') : '')) + '</td>' +
+        '<td class="tk-v">' + esc(tk.v) + '</td>' +
+        '<td>' + Shell.rygDot(tk.ryg) + '</td>' +
+        '<td style="text-align:right"><button class="pbtn" data-prop-ticker="' + i + '">✎ Propose change</button></td></tr>';
+    }).join('');
+
+    /* §2 outcomes & dates — sign-off YES; the 90-day prediction is what you're judged on */
+    function dateRow(key, label, extra) {
+      var p = 'dates.' + key;
+      var v = t.dates[key];
+      return '<tr class="' + (isPend(p) ? 'pending' : '') + '"><td class="tk-k">' + esc(label) + ' ' + (extra || '') + (isPend(p) ? pendingTag(p) : '') + '</td>' +
+        '<td class="tk-v">' + (v ? esc(v) : '<span class="soft">not set in the offer — propose one (the gate requires it)</span>') + '</td>' +
+        '<td></td><td style="text-align:right"><button class="pbtn" data-prop-date="' + esc(key) + '">✎ Propose change</button></td></tr>';
+    }
+
+    /* §3 the 25 squares — edit freely; PTK index 12 locked gold */
+    var sqRows = t.squares.map(function (s, i) {
+      if (s.ptk) return '<tr class="ptkrow"><td>PTK</td><td colspan="3">PTK — Promises to Keep · locked at the centre (index 12) — the accountability engine is not negotiable</td></tr>';
+      return '<tr><td class="soft">' + esc(s.id) + '</td>' +
+        '<td><input type="text" data-sq="' + i + '" data-f="label" value="' + esc(s.label) + '" aria-label="square label"></td>' +
+        '<td><input type="text" data-sq="' + i + '" data-f="kpi" value="' + esc(s.kpi) + '" aria-label="square KPI"></td>' +
+        '<td><input type="number" min="0" max="100" step="5" data-sq="' + i + '" data-f="human" value="' + s.human + '" aria-label="human share percent">%</td></tr>';
+    }).join('');
+    var live = t.squares.filter(function (s) { return !s.ptk; });
+    var roll = live.length ? Math.round(live.reduce(function (a, s) { return a + Number(s.human || 0); }, 0) / live.length) : 20;
+
+    /* free-edit fence + WIIFM */
+    var dnvRows = t.do_not_violate.map(function (r, i) {
+      var label = typeof r === 'string' ? r : r.rule;
+      var rem = (typeof r === 'object' && r.proposed_remove);
+      return '<div class="dnv-row' + (rem ? ' removed' : '') + '"><span' + (rem ? ' style="text-decoration:line-through;opacity:.6"' : '') + '>' + esc(label) +
+        (rem ? ' <span class="difftag" style="display:inline">removal pending Prime sign-off</span>' : '') + '</span>' +
+        (rem ? '' : '<button class="pbtn" data-dnv-remove="' + i + '">propose removal</button>') + '</div>';
+    }).join('') || '<div class="footnote">no do-not-violate rules on the offer yet — the fence has to be named (add at least one below; adding fence is always safe)</div>';
+
+    var toolsSaved = (e.tool_inventory && e.tool_inventory.tools) || [];
+    var toolRows = toolsSaved.map(function (tw) {
+      return '<div class="status-row ok" style="font-size:12px"><span class="st">TOOL</span><span class="grow"><b>' + esc(tw.tool) + '</b> — runs: ' + esc(tw.runs) + '</span></div>';
+    }).join('');
+
+    return '' +
+      '<div class="panel" style="border-color:rgba(232,194,77,.4);margin-bottom:14px"><div class="ph">The negotiation — Tim&rsquo;s standing invitation</div>' +
+      '<p style="font-size:13.5px;margin:0">' + esc(LINE4) + '</p></div>' +
+
+      '<div class="panel terms" style="margin-bottom:14px"><div class="ph">§1 · Ticker KPIs — targets need both signatures <span class="soft">(un-agreed targets are theatre)</span></div>' +
+      '<table><thead><tr><th>KPI</th><th>target</th><th>RYG</th><th></th></tr></thead><tbody>' + tickRows + '</tbody></table>' +
+      '<button class="pbtn" id="addChip">+ Propose a new ticker chip</button></div>' +
+
+      '<div class="panel terms" style="margin-bottom:14px"><div class="ph">§2 · Outcomes &amp; dates — both parties hold the same number</div>' +
+      '<table><tbody>' +
+      dateRow('timing_window', 'Timing window') +
+      dateRow('definition_of_done', 'Definition-of-Done date(s)') +
+      dateRow('prediction_90d', 'The 90-day prediction', '<span class="judge">this is what you&rsquo;re judged on</span>') +
+      '</tbody></table></div>' +
+
+      '<div class="panel terms" style="margin-bottom:14px"><div class="ph">§3 · The 25 squares — yours to populate <span class="freebadge">edit freely — populating squares IS the Caller&rsquo;s job</span></div>' +
+      '<p class="footnote">per-square human% flexes; card roll-up currently <b style="color:' + (roll > 20 ? 'var(--red)' : 'var(--green)') + '">' + roll + '% human</b> — a roll-up over 20% fires the existing 80/20 exception on the Command Deck (no sign-off needed here).</p>' +
+      '<div style="overflow-x:auto"><table class="sqtable"><thead><tr><th>id</th><th>label</th><th>KPI</th><th>human%</th></tr></thead><tbody>' + sqRows + '</tbody></table></div></div>' +
+
+      '<div class="panel" style="margin-bottom:14px"><div class="ph">WIIFM <span class="freebadge">yours to rewrite — nobody signs off on what motivates you</span></div>' +
+      '<textarea id="wiifm" style="width:100%;box-sizing:border-box;min-height:64px">' + esc(t.wiifm) + '</textarea></div>' +
+
+      '<div class="panel" style="margin-bottom:14px"><div class="ph">do_not_violate — the fence <span class="soft">(ADD freely · removal needs Prime sign-off)</span></div>' +
+      dnvRows +
+      '<div class="row" style="margin-top:8px"><input type="text" id="dnvNew" placeholder="add a fence rule — e.g. No predatory language" style="flex:1;min-width:200px;background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);padding:8px 11px;font-family:inherit;font-size:13px">' +
+      '<button class="btn" id="dnvAdd">Add rule</button></div></div>' +
+
+      '<div class="panel" style="margin-bottom:14px"><div class="ph">Tool inventory — which tools run these squares today? <span class="soft">(A4 · Tool Squares seam)</span></div>' +
+      '<p class="footnote">The card meets you where you work — your current tools become deep-link squares so nobody loses continuity. We NEVER store your credentials; this list seeds the tools registry (usage × cost × buildability), and nothing is replaced silently.</p>' +
+      toolRows +
+      '<div class="toolrow"><input type="text" id="toolName" placeholder="tool — e.g. Google Calendar, Excel, a booking system" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);padding:8px 11px;font-family:inherit;font-size:13px">' +
+      '<input type="text" id="toolRuns" placeholder="which squares / jobs it runs today" style="background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);padding:8px 11px;font-family:inherit;font-size:13px">' +
+      '<button class="btn" id="toolAdd">Add tool</button></div></div>' +
+
+      '<div class="panel tight" style="margin-bottom:14px"><div class="ph">Read-only chrome — not on the table</div>' +
+      '<div class="row" style="font-size:11.5px;color:var(--soft)">' +
+      Shell.pill('store: ' + card.store.split('—')[0].trim(), 'gold') + ' ' +
+      (card.reg_no ? Shell.pill('reg_no ' + card.reg_no, 'info') + ' ' : '') +
+      Shell.pill('80/20 covenant', 'info') + ' ' + Shell.pill('PTK at index 12', 'gold') + ' ' +
+      Shell.pill('Approve / Modify / Decline — the only three verbs', 'warn') + ' ' +
+      Shell.pill('one neck to choke', 'danger') + '</div></div>' +
+
+      '<div class="navrow"><button class="btn" data-nav="2">← North Star</button><button class="btn gold-cta" data-nav="4">Review &amp; sign →</button></div>' +
+      honestyLine();
+  }
+
+  /* the propose-change editor — the why is REQUIRED: "the why travels with the edit" */
+  function openProp(cfg) {
+    var box = $('propBox');
+    box.innerHTML = '<h4>✎ Propose a change — ' + esc(cfg.title) + '</h4>' +
+      '<div class="fromline"><b>from:</b> ' + esc(String(cfg.from === '' ? '∅ (not set)' : cfg.from)) + '</div>' +
+      '<label for="pTo">to</label><input type="text" id="pTo" value="' + esc(cfg.from === '∅' ? '' : String(cfg.from)) + '">' +
+      '<label for="pWhy">why — required; the why travels with the edit</label>' +
+      '<textarea id="pWhy" placeholder="e.g. ramp month is half-staffed"></textarea>' +
+      '<div class="perr" id="pErr"></div>' +
+      '<div class="verdicts">' +
+      '<button class="btn modify" id="pSave">Save counter-proposal</button>' +
+      (cfg.onRemove ? '<button class="btn decline" id="pRemove">Propose removal</button>' : '') +
+      '<button class="btn" id="pCancel">Cancel</button></div>' +
+      '<p class="footnote" style="margin-top:9px">Counter-proposals go to Tim&rsquo;s desk (the Command Deck HIL queue) — nothing applies until the Prime signs off.</p>';
+    $('propWrap').classList.add('open');
+    function close() { $('propWrap').classList.remove('open'); }
+    function err(m) { var e = $('pErr'); e.textContent = m; e.classList.add('show'); }
+    $('pCancel').addEventListener('click', close);
+    $('pSave').addEventListener('click', function () {
+      var to = $('pTo').value.trim(), why = $('pWhy').value.trim();
+      if (!why) { err('The why is required — the why travels with the edit.'); $('pWhy').focus(); return; }
+      if (!to) { err('Name the counter-value (or use Propose removal).'); $('pTo').focus(); return; }
+      cfg.onSave(to, why); close();
+    });
+    var rm = $('pRemove');
+    if (rm) rm.addEventListener('click', function () {
+      var why = $('pWhy').value.trim();
+      if (!why) { err('The why is required — the why travels with the edit.'); $('pWhy').focus(); return; }
+      cfg.onRemove(why); close();
+    });
+  }
+  $('propWrap').addEventListener('click', function (ev) { if (ev.target === $('propWrap')) $('propWrap').classList.remove('open'); });
+
+  function wireScreen3() {
+    var scr = $('scr3');
+    if (!scr) return;
+    var e = entry();
+
+    /* ticker counter-proposals */
+    scr.querySelectorAll('[data-prop-ticker]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = Number(b.getAttribute('data-prop-ticker'));
+        var tk = e.terms.ticker[i];
+        openProp({
+          title: 'ticker KPI “' + tk.k + '” target', from: tk.v,
+          onSave: function (to, why) {
+            if (recordEdit('ticker[' + i + '].v', tk.v, to, why, true)) { tk.v = to; save(); }
+            toNegotiated(); go(3);
+          },
+          onRemove: function (why) {
+            recordEdit('ticker[' + i + ']', tk.k + ' ' + tk.v, '(removed)', why, true);
+            tk.proposed_remove = true; save(); toNegotiated(); go(3);
+          }
+        });
+      });
+    });
+    var add = $('addChip');
+    if (add) add.addEventListener('click', function () {
+      openProp({
+        title: 'a NEW ticker chip (name → target, e.g. “Midweek bookings → 4/wk”)', from: '∅',
+        onSave: function (to, why) {
+          var parts = to.split('→');
+          var k = parts[0].trim() || 'New KPI', v = (parts[1] || '').trim() || to;
+          var i = e.terms.ticker.length;
+          e.terms.ticker.push({ k: k, v: v, ryg: 'yellow', proposed_add: true });
+          recordEdit('ticker[' + i + ']', '∅', k + ' ' + v, why, true);
+          save(); toNegotiated(); go(3);
+        }
+      });
+    });
+
+    /* dates */
+    var DATE_LABEL = { timing_window: 'Timing window', definition_of_done: 'Definition-of-Done date(s)', prediction_90d: 'The 90-day prediction' };
+    scr.querySelectorAll('[data-prop-date]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var key = b.getAttribute('data-prop-date');
+        openProp({
+          title: DATE_LABEL[key] || key, from: e.terms.dates[key] || '∅',
+          onSave: function (to, why) {
+            if (recordEdit('dates.' + key, e.terms.dates[key] || '', to, why, true)) { e.terms.dates[key] = to; save(); }
+            toNegotiated(); go(3);
+          }
+        });
+      });
+    });
+
+    /* squares — edit freely; logged to the audit trail, never blocked, no sign-off */
+    scr.querySelectorAll('.sqtable input').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        var i = Number(inp.getAttribute('data-sq')), f = inp.getAttribute('data-f');
+        var s = e.terms.squares[i];
+        var to = f === 'human' ? Math.max(0, Math.min(100, Number(inp.value || 0))) : inp.value.trim();
+        if (recordEdit('squares[' + i + '].' + f, s[f], to, '', false, 'free edit — populating squares IS the Caller’s job')) {
+          s[f] = to; save();
+        }
+      });
+    });
+
+    /* WIIFM — free */
+    var w = $('wiifm');
+    if (w) w.addEventListener('change', function () {
+      if (recordEdit('wiifm', e.terms.wiifm, w.value.trim(), '', false, 'WIIFM — yours to rewrite; logged, visible to Tim, never blocked')) {
+        e.terms.wiifm = w.value.trim(); save();
+      }
+    });
+
+    /* fence — add free, removal sign-off */
+    var dnvAdd = $('dnvAdd');
+    if (dnvAdd) dnvAdd.addEventListener('click', function () {
+      var v = $('dnvNew').value.trim();
+      if (!v) { $('dnvNew').focus(); return; }
+      var i = e.terms.do_not_violate.length;
+      e.terms.do_not_violate.push(v);
+      recordEdit('do_not_violate[' + i + ']', '∅', v, '', false, 'fence rule added — adding fence is always safe');
+      save(); go(3);
+    });
+    scr.querySelectorAll('[data-dnv-remove]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = Number(b.getAttribute('data-dnv-remove'));
+        var r = e.terms.do_not_violate[i];
+        var label = typeof r === 'string' ? r : r.rule;
+        openProp({
+          title: 'REMOVE fence rule “' + label + '”', from: label,
+          onSave: function () { /* removal-only editor */ },
+          onRemove: function (why) {
+            recordEdit('do_not_violate[' + i + ']', label, '(removed)', why, true);
+            e.terms.do_not_violate[i] = { rule: label, proposed_remove: true };
+            save(); toNegotiated(); go(3);
+          }
+        });
+        /* hide the save button for a pure-removal proposal */
+        var sv = $('pSave'); if (sv) sv.style.display = 'none';
+        var to = $('pTo'); if (to) { to.disabled = true; to.value = '(removal)'; }
+      });
+    });
+
+    /* A4 tool inventory — stored for Tool Squares */
+    var tAdd = $('toolAdd');
+    if (tAdd) tAdd.addEventListener('click', function () {
+      var name = $('toolName').value.trim(), runs = $('toolRuns').value.trim();
+      if (!name) { $('toolName').focus(); return; }
+      if (!e.tool_inventory) e.tool_inventory = { tools: [] };
+      e.tool_inventory.tools.push({ tool: name, runs: runs || '(unspecified)' });
+      e.tool_inventory.updated_at = nowISO();
+      addRound('caller', 'log', [], 'Tool inventory: “' + name + '” runs ' + (runs || '(unspecified)') + ' today (A4 harvest, rung 2 — consented, visible)');
+      /* mirror to the shared Tool Squares seam */
+      var reg = lsLoad(LS_TOOLS, {});
+      reg[cardId] = { caller: e.caller, at: e.tool_inventory.updated_at, tools: e.tool_inventory.tools };
+      lsSave(LS_TOOLS, reg);
+      save(); go(3);
+    });
+  }
+
+  /* ---------- Screen 4 — THE ACCEPTANCE ---------- */
+  function screen4HTML() {
+    var e = entry();
+    var pend = pendingEdits();
+    var g = gateCheck();
+    var guard = identityGuard();
+    var strip;
+    if (!pend.length) {
+      strip = '<div class="ss-line">You are accepting <b>' + esc(card.store.split('—')[0].trim()) + '</b> as offered.</div>' +
+        '<p class="footnote">Fast path — zero edits. Tim&rsquo;s sign-off item arrives pre-verdicted &ldquo;rubber-stamp&rdquo; weight (it still appears — the human is the governor, never auto-apply).</p>';
+    } else {
+      strip = '<div class="ss-line">You are accepting <b>' + esc(card.store.split('—')[0].trim()) + '</b> &hellip;with <b>' + pend.length +
+        ' counter-proposal' + (pend.length === 1 ? '' : 's') + '</b> that go to Tim&rsquo;s desk.</div>' +
+        pend.map(function (ed) {
+          return '<div class="editrow"><b>' + esc(ed.path) + '</b>: ' + esc(String(ed.from === '' ? '∅' : ed.from)) + ' → <b>' + esc(String(ed.to)) + '</b>' +
+            (ed.why ? '<span class="why">why: ' + esc(ed.why) + '</span>' : '') + '</div>';
+        }).join('');
+    }
+    var blockers = '';
+    if (g.hard.length) {
+      blockers = g.hard.map(function (m) { return '<div class="status-row bad"><span class="st">GATE</span><span class="grow">' + esc(m) + '</span></div>'; }).join('') +
+        '<div class="hardblock">Ticket cannot progress until vision is sharpened.</div>' +
+        '<p class="footnote">Fix on <a href="#" data-nav="2">Screen 2 (North Star)</a> and <a href="#" data-nav="3">Screen 3 (dates &amp; fence)</a> — the gate validates live so Tim&rsquo;s queue slot is never wasted.</p>';
+    }
+    if (g.flags.length) {
+      blockers += g.flags.map(function (m) {
+        return '<div class="status-row warn"><span class="st">FLAG</span><span class="grow">' + esc(m) + ' — [ALIGNMENT-FLAG] travels with the acceptance.</span></div>';
+      }).join('');
+    }
+    if (guard) blockers += '<div class="status-row warn"><span class="st">NAMED</span><span class="grow">' + guard + '</span></div>';
+
+    return '<div class="sumstrip">' + strip + '</div>' + blockers +
+      '<div class="sigblock"><label for="sig">Sign your full name — the ritual matters even in localStorage</label>' +
+      '<input type="text" id="sig" autocomplete="name" autocapitalize="words" placeholder="' + esc(e.caller) + '"></div>' +
+      '<div class="cta-dock"><button class="btn gold-cta" id="acceptBtn" disabled>' + esc(ACCEPT_VERB) + '</button>' +
+      '<div class="footnote" id="acceptNote" style="margin-top:6px"></div></div>' +
+      '<div class="declinewrap">' +
+      '<p class="footnote" style="margin-bottom:8px">The No is part of the doctrine: &ldquo;Accountability is explicit and opt-in.&rdquo; Declining returns the card to Tim&rsquo;s orphan rail — the idea passed its gates; only the assignment failed. No Park, no guilt.</p>' +
+      '<button class="btn ghost-decline" id="declineBtn">Decline this assignment</button></div>' +
+      '<div class="navrow"><button class="btn" data-nav="3">← The Terms</button></div>' +
+      honestyLine();
+  }
+  function wireScreen4() {
+    var scr = $('scr4');
+    if (!scr) return;
+    var sig = $('sig'), btn = $('acceptBtn'), note = $('acceptNote');
+    if (!sig) return;
+    var g = gateCheck(), guard = identityGuard();
+    function refresh() {
+      var ok = sig.value.trim().length > 0 && !g.hard.length && !guard;
+      btn.disabled = !ok;
+      note.innerHTML = guard ? guard
+        : (g.hard.length ? 'Ticket cannot progress until vision is sharpened.'
+          : (!sig.value.trim() ? 'Sign your full name to arm the button — the button is real, and so is the No.' : 'Armed. The verb is yours.'));
+    }
+    sig.addEventListener('input', refresh);
+    refresh();
+
+    btn.addEventListener('click', function () {
+      var e = entry();
+      if (btn.disabled) return;
+      var name = sig.value.trim();
+      var pend = pendingEdits();
+      e.signature = { name: name, at: nowISO() };
+      addRound('caller', 'accept', [], '“' + ACCEPT_VERB + '” — signed ' + name +
+        (pend.length ? ' · ' + pend.length + ' counter-proposal(s) ride along to Tim’s desk' : ' · as offered (rubber-stamp weight)'));
+      e.state = 'accepted-pending-signoff';
+      save();
+      /* push the Command Deck HIL entry (shared hb1000-review-queue) */
+      var rq = lsLoad(LS_RQ, []);
+      rq.push({
+        type: 'acceptance-signoff',
+        cardId: cardId,
+        caller: e.caller,
+        signature: name,
+        edits: pend,
+        flags: gateCheck().flags,
+        weight: pend.length ? 'standard' : 'rubber-stamp',
+        at: nowISO()
+      });
+      lsSave(LS_RQ, rq);
+      /* the send-off — mission line 5, then the live card */
+      var t = $('toast');
+      t.innerHTML = '<b>Accepted — pending Prime sign-off.</b><br>' + esc(LINE5) +
+        '<div class="footnote" style="margin-top:8px"><a href="card.html?card=' + esc(cardId) + '">to your card →</a> (auto in 4s) · Tim signs off on the <a href="command.html">Command Deck</a></div>';
+      t.classList.add('show');
+      setTimeout(function () { location.href = 'card.html?card=' + encodeURIComponent(cardId); }, 4000);
+    });
+
+    $('declineBtn').addEventListener('click', function () {
+      var box = $('declBox');
+      box.innerHTML = '<h4>Decline this assignment</h4>' +
+        '<p class="muted" style="font-size:13px">Honest and real — the card returns to the orphan rail on the Command Deck, not to Park. The idea passed its gates; only the assignment failed.</p>' +
+        '<label style="display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:10px 2px 5px">Tell Tim why (it travels with the card):</label>' +
+        '<textarea id="declWhy" placeholder="optional — transparency is kindness"></textarea>' +
+        '<div class="verdicts"><button class="btn decline" id="declGo">Decline this assignment</button>' +
+        '<button class="btn" id="declCancel">Back</button></div>';
+      $('declWrap').classList.add('open');
+      $('declCancel').addEventListener('click', function () { $('declWrap').classList.remove('open'); });
+      $('declGo').addEventListener('click', function () {
+        var e = entry();
+        var why = $('declWhy').value.trim();
+        addRound('caller', 'decline', [], why || '(no reason given — the No still counts)');
+        e.state = 'declined';
+        e.declined_at = nowISO();
+        if (why) e.decline_note = why;
+        save();
+        $('declWrap').classList.remove('open');
+        route();
+      });
+    });
+  }
+
+  /* ================================================================
+     SUMMARY — pending sign-off + the forever-revisitable contract
+     ================================================================ */
+  function roundsHTML() {
+    var e = entry();
+    return (e.rounds || []).map(function (r) {
+      var edits = (r.edits || []).map(function (ed) {
+        return '<div class="editrow"><b>' + esc(ed.path) + '</b>: ' + esc(String(ed.from === '' ? '∅' : ed.from)) + ' → <b>' + esc(String(ed.to)) + '</b>' +
+          (ed.why ? '<span class="why">why: ' + esc(ed.why) + '</span>' : '') + '</div>';
+      }).join('');
+      return '<div class="roundrow"><div class="rr-t"><span>' + esc(r.by) + ' · ' + esc(r.verb) + '</span>' +
+        '<span class="at">' + esc(new Date(r.at).toLocaleString()) + '</span></div>' +
+        (r.note ? '<div class="rr-note">' + esc(r.note) + '</div>' : '') + edits + '</div>';
+    }).join('');
+  }
+  function renderSummary(mode) {
+    var e = entry();
+    var pend = pendingEdits();
+    var head;
+    if (mode === 'pending') {
+      head = '<span class="bigpill pending">⏳ ASSIGNMENT PENDING PRIME SIGN-OFF' + (pend.length ? ' (' + pend.length + ' fields)' : '') + '</span>' +
+        '<p class="muted" style="font-size:13px;margin-top:10px">Signed by <b style="color:var(--ink)">' + esc(e.signature ? e.signature.name : e.caller) + '</b>' +
+        (e.signature ? ' · ' + esc(new Date(e.signature.at).toLocaleString()) : '') +
+        '. Tim answers with the same three verbs on the <a href="command.html">Command Deck</a> — Approve → the card goes live · Modify → the round returns to you · Decline → the orphan rail.</p>';
+    } else {
+      head = '<span class="bigpill active">✓ ACTIVE — ' + esc(e.terms_line || 'accepted') + '</span>' +
+        '<p class="muted" style="font-size:13px;margin-top:10px">The contract never hides — this summary reopens from the card header, forever.</p>';
+    }
+    var t = e.terms;
+    $('stage').innerHTML =
+      '<div class="panel" style="margin-bottom:14px"><div class="ph">Ceremony summary — ' + esc(card.store) + '</div>' + head + '</div>' +
+      '<div class="panel" style="margin-bottom:14px"><div class="ph">The North Star, as signed</div>' +
+      '<p style="font-size:14px"><b style="color:var(--gold)">Local North Star:</b> ' + esc(t.local_north_star || '—') + '</p>' +
+      '<p style="font-size:13px;color:var(--muted)"><b style="color:var(--gold)">Rhymes with the Prime:</b> ' + esc(t.rhymes_with_prime || '—') + '</p>' +
+      '<p style="font-size:12.5px;color:var(--muted)"><b style="color:var(--teal)">WIIFM:</b> ' + esc(t.wiifm || '—') + '</p>' +
+      '<p style="font-size:12.5px;color:var(--muted)"><b>Dates:</b> window ' + esc(t.dates.timing_window || '—') + ' · DoD ' + esc(t.dates.definition_of_done || '—') + ' · 90-day ' + esc(t.dates.prediction_90d || '—') + '</p></div>' +
+      (mode === 'active' && e.signoff ? '<div class="panel" style="margin-bottom:14px"><div class="ph">Prime sign-off</div>' +
+        '<p style="font-size:13px">' + esc(e.signoff.by) + ' · <b style="color:var(--green)">' + esc(e.signoff.verdict) + '</b> · ' + esc(new Date(e.signoff.at).toLocaleString()) +
+        (e.signoff.note ? ' — “' + esc(e.signoff.note) + '”' : '') + '</p></div>' : '') +
+      '<div class="panel" style="margin-bottom:14px"><div class="ph">The contract history — rounds[], append-only</div>' + roundsHTML() + '</div>' +
+      '<div class="navrow"><a class="btn gold-cta" href="card.html?card=' + esc(cardId) + '">Open the live card →</a>' +
+      (mode === 'active' ? '<button class="btn modify" id="reqChange">Request a change</button>' : '') +
+      '<a class="btn" href="command.html">Command Deck</a></div>' + honestyLine();
+    var rc = $('reqChange');
+    if (rc) rc.addEventListener('click', function () {
+      var e2 = entry();
+      e2.state = 'negotiated';
+      addRound('caller', 'log', [], 'Change requested after activation — a new modify round through the same machinery (same HIL path)');
+      save(); screenNo = 3; route();
+    });
+  }
+
+  /* ---------- declined — terminal, honest, never Park ---------- */
+  function renderDeclined() {
+    var e = entry();
+    $('stage').innerHTML =
+      '<div class="panel"><div class="ph">Assignment declined — terminal</div>' +
+      '<span class="bigpill declined">DECLINED' + (e.declined_at ? ' · ' + esc(new Date(e.declined_at).toLocaleDateString()) : '') + '</span>' +
+      '<p class="muted" style="font-size:13.5px;margin-top:12px">' + esc(e.caller) + ' said No — and the No is part of the doctrine: &ldquo;Accountability is explicit and opt-in.&rdquo; ' +
+      'The card is back on the <a href="command.html">Command Deck orphan rail</a> (the existing target-0 campaign) with the reason attached. ' +
+      'It does NOT go to Park — the idea passed its gates; only the assignment failed.</p>' +
+      (e.decline_note ? '<blockquote style="font-size:13px">“' + esc(e.decline_note) + '”</blockquote>' : '') +
+      '<div class="panel tight" style="margin-top:12px"><div class="ph">The contract history — rounds[], append-only</div>' + roundsHTML() + '</div>' +
+      ((ch && ch.role !== 'admin') ? '' :
+        '<div class="navrow"><button class="btn modify" id="reOffer">Re-offer the assignment (Tim&rsquo;s verb)</button></div>') +
+      honestyLine() + '</div>';
+    var ro = $('reOffer');
+    if (ro) ro.addEventListener('click', function () {
+      var e2 = entry();
+      e2.state = 'offered';
+      e2.signature = null; e2.signoff = null; e2.pending_paths = [];
+      addRound('moderator', 'offer', [], 'Re-offered after decline — the history above travels with the card');
+      save(); screenNo = 1; route();
+    });
+  }
+
+  /* nav delegation for [data-nav] buttons rendered inside screens */
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-nav]');
+    if (b) { ev.preventDefault(); go(Number(b.getAttribute('data-nav'))); }
+  });
+})();
+</script>
+</body>
+</html>

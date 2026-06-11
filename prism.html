@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Babel Bridge Prism — same facts, different register</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔆</text></svg>">
+<!-- ==========================================================================
+     BABEL BRIDGE — THE RECEIVER PAGE (prism.html)
+     A message arrives as plain white light; this page is the receiver's prism.
+     Two ways in, both read-only:
+       prism.html?id=<key>      → public spectrum from data/spectra.json
+       prism.html#p=<base64url> → a spectrum carried inside the link itself
+                                  (the fragment never hits server logs)
+     Doctrine locks honored here:
+       · the RECEIVER controls the register — the page opens at white light
+         (or the reader's own saved voice), never at the sender's preference
+       · verbatim-locked canon is never re-voiced — locked spectra label every
+         non-plain color as a framing expansion
+       · nothing here sends anything, generates anything, or phones home —
+         static render only, no tracking parameters (tone gate)
+     ========================================================================== -->
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* receiver layout — single quiet column, no app shell (this page faces outward) */
+  .prism-page{max-width:680px; margin:0 auto; padding:34px 22px 60px}
+  .pr-mast{display:flex; align-items:center; gap:10px; margin-bottom:6px}
+  .pr-mast .glyph{color:var(--gold); display:inline-flex}
+  .pr-mast h1{font-size:24px; margin:0}
+  .pr-tag{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.12em; font-weight:700; margin:0 0 18px}
+  .pr-intro{font-size:13.5px; color:var(--muted); line-height:1.65; border-left:3px solid var(--gold);
+    padding:10px 16px; background:var(--panel-2); border-radius:0 var(--radius) var(--radius) 0; margin:0 0 22px}
+  .pr-intro b{color:var(--gold)}
+  .pr-title{font-size:15px; font-weight:800; color:#fff; margin:0 0 4px}
+  .pr-title .pp-lock{margin-left:8px; vertical-align:middle}
+  .pr-src{font-size:11px; color:var(--soft); font-style:italic; margin:0 0 12px}
+  .pr-err{border:1px solid rgba(224,85,107,.5); background:rgba(224,85,107,.07); color:var(--red);
+    border-radius:var(--radius); padding:12px 16px; font-size:13px}
+  .pr-samples{margin:18px 0 0}
+  .pr-samples .sh{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:8px}
+  .pr-samples a{display:block; padding:8px 13px; margin:6px 0; border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--panel); color:var(--ink); font-size:13px; transition:border-color .15s}
+  .pr-samples a:hover{border-color:var(--gold); color:var(--ink)}
+  .pr-samples a b{color:var(--gold)}
+  .pr-samples a .k{display:block; font-size:10.5px; color:var(--soft); margin-top:1px}
+  .pr-foot{border-top:1px solid var(--line); margin-top:30px; padding-top:12px; font-size:11.5px; color:var(--soft); font-style:italic}
+  .pr-foot .viral{display:block; margin-top:4px; font-style:normal; font-weight:700; color:var(--gold)}
+  .pr-foot .viral:hover{color:var(--gold-glass)}
+  .pr-foot .home{display:block; margin-top:6px; font-style:normal; color:var(--soft); font-size:11px}
+  .pr-quiet{font-size:11px; color:var(--soft); margin-top:10px}
+</style>
+</head>
+<body>
+<main class="prism-page">
+
+  <div class="pr-mast">
+    <span class="glyph" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 3 L22 20 L2 20 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M12 10 L12 16" stroke="currentColor" stroke-width="1.6"/></svg></span>
+    <h1>The Babel Bridge <b>Prism</b></h1>
+  </div>
+  <p class="pr-tag">Same facts. Different register.</p>
+
+  <!-- the one-paragraph "what is Babel Bridge" intro -->
+  <p class="pr-intro"><b>What is this?</b> Babel Bridge is a simple idea: every message arrives as plain
+    white light — exactly what the sender wrote — and one tap breaks it open into the other registers it
+    was composed in: <b>Barstool</b> (two friends at a bar), <b>Timbit</b> (the bumper-sticker bite),
+    <b>Boardroom</b> (the executive narrative), and <b>Swiss</b> (institutional precision). Same facts in
+    every color; only the register changes — and the <em>receiver</em>, not the sender, holds the prism.
+    Quoted lines are sacred: they render verbatim in every color, never rewritten, never compressed.</p>
+
+  <h2 class="pr-title" id="title" hidden></h2>
+  <p class="pr-src" id="src" hidden></p>
+  <div id="spectrum"></div>
+
+  <!-- landing state: no ?id= and no #p= — explain, and show real spectra to try -->
+  <div id="landing" hidden>
+    <div class="pr-samples">
+      <div class="sh">Try a real prism</div>
+      <a href="prism.html?id=doc-ship-ugly"><b>The soul rule</b> — “Ship it ugly. Use it daily.”<span class="k">doctrine · verbatim-locked canon</span></a>
+      <a href="prism.html?id=tm-01"><b>Timbit tm-01</b> — “It's expensive to be poor — and that's the crime we fix.”<span class="k">one of the 25 Timmyisms · verbatim-locked</span></a>
+      <a href="prism.html?id=ptk:ptk-005"><b>A promise on the board</b> — Casey runs the Occupancy Engine as Dingo Caller<span class="k">PTK — Promises to Keep</span></a>
+      <a href="prism.html?id=card:pawn-princess-pp01:vv"><b>A Vivid Vision</b> — “Dignified cash when life happens.”<span class="k">Dingo Card header · verbatim-locked</span></a>
+    </div>
+    <p class="pr-quiet">Got a prism link from someone? It opens right here — the spectrum travels in the
+      link itself and is rendered on your side only. Nothing on this page sends anything, tracks anything,
+      or generates anything: it renders exactly what was shared, in the register you choose.</p>
+  </div>
+
+  <div class="pr-err" id="err" hidden></div>
+
+  <footer class="pr-foot">
+    Every prism ends with the same quiet line, and so does this page:
+    <a class="viral" href="prism.html">Rendered by Babel Bridge — get your own prism →</a>
+    <a class="home" href="index.html">Part of the HB1000 Operating System — Human Brilliance + AI, in service of Social Impact Capitalism</a>
+  </footer>
+
+</main>
+
+<script src="assets/prism.js"></script>
+<script>
+(function () {
+  'use strict';
+  /* The receiver's hand: parse #p= (spectrum carried in the link) or ?id= (public
+     spectrum from data/spectra.json) and render it always-open via Prism.renderInline.
+     The reader's chips switch locally; the page never writes anyone's voice key. */
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function fail(msg) {
+    $('err').textContent = msg;
+    $('err').hidden = false;
+    $('landing').hidden = false; /* the explainer is the consolation prize */
+  }
+
+  /* base64url → UTF-8 string (the fragment form: prism.html#p=<payload>) */
+  function b64uDecode(s) {
+    s = s.replace(/-/g, '+').replace(/_/g, '/');
+    while (s.length % 4) s += '=';
+    var bin = atob(s);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+
+  /* Accept both payload shapes:
+       a bare prism block            {plain, barstool, timbit, boardroom, swiss, locked, title}
+       an outbound spectrum envelope {registers:{...}, default, title, ...}  (fleet draft shape)
+     The sender's `default` is deliberately ignored — the receiver controls the register
+     (white-light doctrine); the page opens at plain or the reader's own saved voice. */
+  function normalize(payload) {
+    if (!payload || typeof payload !== 'object') return null;
+    var block = (payload.registers && typeof payload.registers === 'object') ? payload.registers : payload;
+    var out = {};
+    ['plain', 'barstool', 'timbit', 'boardroom', 'swiss'].forEach(function (c) {
+      if (typeof block[c] === 'string' && block[c].length) out[c] = block[c];
+    });
+    if (payload.locked === true || block.locked === true) out.locked = true;
+    out.__title = (typeof payload.title === 'string' && payload.title) ||
+                  (typeof block.title === 'string' && block.title) || '';
+    return out;
+  }
+
+  function show(block, id, srcNote) {
+    if (block.__title) { $('title').textContent = block.__title; $('title').hidden = false; }
+    if (srcNote) { $('src').textContent = srcNote; $('src').hidden = false; }
+    Prism.renderInline($('spectrum'), block, id || null);
+  }
+
+  var frag = (location.hash || '').replace(/^#/, '');
+  var pMatch = /(?:^|&)p=([^&]+)/.exec(frag);
+  var qId = new URLSearchParams(location.search).get('id');
+
+  if (pMatch) {
+    /* the spectrum travels inside the link — decoded locally, never logged server-side */
+    var block = null;
+    try { block = normalize(JSON.parse(b64uDecode(pMatch[1]))); } catch (e) { /* fall through */ }
+    if (block && Object.keys(block).some(function (k) { return k !== '__title' && k !== 'locked'; })) {
+      show(block, null, 'Carried inside this link — rendered on your side only.');
+    } else {
+      fail('This prism link didn’t decode. Ask the sender for a fresh one — the spectrum travels inside the link itself, so a truncated paste breaks it.');
+    }
+  } else if (qId) {
+    /* public spectrum, by id — only spectra committed to data/spectra.json resolve here */
+    Prism.spectra().then(function (S) {
+      var entry = S[qId];
+      if (!entry) { fail('No public spectrum named “' + qId + '” — it may not be committed yet, or the link is mistyped.'); return; }
+      var block = normalize(entry);
+      if (!block.__title && entry.title) block.__title = entry.title;
+      show(block, qId, (entry.meta && entry.meta.source) ? 'Source: ' + entry.meta.source : '');
+    });
+  } else {
+    $('landing').hidden = false;
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>Show Me Feed — The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* ---- Show Me feed — ported from showme/index.html onto the shared shell ---- */
+  main.feed-main{max-width:1400px}
+  .feedhead{margin-bottom:12px}
+  .feedhead h1{margin:0; font-size:24px}
+  .feedhead .btn.nav{font-size:16px; padding:6px 16px}
+  .btn.on{background:rgba(232,181,77,.12); border-color:var(--gold); color:var(--gold)}
+
+  .showme{display:flex; flex-direction:column; height:calc(100vh - 235px); min-height:480px}
+  .smmain{
+    flex:1; display:flex; min-height:0;
+    border:1px solid var(--line); border-radius:var(--radius-lg);
+    overflow:hidden; background:var(--panel);
+  }
+  .stage{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px 18px; min-width:0}
+  .stage .title{color:var(--gold); font-size:19px; font-weight:700; margin-bottom:10px; text-align:center; line-height:1.35}
+  .framewrap{flex:1; display:flex; align-items:center; justify-content:center; min-height:0; width:100%}
+  .frameimg{
+    max-width:100%; max-height:100%;
+    border:1px solid var(--line); border-radius:10px; background:var(--panel-2);
+    object-fit:contain; cursor:zoom-in;
+  }
+  .htmlframe{
+    border:1px solid var(--line); border-radius:10px; background:var(--panel-2);
+    padding:18px; width:94%; max-height:100%; overflow:auto;
+  }
+  .zoomhint{color:var(--muted); font-size:12px; margin-top:6px}
+  .empty{color:var(--muted)}
+
+  .side{
+    width:330px; max-width:36vw; border-left:1px solid var(--line); background:var(--panel-2);
+    padding:20px; overflow-y:auto; display:none; flex-direction:column; gap:12px;
+  }
+  .side .frameno{color:var(--teal); font-size:12px; letter-spacing:.07em; text-transform:uppercase; font-weight:800}
+  .side .cap{font-size:15px; line-height:1.7}
+  .side .when{color:var(--muted); font-size:12px}
+
+  .strip{display:flex; gap:10px; padding:12px 2px; overflow-x:auto; min-height:112px; align-items:flex-start}
+  .tcell{display:flex; flex-direction:column; gap:4px; cursor:pointer; flex:0 0 auto; width:120px}
+  .thumb{
+    height:72px; width:120px; object-fit:cover; object-position:top;
+    border:1px solid var(--line); border-radius:8px; opacity:.6; background:var(--panel-2);
+  }
+  .tcell:hover .thumb{opacity:.95}
+  .tcell.cur .thumb{border-color:var(--gold); opacity:1; box-shadow:0 0 0 1px var(--gold)}
+  .tlabel{font-size:10.5px; color:var(--muted); line-height:1.25; max-height:26px; overflow:hidden}
+  .tcell.cur .tlabel{color:var(--gold)}
+  .thumb.txt{display:flex; align-items:center; justify-content:center; color:var(--soft); font-size:11px; font-weight:800}
+
+  /* lightbox: scroll = zoom · drag = pan · double-click = fit/100% */
+  .lb{position:fixed; inset:0; background:rgba(2,5,9,.96); display:none; z-index:300; flex-direction:column}
+  .lb.open{display:flex}
+  .lbbar{display:flex; align-items:center; gap:10px; padding:10px 16px; color:var(--muted); font-size:13px; flex-wrap:wrap}
+  .lbbar .title2{color:var(--gold); font-size:15px; font-weight:700; margin-right:auto}
+  .lbview{flex:1; overflow:hidden; position:relative; cursor:grab}
+  .lbview.dragging{cursor:grabbing}
+  .lbimg{position:absolute; transform-origin:0 0; user-select:none; -webkit-user-drag:none}
+
+  @media (max-width:900px){
+    .showme{height:auto}
+    .smmain{flex-direction:column}
+    .side{width:100%; max-width:none; border-left:none; border-top:1px solid var(--line); max-height:32vh}
+    .frameimg,.htmlframe{max-height:46vh}
+  }
+</style>
+</head>
+<body>
+<main class="feed-main">
+  <div class="spread feedhead">
+    <h1>📺 <b>SHOW ME</b> — live build feed</h1>
+    <div class="row">
+      <button class="btn nav" id="prev" title="Previous frame (←)" aria-label="Previous frame">←</button>
+      <button class="btn nav" id="next" title="Next frame (→)" aria-label="Next frame">→</button>
+      <button class="btn on" id="liveBtn" title="Follow the newest frame automatically">
+        <span class="live-dot" aria-hidden="true"></span> LIVE
+      </button>
+      <span class="muted" id="meta">connecting…</span>
+    </div>
+  </div>
+
+  <div class="showme">
+    <div class="smmain">
+      <div class="stage" id="stage"><div class="empty">Waiting for the first frame…</div></div>
+      <aside class="side" id="side" aria-label="Frame caption">
+        <div class="frameno" id="frameno"></div>
+        <div class="cap" id="cap"></div>
+        <div class="when" id="when"></div>
+      </aside>
+    </div>
+    <div class="strip" id="strip" aria-label="Filmstrip"></div>
+  </div>
+
+  <p class="footnote">
+    Polls <code>data/feed.json</code> every 3 seconds — the agent fleet appends frames; this page only watches.
+    Keyboard: ← / → step · Home = first · End = back to LIVE.
+  </p>
+</main>
+
+<div class="lb" id="lb" role="dialog" aria-label="Image lightbox">
+  <div class="lbbar">
+    <span class="title2" id="lbtitle"></span>
+    <span>scroll = zoom &nbsp;·&nbsp; drag = pan &nbsp;·&nbsp; double-click = fit/100% &nbsp;·&nbsp; Esc = close</span>
+    <button class="btn" id="lbclose">Close ✕</button>
+  </div>
+  <div class="lbview" id="lbview"><img class="lbimg" id="lbimg" alt=""></div>
+</div>
+
+<script src="assets/shell.js"></script>
+<script>
+'use strict';
+Shell.init('feed');
+
+(function () {
+  var cards = [], idx = -1, liveMode = true, lastKey = '';
+  var $ = function (id) { return document.getElementById(id); };
+
+  function show(i) {
+    if (!cards.length) return;
+    idx = Math.max(0, Math.min(cards.length - 1, i));
+    var cur = cards[idx];
+    var stage = $('stage');
+    stage.innerHTML = '';
+    var t = document.createElement('div');
+    t.className = 'title'; t.textContent = cur.title || '';
+    stage.appendChild(t);
+    var wrap = document.createElement('div');
+    wrap.className = 'framewrap';
+    stage.appendChild(wrap);
+    if (cur.image) {
+      var im = document.createElement('img');
+      im.className = 'frameimg';
+      im.src = cur.image + '?t=' + Date.now();
+      im.alt = cur.title || 'feed frame';
+      im.onclick = function () { openLB(cur); };
+      wrap.appendChild(im);
+      var h = document.createElement('div');
+      h.className = 'zoomhint';
+      h.innerHTML = '🔍 click the image to zoom in and read it';
+      stage.appendChild(h);
+    } else if (cur.html) {
+      var d = document.createElement('div');
+      d.className = 'htmlframe';
+      d.innerHTML = cur.html;
+      wrap.appendChild(d);
+    }
+    $('side').style.display = 'flex';
+    $('frameno').textContent = 'Frame ' + (idx + 1) + ' of ' + cards.length;
+    $('cap').textContent = cur.caption || '';
+    $('when').textContent = cur.ts ? ('marker: ' + cur.ts) : '';
+    renderStrip();
+    $('meta').textContent = 'frame ' + (idx + 1) + '/' + cards.length +
+      (liveMode ? '  ·  following live' : '  ·  paused on this frame');
+  }
+
+  function renderStrip() {
+    var strip = $('strip');
+    strip.innerHTML = '';
+    cards.forEach(function (c, i) {
+      var cell = document.createElement('div');
+      cell.className = 'tcell' + (i === idx ? ' cur' : '');
+      if (c.image) {
+        var th = document.createElement('img');
+        th.className = 'thumb';
+        th.src = c.image + '?t=' + Date.now();
+        th.alt = '';
+        cell.appendChild(th);
+      } else {
+        var ph = document.createElement('div');
+        ph.className = 'thumb txt';
+        ph.textContent = 'TXT';
+        cell.appendChild(ph);
+      }
+      var lb = document.createElement('div');
+      lb.className = 'tlabel';
+      lb.textContent = (i + 1) + '. ' + (c.title || '');
+      cell.appendChild(lb);
+      cell.title = c.title || '';
+      cell.onclick = function () { setLive(false); show(i); };
+      strip.appendChild(cell);
+    });
+    var cur = strip.querySelector('.tcell.cur');
+    if (cur) cur.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  }
+
+  function setLive(v) {
+    liveMode = v;
+    $('liveBtn').className = 'btn' + (v ? ' on' : '');
+    if (v && cards.length) show(cards.length - 1);
+    else if (cards.length) {
+      $('meta').textContent = 'frame ' + (idx + 1) + '/' + cards.length + '  ·  paused on this frame';
+    }
+  }
+  $('liveBtn').onclick = function () { setLive(!liveMode); };
+  $('prev').onclick = function () { setLive(false); show(idx - 1); };
+  $('next').onclick = function () {
+    if (idx >= cards.length - 2) setLive(true);
+    else { setLive(false); show(idx + 1); }
+  };
+
+  function poll() {
+    fetch('data/feed.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (j) {
+        var nc = j.cards || [];
+        var key = nc.length + '|' + (nc.length ? (nc[nc.length - 1].ts || '') : '');
+        if (key !== lastKey) {
+          lastKey = key; cards = nc;
+          if (liveMode) show(cards.length - 1);
+          else { renderStrip(); $('frameno').textContent = 'Frame ' + (idx + 1) + ' of ' + cards.length; }
+        }
+      })
+      .catch(function () { $('meta').textContent = 'waiting for the feed…'; });
+  }
+  poll();
+  setInterval(poll, 3000);
+
+  /* ---------- Lightbox: zoom + pan (ported wholesale) ---------- */
+  var scale = 1, minScale = 1, px = 0, py = 0, nw = 0, nh = 0, drag = null;
+  var lb = $('lb'), lbimg = $('lbimg'), lbview = $('lbview');
+
+  function openLB(card) {
+    $('lbtitle').textContent = card.title || '';
+    lbimg.src = card.image + '?t=' + Date.now();
+    lbimg.alt = card.title || '';
+    lb.classList.add('open');
+    lbimg.onload = function () { nw = lbimg.naturalWidth; nh = lbimg.naturalHeight; fit(); };
+    if (lbimg.complete && lbimg.naturalWidth) { nw = lbimg.naturalWidth; nh = lbimg.naturalHeight; fit(); }
+  }
+  function fit() {
+    var vw = lbview.clientWidth, vh = lbview.clientHeight;
+    /* fit-to-WIDTH so text is readable; tall images can be panned vertically */
+    var fw = vw / nw, fh = vh / nh;
+    minScale = Math.min(fw, fh);
+    scale = fw;
+    px = (vw - nw * scale) / 2; py = 20;
+    if (nh * scale <= vh) { scale = Math.min(fw, fh); px = (vw - nw * scale) / 2; py = (vh - nh * scale) / 2; }
+    apply();
+  }
+  function apply() {
+    var vw = lbview.clientWidth, vh = lbview.clientHeight;
+    var w = nw * scale, h = nh * scale;
+    px = w <= vw ? (vw - w) / 2 : Math.max(Math.min(px, 0), vw - w);
+    py = h <= vh ? (vh - h) / 2 : Math.max(Math.min(py, 20), vh - h - 20);
+    lbimg.style.transform = 'translate(' + px + 'px,' + py + 'px) scale(' + scale + ')';
+  }
+  lbview.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    var old = scale;
+    scale = Math.max(minScale * 0.8, Math.min(4, scale * (e.deltaY < 0 ? 1.18 : 0.85)));
+    var r = lbview.getBoundingClientRect();
+    var mx = e.clientX - r.left, my = e.clientY - r.top;
+    px = mx - (mx - px) * (scale / old);
+    py = my - (my - py) * (scale / old);
+    apply();
+  }, { passive: false });
+  lbview.addEventListener('mousedown', function (e) {
+    drag = { x: e.clientX, y: e.clientY, px: px, py: py };
+    lbview.classList.add('dragging');
+  });
+  window.addEventListener('mousemove', function (e) {
+    if (!drag) return;
+    px = drag.px + (e.clientX - drag.x);
+    py = drag.py + (e.clientY - drag.y);
+    apply();
+  });
+  window.addEventListener('mouseup', function () { drag = null; lbview.classList.remove('dragging'); });
+  lbview.addEventListener('dblclick', function (e) {
+    if (scale > minScale * 1.05) { fit(); }
+    else {
+      var old = scale; scale = 1;
+      var r = lbview.getBoundingClientRect();
+      var mx = e.clientX - r.left, my = e.clientY - r.top;
+      px = mx - (mx - px) * (scale / old);
+      py = my - (my - py) * (scale / old);
+      apply();
+    }
+  });
+  $('lbclose').onclick = function () { lb.classList.remove('open'); };
+  lb.addEventListener('click', function (e) { if (e.target === lb) lb.classList.remove('open'); });
+
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') lb.classList.remove('open');
+    if (lb.classList.contains('open')) return;
+    if (e.key === 'ArrowLeft') { setLive(false); show(idx - 1); }
+    if (e.key === 'ArrowRight') {
+      if (idx >= cards.length - 2) setLive(true);
+      else { setLive(false); show(idx + 1); }
+    }
+    if (e.key === 'Home') { setLive(false); show(0); }
+    if (e.key === 'End') { setLive(true); }
+  });
+  window.addEventListener('resize', function () { if (lb.classList.contains('open')) fit(); });
+})();
+</script>
+</body>
+</html>

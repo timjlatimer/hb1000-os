@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#070b10">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Flypaper — catch a Cloud Butterfly · The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦋</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<script>
+/* ---- auto-skip (settings.autoSkip): straight to ?next BEFORE first paint.
+       Only fires when ?next is present (the login flow); the nav Flypaper
+       link — no ?next — always remains the way back in. ---- */
+(function () {
+  'use strict';
+  try {
+    var s = JSON.parse(localStorage.getItem('hb1000-flypaper'));
+    if (!(s && s.settings && s.settings.autoSkip)) return;
+    var next = new URLSearchParams(location.search).get('next');
+    if (next && !/^([a-z]+:)?\/\//i.test(next) && next.charAt(0) !== '/') location.replace(next);
+  } catch (e) { /* fresh store / private mode — show the page */ }
+})();
+</script>
+<style>
+  /* =====================================================================
+     THE FLYPAPER — post-login interstitial + two-stage capture.
+     Design law (Tim, verbatim): "a very very simple fly trap" — a trap,
+     not a form. Dark by default REGARDLESS of theme (canon #138 — "you
+     don't want to knock yourself out of no-man's land"). 3 AM phone is
+     the primary device: no white flashes, thumb-zone CTAs, ≥16px inputs.
+     Standalone door layout (login.html precedent) — no sidebar between a
+     half-asleep human and the trap. Guard banner stays, verbatim.
+     ===================================================================== */
+  html, body{min-height:100%}
+  body{display:flex; flex-direction:column; align-items:center; padding:18px 14px 40px; background:#070b10}
+
+  .trap{
+    width:100%; max-width:560px; background:var(--panel);
+    border:1px solid var(--line); border-radius:var(--radius-lg);
+    overflow:hidden; box-shadow:0 22px 70px rgba(0,0,0,.55);
+  }
+
+  /* HERO SLOT: IMG-06 — the Flypaper lantern (Phase-4 harvest, Tim-approved) wired as the
+     background-image, replacing the gradient placeholder. Master PNG: image-harvest/incoming. */
+  .hero{
+    position:relative; height:150px;
+    background:
+      url('assets/img/flypaper-lantern.webp') center 40% / cover no-repeat,
+      linear-gradient(180deg, #0a1018, #0d141d 70%, var(--panel));
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hero::after{ /* soft settle into the card body so Maria's desk reads cleanly below */
+    content:""; position:absolute; inset:auto 0 0 0; height:46px;
+    background:linear-gradient(180deg, transparent, rgba(13,20,29,.78));
+  }
+  .hero .lamp{
+    position:absolute; bottom:-1px; left:50%; transform:translateX(-50%);
+    width:120px; height:3px; border-radius:3px 3px 0 0;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent); opacity:.7;
+  }
+
+  .body{padding:18px 22px 20px}
+  @media (max-width:640px){ .body{padding:16px 15px 18px} }
+
+  /* ---- Maria hosts the Flypaper (A6 — one persona, two desks) ---- */
+  .maria{display:flex; gap:11px; align-items:flex-start; margin-bottom:13px}
+  .maria .ava{
+    flex:0 0 38px; width:38px; height:38px; border-radius:50%;
+    background:linear-gradient(135deg, var(--gold) 0%, #b8862e 55%, #36c2b4 130%);
+    color:#1a1206; font-weight:900; font-size:17px;
+    display:grid; place-items:center; box-shadow:0 0 12px rgba(232,181,77,.35);
+  }
+  .maria .who{font-size:11px; color:var(--soft); text-transform:uppercase; letter-spacing:.09em; font-weight:700}
+  .maria .who b{color:var(--gold); letter-spacing:.02em}
+  .maria .say{font-size:13.5px; color:var(--ink); line-height:1.55; font-style:italic; margin-top:2px}
+  .maria .say .l2{color:var(--muted)}
+
+  h1.ask{font-size:23px; font-weight:900; color:#fff; line-height:1.3; margin:4px 0 8px}
+  h1.ask b{color:var(--gold)}
+
+  .counters{
+    font-size:12.5px; color:var(--muted); font-weight:700; letter-spacing:.05em;
+    font-variant-numeric:tabular-nums; margin:0 0 16px;
+  }
+  .counters b{color:var(--gold)}
+
+  .cta{display:block; width:100%; min-height:56px; margin:10px 0 0; padding:13px 18px;
+    font:inherit; font-size:16px; font-weight:800; border-radius:14px; cursor:pointer;
+    transition:background .15s, color .15s, border-color .15s;}
+  .cta.gold{color:#1a1206; background:linear-gradient(135deg, var(--gold), #d9a23c); border:1px solid var(--gold)}
+  .cta.gold:hover{background:var(--gold)}
+  .cta.ghost{color:var(--muted); background:none; border:1px solid var(--line)}
+  .cta.ghost:hover{color:var(--ink); border-color:var(--soft)}
+
+  .barstool-sub{font-size:12px; color:var(--soft); font-style:italic; margin:13px 0 0; line-height:1.5}
+
+  .quietfoot{
+    display:flex; justify-content:center; gap:8px; align-items:center; flex-wrap:wrap;
+    margin-top:16px; padding-top:13px; border-top:1px solid var(--line);
+    font-size:12.5px; color:var(--soft);
+  }
+  .quietfoot a{color:var(--muted)} .quietfoot a:hover{color:var(--gold)}
+  .quietfoot button{background:none; border:0; padding:0; font:inherit; font-size:12.5px; color:var(--muted); cursor:pointer}
+  .quietfoot button:hover{color:var(--gold)}
+
+  /* ---- settings drawer (one-row law: auto-skip; plus library-after-catch) ---- */
+  .settings{margin-top:12px; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-2); padding:11px 13px}
+  .settings label{display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--ink); padding:5px 0; cursor:pointer}
+  .settings input{width:17px; height:17px; margin-top:1px; accent-color:var(--gold)}
+  .settings .sd{font-size:11.5px; color:var(--soft)}
+
+  /* ---- capture sheet ---- */
+  .tim-line{
+    margin:2px 0 14px; padding:9px 13px; border-left:3px solid var(--gold);
+    background:rgba(232,181,77,.06); border-radius:0 var(--radius) var(--radius) 0;
+    font-size:13px; line-height:1.55; color:var(--ink); font-style:italic;
+  }
+  .tim-line .att{color:var(--gold); font-style:normal; font-weight:700; white-space:nowrap}
+
+  label.f{display:block; font-size:11.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:13px 2px 6px; font-weight:700}
+  input.f, textarea.f{
+    width:100%; box-sizing:border-box; padding:12px 14px; font:inherit; font-size:18px;
+    color:var(--ink); background:var(--panel-2); border:1px solid var(--line);
+    border-radius:var(--radius); outline:none;
+  }
+  input.f:focus, textarea.f:focus{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset}
+  textarea.f{min-height:40vh; line-height:1.55; resize:vertical}
+  @media (max-width:640px){ textarea.f{min-height:50vh} input.f, textarea.f{font-size:16px} }
+  .frozen input.f, .frozen textarea.f{border-style:dashed; color:var(--muted); background:rgba(13,20,29,.6)}
+  .immutable-note{font-size:11px; color:var(--soft); font-style:italic; margin:5px 2px 0}
+  .immutable-note b{color:var(--gold); font-style:normal}
+
+  .donerow{display:flex; gap:9px; flex-wrap:wrap; margin:14px 0 4px}
+  .donerow .cta{flex:1; min-width:160px; margin:0}
+
+  /* ---- Stage B — optional enrich accordion / mobile bottom drawer ---- */
+  .enrich-toggle{
+    display:flex; width:100%; align-items:center; gap:8px; margin-top:14px; padding:11px 14px;
+    font:inherit; font-size:13.5px; font-weight:800; color:var(--muted); text-align:left;
+    background:var(--panel-2); border:1px dashed var(--line); border-radius:var(--radius); cursor:pointer;
+  }
+  .enrich-toggle:hover{color:var(--gold); border-color:var(--gold)}
+  .enrich-toggle .opt{font-weight:600; font-size:11.5px; color:var(--soft); margin-left:auto}
+  .enrich{display:none; margin-top:10px; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-2); padding:13px 15px 15px}
+  .enrich.open{display:block}
+  .enrich .sheet-head{display:none}
+  .enrich input.f, .enrich textarea.f{font-size:15px; background:var(--panel)}
+  .enrich textarea.f{min-height:90px}
+  @media (max-width:640px){
+    /* BLUEPRINT §7.8 — ≤640px the enrich opens as a bottom drawer (same rule as the prism sheet) */
+    .enrich.open{
+      position:fixed; left:0; right:0; bottom:0; top:auto; z-index:160;
+      max-height:82vh; overflow-y:auto; margin:0; border-radius:16px 16px 0 0;
+      border-bottom:0; box-shadow:0 -16px 60px rgba(0,0,0,.7); background:var(--panel);
+    }
+    .enrich.open .sheet-head{
+      display:flex; justify-content:space-between; align-items:center;
+      position:sticky; top:0; background:var(--panel); padding-bottom:6px;
+      font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:var(--muted);
+    }
+    .enrich .sheet-head button{background:none; border:1px solid var(--line); border-radius:8px; color:var(--ink); font:inherit; font-size:13px; padding:4px 12px; cursor:pointer}
+    .enrich input.f, .enrich textarea.f{font-size:16px}
+  }
+  .scrim{position:fixed; inset:0; z-index:150; background:rgba(2,5,9,.6); display:none}
+  @media (max-width:640px){ .scrim.on{display:block} }
+
+  /* ---- /400 sliders with 70/85/95 anchors ---- */
+  .srow{margin:12px 0 2px}
+  .srow .stop{display:flex; justify-content:space-between; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+  .srow .stop .v{color:var(--gold); font-variant-numeric:tabular-nums}
+  .srow input[type=range]{width:100%; margin:7px 0 1px; accent-color:var(--gold); height:26px; cursor:pointer}
+  .rail{position:relative; height:14px; font-size:9px; color:var(--soft); letter-spacing:.04em}
+  .rail span{position:absolute; transform:translateX(-50%); white-space:nowrap}
+  .rail span::before{content:''; position:absolute; left:50%; top:-6px; width:1px; height:5px; background:var(--soft)}
+  .total400{
+    margin-top:13px; padding:9px 13px; border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--panel); display:flex; justify-content:space-between; align-items:baseline;
+    font-size:12px; color:var(--muted); font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  }
+  .total400 b{font-size:21px; color:var(--gold); font-variant-numeric:tabular-nums; letter-spacing:0}
+
+  /* ---- instant-grade card ---- */
+  .grade{margin-top:14px; border:1px solid rgba(232,181,77,.45); border-radius:var(--radius-lg); background:var(--panel-2); padding:13px 15px}
+  .grade .gh{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:7px}
+  .grade .chips{display:flex; flex-wrap:wrap; gap:5px}
+  .grade .honest{font-size:11px; color:var(--soft); font-style:italic; margin-top:8px}
+
+  .backrow{margin-top:14px; font-size:12px; color:var(--soft); text-align:center; width:100%; max-width:560px}
+  .backrow a{color:var(--muted)}
+
+  .guard-banner{max-width:560px; width:100%; box-sizing:border-box; margin:14px 0 0}
+
+  /* ---- toast — word-count-only acknowledgment; never requires scroll ---- */
+  .toast{
+    position:fixed; top:14px; left:50%; transform:translateX(-50%) translateY(-8px); z-index:400;
+    background:var(--panel); border:1px solid var(--gold); border-radius:999px;
+    color:var(--gold); font-size:14px; font-weight:800; padding:9px 22px;
+    box-shadow:0 10px 40px rgba(0,0,0,.6); opacity:0; pointer-events:none;
+    transition:opacity .18s, transform .18s; max-width:92vw; text-align:center;
+  }
+  .toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ================= VIEW 1 — THE INTERSTITIAL (default) ================= -->
+<div class="trap" id="vHome">
+  <!-- HERO IMAGE SLOT — IMG-06 Flypaper lantern (Phase-4 harvest, cleared Tim's gate); art rides as the .hero background -->
+  <div class="hero" role="img"
+       aria-label="Gold-veined butterflies spiraling down through dusk toward a glowing lantern wrapped in ribbons of golden flypaper; the warm rooftops of a small town drift in mist below a quiet field of stars"><span class="lamp"></span></div>
+  <div class="body">
+
+    <div class="maria">
+      <div class="ava" aria-hidden="true">M</div>
+      <div>
+        <div class="who"><b>Maria Rosaria Conti</b> · keeper of the Flypaper</div>
+        <div class="say" id="mariaSay"></div>
+      </div>
+    </div>
+
+    <h1 class="ask">Did your HB1000 bring a <b><span data-prism-id="flypaper-explainer" id="flyExp">cloud butterfly</span></b> today?</h1>
+
+    <div class="counters" id="ctrHome" aria-live="polite">Day — · Today — · YTD —</div>
+
+    <button type="button" class="cta gold" id="btnYes">🪤 Yes — open the Flypaper</button>
+    <button type="button" class="cta ghost" id="btnNo">Not today → my card</button>
+
+    <p class="barstool-sub">3+ in a row on one topic and we’ll tell you your unconscious is circling something.</p>
+
+    <div class="quietfoot">
+      <a href="library.html">📚 Library</a> <span aria-hidden="true">·</span>
+      <button type="button" id="btnGear" aria-expanded="false" aria-controls="settings">⚙ auto-skip</button>
+    </div>
+
+    <div class="settings" id="settings" hidden>
+      <label><input type="checkbox" id="setSkip">
+        <span>Skip this page on login — go straight to my card.
+          <span class="sd">The nav <b>Flypaper</b> link stays the way back in.</span></span></label>
+      <label><input type="checkbox" id="setLib">
+        <span>Show Library after each catch.
+          <span class="sd">Default off — the trap stays quick.</span></span></label>
+    </div>
+  </div>
+</div>
+
+<!-- ================= VIEW 2 — THE CAPTURE FLOW (#catch) ================= -->
+<div class="trap" id="vCatch" hidden>
+  <div class="body">
+    <div class="spread" style="margin-bottom:8px">
+      <div class="counters" id="ctrCatch" style="margin:0" aria-live="polite">Day — · Today — · YTD —</div>
+      <a href="#" id="backHome" style="font-size:12px; color:var(--soft)">← not now</a>
+    </div>
+
+    <blockquote class="tim-line">“Butterflies are like hearing light — name it before it’s gone.”
+      <span class="att">— Tim</span></blockquote>
+
+    <!-- Stage A — THE TRAP. Title + verbatim dump. Nothing else is required. -->
+    <form id="trapForm" novalidate>
+      <div id="stageA">
+        <label class="f" for="fTitle">Name it</label>
+        <input class="f" id="fTitle" type="text" placeholder="Name it" autocomplete="off"
+               autocapitalize="sentences" enterkeyhint="next">
+
+        <label class="f" for="fRaw">Define it — verbatim</label>
+        <textarea class="f" id="fRaw" autocapitalize="sentences"
+          placeholder="Define it — dump it raw. Voice button on your keyboard works great. We never summarize your words."></textarea>
+        <p class="immutable-note" id="rawNote">Your raw words are stored <b>immutable</b> — processing writes alongside them, never over them.</p>
+
+        <button type="submit" class="cta gold" id="btnCaught" style="margin-top:14px">🪤 CAUGHT</button>
+      </div>
+    </form>
+
+    <!-- after the catch: Done pair + optional enrich + instant grade -->
+    <div id="afterCatch" hidden>
+      <div class="donerow">
+        <button type="button" class="cta ghost" id="btnAnother">Done — another?</button>
+        <button type="button" class="cta gold"  id="btnDoneCard">Done → my card</button>
+      </div>
+
+      <button type="button" class="enrich-toggle" id="btnEnrich" aria-expanded="false" aria-controls="enrich">
+        🦋 Dress the butterfly <span class="opt">optional — saving never waits on this</span></button>
+
+      <div class="enrich" id="enrich">
+        <div class="sheet-head"><span>Dress the butterfly</span><button type="button" id="btnSheetClose">▾ done</button></div>
+
+        <label class="f" for="eThesis">Thesis</label>
+        <input class="f" id="eThesis" type="text" placeholder="One-sentence distillation." autocapitalize="sentences">
+
+        <label class="f" for="eBar">Bar Stool</label>
+        <textarea class="f" id="eBar" placeholder="Explain it two beers in. Grade 8. No corporate speak."></textarea>
+
+        <label class="f" for="eCliche">Cliché</label>
+        <input class="f" id="eCliche" type="text" placeholder="The t-shirt phrase." autocapitalize="sentences">
+
+        <div class="sec-h" style="margin:18px 0 2px">Quick self-score <b>/400</b> <span style="font-weight:500; text-transform:none; letter-spacing:0">— first drafts typically land 60–70</span></div>
+        <div id="sliders"></div>
+
+        <div class="total400"><span>Self-score total</span><b id="tot400" aria-live="polite">260/400</b></div>
+      </div>
+
+      <div class="grade" id="grade">
+        <div class="gh">Instant grade — honest, not theatre</div>
+        <div class="chips" id="gradeChips"></div>
+        <p class="honest">Self-scored. The AI full-treatment grade happens at processing — labelled, never faked.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="guard-banner" role="note">
+  <span class="lock" aria-hidden="true">🔒</span>
+  <span><b>Draft-only — nothing sends.</b> The human approves every move.
+  Captures stay local until exported from the <a href="library.html">Library</a> — export to ship.</span>
+</div>
+
+<p class="backrow"><a href="login.html">Sign in</a> · <a href="index.html">The Model (engine room)</a></p>
+
+<div class="scrim" id="scrim"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/shell.js"></script>
+<script src="assets/prism.js"></script>
+<script>
+'use strict';
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Shell.esc;
+
+  /* ======================= data layer — localStorage hb1000-flypaper ======================= */
+  var FP_KEY = 'hb1000-flypaper', RQ_KEY = 'hb1000-review-queue';
+
+  function fpLoad() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(FP_KEY)); } catch (e) { /* fresh */ }
+    if (!s || typeof s !== 'object') s = {};
+    if (!s.settings) s.settings = {};
+    if (typeof s.settings.autoSkip !== 'boolean') s.settings.autoSkip = false;
+    if (typeof s.settings.libraryAfterCatch !== 'boolean') s.settings.libraryAfterCatch = false;
+    if (!(s.days instanceof Array)) s.days = [];
+    if (!(s.captures instanceof Array)) s.captures = [];
+    return s;
+  }
+  function fpSave(s) {
+    try { localStorage.setItem(FP_KEY, JSON.stringify(s)); } catch (e) { /* private mode */ }
+  }
+  function rqAppend(entry) {
+    var q = [];
+    try { q = JSON.parse(localStorage.getItem(RQ_KEY)) || []; } catch (e) { /* fresh */ }
+    if (!(q instanceof Array)) q = [];
+    q.push(entry);
+    try { localStorage.setItem(RQ_KEY, JSON.stringify(q)); } catch (e) { /* private mode */ }
+  }
+  function rqUpdateTotal(id, total) {
+    var q = [];
+    try { q = JSON.parse(localStorage.getItem(RQ_KEY)) || []; } catch (e) { return; }
+    if (!(q instanceof Array)) return;
+    for (var i = 0; i < q.length; i++) if (q[i] && q[i].id === id) q[i].total = total;
+    try { localStorage.setItem(RQ_KEY, JSON.stringify(q)); } catch (e) { /* private mode */ }
+  }
+
+  /* ======================= counters — machine-owned, never human-synced ======================= */
+  var DAY1 = new Date(2026, 0, 11); /* Day 1 = 2026-01-11; zero-hunt days still increment */
+  function localDateStr(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' +
+           String(d.getDate()).padStart(2, '0');
+  }
+  function dayNo(d) {
+    var dd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    return Math.round((dd - DAY1) / 864e5) + 1;
+  }
+
+  var baseYTD = null; /* highest numeric suffix across registry butterflies[].id — computed, never hard-coded */
+  function computeBase(reg) {
+    var m = 0;
+    ((reg && reg.butterflies) || []).forEach(function (b) {
+      /* numeric SUFFIX = last digit group — range ids like "#3–#95 (54 unrecovered)" must not concatenate */
+      var g = String(b.id || '').match(/[0-9]+/g);
+      var n = g ? parseInt(g[g.length - 1], 10) : 0;
+      if (n && n > m) m = n;
+    });
+    return m || null;
+  }
+
+  function counts() {
+    var s = fpLoad(), today = localDateStr(new Date()), t = 0, un = 0;
+    s.captures.forEach(function (c) {
+      if (String(c.captured_at || '').length && localDateStr(new Date(c.captured_at)) === today) t++;
+      if (!c.synced) un++; /* synced rows already live inside baseYTD — never double-count */
+    });
+    return { day: dayNo(new Date()), today: t, ytd: (baseYTD == null ? null : baseYTD + un) };
+  }
+  function renderCounters() {
+    var c = counts();
+    var line = 'Day <b>' + c.day + '</b> · Today <b>' + c.today + '</b> · YTD <b>' +
+               (c.ytd == null ? '…' : c.ytd) + '</b>';
+    $('ctrHome').innerHTML = line;
+    $('ctrCatch').innerHTML = line;
+  }
+
+  Shell.loadJSON('data/butterfly-registry.json').then(function (reg) {
+    baseYTD = computeBase(reg);
+    var s = fpLoad(); s.baseYTD = baseYTD; fpSave(s); /* cache for offline honesty */
+    renderCounters();
+  }).catch(function () {
+    var s = fpLoad();
+    if (s.baseYTD) baseYTD = s.baseYTD; /* last computed value — still machine-owned */
+    renderCounters();
+  });
+
+  /* ======================= Maria hosts (A6) — warm, Sorrento, never mean, no streak-shaming ======================= */
+  var ch = Shell.cardholder();
+  var firstName = ch ? ch.name.split(' ')[0] : null;
+  function mariaLines() {
+    var h = new Date().getHours();
+    var who = firstName ? ', ' + firstName : '';
+    if (h >= 22 || h < 5) return [
+      'Shh — the quiet hours' + (firstName ? ', ' + firstName : ', amore') + '. The faint ones love this light.',
+      'Whisper it to me before it goes, then straight back to your dreams. No bright lights, I promise.'];
+    if (h < 11) return [
+      'Buongiorno' + who + '! In Sorrento we say the morning net catches the best ones.',
+      'Did one follow you out of your dreams? I am here either way.'];
+    if (h < 17) return [
+      'Ciao' + who + '! Even at midday a butterfly can wander in from No Man’s Land.',
+      'If one landed on you, bring it to me — typos and all.'];
+    return [
+      'Buonasera' + who + '. The day is folding its wings.',
+      'Did it leave one behind for us? If not, no matter — domani, caro.'];
+  }
+  (function () {
+    var L = mariaLines();
+    $('mariaSay').innerHTML = esc(L[0]) + '<br><span class="l2">' + esc(L[1]) + '</span>';
+  })();
+
+  /* ======================= prism explainer — registry block first, inline fallback ======================= */
+  var FLY_SPECTRUM = {
+    plain: 'Cloud Butterflies are ideas, insights, and inspirations that come from No Man’s Land — the space between sleep and waking. Catch them here before they fly away.',
+    locked: false,
+    barstool: 'You know that genius idea you had in the shower that was gone by breakfast? This is the sticky paper. Dump it here, half-asleep, typos and all.',
+    timbit: 'Catch it before it flies.',
+    boardroom: 'A zero-friction intake for pre-conscious insight capture, feeding the HB1000 innovation pipeline’s scoring and triage stages.',
+    swiss: 'PURPOSE — pre-conscious insight capture\nWINDOW — No Man’s Land (sleep ⇄ waking)\nPROTOCOL — v4.0 · /400 self-score\nCOUNTERS — Day · Today · YTD (machine-owned)'
+  };
+  if (window.Prism) Prism.spectra().then(function (S) {
+    if (S['flypaper-explainer']) return; /* spectra.json block wins — already attached by the initial scan */
+    var el = $('flyExp');
+    el.setAttribute('data-prism', JSON.stringify(FLY_SPECTRUM));
+    Prism.scan(el.parentNode);
+  });
+
+  /* ======================= views ======================= */
+  function nextURL() {
+    var next = new URLSearchParams(location.search).get('next');
+    if (next && !/^([a-z]+:)?\/\//i.test(next) && next.charAt(0) !== '/') return next;
+    return ch ? 'card.html?card=' + encodeURIComponent(ch.card) : 'login.html';
+  }
+  function showView() {
+    /* spec §4 back-compat: #library deep-links land on the commons page */
+    if (location.hash === '#library') { location.replace('library.html'); return; }
+    var catching = location.hash === '#catch';
+    $('vHome').hidden = catching;
+    $('vCatch').hidden = !catching;
+    if (catching) setTimeout(function () { $('fTitle').focus(); }, 60);
+  }
+  window.addEventListener('hashchange', showView);
+  showView();
+
+  $('btnYes').addEventListener('click', function () { location.hash = '#catch'; });
+  $('backHome').addEventListener('click', function (ev) { ev.preventDefault(); location.hash = ''; });
+
+  /* ---- the sacred one-tap exit: a zero-day is a FIRST-CLASS EVENT, never an error.
+         No toast, no guilt copy, no delay — record and go. ---- */
+  $('btnNo').addEventListener('click', function () {
+    var s = fpLoad(), today = localDateStr(new Date()), dup = false;
+    for (var i = 0; i < s.days.length; i++) if (s.days[i].date === today) dup = true;
+    if (!dup) { s.days.push({ date: today, nothing: true }); fpSave(s); }
+    location.href = nextURL();
+  });
+
+  /* ---- settings ---- */
+  (function () {
+    var s = fpLoad();
+    $('setSkip').checked = s.settings.autoSkip;
+    $('setLib').checked = s.settings.libraryAfterCatch;
+    $('btnGear').addEventListener('click', function () {
+      var open = $('settings').hidden;
+      $('settings').hidden = !open;
+      $('btnGear').setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    $('setSkip').addEventListener('change', function () {
+      var st = fpLoad(); st.settings.autoSkip = $('setSkip').checked; fpSave(st);
+    });
+    $('setLib').addEventListener('change', function () {
+      var st = fpLoad(); st.settings.libraryAfterCatch = $('setLib').checked; fpSave(st);
+      syncDoneLabel();
+    });
+  })();
+  function syncDoneLabel() {
+    $('btnDoneCard').textContent = fpLoad().settings.libraryAfterCatch
+      ? 'Done → Library' : 'Done → my card';
+  }
+  syncDoneLabel();
+
+  /* ======================= swarm-signal check (verbatim rule: 3+ / same topic / 7 days) ======================= */
+  var STOP = {};
+  ('this that with from have what when where will your just like they them then than there here ' +
+   'about into over under been being would could should because while every other these those some ' +
+   'more most much many very really thing things going gonna want need make makes made take takes ' +
+   'doing done dont cant wont were want only also even back down come came know knows said says ' +
+   'still after before today right think thought people their').split(' ').forEach(function (w) { STOP[w] = 1; });
+  function tokensOf(text) {
+    var seen = {}, out = [];
+    String(text || '').toLowerCase().replace(/[^a-z0-9\s'-]/g, ' ').split(/\s+/).forEach(function (w) {
+      w = w.replace(/^['-]+|['-]+$/g, '');
+      if (w.length >= 4 && !STOP[w] && !seen[w]) { seen[w] = 1; out.push(w); }
+    });
+    return out;
+  }
+  function swarmCheck(newCap, captures) {
+    var cutoff = Date.now() - 7 * 864e5;
+    var mine = tokensOf(newCap.title + ' ' + newCap.raw_text);
+    var best = null, bestN = 0;
+    mine.forEach(function (tok) {
+      var n = 0;
+      captures.forEach(function (c) {
+        if (c.id === newCap.id) return;
+        if (new Date(c.captured_at).getTime() < cutoff) return;
+        if (tokensOf(c.title + ' ' + c.raw_text).indexOf(tok) >= 0) n++;
+      });
+      if (n > bestN) { bestN = n; best = tok; }
+    });
+    /* shares a token with 2+ other captures in the window → 3+ butterflies circling */
+    return bestN >= 2 ? { token: best, count: bestN + 1 } : null;
+  }
+
+  /* ======================= Stage A → CAUGHT ======================= */
+  var DEADLINE_RX = /\bby\s+(mon|tues?|wed(nes)?|thur?s?|fri|satur?|sun)(day)?\b|\bdue\b|\bdeadline\b|\bhearing\b/i;
+  var cur = null; /* the capture being dressed */
+
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('on');
+    setTimeout(function () { t.classList.remove('on'); }, 2200);
+  }
+
+  $('trapForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    if (cur) return; /* already caught — Stage A is frozen */
+    var title = $('fTitle').value.trim();
+    var raw = $('fRaw').value.trim();
+    if (!title) { $('fTitle').focus(); toast('Name it — that’s the only must.'); return; }
+    if (!raw) { $('fRaw').focus(); toast('Dump it raw — even three words.'); return; }
+
+    var s = fpLoad(), now = new Date();
+    /* R-### continues the YTD sequence: max(registry base, local R-### max) + 1 —
+       robust after export-reconcile (synced rows are inside baseYTD already) */
+    var rMax = 0;
+    s.captures.forEach(function (c) {
+      var m = /^R-(\d+)$/i.exec(String(c.id || ''));
+      if (m) rMax = Math.max(rMax, parseInt(m[1], 10));
+    });
+    var id = (baseYTD == null)
+      ? 'FP-' + now.getTime() /* registry unreachable — provisional id, renumbered at export reconcile */
+      : 'R-' + (Math.max(baseYTD, rMax) + 1);
+    var cap = {
+      id: id,
+      day_no: dayNo(now),
+      captured_at: now.toISOString(),
+      tz: (function () { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) { return ''; } })(),
+      channel: 'app',
+      caller: ch ? ch.name : 'guest',
+      title: title,
+      raw_text: raw, /* IMMUTABLE — downstream writes alongside, never over */
+      enrich: { thesis: '', bar_stool: '', cliche: '' },
+      self_score: { humanity: 65, business: 65, fun: 65, wth: 65, total: 260 },
+      flags: { lean_canvas: false, swarm: null, deadline: DEADLINE_RX.test(raw) },
+      status: 'captured',
+      review: 'pending'
+    };
+    var sw = swarmCheck(cap, s.captures);
+    if (sw) cap.flags.swarm = sw.token;
+    cap._swarmCount = sw ? sw.count : 0;
+
+    s.captures.push(cap);
+    fpSave(s);
+    rqAppend({ type: 'butterfly-review', id: cap.id, title: cap.title, total: cap.self_score.total, at: cap.captured_at });
+    cur = cap;
+
+    /* word-count-only acknowledgment (v4.0 canon) */
+    var words = raw.split(/\s+/).length;
+    toast('🪤 CAPTURED (' + words + ' word' + (words === 1 ? '' : 's') + ').');
+
+    /* freeze the trap — verbatim is verbatim */
+    $('fTitle').readOnly = true;
+    $('fRaw').readOnly = true;
+    $('stageA').classList.add('frozen');
+    $('rawNote').innerHTML = '<b>Caught.</b> Stored verbatim and immutable — enrichment below writes alongside, never over.';
+    $('btnCaught').hidden = true;
+
+    renderCounters(); /* Today # and YTD # bump immediately */
+    buildSliders();
+    renderGrade();
+    $('afterCatch').hidden = false;
+    $('afterCatch').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  /* ======================= Stage B — optional enrich ======================= */
+  var DIMS = [
+    ['humanity', 'Humanity'], ['business', 'Business'], ['fun', 'Fun'], ['wth', 'WTH']
+  ];
+  function buildSliders() {
+    $('sliders').innerHTML = DIMS.map(function (d) {
+      return '<div class="srow">' +
+        '<div class="stop"><label for="sl-' + d[0] + '">' + d[1] + '</label><span class="v" id="sv-' + d[0] + '">65</span></div>' +
+        '<input type="range" id="sl-' + d[0] + '" min="1" max="100" step="5" value="65"' +
+          ' aria-label="' + d[1] + ' self-score out of 100">' +
+        '<div class="rail" aria-hidden="true">' +
+          '<span style="left:70%">70 Good</span><span style="left:85%">85 Great</span><span style="left:95%">95+ Rare</span>' +
+        '</div></div>';
+    }).join('');
+    DIMS.forEach(function (d) {
+      $('sl-' + d[0]).addEventListener('input', function () {
+        $('sv-' + d[0]).textContent = this.value;
+        saveScore();
+      });
+    });
+  }
+  function saveScore() {
+    if (!cur) return;
+    var s = fpLoad(), total = 0, score = {};
+    DIMS.forEach(function (d) { score[d[0]] = Number($('sl-' + d[0]).value); total += score[d[0]]; });
+    score.total = total;
+    for (var i = 0; i < s.captures.length; i++) {
+      if (s.captures[i].id === cur.id) {
+        s.captures[i].self_score = score;
+        s.captures[i].flags.lean_canvas = score.business >= 70;
+        cur = s.captures[i];
+        break;
+      }
+    }
+    fpSave(s);
+    rqUpdateTotal(cur.id, total);
+    $('tot400').textContent = total + '/400';
+    renderGrade();
+  }
+  function saveEnrich() {
+    if (!cur) return;
+    var s = fpLoad();
+    for (var i = 0; i < s.captures.length; i++) {
+      if (s.captures[i].id === cur.id) {
+        s.captures[i].enrich = {
+          thesis: $('eThesis').value.trim(),
+          bar_stool: $('eBar').value.trim(),
+          cliche: $('eCliche').value.trim()
+        };
+        cur = s.captures[i];
+        break;
+      }
+    }
+    fpSave(s);
+  }
+  ['eThesis', 'eBar', 'eCliche'].forEach(function (id) {
+    $(id).addEventListener('change', saveEnrich);
+    $(id).addEventListener('blur', saveEnrich);
+  });
+
+  function setEnrich(open) {
+    $('enrich').classList.toggle('open', open);
+    $('btnEnrich').setAttribute('aria-expanded', open ? 'true' : 'false');
+    $('scrim').classList.toggle('on', open);
+  }
+  $('btnEnrich').addEventListener('click', function () { setEnrich(!$('enrich').classList.contains('open')); });
+  $('btnSheetClose').addEventListener('click', function () { setEnrich(false); });
+  $('scrim').addEventListener('click', function () { setEnrich(false); });
+
+  /* ======================= instant-grade card — earned-only chips, graceful absence ======================= */
+  function renderGrade() {
+    if (!cur) return;
+    var chips = [];
+    chips.push('<span class="pill gold">' + cur.self_score.total + '/400 · self-scored</span>');
+    if (cur.flags.lean_canvas)
+      chips.push('<span class="pill warn">🏷️ LEAN CANVAS FLAG — Business ≥ 70</span>');
+    if (cur.flags.swarm)
+      chips.push('<span class="pill info">🐝 SWARM SIGNAL — ' + (cur._swarmCount || 3) +
+        ' butterflies circling “' + esc(cur.flags.swarm) + '” this week. Your unconscious is circling this.</span>');
+    if (cur.flags.deadline)
+      chips.push('<span class="pill danger">⏱️ DEADLINE — time words in the raw text</span>');
+    chips.push('<span class="pill">📋 REVIEW QUEUE — flagged for Tim</span>'); /* always — every capture */
+    $('gradeChips').innerHTML = chips.join(' ');
+  }
+
+  /* ======================= done pair ======================= */
+  function resetTrap() {
+    cur = null;
+    $('fTitle').value = ''; $('fRaw').value = '';
+    $('fTitle').readOnly = false; $('fRaw').readOnly = false;
+    $('stageA').classList.remove('frozen');
+    $('rawNote').innerHTML = 'Your raw words are stored <b>immutable</b> — processing writes alongside them, never over them.';
+    $('btnCaught').hidden = false;
+    $('eThesis').value = ''; $('eBar').value = ''; $('eCliche').value = '';
+    setEnrich(false);
+    $('afterCatch').hidden = true;
+    $('fTitle').focus();
+  }
+  $('btnAnother').addEventListener('click', resetTrap);
+  $('btnDoneCard').addEventListener('click', function () {
+    location.href = fpLoad().settings.libraryAfterCatch ? 'library.html' : nextURL();
+  });
+})();
+</script>
+</body>
+</html>

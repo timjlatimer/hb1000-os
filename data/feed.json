@@ -1,0 +1,100 @@
+{
+  "cards": [
+    {
+      "ts": "model",
+      "title": "The HB1000 OS — the whole model",
+      "image": "assets/img/os-view-model-full.png",
+      "caption": "A diamond split by the equator: vision above, HB1000 (human + AI) at the centre, service rings + Dingo ‘buildings’ below."
+    },
+    {
+      "ts": "card",
+      "title": "Inside a Dingo Card",
+      "image": "assets/img/os-view-card.png",
+      "caption": "A 5×5 of 25 activity squares, PTK at the centre, a ticker-tape of red/yellow/green KPIs, 80/20 human-vs-agent."
+    },
+    {
+      "ts": "cashout",
+      "title": "Cash-Out Assignment — before → after",
+      "image": "assets/img/showme-cashout.png",
+      "caption": "Manager 100% by hand → the agent does ~80%, finds the air, the manager approves and goes home."
+    },
+    {
+      "ts": "strategy",
+      "title": "Where to point the build — gated by human adoption",
+      "image": "assets/img/board-strategy.png",
+      "caption": "Build is free; human adoption is the only scarce resource. Build many lanes in parallel; protect the prime (Pawn Princess)."
+    },
+    {
+      "ts": "decided",
+      "title": "DECIDED — what we build next, in parallel",
+      "image": "assets/img/board-lanes2.png",
+      "caption": "Protect the cash-out prime. Build-ahead now (zero load): Dingo Card layer + Stage-2 engine + rails. Next adoption = Stage-2 with Samantha."
+    },
+    {
+      "ts": "dingo-live",
+      "title": "BUILT — the Dingo Card, live & data-driven",
+      "image": "assets/img/showme-dingo-card.png",
+      "caption": "PP-01's card rendered from sample-card.json: vivid vision + WIIFM up top, ticker-tape KPIs, 5×5 with PTK at the heart, 80/20 roll-up = Caller 32% · AI 68%. Drop in real data and any store's card lights up."
+    },
+    {
+      "ts": "stage2-live",
+      "title": "BUILT — Stage-2 catches what the drawer can't",
+      "image": "assets/img/showme-stage2.png",
+      "caption": "Next-day bank reconciliation (Samantha's lane): clean deposit RECONCILES; a $40 that balanced last night but never hit the bank ESCALATES; a duplicated card line flags a $240 over-settlement. Tests passing on the real venv. Read-only — never moves money."
+    },
+    {
+      "ts": "d2d-card",
+      "title": "NEW LANE — Door-to-Door Occupancy Drive",
+      "image": "assets/img/showme-door2door.png",
+      "caption": "Same engine, new JSON: PTK = '85% occupancy today'. Agent does the lists/scripts/follow-up/reporting; the rep knocks & closes (roll-up auto-shifts to Caller 39% · AI 61%). Early draft — superseded by the Seba Hub Occupancy Engine card."
+    },
+    {
+      "ts": "seba-hub",
+      "title": "SEBA HUB — the Occupancy Engine (lanes + intent engine in one card)",
+      "image": "assets/img/showme-seba-hub.png",
+      "caption": "Marries both asks: the TOP 12 squares are real occupancy lanes we already own (wedding venue, midweek gap, RV/cabins/geodomes/bunkies/insta-cabins, summer camp ≤500, driving range, propane = 0 local competitors, treasure hunt, festival ≤5,000 tix). The BOTTOM squares are the Intent Harvesting Engine that fills them: SENSE → SCORE → ROUTE (Golden Age fleet) → DRAFT → human approve → CONNECT → OFFER → OUTCOME → LEARN + Trust ledger. PTK = no empty night, no empty seat. Caller TBD; Casey/Murphy/Thomas scope the lanes."
+    },
+    {
+      "ts": "golden-fleet",
+      "title": "THE GOLDEN AGE FLEET — your routing library (from ChatGPT, now in the repo)",
+      "image": "assets/img/showme-golden-fleet.webp",
+      "caption": "All 10 trust archetypes the engine routes to: Fuller Brush (give first), Avon (neighbor trust), Route Man (be there at the moment of need), Tupperware (community proof), Kirby (proof/demo), Electrolux (professional calm), Family Future (protect tomorrow), Southwestern (territory math), Mary Kay (recognition/dignity), Network Builder (law of 250). Each card carries its shadow side / abuses + the existential risk if AI gets it wrong — the conscience layer."
+    },
+    {
+      "ts": "seba-console",
+      "title": "TWO PARALLEL TRACKS — midweek groups + weekend individuals, one engine",
+      "image": "assets/img/showme-seba-console.png",
+      "caption": "85% needs BOTH (weekends are only 2 of 7 nights), season is 3 months / day 8 → run both now. TRACK A: group ORGANIZERS (gold ★, 'fills 10–50 beds') → midweek blocks, rescue-register draft, needs the human close. TRACK B: INDIVIDUALS → weekend nights, mostly SELF-SERVE (draft hands them a booking link, ~0 human time). The human closer's attention is value-sorted (organizers first); individuals self-close, so running both isn't double the work. Channel gate green-only; red_individual_private = content only, no override. Draft-only throughout."
+    },
+    {
+      "ts": "estate-audit",
+      "title": "JUNE 10 - THE ESTATE AUDIT - every vault of Tim's IP, accounted for",
+      "html": "<div style=\"font-size:16px;line-height:1.9\"><b style=\"color:#e8b54d\">Where Tim's life work lives, verified one by one:</b><br>&#9989; This computer + OneDrive (15k+ files)<br>&#9989; GitHub - 50+ repos incl. ChatGPT & Claude archives<br>&#9989; Cowork + Claude Code sessions (every transcript searchable)<br>&#9989; Gmail + Outlook (mailbox readable back to 2025)<br>&#9989; Google Drive (connected, verified)<br>&#128260; Manus Knowledge Library - push to GitHub instructed<br>&#128260; Grok / Gemini / Replit (Aug-Sep 2025) - Fidel rescue email drafted<br>&#128260; iPhone camera roll 2001-2026 - importing the 2026 gap right now<br><br><b style=\"color:#36c2b4\">Nothing is lost. Everything has an address.</b></div>",
+      "caption": "One session, every vault tested: disk, GitHub, Cowork, Claude Code, Gmail, Outlook, Drive, ChatGPT, Manus, the phone. What wasn't already captured now has a named rescue in flight."
+    },
+    {
+      "ts": "outlook-rescue",
+      "title": "RESCUED - the 'lost' era (Jul-Dec 2025) found in Tim's Outlook",
+      "html": "<div style=\"font-size:16px;line-height:1.9\">~300 emails read &#8594; <b style=\"color:#e8b54d\">63 visionary emails identified</b> &#8594; 7 concept files saved to <b>Outlook-Rescue-2025\\</b><br><br><b style=\"color:#e8b54d\">The genealogy (nothing died - it evolved):</b><br>Seacan Founders Village (Aug) &#8594; Big Mama's Genius/Data Village (Sept) &#8594; CRAgent + Give Like a Billionaire (Oct) &#8594; team handoff (Nov) &#8594; the live Maven Portal (Dec)<br><br>Crown jewel: the <b>Big Mama Master Build Prompt</b> - full product spec rescued from a PDF attachment.<br><span style=\"color:#e0556b\">&#9888; One live OpenAI API key found in an Oct 7 email - Tim to revoke + delete.</span></div>",
+      "caption": "Tim anxiety-saved his concepts into email attachments through fall 2025, then feared they were gone. An agent read the era, split visionary IP from day-to-day, and filed it: INVENTORY.md (63 finds, click-to-open), concepts\\ (full rescued text), ATTACHMENTS-TODO.md (20+ files to download)."
+    },
+    {
+      "ts": "iphone-import",
+      "title": "LIVE NOW - iPhone camera roll import (Dec 2025 - Jun 2026)",
+      "html": "<div style=\"font-size:16px;line-height:1.9\">The iPhone is plugged in and the full camera roll is visible: <b style=\"color:#e8b54d\">every month from 2001 to June 2026</b>.<br><br>The OneDrive archive already held everything through Dec 21, 2025 - so the import is filling the gap: <b>23 month-folders, Dec 2025 &#8594; Jun 2026</b>, landing in <b>OneDrive\\Pictures\\iPhone-Import-2026-06-10</b>.<br><br>Progress: Dec (682) &#10003; - Jan (551) &#10003; - Feb (2,636) &#10003; - March onward in flight...<br><br><b style=\"color:#36c2b4\">Next: cross-reference Tim's concept-preserving screenshots against the rescued email concepts, by date.</b></div>",
+      "caption": "Tim took screenshots to preserve ideas the way he emailed himself concepts - same anxiety, same gold. Once the photos land, each screenshot gets matched to its email-era concept so the visual + written record of every idea lives together."
+    },
+    {
+      "ts": "butterfly-harvest",
+      "title": "LIVE NOW - the Cloud Butterfly hunt: harvest DONE, registry building",
+      "html": "<div style=\"font-size:16px;line-height:1.9\"><b style=\"color:#e8b54d\">The mystery solved:</b> the \"30\" Tim saw = the Maven Innovation Index - butterflies that GRADUATED. The raw population: <b>YTD 119 by Jan 23 alone</b> - Tim's ~250 estimate is on target.<br><br><b style=\"color:#e8b54d\">Harvested from every vault:</b><br>&#9989; Outlook: ~80 butterflies verbatim (+ the scoring system: Humanity/Business/Fun/WTH /400, THESIS + BAR STOOL)<br>&#9989; Disk: ~75 + the January registry pages<br>&#9989; GitHub: 65 files - the MASTER INDEX, daily DCB logs Dec 17-Apr 6, January Days 1-15 archives, Protocol v4.0, 17 Manus sessions<br><br>&#128296; <b style=\"color:#36c2b4\">Registry builder running now</b> - dedupe, restore Tim's numbering, score format, \"resume the practice\" template.<br><br>&#128247; Meanwhile: iPhone import at <b>5,426 files</b> - March (2,055) copying...</div>",
+      "caption": "Origin text found - The Seance (Verona, Feb 23, 3:33 AM): 'It''s like having a seance with your unconscious... Hunting we will go!' Top score so far: SEBA Influencer Bootcamp, 365/400."
+    },
+    {
+      "ts": "hb1000-os-build",
+      "title": "THE BIG ONE - the HB1000 Operating System is being built RIGHT NOW",
+      "html": "<div style=\"font-size:16px;line-height:1.9\"><b style=\"color:#e8b54d\">Phase 1 COMPLETE:</b> 18 agents swept the entire estate - 19 topic blueprints synthesized into one decisive BLUEPRINT.md. The canonical model is locked: the diamond, the equator, the half-gold/half-blue HB1000 marriage sphere, the three service rings, Dingo City at the base.<br><br><b style=\"color:#36c2b4\">Phase 2 BUILDING NOW:</b> 1 foundation builder + 12 parallel page-builders + 1 integrator constructing a 14-page web app:<br>The Model &#183; Dingo Card <b>2D &#8646; 3D</b> with the gold PTK heart &#183; Dingo City &#183; Command Deck (scale to 100) &#183; The Nursery &#183; North Star Builder &#183; Do Before I Die &#183; PTK dual ledger &#183; Culture Chaser + 25 Timmyisms &#183; Agent Fleet &#183; The Doctrine &#183; Learning Loop V13.0 &#183; Build Your Own Life &#183; the live Feed.<br><br><b style=\"color:#e8b54d\">Seeded 100% real:</b> ~99 actual initiatives, 40 scored Cloud Butterflies, the 3 live Dingo cards, both AI Research briefings. No lorem ipsum anywhere.</div>",
+      "caption": "The soul rule, printed in the app chrome: 'The Dingo Card IS the operating system. Everything else is a field on it, a feed into it, or a score from it.' - 'Ship it ugly. Use it daily. Success = the card was used yesterday.'"
+    }
+  ]
+}

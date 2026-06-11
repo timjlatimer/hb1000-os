@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dingo Card — 2D ⇄ 3D · The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🃏</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ---------- page-specific (card.html) ---------- */
+.topline{display:flex; justify-content:space-between; align-items:flex-end; gap:14px; row-gap:9px; flex-wrap:wrap; margin-bottom:8px}
+.topline .sub{font-size:12.5px; color:var(--muted); max-width:640px; line-height:1.5}
+.pickwrap{text-align:right}
+.picker{display:flex; gap:6px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
+.viewtabs{display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:var(--panel-2)}
+.viewtabs button{background:transparent; border:0; color:var(--muted); padding:8px 22px; font:700 13px 'Inter',"Segoe UI",sans-serif; cursor:pointer}
+.viewtabs button.on{background:rgba(232,181,77,.14); color:var(--gold)}
+.viewtabs button:focus-visible{outline:2px solid var(--gold)}
+.viewbar{display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:14px 0 12px}
+.viewbar .hint{font-size:11.5px; color:var(--soft)}
+.notice{margin:10px 0; padding:9px 13px; border:1px solid rgba(232,194,77,.5); background:rgba(232,194,77,.07);
+        border-radius:var(--radius); font-size:12.5px; color:var(--yellow)}
+.notice.err{border-color:rgba(224,85,107,.5); background:rgba(224,85,107,.07); color:var(--red)}
+
+/* 2D card — faithful port of dingo/card.html on theme tokens */
+.cardhead{display:flex; justify-content:space-between; align-items:flex-start; gap:22px; margin:14px 2px 12px}
+/* persona medallion — card-keyed lookup (PERSONA_ART); cards without art skip gracefully */
+.medallion{flex:0 0 86px; width:86px; height:86px; border-radius:50%; object-fit:cover;
+  border:1.5px solid rgba(232,181,77,.6); box-shadow:0 0 16px rgba(232,181,77,.28), 0 4px 14px rgba(0,0,0,.45)}
+.medallion[hidden]{display:none}
+.vv{font-size:13px; color:var(--muted); line-height:1.6; min-width:0}
+.vv .big{color:var(--ink); font-size:17.5px; font-weight:800; letter-spacing:-.01em; display:flex; gap:9px; align-items:center; flex-wrap:wrap}
+.vv b{color:var(--gold)}
+.vv .wiifm{color:var(--teal)}
+.vv .caller{color:var(--soft)}
+.meter{min-width:236px; text-align:right; font-size:11.5px; color:var(--muted); flex:0 0 auto}
+.meter b{color:#cdd8e2}
+.meter .rbar{height:9px; border-radius:5px; background:#16222e; margin-top:5px; overflow:hidden}
+.meter .rbar>i{display:block; height:100%}
+.meter .cov{display:none; color:var(--red); font-size:10.5px; margin-top:4px; font-weight:700}
+.meter.alarm .cov{display:block}
+.cardfoot{margin-top:11px; padding-top:9px; border-top:1px dashed var(--line); font-size:12px; color:var(--soft)}
+.cardfoot b{color:var(--muted)}
+.grid5.flash{outline:2px solid var(--gold); outline-offset:4px; border-radius:6px}
+.sq:focus-visible{outline:2px solid var(--gold)}
+.sq.ptk .big{font-weight:900; color:var(--gold); font-size:13px; letter-spacing:.04em}
+.sq.hot{border-color:var(--gold); box-shadow:0 0 12px rgba(232,181,77,.35)}
+
+/* PTK centre square — grade (prominent, top-right) · age (small) · mosaic (1 row)
+   All three computed at render from ptk-seed.json — never stored, never asserted. */
+.sq.ptk .grade{position:absolute; top:5px; right:9px; font-size:20px; font-weight:900; line-height:1; text-align:right; text-shadow:0 1px 8px rgba(0,0,0,.45)}
+.sq.ptk .grade .gr-of{display:block; font-size:8px; font-weight:700; color:#cdb27a; letter-spacing:.04em; margin-top:1px}
+.ptk-mosaic{display:flex; gap:3px; justify-content:center; align-items:center; margin:5px auto 2px; width:max-content; max-width:100%}
+.ptk-mosaic i{width:7px; height:7px; border-radius:50%; flex:0 0 auto}
+.ptk-mosaic i.k{background:var(--green); box-shadow:0 0 4px rgba(70,198,109,.8)}
+.ptk-mosaic i.b{background:var(--red); box-shadow:0 0 4px rgba(224,85,107,.8)}
+.ptk-mosaic i.p{background:var(--yellow); opacity:.8}
+.ptk-mosaic i.od{background:var(--yellow); box-shadow:0 0 0 1.5px var(--red), 0 0 6px rgba(224,85,107,.8)}
+.ptk-mosaic .more{font-size:8.5px; color:#cdb27a; font-weight:700}
+.ptk-meta{font-size:9.5px; color:#cdb27a; text-align:center; margin-top:1px; letter-spacing:.02em}
+
+/* 3D stage */
+#stage3d{position:relative; height:560px; border:1px solid var(--line); border-radius:var(--radius-lg); overflow:hidden; background:#05080c}
+#stage3d canvas{display:block}
+.hint3d{position:absolute; left:12px; bottom:10px; z-index:5; font-size:11.5px; color:var(--muted);
+        background:rgba(7,11,16,.78); padding:5px 12px; border-radius:999px; border:1px solid var(--line); pointer-events:none}
+.legend3d{position:absolute; right:12px; top:10px; z-index:5; font-size:11px; color:var(--muted);
+          background:rgba(7,11,16,.78); padding:6px 12px; border-radius:var(--radius); border:1px solid var(--line); pointer-events:none}
+.legend3d .dot{width:8px; height:8px; margin-right:4px}
+#notice3d{position:absolute; inset:auto 12px 46px 12px; z-index:6; display:none}
+#notice3d.show{display:block}
+
+/* drawer internals — backdrop fades, drawer eases (square → drawer feels physical) */
+#backdrop{position:fixed; inset:0; z-index:140; background:rgba(2,5,9,.45); opacity:0; pointer-events:none; transition:opacity .22s ease}
+#backdrop.show{opacity:1; pointer-events:auto}
+.drawer{transition:right .26s cubic-bezier(.2,.75,.25,1)}
+.ticker:focus-within .ticker-track{animation-play-state:paused} /* keyboard users get the same pause-on-hover */
+.drawer h3{margin:4px 0 8px}
+.drawer .sec-h{margin:18px 0 7px}
+.drawer input[type=text],.drawer textarea,.drawer input[type=number]{
+  width:100%; background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
+  color:var(--ink); padding:7px 10px; font:500 13px 'Inter',"Segoe UI",sans-serif}
+.drawer textarea{min-height:62px; resize:vertical}
+.drawer input[type=range]{width:100%; accent-color:var(--gold)}
+.budget3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+.loopline{font-size:12px; color:var(--muted); background:var(--panel-2); border:1px dashed var(--line);
+          border-radius:var(--radius); padding:8px 11px; line-height:1.6}
+.loopline b{color:var(--gold)}
+.wo{background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:10px 12px; margin:8px 0; font-size:12.5px}
+.wo .woid{font-family:ui-monospace,Consolas,monospace; font-size:11.5px; color:var(--cyan); font-weight:700}
+.wo .audit{font-size:10.5px; color:var(--soft); margin-top:6px; border-top:1px dashed var(--line); padding-top:5px}
+.wo .audit div{margin:1px 0}
+.fieldnote{font-size:10.5px; color:var(--soft); margin:3px 0 0}
+.seednote{font-size:11px; color:var(--soft); margin-top:4px}
+.seednote a{cursor:pointer}
+@media (max-width:760px){
+  .cardhead{flex-direction:column; gap:12px; margin:12px 0 10px}
+  .medallion{width:64px; height:64px; flex-basis:64px}
+  .meter{text-align:left; min-width:0; width:100%}
+  #stage3d{height:420px}
+  .topline{flex-direction:column; align-items:flex-start}
+  .pickwrap{text-align:left}
+  .picker{justify-content:flex-start}
+}
+@media (max-width:480px){
+  .topline h1{font-size:23px}
+  .topline .sub{font-size:11.5px}
+  .vv .big{font-size:15.5px}
+  .viewtabs button{padding:7px 15px; font-size:12.5px}
+  .viewbar{margin:10px 0}
+}
+@media (prefers-reduced-motion:reduce){ #backdrop{transition:none} .drawer{transition:none} }
+</style>
+</head>
+<body>
+<main>
+
+  <div class="topline">
+    <div>
+      <h1>Dingo <b>Card</b></h1>
+      <div class="sub">5×5 · 25 activity squares · PTK at the heart · one Dingo Caller — "one neck to choke" · 80/20 computed, never asserted</div>
+    </div>
+    <div class="pickwrap">
+      <div class="picker" id="picker"></div>
+      <div id="usedPill" style="margin-top:7px"></div>
+    </div>
+  </div>
+
+  <div class="viewbar">
+    <div class="viewtabs" role="tablist" aria-label="Card view">
+      <button id="tab2d" class="on" role="tab" aria-selected="true">2D Card</button>
+      <button id="tab3d" role="tab" aria-selected="false">3D Building</button>
+    </div>
+    <span class="hint" id="viewHint">The flat working view — the on-ramp. Flip to 3D to see this card as a Dingo City building.</span>
+  </div>
+
+  <div id="pageNotice"></div>
+
+  <!-- ============================== 2D VIEW ============================== -->
+  <section id="view2d" class="panel" style="padding:16px 18px">
+    <div class="ticker" id="ticker" aria-label="Live ticker-tape KPIs"><div class="ticker-track" id="tickerTrack"></div></div>
+
+    <div class="cardhead">
+      <!-- IMG-02 (Phase-4 harvest, Tim-approved) — persona medallion slot; populated per-card from PERSONA_ART, hidden when a card has no art -->
+      <img class="medallion" id="medallion" hidden alt="">
+      <div class="vv" id="vv"></div>
+      <div class="meter" id="meter" aria-live="polite"></div>
+    </div>
+
+    <div class="grid5" id="grid"></div>
+
+    <div id="offRocks" style="margin-top:11px"></div>
+
+    <div class="cardfoot"><b>Dingo Caller</b> — "one neck to choke" populates the squares &amp; approves · <b style="color:var(--gold)">20%</b> &nbsp;|&nbsp; <b>AI agent fleet</b> — does the work · <b style="color:var(--cyan)">80%</b></div>
+  </section>
+
+  <!-- ============================== 3D VIEW ============================== -->
+  <section id="view3d" hidden>
+    <div id="stage3d">
+      <div class="legend3d"><span class="dot g"></span>green &nbsp;<span class="dot y"></span>yellow &nbsp;<span class="dot r"></span>red &nbsp;·&nbsp; <span style="color:var(--gold)">gold = PTK</span> &nbsp;·&nbsp; banner = ticker-tape<br>
+      ground pipes = service lines (<span style="color:var(--teal)">SoT</span> · <span style="color:var(--blue)">Blue Seal</span> · <span style="color:var(--red)">S&amp;M</span>) — particle flow computed from this card: green+fast = healthy · red+slow = trouble · gold tint = Caller-heavy</div>
+      <div class="hint3d">Drag to Rotate · Scroll to Zoom · click a window → square drawer · gold centre window → PTK</div>
+      <div class="notice" id="notice3d"></div>
+    </div>
+    <div class="footnote" style="margin-top:8px">Each building is a standing Dingo card — 5 floors × 5 windows, window colour = square R/Y/G, the ticker-tape banner wraps between window-top and roofline. The ground pipes are Dingo City's marketing piping at building scale: particle speed, colour and stutter are computed from this card's ticker RYG mix and 80/20 roll-up (slider moves retint the flow live) — never asserted. The whole portfolio lives in <a href="city.html">Dingo City</a>.</div>
+  </section>
+
+  <div class="footnote" style="margin-top:18px" id="dataFootnote"></div>
+
+</main>
+
+<!-- drawer + backdrop -->
+<div id="backdrop"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-label="Dingo square detail"></aside>
+
+<script src="assets/shell.js"></script>
+<!-- Babel Bridge prism widget (PRISM CONTRACT): spectrum plain/barstool/timbit/boardroom/swiss
+     (picture reserved v2) · global voice key hb1000-voice · auto-attaches a ◇ icon to elements
+     carrying data-prism-id (resolved against data/spectra.json). No spectrum = no icon, so this
+     page degrades byte-for-byte gracefully until prism.js + spectra.json land. -->
+<script src="assets/prism.js"></script>
+
+<!-- Three.js 0.160.0 — vendored locally for MVP robustness (assets/vendor/), with the pinned unpkg
+     CDN as fallback. ES modules + importmap; loaded lazily on first flip to 3D. The "scopes" entry
+     lets the CDN fallback's OrbitControls resolve its bare 'three' import to the CDN build instead
+     of the (missing) local file. -->
+<script type="importmap">
+{ "imports": {
+    "three": "./assets/vendor/three.module.js",
+    "three/addons/": "./assets/vendor/addons/"
+  },
+  "scopes": {
+    "https://unpkg.com/": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" }
+  }
+}
+</script>
+<script type="module">
+window.__hb3d = (async () => {
+  try {
+    const THREE = await import('three');
+    const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+    return { THREE, OrbitControls };
+  } catch (e) {
+    /* vendored copy missing or blocked → same pinned 0.160.0 from the unpkg CDN */
+    const THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+    const { OrbitControls } = await import('https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js');
+    return { THREE, OrbitControls };
+  }
+})();
+window.__hb3d.catch(function(){ /* surfaced when the user flips to 3D */ });
+</script>
+
+<script>
+'use strict';
+Shell.init('card');
+
+/* =====================================================================
+   DINGO CARD — the core screen.
+   2D = faithful port of dingo/card.html (ticker, VV+WIIFM header,
+   5×5 grid, PTK gold centre at index 12, RYG dots, computed roll-up).
+   3D = the same JSON as a Dingo City building (Three.js 0.160.0).
+   Data law: loads the 3 real JSONs in data/cards/ unmodified, ?card= routed.
+   ===================================================================== */
+
+var $ = function(id){ return document.getElementById(id); };
+var esc = Shell.esc;
+var RYG = { green:'#46c66d', yellow:'#e8c24d', red:'#e0556b' };
+var RYGCLS = { green:'g', yellow:'y', red:'r' };
+
+var CARDS = [
+  { file:'pawn-princess-pp01', name:'Pawn Princess PP-01', note:'the reference card' },
+  { file:'seba-hub-occupancy', name:'Seba Hub Occupancy Engine', note:'lanes + intent engine' },
+  { file:'door-to-door',       name:'Door-to-Door Drive', note:'early draft', superseded:true }
+];
+
+var rawParam = new URLSearchParams(location.search).get('card') || 'pawn-princess-pp01';
+var cardFile = rawParam.replace(/\.json$/i,'').replace(/[^a-zA-Z0-9\-_]/g,'');
+var cardPath = 'data/cards/' + cardFile + '.json';
+
+/* ---- localStorage (human decisions persist; everything else recomputes) ---- */
+function loadLS(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)); return (v===null||v===undefined)?d:v; }catch(e){ return d; } }
+function saveLS(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+var LS_SLIDERS='hb1000-card-sliders', LS_ASSIGN='hb1000-card-assignees',
+    LS_WO='hb1000-workorders', LS_SEQ='hb1000-wo-seq', LS_USED='hb1000-card-used';
+var overrides = loadLS(LS_SLIDERS,{});
+var assignees = loadLS(LS_ASSIGN,{});
+var workorders = loadLS(LS_WO,{});
+
+/* ---- file:// fallback — embedded byte-copies of the clean seed cards.
+   Used ONLY when fetch is blocked (file:// CORS). door-to-door.json is NOT
+   embedded (its seed text contains a legacy name kept out of page source);
+   it needs HTTP. ---- */
+var FALLBACK_CARDS = {
+'pawn-princess-pp01': JSON.parse(`{
+  "store": "Pawn Princess — Store PP-01",
+  "caller": "Lauren (store manager)",
+  "vivid_vision": {
+    "purpose": "Dignified cash when life happens",
+    "bhag": "50 dignified stores in 5 years",
+    "values": ["Dignity", "Speed", "Transparency"]
+  },
+  "wiifm": "Run a balanced, trusted store — and get home on time.",
+  "ticker": [
+    {"k": "Cash", "v": "positive", "ryg": "green"},
+    {"k": "Noon SLA", "v": "✓", "ryg": "green"},
+    {"k": "Loans vs target", "v": "▼", "ryg": "yellow"},
+    {"k": "Lapsed loans", "v": "▲", "ryg": "red"},
+    {"k": "Reviews", "v": "4.8★", "ryg": "green"}
+  ],
+  "squares": [
+    {"id": "D1", "label": "Daily cash-out", "kpi": "balanced by close", "ryg": "green", "human": 20},
+    {"id": "D2", "label": "Noon reconciliation", "kpi": "by 12:00", "ryg": "green", "human": 20},
+    {"id": "D3", "label": "Pawn loans written", "kpi": "vs target", "ryg": "yellow", "human": 30},
+    {"id": "D4", "label": "Redemptions", "kpi": "rate", "ryg": "green", "human": 20},
+    {"id": "D5", "label": "Layaways", "kpi": "active", "ryg": "green", "human": 20},
+    {"id": "D6", "label": "Inventory aging", "kpi": "<90 days", "ryg": "yellow", "human": 40},
+    {"id": "D7", "label": "Lapsed loans", "kpi": "to forfeit", "ryg": "red", "human": 30},
+    {"id": "D8", "label": "Store presentation", "kpi": "clean & set", "ryg": "green", "human": 80},
+    {"id": "D9", "label": "Customer follow-up", "kpi": "calls done", "ryg": "yellow", "human": 20},
+    {"id": "D10", "label": "Staff schedule", "kpi": "covered", "ryg": "green", "human": 50},
+    {"id": "D11", "label": "Compliance log", "kpi": "police upload 24h", "ryg": "green", "human": 20},
+    {"id": "D12", "label": "Bank deposit", "kpi": "made & logged", "ryg": "green", "human": 60},
+    {"id": "PTK", "ptk": true},
+    {"id": "D14", "label": "Blue Seal give-back", "kpi": "hooked up", "ryg": "yellow", "human": 20},
+    {"id": "D15", "label": "Reviews", "kpi": "rating", "ryg": "green", "human": 20},
+    {"id": "D16", "label": "Safety checks", "kpi": "done", "ryg": "green", "human": 60},
+    {"id": "D17", "label": "Training", "kpi": "module", "ryg": "yellow", "human": 30},
+    {"id": "D18", "label": "Upsell / attach", "kpi": "rate", "ryg": "yellow", "human": 20},
+    {"id": "D19", "label": "Returns", "kpi": "handled", "ryg": "green", "human": 20},
+    {"id": "D20", "label": "Loss prevention", "kpi": "shrink", "ryg": "green", "human": 30},
+    {"id": "D21", "label": "Utilities", "kpi": "in budget", "ryg": "green", "human": 20},
+    {"id": "D22", "label": "Local outreach", "kpi": "events", "ryg": "yellow", "human": 40},
+    {"id": "D23", "label": "Supplies", "kpi": "stocked", "ryg": "green", "human": 50},
+    {"id": "D24", "label": "KPI review", "kpi": "weekly", "ryg": "green", "human": 20},
+    {"id": "D25", "label": "Month-end email", "kpi": "sent", "ryg": "yellow", "human": 20}
+  ]
+}`),
+'seba-hub-occupancy': JSON.parse(`{
+  "store": "Seba Hub — Occupancy Engine (every empty night is lost revenue)",
+  "caller": "Casey — one neck to choke (sales & marketing lead)",
+  "vivid_vision": {
+    "purpose": "Fill what we already have — no empty night, no empty seat",
+    "bhag": "Every weekend a wedding, every cabin full, every season alive at Seba Hub",
+    "values": ["Hospitality", "Stewardship", "Dignity"]
+  },
+  "wiifm": "Rep: warm intros to people already looking. Seba: perishable capacity stops leaking — empty nights become revenue.",
+  "ticker": [
+    {"k": "Weekday fill (Sun–Thu)", "v": "0%", "ryg": "red"},
+    {"k": "Weekend fill", "v": "~25%", "ryg": "red"},
+    {"k": "Perishable nights", "v": "leaking", "ryg": "red"},
+    {"k": "Propane competitors", "v": "0 local", "ryg": "green"},
+    {"k": "Caller", "v": "Casey", "ryg": "green"}
+  ],
+  "squares": [
+    {"id": "L1", "label": "Wedding venue", "kpi": "weekends ~25% → 100%", "ryg": "yellow", "human": 70},
+    {"id": "L2", "label": "Midweek events", "kpi": "0% Sun–Thu = the gap", "ryg": "red", "human": 60},
+    {"id": "L3", "label": "RV rental sites", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L4", "label": "Cabins (day-to-day)", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L5", "label": "Geodomes", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L6", "label": "Bunkie cabins", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L7", "label": "Insta-cabins", "kpi": "0% Sun–Thu", "ryg": "red", "human": 50},
+    {"id": "L8", "label": "Summer kids camp", "kpi": "up to 500", "ryg": "green", "human": 60},
+    {"id": "L9", "label": "Driving range", "kpi": "special events", "ryg": "yellow", "human": 60},
+    {"id": "L10", "label": "Propane fill", "kpi": "0 local competitors", "ryg": "green", "human": 80},
+    {"id": "L11", "label": "Treasure hunt", "kpi": "sell entries", "ryg": "yellow", "human": 40},
+    {"id": "L12", "label": "In-the-Woods festival", "kpi": "up to 5,000 tix", "ryg": "yellow", "human": 40},
+    {"id": "PTK", "ptk": true},
+    {"id": "E1", "label": "SENSE", "kpi": "scan all socials", "ryg": "green", "human": 15},
+    {"id": "E2", "label": "SCORE", "kpi": "confidence + sizzle", "ryg": "green", "human": 15},
+    {"id": "E3", "label": "ROUTE", "kpi": "Golden Age fleet", "ryg": "green", "human": 20},
+    {"id": "E4", "label": "DRAFT knock", "kpi": "draft-only", "ryg": "green", "human": 20},
+    {"id": "E5", "label": "HUMAN approve", "kpi": "Casey decides", "ryg": "green", "human": 90},
+    {"id": "E6", "label": "CONNECT", "kpi": "warm rep", "ryg": "green", "human": 80},
+    {"id": "E7", "label": "OFFER", "kpi": "book / reserve / ticket", "ryg": "green", "human": 60},
+    {"id": "E8", "label": "OUTCOME log", "kpi": "filled or not", "ryg": "green", "human": 30},
+    {"id": "E9", "label": "LEARN", "kpi": "what fills", "ryg": "green", "human": 20},
+    {"id": "E10", "label": "Trust ledger", "kpi": "no creepiness", "ryg": "green", "human": 40},
+    {"id": "O1", "label": "Calendar fill %", "kpi": "wkdy 0% · wknd 25%", "ryg": "red", "human": 25},
+    {"id": "O2", "label": "Daily close-out", "kpi": "to Casey", "ryg": "green", "human": 30}
+  ]
+}`)
+};
+
+var card = null;
+var cellEls = [];          // grid cell elements by square index
+var openSqIndex = -1;      // drawer state
+var fileMode = false;
+
+/* =================== boot =================== */
+buildPicker();
+Shell.loadJSON(cardPath).then(function(c){ card = c; afterLoad(); })
+.catch(function(err){
+  if (location.protocol === 'file:' && FALLBACK_CARDS[cardFile]) {
+    card = FALLBACK_CARDS[cardFile]; fileMode = true; afterLoad();
+    pageNotice('file:// mode — the browser blocks fetch of local JSON, so this is the page’s embedded byte-copy of <code>' + esc(cardPath) + '</code>. Serve over HTTP (e.g. <code>python -m http.server</code>) to load the file itself.', false);
+  } else if (location.protocol === 'file:') {
+    pageNotice('file:// mode — <code>' + esc(cardPath) + '</code> can’t be fetched and has no embedded copy. Serve the app over HTTP (e.g. <code>python -m http.server</code> in <code>hb1000-os/app/</code>) or pick another card above.', true);
+  } else {
+    pageNotice('Could not load <code>' + esc(cardPath) + '</code> — ' + esc(err.message) + '. Pick a card above.', true);
+  }
+});
+
+/* PTK seed — loaded in parallel; the gold centre square re-renders when it lands */
+var ptkSeed = null;
+Shell.loadJSON('data/ptk-seed.json').then(function(s){ ptkSeed = s; if (card) renderGrid(); }).catch(function(){});
+
+function afterLoad(){
+  renderAll();
+  acceptanceHook();
+  touchUsage();
+  renderUsedPill();
+  /* pre-warm the 3D scene in idle time so the 2D ⇄ 3D flip feels instant —
+     the module import already started at page load; this just builds the scene
+     early (animation loop stays off until the user actually flips). */
+  (window.requestIdleCallback || function(f){ setTimeout(f, 600); })(prewarm3D);
+}
+
+function prewarm3D(){
+  if (three.built || !window.__hb3d || !webglOK()) return;
+  window.__hb3d.then(function(mod){
+    if (!three.built && card) { build3D(mod.THREE, mod.OrbitControls); three.built = true; }
+  }).catch(function(){ /* surfaced by ensure3D when the user flips */ });
+}
+
+function pageNotice(html, isErr){
+  var d = document.createElement('div');
+  d.className = 'notice' + (isErr ? ' err' : '');
+  d.innerHTML = html;
+  $('pageNotice').appendChild(d);
+}
+
+/* =================== card picker =================== */
+function buildPicker(){
+  $('picker').innerHTML = CARDS.map(function(c){
+    var on = c.file === cardFile ? ' on' : '';
+    var badge = c.superseded ? ' <span class="badge-superseded">superseded</span>' : '';
+    return '<a class="chip' + on + '" href="card.html?card=' + esc(c.file) + '" title="' + esc(c.note) + '">' + esc(c.name) + badge + '</a>';
+  }).join('');
+}
+
+/* =================== shared computations (never asserted) =================== */
+function ovKey(sq){ return cardFile + ':' + sq.id; }
+function humanOf(sq){
+  var o = overrides[ovKey(sq)];
+  var v = (o === undefined || o === null) ? (sq.human === undefined ? 20 : sq.human) : o;
+  return Math.max(0, Math.min(100, Number(v)));
+}
+function nonPTK(){ return card.squares.filter(function(s){ return !s.ptk; }); }
+function rollup(){
+  var sqs = nonPTK();
+  if (!sqs.length) return 20;
+  return Math.round(sqs.reduce(function(a,s){ return a + humanOf(s); }, 0) / sqs.length);
+}
+
+/* =================== validation (header is mandatory data) =================== */
+function validatePills(){
+  var vv = card.vivid_vision || {};
+  var fails = [];
+  var purposeWords = String(vv.purpose||'').trim().split(/\s+/).filter(function(w){ return /[A-Za-z0-9]/.test(w); }).length;
+  if (!vv.purpose) fails.push('purpose missing');
+  else if (purposeWords > 8) fails.push('purpose ' + purposeWords + ' words (max 8)');
+  if (!vv.bhag) fails.push('BHAG missing');
+  if (!(vv.values && vv.values.length >= 1)) fails.push('needs ≥1 core value');
+  if (!card.wiifm) fails.push('WIIFM missing');
+  var tbd = /^TBD/i.test(String(card.caller||'').trim());
+  if (!card.caller) fails.push('no Caller');
+  var html = '';
+  if (tbd) html += Shell.pill('TBD — assign one Dingo Caller', 'danger') + ' ';
+  if (fails.length) html += Shell.pill('incomplete: ' + fails.join(' · '), 'warn');
+  else if (!tbd) html += Shell.pill('card complete — purpose ≤8 ✓ · BHAG ✓ · values ✓ · WIIFM ✓ · Caller ✓', 'gold');
+  // structural sanity — computed, surfaced, never silently fixed
+  var ptkIdx = card.squares.findIndex(function(s){ return s.ptk; });
+  if (card.squares.length !== 25) html += ' ' + Shell.pill(card.squares.length + ' squares (expected 25)', 'warn');
+  if (ptkIdx !== 12) html += ' ' + Shell.pill('PTK at index ' + ptkIdx + ' (canon: 12)', 'warn');
+  /* legacy-name detector — regex assembled at runtime so the forbidden string never appears in page source */
+  if (new RegExp('SI' + 'BA').test(JSON.stringify(card))) html += ' ' + Shell.pill('seed text uses a legacy site name — canonical vocabulary: Seba', 'warn');
+  if (cardFile === 'door-to-door') html += ' <a class="pill info" href="card.html?card=seba-hub-occupancy">superseded by the Seba Hub Occupancy Engine →</a>';
+  return html;
+}
+
+/* =================== 2D render =================== */
+function renderAll(){
+  renderTicker();
+  renderMedallion();
+  renderHead();
+  renderGrid();
+  renderOffRocks();
+  $('dataFootnote').innerHTML =
+    'Real seed data: <code>data/cards/' + esc(cardFile) + '.json</code> (byte-identical copy of the <code>dingo/</code> original). ' +
+    'Slider overrides, assignees and work-order drafts live only in this browser (localStorage) — nothing sends, nothing writes back to the JSON. ' +
+    'The PEARL Diamond external face stays frozen at <a href="https://learning-loop.manus.space" target="_blank" rel="noopener">learning-loop.manus.space</a>.';
+}
+
+function renderTicker(){
+  var chips = card.ticker.map(function(t, ix){
+    return '<span class="tk" data-ix="' + ix + '" role="button" tabindex="0" title="open the deeper numbers — jump to the matching square">' +
+      '<span class="dot ' + (RYGCLS[t.ryg]||'grey') + '"></span>' +
+      '<span class="k">' + esc(t.k) + '</span> <span class="v">' + esc(t.v) + '</span></span>';
+  }).join('');
+  chips += '<span class="tk" style="color:var(--soft);cursor:default">— live ticker-tape KPIs —</span>';
+  chips += '<span class="tk" style="color:var(--soft);cursor:default" title="design slot only — the Caller’s passcode-protected personal paycheck layer (Phase 2). “Give yourself a raise — and SEE it.”">🔐 personal WIIFM layer · passcode · design slot</span>';
+  var track = $('tickerTrack');
+  track.innerHTML = chips;
+  track.addEventListener('click', tickerClick);
+  track.addEventListener('keydown', function(e){ if (e.key === 'Enter') tickerClick(e); });
+}
+
+function tickerClick(e){
+  var tk = e.target.closest('.tk');
+  if (!tk || tk.dataset.ix === undefined) return;
+  var t = card.ticker[Number(tk.dataset.ix)];
+  touchUsage();
+  var words = (t.k + ' ' + t.v).toLowerCase().split(/[^a-z0-9%★]+/).filter(function(w){ return w.length > 3; });
+  var hit = -1;
+  card.squares.forEach(function(s, i){
+    if (hit >= 0 || s.ptk) return;
+    var hay = (s.label + ' ' + (s.kpi || '')).toLowerCase();
+    if (words.some(function(w){ return hay.indexOf(w) >= 0; })) hit = i;
+  });
+  if (hit >= 0) {
+    openDrawer(hit);
+    cellEls[hit].scrollIntoView({ block:'center', behavior:'smooth' });
+    cellEls[hit].classList.add('hot');
+    setTimeout(function(){ cellEls[hit].classList.remove('hot'); }, 1400);
+  } else {
+    $('grid').classList.add('flash');
+    setTimeout(function(){ $('grid').classList.remove('flash'); }, 800);
+  }
+}
+
+/* persona medallion art — card-keyed lookup. Only cards with Tim-approved art
+   appear here (IMG-02, Phase-4 harvest); every other card skips gracefully
+   (the img stays hidden, the header lays out exactly as before). */
+var PERSONA_ART = {
+  'pawn-princess-pp01': {
+    src: 'assets/img/pawn-princess-medallion.webp',
+    alt: 'Pawn Princess persona medallion — a confident store manager in 1950s shop dress behind her pawn-shop counter, framed in an engraved antique-gold ring'
+  }
+};
+function renderMedallion(){
+  var m = $('medallion');
+  if (!m) return;
+  var art = PERSONA_ART[cardFile];
+  if (art) { m.src = art.src; m.alt = art.alt; m.hidden = false; }
+  else { m.hidden = true; m.removeAttribute('src'); m.alt = ''; }
+}
+
+function renderHead(){
+  var vv = card.vivid_vision || {};
+  /* PRISM CONTRACT — data-prism-id keys are LAW: "card:<file>:vv" / "card:<file>:wiifm".
+     prism.js resolves them against data/spectra.json (authored by the prism-core builder
+     with the same convention). VV is verbatim canon: spectra expand framing, never
+     rewrite the purpose/BHAG/values lines. No spectrum = no icon. */
+  $('vv').innerHTML =
+    '<div class="big">' + esc(card.store) + (cardFile === 'door-to-door' ? ' <span class="badge-superseded">superseded</span>' : '') + '</div>' +
+    '<div style="margin:3px 0 6px">' + validatePills() + '</div>' +
+    '<span data-prism-id="card:' + esc(cardFile) + ':vv"><b>VIVID VISION</b> — ' + esc(vv.purpose||'') + ' · <i>' + esc(vv.bhag||'') + '</i> · ' + esc((vv.values||[]).join(' / ')) + '</span><br>' +
+    '<span class="wiifm" data-prism-id="card:' + esc(cardFile) + ':wiifm"><b style="color:var(--teal)">WIIFM:</b> ' + esc(card.wiifm||'') + '</span> &nbsp;·&nbsp; ' +
+    '<span class="caller">Caller: ' + esc(card.caller||'—') + '</span>';
+  updateMeter();
+  prismScan($('vv'));
+}
+
+/* prism.js scan hook — this page renders after async JSON loads, so prism.js's
+   DOMContentLoaded pass misses these elements; re-scan the freshly built subtree.
+   Graceful absence: until assets/prism.js ships, window.Prism is undefined and
+   this is a no-op (no icon, no placeholder, no error).
+
+   ALIAS RESOLUTION (coordination shim): the markup carries the CONTRACT keys —
+   "card:<file>:vv" / "card:<file>:wiifm" / "ptk:<promiseId>" — and those stay
+   primary. The spectra.json currently on disk was authored as "vv-<file>" /
+   "wiifm-<file>" / bare "<promiseId>", and prism.js resolves ids by EXACT match.
+   So: if the contract key has no spectrum but its on-disk alias does, swap the
+   attribute to the alias before scanning. Contract key authored later → it wins
+   untouched. Neither exists → graceful absence, exactly as the contract demands. */
+function prismAlias(id){
+  var m;
+  if ((m = /^card:(.+):vv$/.exec(id)))    return 'vv-' + m[1];
+  if ((m = /^card:(.+):wiifm$/.exec(id))) return 'wiifm-' + m[1];
+  if ((m = /^ptk:(.+)$/.exec(id)))        return m[1];
+  return null;
+}
+function prismScan(el){
+  if (!(window.Prism && typeof window.Prism.scan === 'function')) return;
+  var root = el || document;
+  var run = function(){ try { window.Prism.scan(root); } catch (e) { /* prism must never break the card */ } };
+  if (typeof window.Prism.spectra !== 'function') { run(); return; }
+  window.Prism.spectra().then(function(S){
+    Array.prototype.forEach.call(root.querySelectorAll('[data-prism-id]'), function(n){
+      var id = n.getAttribute('data-prism-id');
+      if (S[id]) return;                       /* contract key authored — use it */
+      var alias = prismAlias(id);
+      if (alias && S[alias]) n.setAttribute('data-prism-id', alias);
+    });
+    run();
+  }).catch(run);
+}
+
+function updateMeter(){
+  var h = rollup(), a = 100 - h;
+  var m = $('meter');
+  m.className = 'meter' + (h > 20 ? ' alarm' : '');
+  m.innerHTML = '<b>80 / 20 roll-up</b> <span class="soft">(computed)</span><br>' +
+    'Caller <b style="color:var(--gold)">' + h + '%</b> · AI agents <b style="color:var(--cyan)">' + a + '%</b>' +
+    '<div class="rbar" role="img" aria-label="Caller ' + h + ' percent, AI agents ' + a + ' percent">' +
+      '<i style="width:100%;background:linear-gradient(90deg,var(--cyan) ' + a + '%,var(--gold) ' + a + '%)"></i></div>' +
+    '<div class="cov">over the 20% covenant — goes red, the Council triages</div>';
+  /* keep the 3D marketing flow in step with the live roll-up (gold tint = Caller-heavy) */
+  if (three.built && three.flow) three.flow.retint();
+}
+
+function renderGrid(){
+  var g = $('grid');
+  g.innerHTML = '';
+  cellEls = [];
+  var promises = Array.isArray(card.promises) ? card.promises : []; // promises[] slot — Phase-2 PTK engine drops in here
+  card.squares.forEach(function(s, i){
+    var c = document.createElement('div');
+    c.setAttribute('tabindex','0');
+    c.dataset.i = i;
+    if (s.ptk) {
+      c.className = 'sq ptk';
+      c.setAttribute('role','link');
+      c.setAttribute('aria-label','PTK — Promises to Keep — open the dual ledger');
+      var nowMs = Date.now();
+      /* focal line — card.promises[0] → ptk-seed focal_promises → placeholder.
+         Focal promises are verbatim canon — prisms expand framing, never rewrite. */
+      var focalRaw = null;
+      var focal = 'the centre is an accountability engine, not empty';
+      var focalPid = null;            /* PRISM CONTRACT key: "ptk:<promiseId>" */
+      if (promises.length) {
+        focalRaw = String(promises[0].text || promises[0]);
+        focal = esc(focalRaw);
+        if (promises[0].id) focalPid = promises[0].id;
+      } else if (ptkSeed && Array.isArray(ptkSeed.focal_promises)) {
+        var fp = ptkSeed.focal_promises.find(function(f){ return f.card === cardFile; }) || {};
+        if (fp.promise) { focalRaw = String(fp.promise); focal = esc(focalRaw); }
+      }
+      /* linked promises — counts, letter grade, age, mosaic, OVERDUE:
+         ALL computed at render from ptk-seed.json, never stored, never asserted */
+      var linked = (ptkSeed && Array.isArray(ptkSeed.promises))
+        ? ptkSeed.promises.filter(function(p){ return p.card === cardFile; }) : [];
+      var isOpen = function(p){ return p.status === 'promised' || p.status === 'in_progress'; };
+      var isOver = function(p){ return isOpen(p) && p.dueDate && (nowMs - Date.parse(p.dueDate)) >= 7 * 864e5; };
+      var counts = '', overdue = false, gradeHtml = '', mosaicHtml = '', ageTxt = '', ageTip = '';
+      if (linked.length) {
+        var gave = linked.filter(function(p){ return p.direction === 'gave'; }).length;
+        counts = gave + ' gave · ' + (linked.length - gave) + ' received';
+        overdue = linked.some(isOver);
+
+        /* LETTER GRADE A–F from the locked keep-rate formula (blueprint §4.5:
+           keep_rate = totalKept / totalPromises × 100). Pending “–” until a
+           linked promise actually finishes — a grade needs a real outcome. */
+        var kept = linked.filter(function(p){ return p.status === 'kept'; }).length;
+        var broken = linked.filter(function(p){ return p.status === 'broken'; }).length;
+        var keepRate = Math.round(kept / linked.length * 100);
+        if (kept + broken > 0) {
+          /* bands match ptk.html's letterGrade exactly — one scale, two surfaces */
+          var gLetter = keepRate >= 90 ? 'A' : keepRate >= 80 ? 'B' : keepRate >= 70 ? 'C' : keepRate >= 60 ? 'D' : 'F';
+          var gColor = { A:'var(--green)', B:'var(--green)', C:'var(--yellow)', D:'var(--orange)', F:'var(--red)' }[gLetter];
+          gradeHtml = '<span class="grade" style="color:' + gColor + '" title="letter grade from this card’s keep-rate (kept ÷ all linked promises): ' +
+            kept + ' of ' + linked.length + ' kept = ' + keepRate + '% → ' + gLetter +
+            ' · bands: A ≥90 · B ≥80 · C ≥70 · D ≥60 · F <60 — computed at render, never stored">' +
+            gLetter + '<span class="gr-of">' + keepRate + '% kept</span></span>';
+        } else {
+          gradeHtml = '<span class="grade" style="color:#cdb27a" title="grade pending — no linked promise has finished (kept or broken) yet; the keep-rate computes from real outcomes only">–' +
+            '<span class="gr-of">no grade yet</span></span>';
+        }
+
+        /* MOSAIC — one row, one dot per linked promise: green kept · red broken ·
+           amber pending · red-ringed amber = computed OVERDUE. Gave first, then received. */
+        var ordered = linked.filter(function(p){ return p.direction === 'gave'; })
+                     .concat(linked.filter(function(p){ return p.direction !== 'gave'; }));
+        var MAXDOTS = 12;
+        mosaicHtml = '<div class="ptk-mosaic" role="img" aria-label="promise mosaic — ' + counts + '">' +
+          ordered.slice(0, MAXDOTS).map(function(p){
+            var cls = p.status === 'kept' ? 'k' : p.status === 'broken' ? 'b' : isOver(p) ? 'od' : 'p';
+            var st = isOver(p) ? p.status + ' — ⚠️ OVERDUE ' + Math.floor((nowMs - Date.parse(p.dueDate)) / 864e5) + 'd past due' : p.status;
+            return '<i class="' + cls + '" title="' + esc(p.id + ' · ' + p.direction + ' · ' + st + ' — ' + String(p.promise).slice(0, 70)) + '"></i>';
+          }).join('') +
+          (ordered.length > MAXDOTS ? '<span class="more">+' + (ordered.length - MAXDOTS) + '</span>' : '') +
+          '</div>';
+
+        /* PROMISE AGE — days since the oldest open promise was MADE (dateMade), the
+           cheapest sacredness device: a promise that shows its age never quietly dies. */
+        var open = linked.filter(function(p){ return isOpen(p) && p.dateMade; })
+          .sort(function(a, b){ return Date.parse(a.dateMade) - Date.parse(b.dateMade); });
+        var metaPid = null;
+        if (open.length) {
+          var ageDays = Math.max(0, Math.floor((nowMs - Date.parse(open[0].dateMade)) / 864e5));
+          ageTxt = 'oldest open: ' + ageDays + ' day' + (ageDays === 1 ? '' : 's');
+          ageTip = 'oldest open promise — “' + String(open[0].promise).slice(0, 90) + '” · promised ' + open[0].dateMade +
+            ' — ' + ageDays + ' days ago (computed at render, never stored)';
+          metaPid = open[0].id;
+        }
+        /* if the focal one-liner IS a real seed promise, the focal span carries its prism id */
+        if (!focalPid && focalRaw) {
+          var fm = linked.find(function(p){ return p.promise === focalRaw; });
+          if (fm) focalPid = fm.id;
+        }
+      }
+      /* PRISM CONTRACT — "ptk:<promiseId>": the focal span wears the prism when the focal
+         is a real promise record; otherwise the age/meta line (which IS the oldest open
+         promise) carries it. Never attach a different promise's spectrum to the focal
+         one-liner — wrong content behind an icon is worse than no icon. */
+      var prismAttr = focalPid ? ' data-prism-id="ptk:' + esc(focalPid) + '"' : '';
+      var metaPrismAttr = (!focalPid && typeof metaPid === 'string' && metaPid) ? ' data-prism-id="ptk:' + esc(metaPid) + '"' : '';
+      c.innerHTML = gradeHtml +
+        '<div class="big" style="text-align:center;margin-top:2px">PTK</div>' +
+        '<div class="label" style="text-align:center">Promises to Keep</div>' +
+        '<div class="kpi" style="text-align:center"><span' + prismAttr + '>' + focal + '</span>' +
+        mosaicHtml +
+        ((counts || ageTxt) ? '<div class="ptk-meta"' + metaPrismAttr + (ageTip ? ' title="' + esc(ageTip) + '"' : '') + '>' +
+          counts + (counts && ageTxt ? ' · ' : '') + ageTxt + '</div>' : '') +
+        (overdue ? '<div style="margin-top:2px"><span class="pill danger" style="font-size:9px;padding:1px 7px" title="a linked promise is 7+ days past its dueDate — computed at render, never stored">⚠️ OVERDUE</span></div>' : '') +
+        '<div style="margin-top:2px">→ kaboom: the dual ledger</div></div>';
+    } else {
+      c.className = 'sq';
+      c.setAttribute('role','button');
+      c.setAttribute('aria-label', s.id + ' ' + s.label);
+      var a = 100 - humanOf(s);
+      c.innerHTML = '<span class="id">' + esc(s.id) + '</span>' +
+        '<div class="label">' + esc(s.label) + '</div>' +
+        '<div class="kpi">' + esc(s.kpi || '') + '</div>' +
+        '<span class="dot ' + (RYGCLS[s.ryg || 'green'] || 'g') + '"></span>' +
+        '<div class="agentbar" style="width:' + a + '%" title="AI agents ' + a + '%"></div>';
+    }
+    c.addEventListener('click', function(){ squareClick(i); });
+    c.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); squareClick(i); } });
+    g.appendChild(c);
+    cellEls.push(c);
+  });
+  prismScan(g);
+}
+
+function squareClick(i){
+  touchUsage();
+  if (card.squares[i].ptk) { location.href = 'ptk.html'; return; }
+  openDrawer(i);
+}
+
+function renderOffRocks(){
+  var cash = card.ticker.find(function(t){ return /cash/i.test(t.k); });
+  var noon = card.ticker.find(function(t){ return /noon/i.test(t.k); });
+  if (cash) {
+    var cls = { green:'ok', yellow:'warn', red:'bad' }[cash.ryg] || 'warn';
+    $('offRocks').innerHTML = '<div class="status-row ' + cls + '">' +
+      '<span class="st">' + (cls === 'ok' ? 'off the rocks' : 'on the rocks') + '</span>' +
+      '<span class="grow">Operational cash today: <b>' + esc(cash.k) + ' ' + esc(cash.v) + '</b> — not net profit, capex excluded' +
+      (noon ? ' · noon-reconciliation SLA: <b>' + esc(noon.v) + '</b>' : '') + '</span>' + Shell.rygDot(cash.ryg) + '</div>';
+  } else {
+    $('offRocks').innerHTML = '<div class="footnote">Off-the-rocks flag (operational cash today + noon-reconciliation SLA): no cash line wired on this card yet — it is the first trusted ticker number.</div>';
+  }
+}
+
+/* =================== usage tracker ("was the card used yesterday?") =================== */
+function ymd(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function touchUsage(){
+  var map = loadLS(LS_USED, {});
+  var arr = map[cardFile] || [];
+  var today = ymd(new Date());
+  if (arr.indexOf(today) < 0) { arr.push(today); map[cardFile] = arr.slice(-60); saveLS(LS_USED, map); renderUsedPill(); }
+}
+function renderUsedPill(){
+  var map = loadLS(LS_USED, {});
+  var arr = map[cardFile] || [];
+  var yest = ymd(new Date(Date.now() - 86400000));
+  var used = arr.indexOf(yest) >= 0;
+  var upCls = used ? 'good' : 'warn';
+  var upTip = used ? 'tracked locally in this browser — ‘the card was used yesterday’ is the only success metric'
+                   : 'The soul rule: success = the card was used yesterday';
+  $('usedPill').innerHTML = '<span class="pill ' + upCls + '" title="' + upTip + '">used yesterday: ' + (used ? 'YES' : 'NO') + '</span>';
+}
+
+/* =================== Acceptance Ceremony hook (Phase 4.5 — additive) ===================
+   Reads localStorage hb1000-acceptance (written by ceremony.html / command.html) at render.
+   While accepted-pending-signoff: yellow header pill + "Assignment" ticker chip; pending
+   ticker fields get a thin yellow left border with the from→to diff in the title.
+   After Tim approves: green "accepted ✓" chip for 7 days (computed at render), then drops.
+   The card-header Caller line click reopens the Ceremony contract summary — forever. */
+function acceptanceHook(){
+  var acc = null;
+  try { acc = (JSON.parse(localStorage.getItem('hb1000-acceptance')) || {})[cardFile]; } catch(e){ /* absent */ }
+  if (!acc || !acc.state || acc.state === 'none') return;
+  var url = 'ceremony.html?card=' + encodeURIComponent(cardFile);
+  function monD(iso){ var d = new Date(iso); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()] + ' ' + d.getDate(); }
+  function lastEditOf(path){
+    var hit = null;
+    (acc.rounds || []).forEach(function(r){ (r.edits || []).forEach(function(ed){ if (ed.path === path) hit = ed; }); });
+    return hit;
+  }
+  /* header pill — same slot as the red "TBD — assign one Dingo Caller" badge */
+  var nPend = (acc.pending_paths || []).length;
+  var pill = null;
+  if (acc.state === 'accepted-pending-signoff') pill = '<span class="pill warn">⏳ ASSIGNMENT PENDING PRIME SIGN-OFF' + (nPend ? ' (' + nPend + ' fields)' : '') + '</span>';
+  else if (acc.state === 'offered') pill = '<span class="pill">OFFERED — awaiting the Caller</span>';
+  else if (acc.state === 'briefed' || acc.state === 'negotiated') pill = '<span class="pill warn">CEREMONY IN PROGRESS — negotiation round open</span>';
+  else if (acc.state === 'declined') pill = '<span class="pill danger">ASSIGNMENT DECLINED — back on the orphan rail</span>';
+  var pillRow = $('vv').children[1];
+  if (pill && pillRow){
+    var a = document.createElement('a');
+    a.href = url;
+    a.title = 'open the Acceptance Ceremony — the contract never hides';
+    a.innerHTML = pill;
+    pillRow.appendChild(document.createTextNode(' '));
+    pillRow.appendChild(a);
+  }
+  /* the Caller line reopens the contract summary forever */
+  var callerEl = $('vv').querySelector('.caller');
+  if (callerEl){
+    callerEl.style.cursor = 'pointer';
+    callerEl.style.textDecoration = 'underline dotted';
+    callerEl.title = 'Caller line → Ceremony contract summary (the contract never hides)';
+    callerEl.addEventListener('click', function(){ location.href = url; });
+  }
+  /* ticker chip — the ticker is the public truth channel (in 3D the banner wraps the building) */
+  var chip = null;
+  if (acc.state === 'accepted-pending-signoff') chip = { v:'PENDING PRIME SIGN-OFF', c:'y' };
+  else if (acc.state === 'active' && acc.signoff && acc.signoff.at){
+    var days = (Date.now() - Date.parse(acc.signoff.at)) / 864e5;
+    if (days <= 7) chip = { v:'accepted ✓ ' + monD(acc.signoff.at) + (acc.signature && acc.signature.name ? ' · signed ' + acc.signature.name : ''), c:'g' };
+  }
+  else if (acc.state === 'declined') chip = { v:'ORPHAN — declined', c:'r' };
+  else chip = { v:'in ceremony — ' + acc.state, c:'y' };
+  if (chip){
+    var tk = document.createElement('a');
+    tk.className = 'tk';
+    tk.href = url;
+    tk.title = 'Assignment state — computed from hb1000-acceptance at render; click → the Ceremony';
+    tk.innerHTML = '<span class="dot ' + chip.c + '"></span><span class="k">Assignment</span> <span class="v">' + esc(chip.v) + '</span>';
+    var track = $('tickerTrack');
+    track.insertBefore(tk, track.firstChild);
+  }
+  /* pending ticker fields: thin yellow left border + the from→to diff (hover title) */
+  (acc.pending_paths || []).forEach(function(p){
+    var m = /^ticker\[(\d+)\]/.exec(p);
+    if (!m) return;
+    var elTk = $('tickerTrack').querySelector('.tk[data-ix="' + m[1] + '"]');
+    if (!elTk) return;
+    elTk.style.borderLeft = '3px solid var(--yellow)';
+    elTk.style.paddingLeft = '7px';
+    var ed = lastEditOf(p) || lastEditOf('ticker[' + m[1] + ']');
+    if (ed) elTk.title = 'pending Prime sign-off: ' + String(ed.from) + ' → ' + String(ed.to) + (ed.why ? ' — why: ' + ed.why : '');
+  });
+}
+
+/* =================== square detail drawer — the work-order layer =================== */
+function closeDrawer(){
+  $('drawer').classList.remove('open');
+  $('backdrop').classList.remove('show');
+  openSqIndex = -1;
+}
+$('backdrop').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeDrawer(); });
+
+function openDrawer(i){
+  openSqIndex = i;
+  var s = card.squares[i];
+  var h = humanOf(s), seed = (s.human === undefined ? 20 : s.human);
+  var aKey = cardFile + ':' + s.id;
+  var kpis = String(s.kpi || '').split('·').map(function(k){ return k.trim(); }).filter(Boolean);
+  var d = $('drawer');
+  d.innerHTML =
+    '<span class="d-x" id="dx" role="button" aria-label="Close">×</span>' +
+    '<div class="sec-h" style="margin-top:0">Dingo square — the work-order layer</div>' +
+    '<h3>' + esc(s.id) + ' · ' + esc(s.label) + '</h3>' +
+    '<div class="row">' + Shell.rygDot(s.ryg || 'green') + ' ' + Shell.pill((s.ryg || 'green').toUpperCase(), s.ryg || 'green') +
+      ' <span class="muted" style="font-size:12px">status from seed data — turns green via the receipt stream</span></div>' +
+
+    '<div class="sec-h">KPIs (1–3 per square · manual entry, MVP)</div>' +
+    (kpis.length ? kpis.map(function(k){ return '<div class="status-row ok" style="margin:4px 0"><span class="grow">' + esc(k) + '</span></div>'; }).join('')
+                 : '<div class="footnote">no KPI text on this square yet</div>') +
+
+    '<div class="sec-h">80/20 — this square <span class="soft">(flexes per square; the standard is 80/20 across the card)</span></div>' +
+    '<input type="range" id="hSlider" min="0" max="100" step="5" value="' + h + '" aria-label="Human share percent">' +
+    '<div id="dSplit">' + Shell.splitBar(h) + '</div>' +
+    '<div class="seednote">seed value: Caller ' + seed + '% · ' +
+      '<a id="resetH">reset to seed</a> — your override lives in this browser only and live-updates the card roll-up</div>' +
+
+    '<div class="sec-h">Assignee</div>' +
+    '<input type="text" id="assignee" placeholder="hand this square to someone (the Caller stays the one neck to choke)" value="' + esc(assignees[aKey] || '') + '">' +
+    '<div class="fieldnote">squares are assignable — accountability for the card never moves off the Dingo Caller</div>' +
+
+    '<div class="sec-h">The Fix-It loop (every square runs it)</div>' +
+    '<div class="loopline"><b>ticket</b> → agent work loop → <b>approval gate</b> (Approve / Modify / Decline — the only verbs) → signed receipt (SHA256) → append-only learning ledger</div>' +
+
+    '<div class="sec-h">Work orders <span class="soft">(drafts — local to this browser, shaped like _TEMPLATE_Dingo_Card.md)</span></div>' +
+    '<div id="woList"></div>' +
+    '<div class="wo" style="border-style:dashed">' +
+      '<div class="woid" id="woNextId"></div>' +
+      '<div class="fieldnote" style="margin-bottom:6px">Ladder: Prime North Star → Local NS "' + esc((card.vivid_vision||{}).purpose||'') + '" → ' + esc(card.store) + ' → ' + esc(s.label) + '</div>' +
+      '<textarea id="woAsk" placeholder="The Ask — what exactly is this work order asking for?"></textarea>' +
+      '<input type="text" id="woDod" placeholder="Definition of Done — the stop condition" style="margin-top:6px">' +
+      '<div class="budget3" style="margin-top:6px">' +
+        '<input type="text" id="woTok" placeholder="token budget">' +
+        '<input type="text" id="woDol" placeholder="$ budget">' +
+        '<input type="text" id="woTime" placeholder="time budget">' +
+      '</div>' +
+      '<div class="fieldnote">HIL checkpoint: human approval gate before any dispatch — nothing auto-applies, nothing auto-sends.</div>' +
+      '<div class="verdicts"><button class="btn gold-cta" id="woSave">Save draft work order</button><span class="footnote" id="woEditNote"></span></div>' +
+    '</div>';
+
+  d.classList.add('open');
+  $('backdrop').classList.add('show');
+  $('dx').addEventListener('click', closeDrawer);
+
+  /* live 80/20 slider — updates drawer bar, grid agent bar, card roll-up */
+  $('hSlider').addEventListener('input', function(){
+    var v = Number(this.value);
+    overrides[ovKey(s)] = v;
+    saveLS(LS_SLIDERS, overrides);
+    $('dSplit').innerHTML = Shell.splitBar(v);
+    var bar = cellEls[i].querySelector('.agentbar');
+    if (bar) bar.style.width = (100 - v) + '%';
+    updateMeter();
+    touchUsage();
+  });
+  $('resetH').addEventListener('click', function(){
+    delete overrides[ovKey(s)];
+    saveLS(LS_SLIDERS, overrides);
+    openDrawer(i); updateMeter();
+    var bar = cellEls[i].querySelector('.agentbar');
+    if (bar) bar.style.width = (100 - humanOf(s)) + '%';
+  });
+  $('assignee').addEventListener('change', function(){
+    if (this.value.trim()) assignees[aKey] = this.value.trim(); else delete assignees[aKey];
+    saveLS(LS_ASSIGN, assignees); touchUsage();
+  });
+
+  renderWOs(s);
+  $('woNextId').textContent = 'next card_id: ' + nextWOId(false);
+  var editingId = null;
+  $('woSave').addEventListener('click', function(){
+    var ask = $('woAsk').value.trim();
+    if (!ask) { $('woAsk').focus(); return; }
+    var key = cardFile + ':' + s.id;
+    var list = (workorders[key] = workorders[key] || []);
+    var stamp = ymd(new Date()) + ' ' + new Date().toTimeString().slice(0,5);
+    if (editingId) {
+      var w = list.find(function(x){ return x.id === editingId; });
+      if (w) { w.ask = ask; w.dod = $('woDod').value.trim(); w.budget = budgetVals(); w.state = 'Draft'; w.audit.push({ t: stamp, ev: 'modified' }); }
+      editingId = null; $('woEditNote').textContent = '';
+    } else {
+      list.push({ id: nextWOId(true), state: 'Draft', ask: ask, dod: $('woDod').value.trim(),
+        budget: budgetVals(), audit: [{ t: stamp, ev: 'created (draft)' }] });
+    }
+    saveLS(LS_WO, workorders);
+    $('woAsk').value = ''; $('woDod').value = ''; $('woTok').value = ''; $('woDol').value = ''; $('woTime').value = '';
+    $('woNextId').textContent = 'next card_id: ' + nextWOId(false);
+    renderWOs(s); touchUsage();
+  });
+
+  function budgetVals(){ return { tokens: $('woTok').value.trim(), dollars: $('woDol').value.trim(), time: $('woTime').value.trim() }; }
+
+  function renderWOs(sq){
+    var key = cardFile + ':' + sq.id;
+    var list = workorders[key] || [];
+    var stampNow = function(){ return ymd(new Date()) + ' ' + new Date().toTimeString().slice(0,5); };
+    $('woList').innerHTML = list.length ? list.map(function(w, wi){
+      var stPill = w.state === 'Approved' ? Shell.pill('Approved', 'good')
+                 : w.state === 'Declined' ? Shell.pill('Declined', 'danger')
+                 : Shell.pill('Draft', 'warn');
+      var b = w.budget || {};
+      var budgetLine = [b.tokens && ('tokens: ' + b.tokens), b.dollars && ('$: ' + b.dollars), b.time && ('time: ' + b.time)].filter(Boolean).join(' · ');
+      return '<div class="wo">' +
+        '<div class="spread"><span class="woid">' + esc(w.id) + '</span>' + stPill + '</div>' +
+        '<div style="margin:5px 0"><b>The Ask:</b> ' + esc(w.ask) + '</div>' +
+        (w.dod ? '<div><b>DoD:</b> ' + esc(w.dod) + '</div>' : '') +
+        (budgetLine ? '<div class="fieldnote">' + esc(budgetLine) + '</div>' : '') +
+        '<div class="verdicts">' +
+          '<button class="btn approve" data-wi="' + wi + '" data-v="approve">Approve</button>' +
+          '<button class="btn modify" data-wi="' + wi + '" data-v="modify">Modify</button>' +
+          '<button class="btn decline" data-wi="' + wi + '" data-v="decline">Decline</button>' +
+        '</div>' +
+        '<div class="audit">' + w.audit.map(function(a){ return '<div>' + esc(a.t) + ' — ' + esc(a.ev) + '</div>'; }).join('') + '</div>' +
+        '</div>';
+    }).join('') : '<div class="footnote">no work orders on this square yet — draft one below (it stays in this browser; the agent dispatch behind it is simulated)</div>';
+
+    $('woList').querySelectorAll('button[data-v]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var w = list[Number(btn.dataset.wi)];
+        var v = btn.dataset.v;
+        if (v === 'approve') { w.state = 'Approved'; w.audit.push({ t: stampNow(), ev: 'APPROVED at the HIL gate (simulated dispatch — nothing sends)' }); }
+        if (v === 'decline') { w.state = 'Declined'; w.audit.push({ t: stampNow(), ev: 'DECLINED at the HIL gate' }); }
+        if (v === 'modify') {
+          editingId = w.id;
+          $('woAsk').value = w.ask; $('woDod').value = w.dod || '';
+          $('woTok').value = (w.budget||{}).tokens || ''; $('woDol').value = (w.budget||{}).dollars || ''; $('woTime').value = (w.budget||{}).time || '';
+          $('woEditNote').textContent = 'modifying ' + w.id + ' — Save updates it';
+          $('woAsk').focus();
+          return;
+        }
+        saveLS(LS_WO, workorders);
+        renderWOs(sq); touchUsage();
+      });
+    });
+  }
+}
+
+function nextWOId(consume){
+  var seq = loadLS(LS_SEQ, 0) + 1;
+  if (consume) saveLS(LS_SEQ, seq);
+  return 'DINGO-' + ymd(new Date()) + '-' + String(seq).padStart(4, '0');
+}
+
+/* =================== 2D ⇄ 3D flip =================== */
+var view = '2d';
+$('tab2d').addEventListener('click', function(){ setView('2d'); });
+$('tab3d').addEventListener('click', function(){ setView('3d'); });
+
+function webglOK(){
+  try {
+    var c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+  } catch (e) { return false; }
+}
+
+function setView(v){
+  if (!card) return;
+  touchUsage();
+  if (v === '3d' && !webglOK()) {
+    pageNotice('WebGL is not available in this browser — staying on the 2D card view (same data, same truth).', false);
+    v = '2d';
+  }
+  view = v;
+  $('tab2d').className = v === '2d' ? 'on' : '';
+  $('tab3d').className = v === '3d' ? 'on' : '';
+  $('tab2d').setAttribute('aria-selected', v === '2d');
+  $('tab3d').setAttribute('aria-selected', v === '3d');
+  $('view2d').hidden = v !== '2d';
+  $('view3d').hidden = v !== '3d';
+  $('viewHint').textContent = v === '2d'
+    ? 'The flat working view — the on-ramp. Flip to 3D to see this card as a Dingo City building.'
+    : 'The same JSON, standing up: 5 floors × 5 windows, ticker-tape banner between window-top and roofline.';
+  if (v === '3d') ensure3D(); else pause3D();
+}
+
+/* =================== 3D — Three.js building =================== */
+var three = { built: false, renderer: null, scene: null, camera: null, controls: null,
+              windows: [], bannerTex: null, reduce: false, animating: false };
+var BANNER_W = 4096, BANNER_H = 128;
+
+function notice3d(msg){
+  var n = $('notice3d');
+  if (!msg) { n.className = 'notice'; n.id = 'notice3d'; n.classList.remove('show'); n.textContent = ''; return; }
+  n.textContent = msg; n.classList.add('show');
+}
+
+async function ensure3D(){
+  if (three.built) { resume3D(); return; }
+  notice3d('Loading the 3D engine — Three.js 0.160.0 (vendored locally, CDN fallback)…');
+  try {
+    var waited = 0;
+    while (!window.__hb3d && waited < 5000) { await new Promise(function(r){ setTimeout(r, 100); }); waited += 100; }
+    if (!window.__hb3d) throw new Error('ES module scripts unavailable in this browser');
+    var mod = await window.__hb3d;
+    build3D(mod.THREE, mod.OrbitControls);
+    three.built = true;
+    notice3d('');
+    resume3D();
+  } catch (err) {
+    console.warn('3D unavailable:', err);
+    notice3d('');
+    pageNotice('The 3D engine could not load (' + esc(err.message) + ') — offline or CDN blocked. Showing the 2D card view instead; same data, same truth.', false);
+    setView('2d');
+  }
+}
+
+function build3D(THREE, OrbitControls){
+  three.reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var wrap = $('stage3d');
+  var W = function(){ return wrap.clientWidth || 800; };
+  var H = function(){ return wrap.clientHeight || 560; };
+
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(W(), H());
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  wrap.insertBefore(renderer.domElement, wrap.firstChild);
+
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x05080c);
+  scene.fog = new THREE.Fog(0x05080c, 60, 130);
+
+  var camera = new THREE.PerspectiveCamera(45, W() / H(), 0.1, 400);
+  camera.position.set(16, 11, 21);
+
+  var controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 5.4, 0);
+  controls.enableDamping = true; controls.dampingFactor = 0.06;
+  controls.minDistance = 9; controls.maxDistance = 80;
+  controls.maxPolarAngle = Math.PI * 0.49;
+  controls.autoRotate = !three.reduce; controls.autoRotateSpeed = 0.5;
+  controls.addEventListener('start', function(){ controls.autoRotate = false; });
+
+  scene.add(new THREE.AmbientLight(0xbfd4e6, 0.5));
+  var dl = new THREE.DirectionalLight(0xcfe2ff, 1.6); dl.position.set(14, 24, 10); scene.add(dl);
+  var dl2 = new THREE.DirectionalLight(0xe8b54d, 0.4); dl2.position.set(-12, 8, -16); scene.add(dl2);
+
+  var ground = new THREE.Mesh(new THREE.CircleGeometry(80, 48),
+    new THREE.MeshStandardMaterial({ color: 0x0a0f15, roughness: 1 }));
+  ground.rotation.x = -Math.PI / 2; scene.add(ground);
+  var gridh = new THREE.GridHelper(160, 80, 0x20303f, 0x101924);
+  gridh.position.y = 0.02; scene.add(gridh);
+
+  /* the building — a standing Dingo card: 5 floors × 5 windows, uniform height */
+  var bld = new THREE.Mesh(new THREE.BoxGeometry(10.6, 10.4, 6),
+    new THREE.MeshStandardMaterial({ color: 0x0f1620, roughness: 0.85, metalness: 0.1 }));
+  bld.position.y = 5.2; scene.add(bld);
+
+  var roof = new THREE.Mesh(new THREE.BoxGeometry(11.4, 0.5, 6.8),
+    new THREE.MeshStandardMaterial({ color: 0x141e29, roughness: 0.8 }));
+  roof.position.y = 10.55; scene.add(roof);
+
+  /* windows — emissive colour = the square's RYG; PTK glows gold, centre floor */
+  var winGeo = new THREE.BoxGeometry(1.28, 1.0, 0.16);
+  card.squares.forEach(function(s, i){
+    var row = Math.floor(i / 5), col = i % 5;
+    var floor = 4 - row;                       /* top row of the 2D card = top floor */
+    var x = (col - 2) * 1.92, y = 1.6 + floor * 1.7;
+    var isPTK = !!s.ptk;
+    var hex = isPTK ? 0xe8b54d : ({ green: 0x46c66d, yellow: 0xe8c24d, red: 0xe0556b }[s.ryg || 'green'] || 0x46c66d);
+    var mat = new THREE.MeshStandardMaterial({ color: 0x0b1118, emissive: hex,
+      emissiveIntensity: isPTK ? 2.2 : 1.0, roughness: 0.4 });
+    [3.02, -3.02].forEach(function(z){
+      var w = new THREE.Mesh(winGeo, mat);
+      w.position.set(x, y, z);
+      w.userData.i = i;
+      scene.add(w);
+      three.windows.push(w);
+    });
+    if (isPTK) {
+      [3.9, -3.9].forEach(function(z){
+        var pl = new THREE.PointLight(0xe8b54d, 26, 9, 2);
+        pl.position.set(x, y, z); scene.add(pl);
+      });
+    }
+  });
+
+  /* ticker-tape banner — canvas texture, wraps between window-top and roofline */
+  var bannerTex = makeBannerTexture(THREE);
+  var r = 6.7, bh = 1.1, circ = 2 * Math.PI * r;
+  bannerTex.repeat.x = (circ / bh) / (BANNER_W / BANNER_H);
+  var banner = new THREE.Mesh(new THREE.CylinderGeometry(r, r, bh, 48, 1, true),
+    new THREE.MeshBasicMaterial({ map: bannerTex, side: THREE.DoubleSide }));
+  banner.position.y = 9.62; scene.add(banner);
+  three.bannerTex = bannerTex;
+
+  /* service-line pipes — Dingo City's marketing piping echoed at building scale.
+     Tube + flowing-particle technique inherited from the model tour (legacy);
+     flow speed/colour/stutter computed from THIS card's ticker RYG mix and
+     80/20 roll-up (live slider overrides included). Reduced motion → static
+     pipes, no particles. */
+  buildPipes3D(THREE, scene);
+
+  /* picking — click (not drag) on a window opens the square drawer; PTK → ptk.html */
+  var ray = new THREE.Raycaster(), v2 = new THREE.Vector2(), pd = null;
+  renderer.domElement.addEventListener('pointerdown', function(e){ pd = [e.clientX, e.clientY]; });
+  renderer.domElement.addEventListener('pointerup', function(e){
+    if (pd && Math.hypot(e.clientX - pd[0], e.clientY - pd[1]) < 6) {
+      var rect = renderer.domElement.getBoundingClientRect();
+      v2.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      v2.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      ray.setFromCamera(v2, camera);
+      var hit = ray.intersectObjects(three.windows)[0];
+      if (hit) squareClick(hit.object.userData.i);
+    }
+    pd = null;
+  });
+
+  window.addEventListener('resize', function(){
+    if (!three.renderer) return;
+    camera.aspect = W() / H(); camera.updateProjectionMatrix();
+    renderer.setSize(W(), H());
+  });
+
+  three.renderer = renderer; three.scene = scene; three.camera = camera; three.controls = controls;
+}
+
+function makeBannerTexture(THREE){
+  var c = document.createElement('canvas');
+  c.width = BANNER_W; c.height = BANNER_H;
+  var x = c.getContext('2d');
+  x.fillStyle = '#05080c'; x.fillRect(0, 0, BANNER_W, BANNER_H);
+  x.strokeStyle = '#20303f'; x.lineWidth = 4; x.strokeRect(2, 2, BANNER_W - 4, BANNER_H - 4);
+  x.textBaseline = 'middle';
+  var midY = BANNER_H / 2, pos = 40;
+  function chip(txt, dotCol, txtCol){
+    if (dotCol) { x.fillStyle = dotCol; x.beginPath(); x.arc(pos + 12, midY, 12, 0, 7); x.fill(); pos += 36; }
+    x.fillStyle = txtCol || '#e9eef4';
+    x.font = '700 52px Inter,"Segoe UI",sans-serif';
+    x.fillText(txt, pos, midY);
+    pos += x.measureText(txt).width + 30;
+    x.fillStyle = '#5c768a'; x.fillText('·', pos, midY); pos += 48;
+  }
+  chip(card.store, null, '#e8b54d');
+  card.ticker.forEach(function(t){ chip(t.k + ' ' + t.v, RYG[t.ryg] || '#5c768a'); });
+  x.fillStyle = '#5c768a'; x.font = '600 40px Inter,"Segoe UI",sans-serif';
+  x.fillText('— live ticker-tape KPIs —', pos, midY);
+  var tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+/* ---- marketing-flow stats: health ∈ 0..1 from the ticker RYG mix (primary)
+   + square RYG mix; human = the same 80/20 roll-up the meter shows.
+   Returns null when there is nothing to compute — nothing asserted. ---- */
+function cardFlow(){
+  if (!card) return null;
+  var W = { green:1, yellow:0.5, red:0 };
+  function wOf(x){ return W[x] === undefined ? 0.5 : W[x]; }
+  var tk = Array.isArray(card.ticker) ? card.ticker : [];
+  var th = tk.length ? tk.reduce(function(a,t){ return a + wOf(t.ryg); }, 0) / tk.length : null;
+  var sqs = nonPTK();
+  var sh = sqs.length ? sqs.reduce(function(a,s){ return a + wOf(s.ryg || 'green'); }, 0) / sqs.length : null;
+  var health = th === null ? sh : (sh === null ? th : th * 0.7 + sh * 0.3);
+  if (health === null) return null;
+  return { health: health, human: rollup() };
+}
+
+function buildPipes3D(THREE, scene){
+  var stats = cardFlow();
+  if (!stats) return;
+  /* encoding: red→yellow→green by health, lerped toward gold as the Caller
+     share rises past the 20% covenant (gold tint = human-heavy). */
+  function flowColor(st){
+    var c = st.health < 0.5
+      ? new THREE.Color(0xe0556b).lerp(new THREE.Color(0xe8c24d), st.health * 2)
+      : new THREE.Color(0xe8c24d).lerp(new THREE.Color(0x46c66d), (st.health - 0.5) * 2);
+    var g = Math.max(0, Math.min(1, (st.human - 20) / 40));
+    if (g > 0) c.lerp(new THREE.Color(0xe8b54d), g * 0.55);
+    return c;
+  }
+  /* LOCKED service-line colours: Financial SoT (teal) · Blue Seal (blue) · Sales & Marketing (red) */
+  var LINES = [
+    { color: 0x36c2b4, a: -0.65 },
+    { color: 0x74a6ff, a:  0.78 },
+    { color: 0xe0556b, a:  2.05 }
+  ];
+  var sphereGeo = new THREE.SphereGeometry(0.13, 6, 6);
+  var parts = [], mats = [];
+  LINES.forEach(function(line, k){
+    var dx = Math.sin(line.a), dz = Math.cos(line.a);
+    /* clamp the entry point to the building footprint perimeter (10.6 × 6) */
+    var s = 1 / Math.max(Math.abs(dx) / 5.3, Math.abs(dz) / 3.0);
+    var entryY = 0.55 + k * 0.18;
+    var curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(dx * 17, 0.05, dz * 17),
+      new THREE.Vector3(dx * 11 + dz * 0.9, 0.18, dz * 11 - dx * 0.9),
+      new THREE.Vector3(dx * (s + 1.6), entryY * 0.7, dz * (s + 1.6)),
+      new THREE.Vector3(dx * s * 0.92, entryY, dz * s * 0.92)
+    ]);
+    var tube = new THREE.Mesh(
+      new THREE.TubeGeometry(curve, 24, 0.09, 6, false),
+      new THREE.MeshBasicMaterial({ color: line.color, transparent: true, opacity: 0.4,
+        blending: THREE.AdditiveBlending, depthWrite: false })
+    );
+    scene.add(tube);
+    if (!three.reduce) {
+      var mat = new THREE.MeshBasicMaterial({ color: flowColor(stats), transparent: true, opacity: 0.95,
+        blending: THREE.AdditiveBlending, depthWrite: false });
+      mats.push(mat);
+      for (var p = 0; p < 4; p++) {
+        var m = new THREE.Mesh(sphereGeo, mat);
+        m.userData = { curve: curve, t: p / 4, phase: Math.random() * Math.PI * 2 };
+        m.position.copy(curve.getPointAt(m.userData.t));
+        scene.add(m);
+        parts.push(m);
+      }
+    }
+  });
+  three.flow = {
+    parts: parts, stats: stats,
+    /* live recompute — called when an 80/20 slider moves, so the gold tint follows the meter */
+    retint: function(){
+      var st = cardFlow(); if (!st) return;
+      three.flow.stats = st;
+      var c = flowColor(st);
+      mats.forEach(function(m){ m.color.copy(c); });
+    }
+  };
+}
+
+function resume3D(){
+  if (!three.renderer || three.animating) return;
+  three.animating = true;
+  three.renderer.setAnimationLoop(function(){
+    three.controls.update();
+    if (!three.reduce) {
+      if (three.bannerTex) three.bannerTex.offset.x -= 0.00045;
+      /* marketing-flow particles — speed & stutter ARE this card's KPI state */
+      if (three.flow && three.flow.parts.length) {
+        var t = performance.now() / 1000;
+        var dt = Math.min(0.05, Math.max(0, t - (three.lastT || t))); three.lastT = t;
+        var st = three.flow.stats;
+        var spd0 = 0.06 + st.health * 0.18;          /* green = fast · red = slow */
+        var stut = st.health < 0.5;                  /* trouble = the flow stutters */
+        three.flow.parts.forEach(function(m){
+          var u = m.userData;
+          var spd = spd0 * (stut ? 0.25 + 0.75 * Math.max(0, Math.sin(t * 3.1 + u.phase)) : 1);
+          u.t = (u.t + spd * dt) % 1;
+          m.position.copy(u.curve.getPointAt(u.t));
+          m.scale.setScalar(1 + 0.3 * Math.sin(t * 4 + u.phase));
+        });
+      }
+    }
+    three.renderer.render(three.scene, three.camera);
+  });
+  /* re-measure after un-hiding */
+  var wrap = $('stage3d');
+  three.camera.aspect = (wrap.clientWidth || 800) / (wrap.clientHeight || 560);
+  three.camera.updateProjectionMatrix();
+  three.renderer.setSize(wrap.clientWidth || 800, wrap.clientHeight || 560);
+}
+function pause3D(){
+  if (three.renderer && three.animating) { three.renderer.setAnimationLoop(null); three.animating = false; }
+}
+</script>
+</body>
+</html>

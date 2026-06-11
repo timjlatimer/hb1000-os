@@ -1,0 +1,44 @@
+{
+  "store": "Door-to-Door Occupancy Drive — Seba Hub · Kokanee (pilot)",
+  "caller": "TBD — assign one Dingo Caller",
+  "vivid_vision": {
+    "purpose": "Every unit full, every season — dignity through occupancy",
+    "bhag": "85% occupancy, daily, across every Seba Hub site",
+    "values": ["Dignity", "Hustle", "Honesty"]
+  },
+  "wiifm": "Rep: a warm list + a script that works = you earn well. Site: full rooms, steady revenue, no empty-season panic.",
+  "ticker": [
+    {"k": "Occupancy", "v": "78% ▲", "ryg": "yellow"},
+    {"k": "Doors today", "v": "0 / 120", "ryg": "green"},
+    {"k": "Tours booked", "v": "3", "ryg": "green"},
+    {"k": "Deposits", "v": "1", "ryg": "green"},
+    {"k": "Churn watch", "v": "2", "ryg": "red"}
+  ],
+  "squares": [
+    {"id": "T1", "label": "Today's route", "kpi": "optimized walk list", "ryg": "green", "human": 20},
+    {"id": "T2", "label": "Warm leads queued", "kpi": "prior interest / renewals", "ryg": "green", "human": 20},
+    {"id": "T3", "label": "Do-not-knock list", "kpi": "compliance", "ryg": "green", "human": 10},
+    {"id": "T4", "label": "Script of the day", "kpi": "objections + offer", "ryg": "green", "human": 20},
+    {"id": "T5", "label": "Seasonal offer live", "kpi": "pricing / promo", "ryg": "yellow", "human": 30},
+    {"id": "F6", "label": "Doors knocked", "kpi": "target 120", "ryg": "yellow", "human": 80},
+    {"id": "F7", "label": "Conversations", "kpi": "real talks", "ryg": "yellow", "human": 80},
+    {"id": "F8", "label": "Tours booked", "kpi": "vs target", "ryg": "green", "human": 70},
+    {"id": "F9", "label": "Applications started", "kpi": "in progress", "ryg": "yellow", "human": 60},
+    {"id": "F10", "label": "Deposits / commitments", "kpi": "closed", "ryg": "green", "human": 70},
+    {"id": "U11", "label": "Same-day follow-up", "kpi": "texts / calls", "ryg": "green", "human": 20},
+    {"id": "U12", "label": "Re-knock scheduled", "kpi": "no-answers", "ryg": "green", "human": 20},
+    {"id": "PTK", "ptk": true},
+    {"id": "U13", "label": "Objections → coached", "kpi": "logged", "ryg": "yellow", "human": 30},
+    {"id": "U14", "label": "Referrals captured", "kpi": "word of mouth", "ryg": "green", "human": 40},
+    {"id": "O15", "label": "Occupancy vs 85%", "kpi": "the scoreboard", "ryg": "yellow", "human": 30},
+    {"id": "O16", "label": "Move-ins this week", "kpi": "count", "ryg": "green", "human": 50},
+    {"id": "O17", "label": "Churn watch", "kpi": "at-risk units", "ryg": "red", "human": 40},
+    {"id": "O18", "label": "Waitlist depth", "kpi": "pipeline", "ryg": "green", "human": 20},
+    {"id": "R19", "label": "Rep coverage", "kpi": "shifts filled", "ryg": "green", "human": 50},
+    {"id": "R20", "label": "Earnings tracker", "kpi": "rep incentive", "ryg": "green", "human": 20},
+    {"id": "R21", "label": "Safety check-in", "kpi": "lone-worker", "ryg": "green", "human": 60},
+    {"id": "R22", "label": "Collateral stocked", "kpi": "flyers / forms", "ryg": "green", "human": 50},
+    {"id": "R23", "label": "CRM hygiene", "kpi": "every door logged", "ryg": "green", "human": 20},
+    {"id": "R24", "label": "Daily close-out", "kpi": "report to Caller", "ryg": "green", "human": 20}
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "title": "Learning Loop Protocol V13.0 — The Genie Release: the 2 certified runs (fixtures)",
+    "source": "hb1000-os/blueprint/gap-learning-loop-v13-protocol-the.md §6 — Flood Water Honeycomb Fence (V13_Learning_Loop_Certified_Output.docx) + Get'rDone Model v4 Assessment (20 April 2026)",
+    "protocol": {
+      "version": "V13.0 — The Genie Release",
+      "version_note": "V13 is 'current and only'; archive V8–V12.9.1. V14 = data-model donor only, behaviors pending Tim's confirmation.",
+      "phases": [
+        { "phase": 0, "name": "System of Intake", "persona": "The Sorter", "note": "THE HARD GATE — North Star confirmation, Smelling Salts, Emotional Reality Check. No North Star → HALT." },
+        { "phase": 1, "name": "System of Record", "persona": "The Assessor", "note": "Baseline /100 across 5 dimensions. Threshold: 80." },
+        { "phase": 2, "name": "System of Innovation", "persona": "Best Practice Junkie (BPJ)", "note": "GREEN / BLUE / AMBER suggestions; Swarm Minds: JTBD Orphan Hunter + Pure Innovation Swarm." },
+        { "phase": 3, "name": "System of Adversarial Integrity", "persona": "Society of Guardians", "note": "Devil's Advocate · The North Star's Voice · The Pragmatist + the Accessibility & Inclusion Audit (5 dimensions)." },
+        { "phase": 4, "name": "System of Communication", "persona": "The Presenter", "note": "Swiss-style presentation + downloadable reference documents (BOTH mandatory). Barstool format = the Swiss-style equivalent for non-technical North Stars." },
+        { "phase": 5, "name": "System of Evolution", "persona": "Protocol Engineer", "note": "Spirit Check (4 drift dimensions) + proposed amendments + Gamification Gift-Back." },
+        { "phase": 6, "name": "System of Certification", "persona": "The Judge", "note": "THE BLUE SEAL STAMP — 90/100, no dimension below 18/20. CERTIFIED / CONDITIONAL / NOT CERTIFIED." },
+        { "phase": 7, "name": "Drift Agent", "persona": "The Watchman", "note": "7 drift types: scope_creep · north_star_deviation · phase_skip · threshold_lowered · rabbit_hole · feature_drift · intensity_drift." },
+        { "phase": 8, "name": "The Genie", "persona": "Persistent Learning Agent", "note": "Cumulative KPI report, gifts, DINGO cards spawned, persistence. 'The Genie persists. The Loop remembers. The work continues.'" }
+      ],
+      "numbering_note": "Phases numbered 0–8 internally; UI may display 'Step n of 9.'",
+      "dimensions": ["Completeness", "Clarity", "Accuracy", "Depth", "Actionability"],
+      "thresholds": { "baseline_gate": 80, "certification": 90, "certification_min_dimension": 18 },
+      "north_star_rule": "The Learning Loop has NO built-in North Star. It is a completely neutral engine. Before every run, the North Star must be declared."
+    }
+  },
+  "runs": [
+    {
+      "id": "run-honeycomb",
+      "deliverable": "Flood Water Honeycomb Fence",
+      "date": "2026-04",
+      "intensity": "DRIVEN (85%)",
+      "execution_mode": "Dashboard",
+      "move_37_extreme": "ON — all 9 phases",
+      "north_star_note": "This project serves communities facing real flood risk… Every deliverable must be grounded in that reality. (Emotional Reality Check, verbatim)",
+      "smelling_salts": "PASSED — Context intact. No drift detected. North Star loaded.",
+      "baseline": 82,
+      "final": 92,
+      "certification": "CERTIFIED",
+      "certification_note": "All dimensions 18+.",
+      "stats": {
+        "orphan_solutions": 6,
+        "orphan_solution_labels": { "GREEN": 4, "BLUE": 1, "AMBER": 1 },
+        "orphan_domains": ["biology turgor cells", "HESCO bastions", "NASA origami waterbomb", "Tideflex duckbill valves", "SAP polymers", "mangrove porosity"],
+        "move_37_frontier_ideas": ["Living Levee", "Floodwater-as-a-Service", "Sensor Fence"],
+        "accessibility_design_constraints": 5,
+        "protocol_amendments": 2,
+        "drift": "zero"
+      },
+      "gift_back": "Achievement Unlocked: 'Orphan Collector'",
+      "gift_to_the_loop": "V13.0 at DRIVEN intensity with Move 37 Extreme is the correct version for early-stage physical product concepts.",
+      "closing_voice": "The loop is complete. The ducks are swimming… Get'rDone.",
+      "source_path": "Flood Water Honey Comb fence/Flood Water Honey comb Fence to replace sandbags/V13_Learning_Loop_Certified_Output.docx"
+    },
+    {
+      "id": "run-getrdone",
+      "deliverable": "Get'rDone Model v4 Assessment",
+      "date": "2026-04-20",
+      "intensity": "DRIVEN (75%)",
+      "execution_mode": "KPI-Only",
+      "move_37_extreme": "ON",
+      "north_star": {
+        "prime": "Purpose with Profit — grow people, and people grow the business",
+        "local": "Make the Get'rDone Model so clear… an HB1000 reads it and says 'I'm in.'"
+      },
+      "baseline": 82,
+      "final": 90,
+      "improvement_journey": "82 (baseline) → 88 (post-innovation) → 90 (post-communication) → 90 (final)",
+      "certification": "CONDITIONAL",
+      "certification_text": "CERTIFIED (CONDITIONAL) — Full certification upon resolution of 15% Rule ambiguity",
+      "condition": "Full certification upon resolution of 15% Rule ambiguity",
+      "condition_note": "Accuracy held at 16/20 pending Tim's 15%-Rule decision. The Judge refused to inflate Accuracy 16→18 because the fix was 'a design decision, not a documentation error. It requires Tim's resolution.' Phase-1 critical finding: 'Critical Finding: The 15% Ambiguity' — a design decision flagged for Tim, not silently fixed.",
+      "phase_ledger": [
+        { "phase": 0, "name": "System of Intake", "persona": "The Sorter", "kpi": "N/A", "status": "COMPLETE" },
+        { "phase": 1, "name": "System of Record", "persona": "The Assessor", "kpi": "82/100 baseline", "status": "COMPLETE" },
+        { "phase": 2, "name": "System of Innovation", "persona": "Best Practice Junkie", "kpi": "+6 pts → projected 88/100", "status": "COMPLETE" },
+        { "phase": 3, "name": "System of Adversarial Integrity", "persona": "Society of Guardians", "kpi": "PASS", "status": "COMPLETE" },
+        { "phase": 4, "name": "System of Communication", "persona": "The Presenter", "kpi": "+2 pts, running score 90/100", "status": "COMPLETE" },
+        { "phase": 5, "name": "System of Evolution", "persona": "Protocol Engineer", "kpi": "Spirit Check 4/4 INTACT", "status": "COMPLETE" },
+        { "phase": 6, "name": "System of Certification", "persona": "The Judge", "kpi": "90/100 — CERTIFIED (CONDITIONAL)", "status": "COMPLETE" },
+        { "phase": 7, "name": "Drift Agent", "persona": "The Watchman", "kpi": "CLEAR — zero drift across all 7 dimensions", "status": "COMPLETE" },
+        { "phase": 8, "name": "The Genie", "persona": "Persistent Learning Agent", "kpi": "6 DINGO cards spawned (CRITICAL→MEDIUM)", "status": "COMPLETE" }
+      ],
+      "genie_outputs": {
+        "dingo_cards_generated": 6,
+        "dingo_cards_priority_range": "CRITICAL → MEDIUM",
+        "gift_back": "Reusable Barstool template (Barstool Conversation format = the Swiss-style equivalent for non-technical North Stars — proposed as a protocol amendment)"
+      },
+      "certificate_block": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLEARNING LOOP V13.0 CERTIFICATION\nDeliverable: Get'rDone Model v4 Assessment\nScore: 90/100 — CERTIFIED (CONDITIONAL)\nCondition: Full certification upon resolution of 15% Rule ambiguity\nNorth Star: Make the Get'rDone Model so clear an HB1000 reads it and says 'I'm in.' — Purpose with Profit\nIntensity: DRIVEN (75%) | Drift: NONE | Spirit: INTACT\nDate: 2026-04-20\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+      "closing_liturgy": "The Genie persists. The Loop remembers. The work continues.",
+      "source_path": "Get'rdone/Learning Loop V13.0 DRIVEN - Get'rDone Model v4 Assessment.docx"
+    }
+  ]
+}

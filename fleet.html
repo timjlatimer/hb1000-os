@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Fleet — The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ---------- page-local styles (fleet) ---------- */
+.jump{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 4px}
+
+/* hero banner art — from the model tour (legacy) archive */
+.hero-art{margin:4px 0 18px}
+.hero-art img{width:100%; max-height:280px; object-fit:cover; object-position:center 45%; border-radius:var(--radius-lg); border:1px solid var(--line); display:block}
+.hero-art figcaption{margin-top:6px}
+
+/* Golden Age flip cards */
+.ga-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(196px,1fr)); gap:14px; margin:14px 0}
+.ga-card{position:relative; perspective:1200px; cursor:pointer; outline:none}
+.ga-card:focus-visible .ga-inner{box-shadow:0 0 0 2px var(--gold)}
+.ga-inner{position:relative; width:100%; transition:transform .55s; transform-style:preserve-3d;
+  border-radius:var(--radius); border:1px solid var(--line); background:var(--panel)}
+.ga-card:hover .ga-inner{border-color:rgba(232,181,77,.55)}
+.ga-card.flipped .ga-inner{transform:rotateY(180deg)}
+.ga-card.hl .ga-inner{border-color:var(--gold); box-shadow:0 0 14px rgba(232,181,77,.35)}
+.ga-face{backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius); overflow:hidden}
+.ga-front img{display:block; width:100%; aspect-ratio:935/1683; object-fit:cover; background:#000}
+.ga-front .cap{padding:8px 10px 10px}
+.ga-front .cap .nm{font-weight:800; font-size:12.5px}
+.ga-front .cap .es{font-size:11px; color:var(--teal)}
+.ga-front .cap .pn{font-size:10.5px; color:var(--soft)}
+.ga-front .cap .flip-hint{font-size:9.5px; color:var(--soft); text-transform:uppercase; letter-spacing:.08em; margin-top:4px}
+.ga-back{position:absolute; inset:0; transform:rotateY(180deg); overflow-y:auto;
+  background:linear-gradient(160deg,#1b0d11,#160a0d 60%,#10080a); border:1px solid rgba(224,85,107,.45);
+  padding:12px 13px; font-size:11.5px; line-height:1.45}
+.ga-back h4{color:var(--red); font-size:11px; text-transform:uppercase; letter-spacing:.12em; margin:0 0 7px}
+.ga-back .gq{font-style:italic; color:#f0b9c1; margin-bottom:8px}
+.ga-back .lbl{font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:var(--soft); margin-top:8px}
+.ga-back .guard-line{color:var(--gold-glass)}
+.ga-back .risk{color:#f0a3ae}
+.ga-back .counter{color:var(--teal); font-style:italic; margin-top:9px}
+@media (prefers-reduced-motion:reduce){.ga-inner{transition:none}}
+
+/* journey strip (Fix-It primitives + intent pipeline) */
+.journey{display:flex; gap:0; flex-wrap:wrap; align-items:stretch; margin:14px 0}
+.j-step{flex:1 1 120px; min-width:118px; position:relative; background:var(--panel-2);
+  border:1px solid var(--line); border-radius:var(--radius); padding:10px 11px; margin:4px}
+.j-step .jn{font-size:9.5px; color:var(--soft); font-weight:800; letter-spacing:.08em}
+.j-step .jt{font-weight:800; font-size:12.5px; margin:2px 0}
+.j-step .jd{font-size:10.5px; color:var(--muted); line-height:1.35}
+.j-step .jh{margin-top:6px}
+.j-step.gold{border-color:var(--gold); background:rgba(232,181,77,.08); box-shadow:0 0 12px rgba(232,181,77,.18)}
+.j-step.gold .jt{color:var(--gold)}
+.j-arrow{align-self:center; color:var(--soft); font-size:15px; flex:0 0 auto; padding:0 1px}
+@media (max-width:680px){.j-arrow{display:none}}
+
+/* channel-gate badges */
+.gatebadge{display:inline-block; font-size:10.5px; font-weight:700; border-radius:5px; padding:2px 8px; border:1px solid var(--line); margin:2px}
+.gatebadge.green{color:var(--green); border-color:rgba(70,198,109,.5)}
+.gatebadge.amber{color:var(--yellow); border-color:rgba(232,194,77,.5)}
+.gatebadge.redgate{color:var(--red); border-color:rgba(224,85,107,.6); background:rgba(224,85,107,.07)}
+.invariant{border:1px solid rgba(224,85,107,.65); background:rgba(224,85,107,.07); border-radius:var(--radius);
+  padding:12px 15px; margin:12px 0; font-size:13px}
+.invariant b{color:var(--red)}
+
+/* cash-out demo */
+.ztable td,.ztable th{font-size:12.5px; padding:5px 9px}
+.air{border:1px dashed rgba(232,194,77,.55); border-radius:var(--radius); padding:10px 13px; margin:10px 0; background:rgba(232,194,77,.04)}
+.receipt{background:#0a1018; border:1px solid rgba(70,198,109,.45); border-radius:var(--radius);
+  padding:12px 14px; margin:10px 0; font-family:ui-monospace,Consolas,monospace; font-size:11px;
+  white-space:pre-wrap; word-break:break-word; color:#bfe8cd}
+.ledger-line{font-family:ui-monospace,Consolas,monospace; font-size:10.5px; color:var(--muted);
+  border-bottom:1px dashed var(--line); padding:5px 2px; white-space:nowrap; overflow-x:auto}
+.ledger-line b{color:var(--green)}
+
+/* babel tabs */
+.babel-tabs{display:flex; gap:7px; flex-wrap:wrap; margin:10px 0}
+.babel-pane{background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:13px 16px; font-size:13.5px; line-height:1.55; min-height:96px}
+.babel-pane .alt{font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:var(--soft); margin-bottom:6px}
+
+/* approval console additions */
+.sc-gateblock{font-size:11.5px; color:var(--red); border-left:2px solid var(--red); padding:5px 10px; margin-top:8px; background:rgba(224,85,107,.06); border-radius:0 6px 6px 0}
+.st-tag{font-size:11px; font-weight:700; padding:3px 9px; border-radius:6px; flex:0 0 auto}
+.st-Approved{background:#0e2418; color:#7fdca0; border:1px solid #2f7d52}
+.st-Modified{background:#241c02; color:var(--gold); border:1px solid #5a4a12}
+.st-Declined{background:#1d0e12; color:#f0a3ae; border:1px solid #7d3a44}
+.st-pending{background:#0a1018; color:var(--muted); border:1px solid var(--line)}
+.err-note{border:1px solid rgba(224,85,107,.5); background:rgba(224,85,107,.06); border-radius:var(--radius); padding:10px 14px; font-size:12.5px; color:#f0a3ae}
+</style>
+</head>
+<body>
+<main>
+
+  <figure class="hero-art">
+    <img src="assets/img/fleet-command-jebSA6bMc9XXygDD8TmueP.webp"
+         alt="Fleet Command — a dark-green CRT-style network diagram: a central orange HB1000 ring spoked to glowing green agent emblems on a circuit-grid background"
+         fetchpriority="high">
+    <figcaption class="footnote">Fleet Command — banner art recovered from the model tour (legacy) archive.
+      The agent emblems it drew are lineage; today’s working fleet is the registry and console below.</figcaption>
+  </figure>
+
+  <h1>The Agent <b>Fleet</b></h1>
+  <p class="muted v-tim">The execution half of the HB1000 marriage — the Golden Age routing library, Mr &amp; Mrs Fix-It,
+     the Intent Harvesting Engine, and Babel Bridge — bolted onto Dingo squares under the 80/20 covenant.</p>
+  <p class="muted v-swiss">The execution layer of the HB1000 partnership: the Golden Age routing library, the Mr &amp; Mrs Fix-It
+     service loop, the Intent Harvesting Engine, and Babel Bridge — attached to Dingo Card squares and operated under the
+     80/20 covenant, with human approval required at every sensitive gate.</p>
+
+  <blockquote><b>“The agents bring the intelligence. The HB1000 brings the brilliance.”</b><br>
+  “Let the agents swing the hammers. The HB1000 holds the blueprint.”</blockquote>
+
+  <div class="panel tight">
+    <div class="spread">
+      <div style="flex:1; min-width:240px">
+        <div class="ph">The 80/20 covenant — target</div>
+        <div style="font-size:12.5px; color:var(--muted)">AI quietly does the unscalable 80%. Humans visibly carry the
+        relationship-critical 20%. <b style="color:var(--ink)">If the human’s share creeps over 20%, the dashboard turns red and the Council triages.</b></div>
+      </div>
+      <div style="flex:0 0 250px; min-width:200px" id="covenantBar"></div>
+    </div>
+  </div>
+
+  <div class="jump">
+    <a class="chip" href="#golden-age">Golden Age Fleet</a>
+    <a class="chip" href="#fixit">Mr &amp; Mrs Fix-It loop</a>
+    <a class="chip" href="#cashout">Cash-Out flagship demo</a>
+    <a class="chip" href="#pipeline">Intent pipeline</a>
+    <a class="chip" href="#console">Approval console</a>
+    <a class="chip" href="#babel">Babel Bridge</a>
+    <a class="chip" href="#seba">Seba Hub exemplar</a>
+  </div>
+
+  <!-- ============================== 1. GOLDEN AGE FLEET ============================== -->
+  <h2 class="sec-h" id="golden-age" style="font-size:13px">01 · The <b>Golden Age Fleet</b> — 10 trust archetypes (the routing library)</h2>
+  <p class="muted" id="gaHeader" style="font-size:13px"></p>
+  <blockquote>“Every trust mechanism can become a manipulation mechanism when scaled without conscience.”<br>
+  <b>Counter-principle: use AI to expand care, not to automate predation.</b></blockquote>
+  <p class="footnote">Click any card to flip it to its <span style="color:var(--red)">shadow side</span> — the conscience layer. The full per-card playbook, golden kernel, consumer protection and existential risk live on the strategy-card art itself.</p>
+  <div class="ga-grid" id="gaGrid"></div>
+
+  <div class="grid2">
+    <div class="panel tight">
+      <div class="ph">routeSignal() — the default router (verbatim routing sketch)</div>
+      <p class="footnote" style="margin-top:0">Click a rule to highlight which archetypes the signal routes to.</p>
+      <div id="routeRules"></div>
+      <div id="routeNote" class="muted" style="font-size:12.5px; margin-top:8px"></div>
+    </div>
+    <div class="panel tight">
+      <div class="ph">Confidence bands + scoring dimensions</div>
+      <table><tbody id="bandRows"></tbody></table>
+      <div id="scoreDims" style="margin-top:9px"></div>
+    </div>
+  </div>
+
+  <!-- ============================== 2. MR & MRS FIX-IT ============================== -->
+  <h2 class="sec-h" id="fixit" style="font-size:13px">02 · <b>Mr &amp; Mrs Fix-It</b> — the execution engine (four primitives, end to end)</h2>
+  <blockquote>“Every HB1000 gets a tireless AI Fix-It Crew that works inside their authority lane, does the heavy lifting,
+  checks back when human brilliance is needed, and stays with the problem until it is fixed.”</blockquote>
+
+  <div class="journey" id="fixitJourney"></div>
+
+  <div class="grid2">
+    <div class="panel tight">
+      <div class="ph">The authority lane rule</div>
+      <blockquote style="margin:6px 0"><b>“Brilliance can suggest anywhere. Authority can dispatch only in-lane.”</b></blockquote>
+      <p style="font-size:12.5px; color:var(--muted)">Enforced in code at creation, dispatch, and signoff — never just in a prompt.
+      <i>“If the lane check is client-side, ‘authority dispatches only in-lane’ is a sticker, not a rule. So it isn’t.”</i>
+      Out-of-lane ideas become <b style="color:var(--ink)">Fix-It Suggestions</b> routed to the lane-owning HB1000.
+      In this page the lane rule is enforced in shared JS and visibly labelled as a simulation.</p>
+      <p style="font-size:12.5px; color:var(--muted)">“Agents work 24/7 inside the fence. The HB1000 approves sensitive gates.”</p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">The safety fence (hard rules)</div>
+      <p style="font-size:12.5px; color:var(--muted); margin-top:0">Agents <b style="color:var(--green)">MAY</b> research, draft, compare, clean, score, prepare, analyze, monitor, report.
+      Agents <b style="color:var(--red)">MAY NOT</b> without HB1000 approval: contact customers, send external messages, spend money,
+      make legal/financial claims, change production systems, file legal documents, sign contracts, publish allegations,
+      use sensitive personal data beyond ticket scope, or act outside the authority lane.</p>
+      <p style="font-size:12.5px; color:var(--muted)"><i>“The agent never sleeps, but it still stays inside the fence.”</i>
+      Full MAY/MAY-NOT table: <a href="doctrine.html">The Doctrine</a>.</p>
+    </div>
+  </div>
+
+  <div class="panel tight" style="margin-top:14px">
+    <div class="ph">The Agent Registry — 13 specialist types</div>
+    <div id="registryChips"></div>
+    <p class="footnote">v1 reality check: only the Babel Translator is live; the rest are registry placeholders — “specced, deferred to HB1000.”</p>
+  </div>
+
+  <!-- ============================== 3. CASH-OUT FLAGSHIP DEMO ============================== -->
+  <h2 class="sec-h" id="cashout" style="font-size:13px">03 · <b>Cash-Out</b> — the flagship assignment (BUILT 2026-06-07)</h2>
+  <blockquote>“Manager pushes ‘Cash Out’ → agent does ~80% → manager approves the 20% → clean trail handed to Samantha’s Stage-2 team.”<br>
+  <span class="muted">“Manager 100% by hand → the agent does ~80%, finds the air, the manager approves and goes home.”</span></blockquote>
+
+  <div class="row" style="margin:8px 0 12px">
+    <span class="pill info">READ-ONLY to Bravo</span>
+    <span class="pill danger">never writes to the POS</span>
+    <span class="pill danger">never re-runs the Z — a re-run resets counters and destroys the audit trail</span>
+    <span class="pill good">step budget → escalates with a clean trail, never spins forever</span>
+    <span class="pill warn">PII + dollar figures redacted in the learning ledger</span>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="ph">Step 1 — Ingest the mock Z-report (read-only)</div>
+      <p class="footnote" style="margin-top:0">Simulated figures per CashOut-Assignment-Agent-Spec v0.1 — the built engine at
+      <code>Mr and Mrs Fixit/mvp-v1/cashout/</code> runs this exact flow against a mock Z-report with passing tests.</p>
+      <table class="ztable" id="zTable"></table>
+      <div style="margin-top:12px">
+        <button class="btn gold-cta" id="btnRun">Run nightly cash-out (simulated)</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ph">Step 2 — Reconcile + find the air</div>
+      <div id="reconOut"><p class="muted" style="font-size:13px">Run the cash-out to reconcile
+      <code>(counted cash − starting float)</code> vs the Z-report cash-sales total. The agent auto-matches the bulk and
+      produces a clean <b>exceptions list</b> — not a black-box answer. <i>“Here’s what balances; here are the items that
+      don’t, and where the air likely is.”</i></p></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <div class="ph">Step 3 — Approval gate → signed receipt → append-only ledger</div>
+    <div id="gateOut"><p class="muted" style="font-size:13px">The approval gate appears after reconciliation.
+    Approve / Modify / Decline are the only verbs — nothing auto-applies.</p></div>
+    <div id="receiptOut"></div>
+    <div class="ph" style="margin-top:14px">Learning ledger (append-only JSONL — never edited, never deleted)</div>
+    <div id="ledgerOut"></div>
+    <p class="footnote">Each receipt’s content blob is hashed with SHA256 (sorted-keys canonical, hash stored inside the receipt) — tamper-evident.
+    “Git is your audit log.” Ledger entries here persist to your browser’s localStorage; this demo is a simulation of the built engine.</p>
+  </div>
+
+  <div class="grid2" style="margin-top:14px">
+    <div class="panel tight">
+      <div class="ph">⏳ GATED — waiting on named people</div>
+      <div class="status-row warn"><span class="st">Gated</span><span class="grow">Bravo’s exact Z-report export format — waiting on <b>Diana / Jarrett / Lauren</b> (email replies)</span></div>
+      <div class="status-row warn"><span class="st">Gated</span><span class="grow">Stage-2 bank-data location + process — waiting on <b>Samantha</b></span></div>
+      <div class="status-row warn"><span class="st">Gated</span><span class="grow">Read-only credentials to Bravo + bank — waiting on the owners above (just-in-time, task-scoped)</span></div>
+      <p class="footnote">“The BUILD-NOW block is hours of work, not weeks. The schedule is the managers iterating with it nightly until it’s earned their trust.”</p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">Stage 2 — next day by noon (Samantha’s lane · read-only, never moves money)</div>
+      <div class="status-row ok"><span class="st">✓ Rec</span><span class="grow">Store record pre-reconciled against bank deposits</span></div>
+      <div class="status-row bad"><span class="st">⚠ Air</span><span class="grow">“Balanced-but-wrong”: a $40 that balanced last night but never hit the bank — <b>ESCALATES</b></span></div>
+      <div class="status-row warn"><span class="st">⚠ Dup</span><span class="grow">Duplicated card line flags a $240 over-settlement — routed back to the store</span></div>
+      <p class="footnote">The cash-out is the prime adoption lane (protect the prime — Pawn Princess); next adoption = Stage-2 with Samantha.
+      “Build is free; human adoption is the only scarce resource.”</p>
+    </div>
+  </div>
+
+  <!-- ============================== 4. INTENT PIPELINE ============================== -->
+  <h2 class="sec-h" id="pipeline" style="font-size:13px">04 · The <b>Intent Harvesting</b> pipeline — the SENSE layer that feeds the fleet</h2>
+  <blockquote><b>“We harvest intent, not attention.”</b><br>
+  <span class="muted">Old model: buy attention → interrupt → hope → retarget → pay forever. New model: detect public intent →
+  route to a Golden Age trust mechanism → draft a helpful “digital knock” → a human makes the warm connection → learn.</span></blockquote>
+
+  <div class="journey" id="pipeJourney"></div>
+  <p class="footnote" id="pipeNote">Human-share percentages are computed live from the real Seba Hub Dingo card
+  (<code>data/cards/seba-hub-occupancy.json</code>, squares E1–E10) — computed, never asserted. The approval gate is
+  deliberately the human-heaviest square on the card.</p>
+
+  <div class="invariant">
+    <b>HARD-CODED INVARIANT — the channel gate:</b> every signal is tagged
+    <span class="gatebadge green">green_public_declared</span>
+    <span class="gatebadge green">green_own_account</span>
+    <span class="gatebadge amber">amber_inferred_public — content only</span>
+    <span class="gatebadge redgate">red_individual_private</span>.<br>
+    <b>red_individual_private can ONLY produce a public post, NEVER a message to a person — any phase, no override.
+    No override field exists in the schema, by design.</b> The pilot runs GREEN-ONLY. MVP hard rule: 0 live outbound sends — draft-only throughout.
+  </div>
+
+  <div class="grid3">
+    <div class="panel tight">
+      <div class="ph">Phase 1 — Tin Hat Lab</div>
+      <p style="font-size:12.5px; color:var(--muted); margin:0">“If there were no rules, what would we try?” —
+      <i>Curiosity first. Judgment second. Scale third.</i> Draft-only, 0 live sends.</p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">Phase 2 — Rule-making</div>
+      <p style="font-size:12.5px; color:var(--muted); margin:0">Every tactic gets a verdict: Keep / Modify / Restrict / Kill.</p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">Phase 3 — Regulated scale-up</div>
+      <p style="font-size:12.5px; color:var(--muted); margin:0">A lane goes live only after it is explicitly promoted past Tin Hat.
+      Weak signals (confidence 50–69) sit in the <b style="color:var(--ink)">Watch Queue</b>.</p>
+    </div>
+  </div>
+
+  <!-- ============================== 5. APPROVAL CONSOLE ============================== -->
+  <h2 class="sec-h" id="console" style="font-size:13px">05 · The <b>Approval Console</b> — the human decides every move</h2>
+  <p class="muted" style="font-size:13px" id="laneLine"></p>
+  <div class="row" id="consoleBoard" style="margin:10px 0"></div>
+  <div id="signalList"><p class="muted">Loading real Seba signals from <code>data/signals.json</code>…</p></div>
+  <p class="footnote">Generalized from the working Seba nightly console. Verdicts persist to your browser’s localStorage
+  (<code>hb1000-approvals</code>) — drafts are real seed data; nothing here can send.</p>
+
+  <!-- ============================== 6. BABEL BRIDGE ============================== -->
+  <h2 class="sec-h" id="babel" style="font-size:13px">06 · <b>Babel Bridge</b> — the communication organ of the fleet</h2>
+  <p class="muted" style="font-size:13px">Most of what goes wrong between humans is that <i>“the message did not arrive intact.”</i>
+  Text is a thin pipe that strips tone, face, gesture, feeling. Babel Bridge is a prism: compose once, and the message refracts
+  into every channel a human might need to actually receive it.</p>
+
+  <div class="grid3">
+    <div class="panel tight">
+      <div class="ph">🔺 The Prism</div>
+      <p style="font-size:12.5px; color:var(--muted); margin:0">One message in → parallel renderings out (written text, voice, infograph,
+      picture, comic frames, Emoji Mode glyph strings, haptic, photic — extensible). Inside this OS it shows up as the
+      <b style="color:var(--ink)">Babel Translator</b> agent: Formal / Plain / Barstool / Timbit on every outbound draft.</p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">🛫 The pre-flight check</div>
+      <p style="font-size:12.5px; color:var(--muted); margin:0">The sender sees every rendering before sending and confirms
+      <i>“is that what I meant?”</i> — the AI never guesses in private.</p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">🎚 The receiver’s toggle</div>
+      <p style="font-size:12.5px; color:var(--muted); margin:0">A message arrives as plain “white light” by default; one tap breaks the
+      prism open. <i>The choice of how to take in a message belongs to the person on the other end.</i></p>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <div class="ph">Live demo — one real draft, four altitudes</div>
+    <p class="footnote" style="margin-top:0">The Plain English baseline is the real approved-style draft from <code>data/signals.json</code>
+    (signal org-01, “Rescue · staycation”). The other three are Babel Translator renderings — simulated, draft-only, nothing sends.</p>
+    <div class="babel-tabs" id="babelTabs"></div>
+    <div class="babel-pane" id="babelPane"></div>
+  </div>
+  <p class="footnote">The full multi-channel bridge is NOT rebuilt in this app — canonical build: Babel Bridge v5.1
+  (estate folder <code>Babel Bridge-Better and Emoji mode/V Versions starting at 5.1/</code>). It is LLM-agnostic open
+  infrastructure: “We will not capture value from the protocol.”</p>
+
+  <!-- ============================== 7. SEBA HUB EXEMPLAR ============================== -->
+  <h2 class="sec-h" id="seba" style="font-size:13px">07 · <b>Seba Hub</b> — the live exemplar card</h2>
+  <p class="muted" style="font-size:13px">The whole fleet layer, running on one real Dingo Card: 12 occupancy lanes on top,
+  the Intent Harvesting Engine on the bottom, PTK <b style="color:var(--gold)">“no empty night, no empty seat”</b> at the centre.
+  Dingo Caller: <b style="color:var(--ink)">Casey</b> — one neck to choke; Casey approves every message.</p>
+  <div class="hub-grid">
+    <a class="link-card" href="card.html?card=seba-hub-occupancy">
+      <div class="lc-t">Seba Hub <b>Occupancy Engine</b></div>
+      <div class="lc-d">The live exemplar Dingo Card — lanes L1–L12 on top, engine squares E1–E10 below, the HUMAN-approve square at human&nbsp;90%.</div>
+      <div class="lc-k">card.html?card=seba-hub-occupancy</div>
+    </a>
+    <a class="link-card" href="ptk.html">
+      <div class="lc-t"><b>PTK</b> — Promises to Keep</div>
+      <div class="lc-d">The AI promise engine at the centre of every card. Seba’s focal promise: no empty night, no empty seat.</div>
+      <div class="lc-k">the dual ledger</div>
+    </a>
+    <a class="link-card" href="doctrine.html">
+      <div class="lc-t">The <b>Doctrine</b></div>
+      <div class="lc-d">80/20, authority lanes, Two-Shop Test, receipts, the MAY/MAY-NOT safety fence, Standing Orders.</div>
+      <div class="lc-k">the rules the fleet runs under</div>
+    </a>
+    <a class="link-card" href="command.html">
+      <div class="lc-t"><b>Command Deck</b></div>
+      <div class="lc-d">Where fleet exceptions surface: HIL queue (cap 10), Check Engine, 80/20 alarms.</div>
+      <div class="lc-k">exception-first aggregation</div>
+    </a>
+  </div>
+
+  <hr>
+  <p class="footnote">Tone rule for everything customer-facing: value-first, dignified, no-shame, no-creepiness —
+  “use AI to expand care, not to automate predation.” · “Every output is a baseline, never final.”</p>
+
+</main>
+
+<script src="assets/shell.js"></script>
+<script>
+'use strict';
+Shell.init('fleet');
+
+/* ============================ shared utils ============================ */
+
+// covenant target bar (80/20)
+document.getElementById('covenantBar').innerHTML = Shell.splitBar(20);
+
+function el(id){ return document.getElementById(id); }
+function loadFail(targetId, path){
+  el(targetId).innerHTML = '<div class="err-note">Could not load <code>' + Shell.esc(path) +
+    '</code>. If you opened this file directly from disk, your browser may block local JSON — ' +
+    'serve the app over HTTP (e.g. <code>python -m http.server</code> in <code>app/</code>, or GitHub Pages).</div>';
+}
+
+// stable (sorted-keys canonical) stringify — receipts are hashed over this
+function stableStringify(v){
+  if (v === null || typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '[' + v.map(stableStringify).join(',') + ']';
+  return '{' + Object.keys(v).sort().map(function(k){
+    return JSON.stringify(k) + ':' + stableStringify(v[k]);
+  }).join(',') + '}';
+}
+
+// SHA-256 (pure JS, public-domain pattern) — UTF-8 safe via byte-string conversion
+function sha256(input){
+  var ascii = unescape(encodeURIComponent(String(input)));
+  function rr(v,a){ return (v>>>a) | (v<<(32-a)); }
+  var maxWord = Math.pow(2,32), result = '', i, j;
+  var words = [], asciiBitLength = ascii.length*8;
+  var hash = sha256.h = sha256.h || [];
+  var k = sha256.k = sha256.k || [];
+  var primeCounter = k.length, isComposite = {};
+  for (var candidate = 2; primeCounter < 64; candidate++){
+    if (!isComposite[candidate]){
+      for (i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+      hash[primeCounter] = (Math.pow(candidate, .5) * maxWord) | 0;
+      k[primeCounter++] = (Math.pow(candidate, 1/3) * maxWord) | 0;
+    }
+  }
+  ascii += '\x80';
+  while (ascii.length % 64 - 56) ascii += '\x00';
+  for (i = 0; i < ascii.length; i++){
+    j = ascii.charCodeAt(i);
+    if (j >> 8) return ''; // byte-string guaranteed by encodeURIComponent above
+    words[i>>2] |= j << ((3 - i) % 4) * 8;
+  }
+  words[words.length] = ((asciiBitLength / maxWord) | 0);
+  words[words.length] = (asciiBitLength);
+  for (j = 0; j < words.length;){
+    var w = words.slice(j, j += 16);
+    var oldHash = hash;
+    hash = hash.slice(0, 8);
+    for (i = 0; i < 64; i++){
+      var w15 = w[i-15], w2 = w[i-2];
+      var a = hash[0], e = hash[4];
+      var temp1 = hash[7]
+        + (rr(e,6) ^ rr(e,11) ^ rr(e,25))
+        + ((e & hash[5]) ^ ((~e) & hash[6]))
+        + k[i]
+        + (w[i] = (i < 16) ? w[i] : (
+            w[i-16]
+            + (rr(w15,7) ^ rr(w15,18) ^ (w15>>>3))
+            + w[i-7]
+            + (rr(w2,17) ^ rr(w2,19) ^ (w2>>>10))
+          ) | 0);
+      var temp2 = (rr(a,2) ^ rr(a,13) ^ rr(a,22))
+        + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+      hash = [(temp1 + temp2) | 0].concat(hash);
+      hash[4] = (hash[4] + temp1) | 0;
+    }
+    for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+  }
+  for (i = 0; i < 8; i++){
+    for (j = 3; j + 1; j--){
+      var b = (hash[i] >> (j*8)) & 255;
+      result += ((b < 16) ? '0' : '') + b.toString(16);
+    }
+  }
+  return result;
+}
+
+/* ============================ 1. GOLDEN AGE FLEET ============================ */
+
+// per-archetype "existential risk if AI gets it wrong" (from the verbatim risk list)
+var GA_RISK = {
+  fuller_brush:            'converts service into surveillance',
+  avon_lady:               'AI imitates friendship to exploit intimacy',
+  route_man:               'industrializes persistence into harassment',
+  tupperware_hostess:      'turns community into covert selling',
+  kirby_demonstrator:      'uses inferred distress to pressure the vulnerable',
+  electrolux_advisor:      'converts service into surveillance',
+  family_future_counselor: 'uses inferred distress to pressure the vulnerable',
+  southwestern_scout:      'industrializes persistence into harassment',
+  mary_kay_mentor:         'gamifies self-worth',
+  network_builder:         'turns humans into monetized nodes'
+};
+
+var GA = null;
+
+Shell.loadJSON('data/golden-age.json').then(function(d){
+  GA = d;
+  el('gaHeader').textContent = d.meta.header;
+
+  // gallery
+  el('gaGrid').innerHTML = d.archetypes.map(function(a){
+    var risk = GA_RISK[a.id] || 'scaled without conscience, the mechanism inverts';
+    return '<div class="ga-card" data-id="' + Shell.esc(a.id) + '" tabindex="0" role="button" aria-pressed="false"' +
+      ' aria-label="' + Shell.esc(a.archetype) + ' — flip to shadow side">' +
+      '<div class="ga-inner">' +
+        '<div class="ga-face ga-front">' +
+          '<img src="' + Shell.esc(a.img) + '" alt="' + Shell.esc(a.archetype) + ' strategy card" loading="lazy">' +
+          '<div class="cap">' +
+            '<div class="nm">' + (a.n < 10 ? '0' + a.n : a.n) + ' · ' + Shell.esc(a.archetype) + '</div>' +
+            '<div class="es">' + Shell.esc(a.essence) + '</div>' +
+            '<div class="pn">' + Shell.esc(a.persona) + '</div>' +
+            '<div class="flip-hint">↻ flip — shadow side</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ga-face ga-back">' +
+          '<h4>Shadow side — the conscience layer</h4>' +
+          '<div class="gq">“Every trust mechanism can become a manipulation mechanism when scaled without conscience.”</div>' +
+          '<div class="lbl">Guardrail (verbatim)</div>' +
+          '<div class="guard-line">' + Shell.esc(a.guardrail) + '</div>' +
+          '<div class="lbl">Existential risk if AI gets it wrong</div>' +
+          '<div class="risk">' + Shell.esc(risk) + '</div>' +
+          '<div class="counter">“Use AI to expand care, not to automate predation.”</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  Array.prototype.forEach.call(document.querySelectorAll('.ga-card'), function(card){
+    function flip(){
+      var on = card.classList.toggle('flipped');
+      card.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+    card.addEventListener('click', flip);
+    card.addEventListener('keydown', function(ev){
+      if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); flip(); }
+    });
+  });
+
+  // routeSignal() rules
+  el('routeRules').innerHTML = d.routeSignal.rules.map(function(r, i){
+    return '<span class="chip route-rule" data-i="' + i + '">' + Shell.esc(r.signal) + '</span>';
+  }).join(' ');
+  Array.prototype.forEach.call(document.querySelectorAll('.route-rule'), function(ch){
+    ch.addEventListener('click', function(){
+      var rule = GA.routeSignal.rules[Number(ch.getAttribute('data-i'))];
+      Array.prototype.forEach.call(document.querySelectorAll('.route-rule'), function(c){ c.classList.remove('on'); });
+      ch.classList.add('on');
+      var ids = {};
+      rule.route.forEach(function(id){ ids[id] = true; });
+      var hitNames = [];
+      Array.prototype.forEach.call(document.querySelectorAll('.ga-card'), function(card){
+        var hit = !!ids[card.getAttribute('data-id')];
+        card.classList.toggle('hl', hit);
+        if (hit){
+          var a = GA.archetypes.filter(function(x){ return x.id === card.getAttribute('data-id'); })[0];
+          if (a) hitNames.push(a.archetype);
+        }
+      });
+      var extras = rule.route.filter(function(id){
+        return !GA.archetypes.some(function(a){ return a.id === id; });
+      });
+      el('routeNote').innerHTML = '<b style="color:var(--gold)">' + Shell.esc(rule.signal) + '</b> → routes to: ' +
+        Shell.esc(hitNames.join(' + ') || '—') +
+        (extras.length ? ' <span class="soft">(+ ' + Shell.esc(extras.join(', ')) + ')</span>' : '') +
+        ' — highlighted above.';
+    });
+  });
+
+  // confidence bands + scoring dimensions
+  el('bandRows').innerHTML = d.confidence_bands.map(function(b){
+    return '<tr><td class="num" style="font-weight:800; color:var(--ink)">' + Shell.esc(b.range) +
+      '</td><td>' + Shell.esc(b.meaning) + '</td></tr>';
+  }).join('');
+  el('scoreDims').innerHTML = d.scoring_dimensions.map(function(s){
+    return Shell.pill(s, s.indexOf('creepiness') >= 0 ? 'danger' : 'info');
+  }).join(' ');
+}).catch(function(){ loadFail('gaGrid', 'data/golden-age.json'); });
+
+/* ============================ 2. FIX-IT JOURNEY ============================ */
+
+var FIXIT_STEPS = [
+  ['1', 'Ticket / assignment', 'A standing job on a Dingo square — e.g. “tonight’s cash-out.” Out-of-lane ideas become Fix-It Suggestions.'],
+  ['2', 'Agent work loop', 'Ingest → reconcile → exceptions. Schema-enforced output, validator self-correct, hard step budget.'],
+  ['3', 'Approval gate', 'Agents pause. The HB1000 approves, modifies, or declines — sensitive gates never auto-pass.', true],
+  ['4', 'Signed receipt', 'SHA256 over the sorted-keys canonical blob, hash stored inside the receipt — tamper-evident. Score before/after/delta + HOFI tag.'],
+  ['5', 'Append-only learning ledger', 'JSONL, one line per receipt. Never edited. Never deleted. The system’s memory.']
+];
+
+el('fixitJourney').innerHTML = FIXIT_STEPS.map(function(s, i){
+  var arrow = i < FIXIT_STEPS.length - 1 ? '<div class="j-arrow">→</div>' : '';
+  return '<div class="j-step' + (s[3] ? ' gold' : '') + '">' +
+    '<div class="jn">PRIMITIVE ' + s[0] + '</div>' +
+    '<div class="jt">' + Shell.esc(s[1]) + '</div>' +
+    '<div class="jd">' + Shell.esc(s[2]) + '</div>' +
+  '</div>' + arrow;
+}).join('');
+
+var REGISTRY = ['Research Mechanic', 'Builder Mechanic', 'Babel Translator', 'Claim-Risk Inspector',
+  'DINGO Foreman', 'Scorekeeper Agent', 'Door-to-Door Fleet Agent', 'Occupancy Specialist', 'Data Cleaner',
+  'Gap Audit Inspector', 'HOFI Assessor', 'Cloud Butterfly Scout', 'AgNotice Agent'];
+el('registryChips').innerHTML = REGISTRY.map(function(r){
+  return Shell.pill(r, r === 'Babel Translator' ? 'gold' : '');
+}).join(' ');
+
+/* ============================ 3. CASH-OUT DEMO ============================ */
+
+var Z = {
+  store: 'Pawn Princess — Store PP-01',
+  date: '2026-06-07 (mock Z-report — simulated figures)',
+  starting_float: 300.00,
+  counted_cash: 1512.25,
+  z_cash_sales: 1252.25,
+  z_card_sales: 2140.40,
+  card_settlement: 2140.40,
+  yesterday_close_float: 300.00
+};
+
+var AIR = [
+  { t: '14:38 — Layaway payment #4417: $40.00 taken in cash but rung as card', odds: 'most likely line' },
+  { t: '21:42 — No-sale drawer open with no transaction attached', odds: 'possible' },
+  { t: 'Float chain: yesterday’s close $300.00 = tonight’s opening $300.00 ✓', odds: 'eliminated' }
+];
+
+function money(n){ return (n < 0 ? '−$' : '$') + Math.abs(n).toFixed(2); }
+
+el('zTable').innerHTML =
+  '<tr><th>Store</th><td>' + Shell.esc(Z.store) + '</td></tr>' +
+  '<tr><th>Z-report</th><td>' + Shell.esc(Z.date) + '</td></tr>' +
+  '<tr><th>Starting float</th><td class="num">' + money(Z.starting_float) + '</td></tr>' +
+  '<tr><th>Counted cash (drawer)</th><td class="num">' + money(Z.counted_cash) + '</td></tr>' +
+  '<tr><th>Z cash-sales total</th><td class="num">' + money(Z.z_cash_sales) + '</td></tr>' +
+  '<tr><th>Z card-sales total</th><td class="num">' + money(Z.z_card_sales) + '</td></tr>' +
+  '<tr><th>Card settlement</th><td class="num">' + money(Z.card_settlement) + '</td></tr>';
+
+var LEDGER_KEY = 'hb1000-fleet-ledger';
+function readLedger(){
+  try { return JSON.parse(localStorage.getItem(LEDGER_KEY) || '[]'); } catch (e) { return []; }
+}
+function appendLedger(entry){
+  var l = readLedger();
+  l.push(entry);
+  localStorage.setItem(LEDGER_KEY, JSON.stringify(l));
+  renderLedger();
+}
+function renderLedger(){
+  var l = readLedger();
+  el('ledgerOut').innerHTML = l.length
+    ? l.map(function(e){ return '<div class="ledger-line"><b>' + Shell.esc(e.kind || 'receipt') + '</b> ' +
+        Shell.esc(JSON.stringify(e)) + '</div>'; }).join('')
+    : '<p class="muted" style="font-size:12.5px">Ledger is empty — approve a cash-out above to write the first line.</p>';
+}
+renderLedger();
+
+// computed, never asserted
+var cashToBank = Z.counted_cash - Z.starting_float;
+var variance = +(cashToBank - Z.z_cash_sales).toFixed(2);
+
+el('btnRun').addEventListener('click', function(){
+  el('reconOut').innerHTML =
+    '<div class="status-row ' + (Z.yesterday_close_float === Z.starting_float ? 'ok' : 'bad') + '">' +
+      '<span class="st">' + (Z.yesterday_close_float === Z.starting_float ? '✓ Float' : '⚠ Float') + '</span>' +
+      '<span class="grow">Opening float ' + money(Z.starting_float) + ' matches yesterday’s close ' + money(Z.yesterday_close_float) + '</span></div>' +
+    '<div class="status-row ' + (Z.card_settlement === Z.z_card_sales ? 'ok' : 'warn') + '">' +
+      '<span class="st">' + (Z.card_settlement === Z.z_card_sales ? '✓ Cards' : '⚠ Cards') + '</span>' +
+      '<span class="grow">Card settlement ' + money(Z.card_settlement) + ' vs Z card total ' + money(Z.z_card_sales) + '</span></div>' +
+    '<div class="status-row ' + (variance === 0 ? 'ok' : 'bad') + '">' +
+      '<span class="st">' + (variance === 0 ? '✓ Cash' : '⚠ Cash') + '</span>' +
+      '<span class="grow">(counted ' + money(Z.counted_cash) + ' − float ' + money(Z.starting_float) + ') = ' +
+      money(cashToBank) + ' vs Z cash sales ' + money(Z.z_cash_sales) +
+      ' → <b>variance ' + money(variance) + (variance < 0 ? ' SHORT' : variance > 0 ? ' OVER' : '') + '</b></span></div>' +
+    '<div class="air"><b style="color:var(--yellow)">Find the air</b> — variance localized to ≤3 likely lines (exceptions list, not a black-box answer):' +
+      '<ul style="margin:7px 0 2px; padding-left:20px; font-size:12.5px">' +
+      AIR.map(function(a){ return '<li>' + Shell.esc(a.t) + ' <span class="soft">(' + Shell.esc(a.odds) + ')</span></li>'; }).join('') +
+      '</ul></div>';
+
+  el('gateOut').innerHTML =
+    '<p style="font-size:13px; color:var(--muted); margin-top:0">Manager (simulated session — Lauren’s lane) reviews the exceptions list. ' +
+    'Approve / Modify / Decline are the only verbs at this gate.</p>' +
+    '<div class="verdicts">' +
+      '<button class="btn approve" id="btnApprove">Approve</button>' +
+      '<button class="btn modify" id="btnModify">Modify — annotate first</button>' +
+      '<button class="btn decline" id="btnDecline">Decline — escalate</button>' +
+    '</div>' +
+    '<div id="modifyBox" style="display:none; margin-top:10px">' +
+      '<textarea id="annotation" rows="2" style="width:100%; background:var(--panel-2); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:8px; font:inherit; font-size:12.5px" placeholder="Manager annotation — e.g. confirmed #4417 was the layaway mis-ring; retrained cashier."></textarea>' +
+      '<button class="btn modify" id="btnSaveAnno" style="margin-top:7px">Save annotation + approve</button>' +
+    '</div>';
+
+  el('btnApprove').addEventListener('click', function(){ signReceipt('Approved', ''); });
+  el('btnModify').addEventListener('click', function(){ el('modifyBox').style.display = 'block'; });
+  el('btnSaveAnno').addEventListener('click', function(){
+    signReceipt('Modified', el('annotation').value || '(no annotation text)');
+  });
+  el('btnDecline').addEventListener('click', function(){
+    el('receiptOut').innerHTML =
+      '<div class="status-row bad"><span class="st">Escalated</span><span class="grow">Manager declined. ' +
+      'The agent stops at its step budget and escalates with a clean trail — it does not spin forever. ' +
+      'No receipt is signed; the trail goes to a human.</span></div>';
+    appendLedger({
+      kind: 'escalation', ts: new Date().toISOString(),
+      assignment: 'Tonight’s cash-out — Pawn Princess PP-01 (simulated)',
+      variance_bucket: '$25–$50 short', // dollar figures bucketed — redaction.py pattern
+      note: 'Declined at the approval gate; escalated with a clean trail.'
+    });
+  });
+});
+
+function signReceipt(verdict, annotation){
+  var body = {
+    id: 'RCPT-' + Date.now(),
+    assignment: 'Tonight’s cash-out — Pawn Princess PP-01 (simulated demo of the built mvp-v1/cashout engine)',
+    reconcile: {
+      counted_minus_float: cashToBank,
+      z_cash_sales: Z.z_cash_sales,
+      variance: variance
+    },
+    exceptions: AIR.map(function(a){ return a.t; }),
+    verdict: verdict,
+    annotation: annotation,
+    approvedBy: 'Manager — Lauren’s lane (simulated session)',
+    hofi: 'Oversight',
+    learning: 'Layaway cash/card mis-rings are the most common air at PP-01 — the agent learns the store’s routine.',
+    date: new Date().toISOString()
+  };
+  var hash = sha256(stableStringify(body));
+  var receipt = JSON.parse(JSON.stringify(body));
+  receipt.sha256 = hash;
+  el('receiptOut').innerHTML =
+    '<div class="receipt">SIGNED FIX-IT RECEIPT — tamper-evident\n' +
+    'sha256 (sorted-keys canonical): ' + hash + '\n\n' +
+    Shell.esc(JSON.stringify(receipt, null, 2)) + '</div>' +
+    '<p class="footnote">A signed, balanced cash-out record — the receipt — plus a tidy package handed to Stage 2. ' +
+    'In the learning ledger below, dollar figures are bucketed (redaction pattern); the receipt above is the manager-facing copy.</p>';
+  appendLedger({
+    kind: 'receipt', id: receipt.id, sha256: hash, ts: receipt.date,
+    assignment: 'Nightly cash-out — PP-01 (simulated)',
+    verdict: verdict,
+    variance_bucket: '$25–$50 short', // PII + dollar figures redacted in the ledger
+    hofi: 'Oversight'
+  });
+}
+
+/* ============================ 4. INTENT PIPELINE ============================ */
+
+var PIPE = [
+  ['SENSE',          'E1', 'scan public spaces — Agent A declared + Agent B inferred'],
+  ['SCORE',          'E2', 'confidence + urgency + sizzle + creepiness risk'],
+  ['SORT',           null, 'Agent C: category, strategy match, handoff readiness (folded into SCORE/ROUTE on the Seba card)'],
+  ['ROUTE',          'E3', 'to the Golden Age fleet via routeSignal()'],
+  ['DRAFT',          'E4', 'a helpful “digital knock” — draft-only'],
+  ['HUMAN APPROVES', 'E5', 'the gate — Casey decides; nothing sends without a human'],
+  ['CONNECT',        'E6', 'a human rep makes the warm connection'],
+  ['OFFER',          'E7', 'right offer, right moment — book / reserve / ticket'],
+  ['OUTCOME',        'E8', 'filled or not — logged either way'],
+  ['LEARN',          'E9', 'which moves create trust, conversion, repeatable opportunity']
+];
+
+function renderPipeline(humanById){
+  el('pipeJourney').innerHTML = PIPE.map(function(p, i){
+    var human = (humanById && p[1] != null) ? humanById[p[1]] : null;
+    var chip = (human != null)
+      ? '<div class="jh">' + Shell.pill('human ' + human + '% · AI ' + (100 - human) + '%', human > 50 ? 'gold' : 'info') + '</div>'
+      : (p[1] ? '<div class="jh">' + Shell.pill('square ' + p[1], '') + '</div>' : '');
+    var arrow = i < PIPE.length - 1 ? '<div class="j-arrow">→</div>' : '';
+    return '<div class="j-step' + (p[0] === 'HUMAN APPROVES' ? ' gold' : '') + '">' +
+      '<div class="jn">' + (p[1] ? Shell.esc(p[1]) : '—') + '</div>' +
+      '<div class="jt">' + Shell.esc(p[0]) + '</div>' +
+      '<div class="jd">' + Shell.esc(p[2]) + '</div>' + chip +
+    '</div>' + arrow;
+  }).join('') +
+  '<div class="j-step"><div class="jn">E10</div><div class="jt">Trust ledger</div>' +
+  '<div class="jd">no creepiness — every interaction scored for trust, not just conversion</div>' +
+  (humanById && humanById.E10 != null ? '<div class="jh">' + Shell.pill('human ' + humanById.E10 + '%', 'info') + '</div>' : '') +
+  '</div>';
+}
+
+renderPipeline(null); // render immediately; enrich when the card loads
+
+Shell.loadJSON('data/cards/seba-hub-occupancy.json').then(function(card){
+  var humanById = {};
+  (card.squares || []).forEach(function(s){
+    if (s.id && typeof s.human === 'number') humanById[s.id] = s.human;
+  });
+  renderPipeline(humanById);
+}).catch(function(){
+  el('pipeNote').innerHTML = 'Could not load <code>data/cards/seba-hub-occupancy.json</code> — ' +
+    'pipeline shown without live human-share percentages. Serve over HTTP to load the real card.';
+});
+
+/* ============================ 5. APPROVAL CONSOLE ============================ */
+
+var APPROVAL_KEY = 'hb1000-approvals';
+var verdictStore = {};
+try { verdictStore = JSON.parse(localStorage.getItem(APPROVAL_KEY) || '{}'); } catch (e) { verdictStore = {}; }
+function saveVerdicts(){ localStorage.setItem(APPROVAL_KEY, JSON.stringify(verdictStore)); }
+
+var SIG = null;
+
+window.setVerdict = function(id, v){
+  if (v === 'pending') delete verdictStore[id]; else verdictStore[id] = v;
+  saveVerdicts();
+  renderConsole();
+};
+
+function chBadge(ch){
+  var cls = ch.indexOf('green') === 0 ? 'green' : (ch.indexOf('amber') === 0 ? 'amber' : 'redgate');
+  return '<span class="gatebadge ' + cls + '">' + Shell.esc(ch) + '</span>';
+}
+
+function renderConsole(){
+  if (!SIG) return;
+  var counts = { Approved: 0, Modified: 0, Declined: 0, pending: 0 };
+  SIG.signals.forEach(function(s){ counts[verdictStore[s.id] || 'pending']++; });
+
+  el('laneLine').innerHTML = '<b style="color:var(--ink)">' + Shell.esc(SIG.lane) + '</b><br>' +
+    Shell.esc(SIG.target) + '<br><span class="soft" style="font-size:11.5px"><b style="color:var(--muted)">Channel gate:</b> ' +
+    Shell.esc(SIG.channel_gate || '') + '</span>';
+
+  el('consoleBoard').innerHTML =
+    Shell.pill(SIG.signals.length + ' signals', '') + ' ' +
+    Shell.pill('✅ Approved ' + counts.Approved, 'good') + ' ' +
+    Shell.pill('✏️ Modified → public content ' + counts.Modified, 'warn') + ' ' +
+    Shell.pill('🚫 Declined — watch / no-contact ' + counts.Declined, 'danger') + ' ' +
+    Shell.pill('⏳ Pending ' + counts.pending, '');
+
+  var ordered = SIG.signals.slice().sort(function(a, b){
+    return ((b.class === 'organizer' ? 1 : 0) - (a.class === 'organizer' ? 1 : 0));
+  });
+
+  el('signalList').innerHTML = ordered.map(function(s){
+    var st = verdictStore[s.id] || 'pending';
+    var ch = s.channel || 'green_public_declared';
+    var redGate = (ch === 'red_individual_private');
+    var clsBadge = (s.class === 'organizer')
+      ? '<span class="gatebadge" style="color:var(--gold); border-color:rgba(232,181,77,.5)">★ ORGANIZER · fills 10–50 beds</span>'
+      : '<span class="gatebadge" style="color:var(--muted)">individual</span>';
+    var stLabel = st === 'pending' ? '⏳ pending'
+      : st === 'Approved' ? '✅ Approved'
+      : st === 'Modified' ? '✏️ Modified → public content'
+      : '🚫 Declined — no contact';
+
+    return '<div class="signal-card">' +
+      '<div class="sc-top">' +
+        '<div style="display:flex; gap:6px; flex-wrap:wrap">' + clsBadge + chBadge(ch) + '</div>' +
+        '<div class="sc-title" style="flex:1"></div>' +
+        '<span class="st-tag st-' + Shell.esc(st) + '">' + stLabel + '</span>' +
+      '</div>' +
+      '<div style="font-size:14px; font-weight:600; color:#fff; line-height:1.4">“' + Shell.esc(s.raw) + '”</div>' +
+      '<div class="soft" style="font-size:11px; margin-top:3px">' + Shell.esc(s.source) + '</div>' +
+      '<div style="margin:9px 0 4px">' +
+        Shell.pill('intent: ' + s.intent, 'info') + ' ' +
+        Shell.pill('confidence ' + s.confidence + '%', s.confidence >= 70 ? 'good' : 'warn') + ' ' +
+        Shell.pill('urgency: ' + s.urgency, s.urgency === 'high' ? 'danger' : s.urgency === 'medium' ? 'warn' : '') + ' ' +
+        Shell.pill('creepiness: ' + s.creepiness, s.creepiness === 'high' ? 'danger' : s.creepiness === 'medium' ? 'warn' : 'good') +
+      '</div>' +
+      '<div style="color:var(--gold); font-weight:600; font-size:12.5px">→ route: ' + Shell.esc(s.agent) + '</div>' +
+      '<div style="color:var(--teal); font-size:11.5px; margin:4px 0">sizzle: ' + Shell.esc(s.sizzle) + '</div>' +
+      '<div style="font-size:11.5px; color:var(--ink); background:var(--panel-2); border-left:2px solid var(--cyan); padding:5px 9px; border-radius:0 6px 6px 0; margin:6px 0"><b>first move:</b> ' + Shell.esc(s.move) + '</div>' +
+      s.drafts.map(function(dr){
+        return '<div class="draft"><div class="dh">' + Shell.esc(dr.style) + '</div>' + Shell.esc(dr.text) + '</div>';
+      }).join('') +
+      (redGate
+        ? '<div class="sc-gateblock">🔒 Channel gate: <b>red_individual_private</b> — “Approve draft” is structurally blocked. ' +
+          'This signal can ONLY become a public post, never a message to a person — any phase, no override.</div>'
+        : '') +
+      '<div class="verdicts">' +
+        '<button class="btn approve" ' + (redGate ? 'disabled title="Blocked by the channel gate — red_individual_private never produces a person-directed message"' :
+          'onclick="setVerdict(\'' + Shell.esc(s.id) + '\',\'Approved\')"') + '>Approve draft</button>' +
+        '<button class="btn modify" onclick="setVerdict(\'' + Shell.esc(s.id) + '\',\'Modified\')">Modify → public content instead</button>' +
+        '<button class="btn decline" onclick="setVerdict(\'' + Shell.esc(s.id) + '\',\'Declined\')">Decline — watch / no-contact</button>' +
+        '<button class="btn" onclick="setVerdict(\'' + Shell.esc(s.id) + '\',\'pending\')">reset</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+Shell.loadJSON('data/signals.json').then(function(d){
+  SIG = d;
+  renderConsole();
+}).catch(function(){ loadFail('signalList', 'data/signals.json'); });
+
+/* ============================ 6. BABEL BRIDGE DEMO ============================ */
+
+var BABEL = {
+  order: ['Formal', 'Plain English', 'Barstool', 'Timbit'],
+  note: {
+    'Formal':        'Boardroom altitude — Babel Translator rendering (simulated)',
+    'Plain English': 'The real draft — verbatim from data/signals.json (org-01, “Rescue · staycation”)',
+    'Barstool':      'Street altitude — Babel Translator rendering (simulated)',
+    'Timbit':        'The compressed bite — Babel Translator rendering (simulated)'
+  },
+  text: {
+    'Formal': 'Good afternoon — we understand you are coordinating a fall retreat for approximately 24 guests. ' +
+      'Seba Hub can reserve a dedicated midweek block (cabins plus a gathering space) within an hour of Edmonton, ' +
+      'consolidated to a single invoice, with our team managing the logistics end-to-end. ' +
+      'May we forward a midweek hold for your review?',
+    'Plain English': '(loading the real draft from data/signals.json…)',
+    'Barstool': 'Planning a retreat for 24 people? That’s a thankless job. Bring ’em out to us — cabins, a big room to gather, ' +
+      'an hour from the city, one bill. You show up, we do the rest. Want me to pencil in a midweek hold?',
+    'Timbit': '24 beds. Midweek. One invoice. We handle it — you just show up. Want the hold?'
+  },
+  current: 'Plain English'
+};
+
+function renderBabel(){
+  el('babelTabs').innerHTML = BABEL.order.map(function(k){
+    return '<span class="chip' + (k === BABEL.current ? ' on' : '') + '" data-k="' + Shell.esc(k) + '">' + Shell.esc(k) + '</span>';
+  }).join('');
+  el('babelPane').innerHTML =
+    '<div class="alt">' + Shell.esc(BABEL.note[BABEL.current]) + '</div>' +
+    Shell.esc(BABEL.text[BABEL.current]);
+  Array.prototype.forEach.call(el('babelTabs').querySelectorAll('.chip'), function(ch){
+    ch.addEventListener('click', function(){
+      BABEL.current = ch.getAttribute('data-k');
+      renderBabel();
+    });
+  });
+}
+// Swiss Protocol voice → the Babel demo opens at Boardroom altitude (Formal)
+if (Shell.voice() === 'swiss') BABEL.current = 'Formal';
+renderBabel();
+document.addEventListener('hb-voice-change', function(){
+  if (Shell.voice() === 'swiss'){ BABEL.current = 'Formal'; renderBabel(); }
+});
+
+// pull the real Plain English baseline out of signals.json
+Shell.loadJSON('data/signals.json').then(function(d){
+  var org01 = (d.signals || []).filter(function(s){ return s.id === 'org-01'; })[0];
+  if (org01 && org01.drafts && org01.drafts.length){
+    BABEL.text['Plain English'] = org01.drafts[0].text;
+    renderBabel();
+  }
+}).catch(function(){
+  BABEL.text['Plain English'] = '(could not load data/signals.json — serve the app over HTTP to see the real draft)';
+  renderBabel();
+});
+</script>
+</body>
+</html>

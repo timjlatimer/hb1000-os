@@ -1,0 +1,124 @@
+{
+  "lane": "Seba Hub — Nightly Occupancy (cabins · RV · geodomes · MIDWEEK gap)",
+  "target": "TWO PARALLEL TRACKS, one engine. (A) ORGANIZERS → midweek blocks (one yes = 10–50 beds; ~25–30% human to arrange). (B) INDIVIDUALS → weekend nights, ~90%+ AI: harvest → nudge → drop a ResNexus self-book link (sebastays.com) → they book themselves; Karen/office = phone fallback. AI can offer a ResNexus discount code to close. 85% needs BOTH — weekends are only 2 of 7 nights. Season ~3 months, day 8 — run both now.",
+  "channel_gate": "green_public_declared = ok · green_own_account = ok · amber_inferred_public = content only · red_individual_private = NEVER a message to a person, content only, no override. Pilot runs GREEN-ONLY.",
+  "signals": [
+    {
+      "id": "org-01", "class": "organizer", "channel": "green_public_declared",
+      "source": "Public church-group post", "intent": "declared", "confidence": 90, "urgency": "high",
+      "raw": "Planning our women's fall retreat for ~24. Weekends everywhere are booked and over budget — anyone know a spot within an hour of Edmonton?",
+      "sizzle": "Unpaid volunteer coordinator, terrified of letting the group down. Wants it handled, not a sales pitch.",
+      "creepiness": "low", "agent": "Tupperware Hostess + Route Man",
+      "move": "Rescue-register midweek GROUP BLOCK offer (24 beds) — lead with 'we handle the logistics'",
+      "drafts": [
+        {"style": "Rescue · staycation", "text": "Planning a retreat for 24 is a big lift — happy to take the logistics off your plate. We can hold a midweek block an hour from Edmonton (cabins + a gather space), one price, one invoice. You just show up. Want me to send a midweek hold?"},
+        {"style": "Rescue · off-grid", "text": "If you want the group truly unplugged, we can set you up off-grid midweek — cabins in the woods, a lake, trails, and a communal cookhouse for the group. We coordinate the whole stay so you don't have to. Want options?"}
+      ]
+    },
+    {
+      "id": "org-02", "class": "organizer", "channel": "green_public_declared",
+      "source": "Craft/knitting circle public post", "intent": "declared", "confidence": 86, "urgency": "medium",
+      "raw": "Anyone know a cozy spot for a midweek craft getaway? About 12 of us, want somewhere relaxing in nature.",
+      "sizzle": "Center-of-influence host; picks midweek for calm + cost. Wants togetherness + zero hassle.",
+      "creepiness": "low", "agent": "Tupperware Hostess",
+      "move": "Midweek block for 12 + a craft/gather room; rescue the host",
+      "drafts": [
+        {"style": "Rescue · staycation", "text": "A midweek craft getaway for 12 is exactly our sweet spot — cabins plus a warm room to spread out and create, one hour from Edmonton. We'll set the whole thing up so you can just enjoy it. Want a midweek block held?"},
+        {"style": "Rescue · off-grid", "text": "If the group wants to properly switch off, we can do off-grid cabins in the woods with a cozy communal space for the craft circle. We handle the setup end to end. Want me to send dates?"}
+      ]
+    },
+    {
+      "id": "org-03", "class": "organizer", "channel": "green_own_account",
+      "source": "Inbound DM to our own page", "intent": "declared", "confidence": 94, "urgency": "medium",
+      "raw": "Saw your page — do you do midweek group bookings? I run a book club, about 10 of us, looking for a weekend away (open to midweek to save).",
+      "sizzle": "Already warm (came to us). Open to midweek = aligned with our gap.",
+      "creepiness": "low", "agent": "Tupperware Hostess + Route Man",
+      "move": "Convert warm inbound to a midweek block; human closer takes it",
+      "drafts": [
+        {"style": "Rescue · staycation", "text": "We do — and midweek is honestly the nicest time to come, quieter and easier on the budget. For a book club of 10 we can hold cabins plus a comfy space to gather, all on one booking. Want me to put a midweek hold on a couple of dates?"},
+        {"style": "Human handoff", "text": "I'll have someone from our team confirm a midweek group rate and a couple of date options for your book club of 10 — they can have it sorted in a quick call."}
+      ]
+    },
+    {
+      "id": "org-04", "class": "organizer", "channel": "green_public_declared",
+      "source": "Run/trail club public post", "intent": "declared", "confidence": 83, "urgency": "medium",
+      "raw": "Captain here — want to organize a midweek trail-running getaway near Edmonton, ~15 of us. Need somewhere with actual trails.",
+      "sizzle": "Active-group leader; the trails ARE the product. Midweek by choice.",
+      "creepiness": "low", "agent": "Route Man + Tupperware Hostess",
+      "move": "Midweek block + our ~5km of curated forest trails as the hook",
+      "drafts": [
+        {"style": "Rescue · off-grid", "text": "We've got about 5km of curated forest trails right on site and cabins to match — a midweek block for 15 runners would have the place mostly to yourselves. We'll handle the booking as one package. Want trail maps + dates?"},
+        {"style": "Rescue · staycation", "text": "For a 15-person midweek trail weekend an hour from Edmonton: cabins, on-site trails, a lake to cool off in, and a country restaurant for the post-run feed. One booking, we coordinate it. Want a hold?"}
+      ]
+    },
+    {
+      "id": "org-05", "class": "organizer", "channel": "green_public_declared",
+      "source": "Corporate-offsite ask (public group)", "intent": "declared", "confidence": 80, "urgency": "high",
+      "raw": "Got volunteered to plan a 2-day team offsite within an hour of Edmonton, ~20 people, midweek to keep costs down. Help!",
+      "sizzle": "The 'no good deed' volunteer — wants to not get fired and look good. Pure rescue.",
+      "creepiness": "low", "agent": "Tupperware Hostess + Electrolux Advisor",
+      "move": "Midweek block + meeting/gather space; position as 'we make you look good'",
+      "drafts": [
+        {"style": "Rescue · staycation", "text": "Planning a 20-person offsite is a thankless job — let us make you the hero. Midweek block an hour from Edmonton: cabins, a room set up for sessions, and space to actually connect. One invoice, we run the logistics. Want a midweek hold?"},
+        {"style": "Human handoff", "text": "I'll have our team put together a simple midweek offsite package for ~20 (rooms + meeting space + meals) and walk you through it — you'll have something to send your boss today."}
+      ]
+    },
+    {
+      "id": "org-06", "class": "organizer", "channel": "green_public_declared",
+      "source": "Sports league public post", "intent": "declared", "confidence": 78, "urgency": "medium",
+      "raw": "Slo-pitch league wind-up — thinking a group weekend for ~25 players. Midweek cheaper? Need beds + somewhere to hang out.",
+      "sizzle": "Social leader; group bonding is the job. Budget-aware = midweek-open.",
+      "creepiness": "low", "agent": "Tupperware Hostess + Route Man",
+      "move": "Midweek block for 25 + communal hangout (gym/cookhouse/restaurant)",
+      "drafts": [
+        {"style": "Rescue · staycation", "text": "A 25-player wind-up is right up our alley — midweek we can give your crew cabins, a gym to mess around in, and Lenny's restaurant on site for the team dinner. One booking, we sort it all. Want me to hold a midweek block?"},
+        {"style": "Rescue · off-grid", "text": "If the team wants a proper escape, we can set up an off-grid midweek block with a fire pit and a lake — perfect for a wind-up. We handle the whole thing. Want dates?"}
+      ]
+    },
+    {
+      "id": "ind-01", "class": "individual", "channel": "green_public_declared",
+      "source": "Facebook group", "intent": "declared", "confidence": 92, "urgency": "high",
+      "raw": "Anyone know cabins near Kokanee this weekend? Everything's booked.",
+      "sizzle": "WEEKEND track. Ready to book — mostly self-serve: hand them a booking link and they close themselves.",
+      "creepiness": "low", "agent": "Route Man",
+      "move": "Reply with live availability + a BOOKING LINK (self-serve close, ~0 human time)",
+      "drafts": [
+        {"style": "Self-serve booking", "text": "If you're still stuck, we've got a cabin open this weekend an hour from Edmonton — here's the link to grab it before it's gone: book instantly on sebastays.com."}
+      ]
+    },
+    {
+      "id": "ind-03", "class": "individual", "channel": "green_public_declared",
+      "source": "Local travel group", "intent": "declared", "confidence": 85, "urgency": "high",
+      "raw": "Last-minute — any RV sites with hookups open this weekend within ~1hr of Edmonton?",
+      "sizzle": "WEEKEND track. Declared, ready. Self-serve.",
+      "creepiness": "low", "agent": "Route Man",
+      "move": "Reply with weekend RV availability + booking link (self-serve)",
+      "drafts": [
+        {"style": "Self-serve booking", "text": "We've got full-hookup RV sites open this weekend, about an hour out — here's the link to lock one in: book instantly on sebastays.com."}
+      ]
+    },
+    {
+      "id": "ind-04", "class": "individual", "channel": "green_own_account",
+      "source": "Inbound DM to our page", "intent": "declared", "confidence": 90, "urgency": "medium",
+      "raw": "Do you have a geodome free this Saturday for 2? Anniversary trip.",
+      "sizzle": "WEEKEND track, warm inbound. Self-serve with a touch of warmth.",
+      "creepiness": "low", "agent": "Route Man",
+      "move": "Confirm Saturday geodome + booking link; small anniversary touch",
+      "drafts": [
+        {"style": "Self-serve booking", "text": "We do — a geodome's open Saturday and it's a beautiful anniversary spot. Here's the link to book it, and we'll add a little something to mark the occasion: book instantly on sebastays.com."}
+      ]
+    },
+    {
+      "id": "ind-02", "class": "individual", "channel": "red_individual_private", "intent": "inferred", "confidence": 55, "urgency": "low",
+      "source": "Local subreddit (personal venting)",
+      "raw": "First warm weekend and I am DONE with the city.",
+      "sizzle": "Latent getaway intent, but it's a stranger venting. GATE: content only, never a DM.",
+      "creepiness": "high", "agent": "Fuller Brush (public content only)",
+      "move": "BLOCKED from direct contact by the channel gate → convert to a public post",
+      "drafts": [
+        {"style": "Public content only", "text": "[Public post, no targeting: 'First warm weekend? Here are 5 easy ways to get an hour out of the city for a night — cabins, RV, or a geodome under the stars.']"},
+        {"style": "No-contact", "text": "[red_individual_private — the gate forbids any message addressed to this person, in any phase. Content only.]"}
+      ]
+    }
+  ]
+}

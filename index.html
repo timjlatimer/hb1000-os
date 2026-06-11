@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Model — The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* ---------- page-local: tabs (canonical pictograph pattern, theme tokens) ---------- */
+  .tabs{display:flex; gap:10px; margin:14px 0 6px; flex-wrap:wrap}
+  .tab{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink);
+    padding:9px 16px; border-radius:8px; cursor:pointer; font-size:14px;
+    font-family:inherit; font-weight:600;
+  }
+  .tab.active{border-color:var(--gold); color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset}
+  .view{display:none}
+  .view.active{display:block}
+
+  /* ---------- the canonical diamond SVG ---------- */
+  svg.osvg{
+    width:100%; height:auto; max-width:1000px; display:block; margin:0 auto;
+    background:var(--bg); border:1px solid #16222e; border-radius:12px;
+  }
+  .osvg a{cursor:pointer; outline:none}
+  .osvg a .hit{fill:transparent; stroke:transparent; stroke-width:1}
+  .osvg a:hover .hit, .osvg a:focus-visible .hit{fill:rgba(232,181,77,.05); stroke:rgba(232,181,77,.45)}
+  .osvg a:hover .hot, .osvg a:focus-visible .hot{fill:var(--gold)}
+  .osvg .ringhit{fill:none; stroke:transparent; stroke-width:18; pointer-events:stroke}
+  .osvg .ringlabel{paint-order:stroke; stroke:#0c1118; stroke-width:5; stroke-linejoin:round}
+  .osvg a:hover .ringlabel, .osvg a:focus-visible .ringlabel{filter:brightness(1.4)}
+  .osvg a:hover .bld, .osvg a:focus-visible .bld{stroke:var(--gold)}
+
+  /* mobile: the diamond pans sideways instead of shrinking below legibility */
+  .swipe-hint{display:none; font-size:11px; color:var(--soft); text-align:right; margin:0 2px 4px}
+  @media (max-width:700px){
+    .osvg-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+    .osvg-scroll svg.osvg{min-width:860px}
+    .swipe-hint{display:block}
+  }
+
+  .legend{max-width:1000px; margin:12px auto 0; color:var(--muted); font-size:12.5px; line-height:1.6}
+  .legend b{color:var(--ink)}
+
+  .ringpanel:target{border-color:var(--gold); box-shadow:0 0 18px rgba(232,181,77,.25)}
+  .ringpanel h3 .ring-fin{color:var(--teal)}
+  .ringpanel h3 .ring-bs{color:var(--cyan)}
+  .ringpanel h3 .ring-sm{color:var(--red)}
+  .ringpanel ul{margin:6px 0 8px; padding-left:18px; font-size:12.5px; color:var(--muted); line-height:1.55}
+  .ringpanel ul b{color:var(--ink)}
+
+  /* ---------- sample Dingo card (tab 2) ---------- */
+  .cardwrap{max-width:840px; margin:0 auto}
+  .vvline{font-size:13px; color:var(--muted); margin-top:4px}
+  .vvline b{color:var(--gold)}
+  .vvline i{color:var(--ink)}
+  .wiifmline{font-size:13px; color:var(--muted); margin-top:2px}
+  .wiifmline b{color:var(--teal)}
+  .callerline{font-size:12px; color:var(--muted); margin-top:2px}
+  .grid5 a.sq{display:block; color:inherit}
+  .cardfoot{
+    display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
+    margin-top:14px; font-size:12.5px; color:var(--muted);
+  }
+  .cardfoot b{color:var(--ink)}
+  .cardfoot .pillc{color:var(--teal)}
+
+  figure{margin:0}
+  figure img{border-radius:var(--radius); border:1px solid var(--line); display:block}
+  details.panel summary{cursor:pointer; list-style:none}
+  details.panel summary::-webkit-details-marker{display:none}
+  details.panel summary::before{content:'▸ '; color:var(--gold)}
+  details.panel[open] summary::before{content:'▾ '}
+
+  .chrome-quotes{
+    margin-top:34px; padding-top:14px; border-top:1px solid var(--line);
+    font-size:11.5px; color:var(--soft); font-style:italic; line-height:1.7; text-align:center;
+  }
+  .chrome-quotes b{color:var(--gold); font-style:normal}
+
+  /* ---------- masthead — hero art from the model tour (legacy) archive ---------- */
+  .masthead{
+    position:relative; border:1px solid var(--line); border-radius:var(--radius-lg);
+    overflow:hidden; margin:2px 0 16px; padding:30px 28px 22px; background:var(--panel);
+  }
+  .masthead-art{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:center 36%; opacity:.34;
+  }
+  .masthead-veil{
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(7,11,16,.30), rgba(7,11,16,.82) 72%, rgba(7,11,16,.94));
+  }
+  .masthead-inner{position:relative; z-index:1}
+  .masthead .art-credit{font-size:10.5px; color:var(--soft); font-style:italic; margin-top:10px}
+  @media (max-width:700px){.masthead{padding:20px 16px 16px}}
+
+  /* ---------- the front door pill — issued a card? this is your entrance ---------- */
+  .signin-pill{
+    position:absolute; top:14px; right:16px; z-index:2;
+    display:inline-block; padding:7px 16px; border-radius:40px;
+    font-size:12.5px; font-weight:700; letter-spacing:.02em;
+    color:var(--gold); border:1px solid var(--gold);
+    background:rgba(7,11,16,.72); text-decoration:none;
+  }
+  .signin-pill:hover{background:var(--gold); color:#1a1206; text-decoration:none}
+  @media (max-width:700px){
+    .signin-pill{position:static; display:inline-block; margin:0 0 10px}
+  }
+
+  /* ---------- layer isolation — click a ring/band to focus; click again (or Esc) resets ---------- */
+  .osvg > a, .osvg > g, .osvg > line, .osvg > text{transition:opacity .18s}
+  .osvg.isolating > a:not(.iso-focus),
+  .osvg.isolating > g:not(.iso-focus),
+  .osvg.isolating > g.pipes,
+  .osvg.isolating > line,
+  .osvg.isolating > text{opacity:.13}
+  .osvg.isolating > a.iso-focus{opacity:1; filter:brightness(1.2)}
+  .osvg.isolating > a.iso-focus .hit{fill:rgba(232,181,77,.05); stroke:rgba(232,181,77,.45)}
+  .iso-bar{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    max-width:1000px; margin:10px auto 0; padding:8px 14px;
+    background:var(--panel-2); border:1px solid rgba(232,181,77,.4); border-radius:var(--radius);
+    font-size:13px;
+  }
+  .iso-bar b{color:var(--gold)}
+  .iso-bar .btn{padding:4px 12px; font-size:12px}
+
+  /* ---------- PEARL lineage panel ---------- */
+  #lineage figure img{width:100%; border-radius:var(--radius); border:1px solid var(--line); display:block}
+  #lineage figcaption{margin-top:6px}
+</style>
+</head>
+<body>
+<main>
+  <header class="masthead">
+    <img class="masthead-art" src="assets/img/constellation-hero-eCPSWtgTNHnuAjKsiYYpFM.webp"
+         alt="A sci-fi cockpit window looking onto concentric glowing green rings of constellation nodes, instrument panels framing the view" fetchpriority="high">
+    <div class="masthead-veil" aria-hidden="true"></div>
+    <div class="masthead-inner">
+      <a class="signin-pill" href="login.html" title="Issued a Dingo Card? Sign in and land on it.">🪪 Cardholder? Sign in →</a>
+      <h1>The <b>Model</b> — a diamond split by the equator</h1>
+      <p class="v-tim" style="font-size:14.5px; margin-top:-2px">This is a working map of how we run many projects at once — people set the direction, AI agents do the heavy lifting, and every promise is tracked on a card.</p>
+      <div class="v-swiss">
+        <div class="swiss" style="max-width:560px; margin:4px 0 10px">
+          <div class="sw-row"><div class="sw-k">Ref</div><div class="sw-v">HB-OS-SP-2026-06</div></div>
+          <div class="sw-row"><div class="sw-k">Class</div><div class="sw-v">Institutional Briefing — Swiss Protocol</div></div>
+          <div class="sw-row"><div class="sw-k">Issuing Body</div><div class="sw-v">SIC HB1000 Solve Team</div></div>
+        </div>
+        <p style="font-size:14.5px; margin:0">The HB1000 Operating System is a portfolio-operating architecture: human principals retain strategic direction and final authority (the 20%), a supervised agent fleet executes the balance of the workload (the 80%), and every commitment is tracked on an auditable Dingo Card.</p>
+      </div>
+      <p class="v-tim muted" style="font-size:13px; margin-top:-4px">
+        The HB1000 Operating System — “Human Brilliance + AI, in service of Social Impact Capitalism.”
+        Every element below clicks through to its module. The frozen external face — the PEARL Diamond v4.3 —
+        stays live at <a href="https://learning-loop.manus.space" target="_blank" rel="noopener">learning-loop.manus.space</a> (never rebuilt; we link out).
+      </p>
+      <p class="v-swiss muted" style="font-size:13px; margin-top:4px">
+        System designation: <b style="color:var(--gold)">The HB1000 Operating System</b> — “Human Brilliance + AI, in service of Social Impact Capitalism.”
+        Each element of the model diagram below provides access to its corresponding operational module. The predecessor presentation layer —
+        the PEARL Diamond v4.3 — remains in frozen state at <a href="https://learning-loop.manus.space" target="_blank" rel="noopener">learning-loop.manus.space</a>;
+        under the never-rebuild rule, this application links out and does not reproduce it.
+      </p>
+      <p class="art-credit">Masthead art recovered from the model tour (legacy) archive — the cockpit looking onto the constellation.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Model views">
+    <button class="tab active" id="tab-model" role="tab" aria-selected="true" onclick="showView('model',this)">◆ The Whole Model</button>
+    <button class="tab" id="tab-card" role="tab" aria-selected="false" onclick="showView('card',this)">▦ A Dingo Card — live sample</button>
+  </div>
+
+  <!-- ==================== VIEW 1 — THE WHOLE MODEL ==================== -->
+  <section id="view-model" class="view active" role="tabpanel" aria-labelledby="tab-model">
+
+    <div class="swipe-hint" aria-hidden="true">swipe to pan →</div>
+    <div class="osvg-scroll">
+    <svg class="osvg" viewBox="0 0 1000 780" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="The HB1000 Operating System — a diamond split by the equator. Prime North Star at the apex, the WHY above, the HB1000 human-plus-AI sphere at the centre, three service rings below, Dingo Card buildings at the base.">
+      <defs>
+        <radialGradient id="hb-core" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="#fff7e6"/><stop offset="55%" stop-color="#e8b54d"/><stop offset="100%" stop-color="#7a5a18"/>
+        </radialGradient>
+        <!-- LOCKED orientation: blue-left / gold-right (canonical pictograph) -->
+        <linearGradient id="hb-aih" x1="0" x2="1"><stop offset="0" stop-color="#1a6fb0"/><stop offset="1" stop-color="#51a7f9"/></linearGradient>
+      </defs>
+
+      <!-- the diamond -->
+      <polygon points="500,30 880,400 500,750 120,400" fill="#0c1118" stroke="#1d2a37" stroke-width="1.5"/>
+
+      <!-- gold dashed equator → The Doctrine (the 80/20 covenant lives here) -->
+      <a href="doctrine.html" data-iso="The equator — the 80/20 covenant" data-open="The Doctrine">
+        <title>The equator — the 80/20 covenant · The Doctrine (click once to focus the layer; click again to reset)</title>
+        <rect class="hit" x="128" y="378" width="744" height="42" rx="6"/>
+        <line x1="120" y1="400" x2="880" y2="400" stroke="#e8b54d" stroke-width="1.4" stroke-dasharray="6 6" opacity=".8"/>
+        <text class="hot" x="135" y="392" fill="#8aa0b4" font-size="12">ABOVE = the WHY (vision)</text>
+        <text class="hot" x="865" y="416" fill="#8aa0b4" font-size="12" text-anchor="end">BELOW = the HOW (execution &amp; accountability)</text>
+      </a>
+
+      <!-- apex ★ → Do Before I Die -->
+      <a href="purpose.html" data-iso="Prime North Star — the apex ★" data-open="Do Before I Die">
+        <title>Prime North Star — Do Before I Die · Purpose DNA (click once to focus the layer; click again to reset)</title>
+        <rect class="hit" x="360" y="38" width="280" height="92" rx="10"/>
+        <text x="500" y="70" fill="#e8b54d" font-size="20" text-anchor="middle">★</text>
+        <text class="hot" x="500" y="96" fill="#e8b54d" font-size="15" text-anchor="middle" font-weight="700">PRIME NORTH STAR</text>
+        <text x="500" y="116" fill="#cdd8e2" font-size="12" text-anchor="middle">Your “Ding in the Universe” · Do-Before-I-Die</text>
+      </a>
+
+      <!-- WHY bands -->
+      <a href="north-star.html" data-iso="VIVID VISION band — Purpose · BHAG · Core Values" data-open="North Star Builder">
+        <title>Vivid Vision — Purpose (≤8 words) · BHAG · Core Values → North Star Builder (click once to focus; click again to reset)</title>
+        <rect class="hit" x="330" y="150" width="340" height="30" rx="6"/>
+        <text class="hot" x="500" y="170" fill="#cdd8e2" font-size="13" text-anchor="middle">VIVID VISION — Purpose (≤8 words) · BHAG · Core Values</text>
+      </a>
+      <a href="doctrine.html" data-iso="Social Impact Capitalism · Blue Seal band" data-open="The Doctrine">
+        <title>Social Impact Capitalism · Blue Seal initiative → The Doctrine (click once to focus; click again to reset)</title>
+        <rect class="hit" x="295" y="202" width="410" height="30" rx="6"/>
+        <text class="hot" x="500" y="222" fill="#9fb1c1" font-size="12.5" text-anchor="middle">Social Impact Capitalism &#160;·&#160; Blue Seal initiative</text>
+      </a>
+      <a href="purpose.html" data-iso="Origin Story · Sales &amp; Marketing (the WHY) band" data-open="Do Before I Die">
+        <title>Origin Story · Sales &amp; Marketing (the WHY) → Do Before I Die (click once to focus; click again to reset)</title>
+        <rect class="hit" x="255" y="254" width="490" height="30" rx="6"/>
+        <text class="hot" x="500" y="274" fill="#9fb1c1" font-size="12.5" text-anchor="middle">Origin Story &#160;·&#160; Sales &amp; Marketing (the WHY)</text>
+      </a>
+
+      <!-- three concentric service rings (LOCKED inner→outer: Financial SoT teal · Blue Seal blue · Sales & Marketing red) -->
+      <a href="#ring-financial" data-iso="Financial Source of Truth ring (inner · teal)" data-open="its service description below">
+        <title>Financial Source of Truth ring (inner · teal) — click once to focus the ring; click again to reset</title>
+        <path class="ringhit" d="M180,400 A320,150 0 0,0 820,400"/>
+        <path d="M180,400 A320,150 0 0,0 820,400" fill="none" stroke="#36c2b4" stroke-width="1.3" opacity=".55"/>
+        <text class="ringlabel" x="500" y="548" fill="#36c2b4" font-size="12" text-anchor="middle">Financial Source of Truth ring — “off the rocks” · noon reconciliation</text>
+      </a>
+      <a href="#ring-blueseal" data-iso="Blue Seal ring (middle · blue)" data-open="its service description below">
+        <title>Blue Seal ring (middle · blue) — click once to focus the ring; click again to reset</title>
+        <path class="ringhit" d="M150,400 A350,210 0 0,0 850,400"/>
+        <path d="M150,400 A350,210 0 0,0 850,400" fill="none" stroke="#51a7f9" stroke-width="1.3" opacity=".5"/>
+        <text class="ringlabel" x="500" y="610" fill="#51a7f9" font-size="12" text-anchor="middle">Blue Seal ring — every operation a member</text>
+      </a>
+      <a href="#ring-sm" data-iso="Sales &amp; Marketing ring (outer · red)" data-open="its service description below">
+        <title>Sales &amp; Marketing ring (outer · red) — click once to focus the ring; click again to reset</title>
+        <path class="ringhit" d="M122,400 A378,270 0 0,0 878,400"/>
+        <path d="M122,400 A378,270 0 0,0 878,400" fill="none" stroke="#e0556b" stroke-width="1.3" opacity=".5"/>
+        <text class="ringlabel" x="500" y="668" fill="#e0556b" font-size="12" text-anchor="middle">Sales &amp; Marketing ring — Babel Bridge · CRM · agents</text>
+      </a>
+
+      <!-- pipes from the core down into the buildings (decorative — never intercept clicks) -->
+      <g class="pipes" pointer-events="none">
+        <line x1="500" y1="460" x2="278" y2="690" stroke="#e8b54d" stroke-width="1" opacity=".4"/>
+        <line x1="500" y1="462" x2="500" y2="694" stroke="#36c2b4" stroke-width="1" opacity=".4"/>
+        <line x1="500" y1="460" x2="722" y2="690" stroke="#51a7f9" stroke-width="1" opacity=".4"/>
+      </g>
+
+      <!-- Dingo Card "buildings" → Dingo City -->
+      <g font-size="10.5" fill="#cdd8e2" text-anchor="middle">
+        <a href="city.html">
+          <title>Pawn Princess — a Dingo Card “building” → Dingo City</title>
+          <rect class="bld" x="250" y="690" width="56" height="44" rx="4" fill="#0f1620" stroke="#e8b54d"/>
+          <text x="278" y="708" font-size="14" fill="#e8b54d">▦</text>
+          <text x="278" y="726" fill="#e8b54d" font-size="9">PawnPrincess</text>
+          <text x="278" y="752" fill="#46c66d" font-size="9.5">◀ MVP store</text>
+        </a>
+        <a href="city.html">
+          <title>CashCo — a Dingo Card “building” → Dingo City</title>
+          <rect class="bld" x="472" y="694" width="56" height="44" rx="4" fill="#0f1620" stroke="#36c2b4"/>
+          <text x="500" y="712" font-size="14" fill="#36c2b4">▦</text>
+          <text x="500" y="730" fill="#9fb1c1" font-size="9">CashCo</text>
+        </a>
+        <a href="city.html">
+          <title>Freedom — a Dingo Card “building” → Dingo City</title>
+          <rect class="bld" x="694" y="690" width="56" height="44" rx="4" fill="#0f1620" stroke="#36c2b4"/>
+          <text x="722" y="708" font-size="14" fill="#36c2b4">▦</text>
+          <text x="722" y="726" fill="#9fb1c1" font-size="9">Freedom</text>
+          <text x="722" y="752" fill="#8aa0b4" font-size="9">…+ every op</text>
+        </a>
+      </g>
+
+      <!-- the HB1000 sphere at dead centre (drawn last = on top) → The Doctrine -->
+      <a href="doctrine.html" data-iso="HB1000 — the sphere at dead centre" data-open="The Doctrine">
+        <title>HB1000 — human brilliance (gold) married to the AI fleet (blue) · the 80/20 covenant → The Doctrine (click once to focus; click again to reset)</title>
+        <circle class="hit" cx="500" cy="400" r="74"/>
+        <circle cx="500" cy="400" r="62" fill="url(#hb-core)" stroke="#fff3d6" stroke-width="1.5"/>
+        <path d="M500,338 a62,62 0 0,0 0,124 Z" fill="url(#hb-aih)" opacity=".92"/>
+        <text x="500" y="396" fill="#0a0e14" font-size="16" font-weight="800" text-anchor="middle">HB1000</text>
+        <text x="500" y="414" fill="#0a0e14" font-size="9.5" font-weight="700" text-anchor="middle">Human + AI</text>
+        <text class="hot" x="500" y="486" fill="#cdd8e2" font-size="11.5" text-anchor="middle" opacity=".9">human brilliance (gold) married to the AI fleet (blue)</text>
+      </a>
+
+      <text x="500" y="772" fill="#8aa0b4" font-size="11.5" text-anchor="middle">Each operation = a Dingo Card “building”, run by the AI agent fleet + one human Caller, served by the rings.</text>
+    </svg>
+    </div>
+
+    <div id="iso-bar" class="iso-bar" hidden>
+      <span>Focused layer: <b id="iso-label"></b> — everything else is dimmed.</span>
+      <a id="iso-open" class="btn" href="#">open →</a>
+      <button id="iso-clear" class="btn" type="button">clear focus (or press Esc)</button>
+    </div>
+
+    <div class="legend">
+      <b>How to read it:</b> the model is a <b>diamond split by the equator</b>. <b>Above</b> = the WHY (your Prime North Star / vivid vision / SIC / Blue Seal).
+      At the centre = <b>HB1000</b> — human brilliance married to the AI fleet. <b>Below</b> = the HOW: cross-cutting <b>service rings</b>
+      (Financial Source of Truth, Blue Seal, Sales &amp; Marketing) that pipe into every <b>operational Dingo Card “building.”</b>
+      Flip to <b>“A Dingo Card”</b> to see inside one.
+      <br><b>Layer focus:</b> click any ring, band, the apex ★, the equator or the HB1000 sphere <b>once to isolate it</b> — everything else dims;
+      click it <b>again (or press Esc)</b> to reset. While focused, the bar above the legend links into its module.
+      The buildings still click straight through to Dingo City.
+    </div>
+
+    <!-- the apex, verbatim -->
+    <div class="panel" style="margin-top:22px">
+      <div class="ph">The apex — Prime North Star (Tim’s verbatim · ONE per deployment)</div>
+      <blockquote>
+        “Help people get more out of life — not by force, but by example. Believe in abundance — of potential, of solutions, of impact.
+        Put a Ding in the Universe through <b style="color:var(--gold)">Social Impact Capitalism</b> (S.I.C.) — Business as a Force for Good.”
+      </blockquote>
+      <div class="footnote">
+        Litmus: “If a project can’t articulate its Ding, it’s parked.” &nbsp;·&nbsp;
+        The full story lives at <a href="purpose.html">Do Before I Die</a>; build your own at the <a href="north-star.html">North Star Builder</a>.
+      </div>
+    </div>
+
+    <!-- the three service rings, locked order -->
+    <div class="sec-h">The three <b>service rings</b> — locked order, inner → outer</div>
+    <div class="grid3">
+      <div class="panel ringpanel" id="ring-financial">
+        <h3><span class="ring-fin">1 · Financial Source of Truth</span> <span class="muted" style="font-weight:500">— inner · teal</span></h3>
+        <ul>
+          <li><b>Owner:</b> Samantha + the Philippines team — a centralized service to every Dingo card.</li>
+          <li><b>SLAs:</b> daily cash-out reconciliation by <b>12:00 noon next day</b> (scales to ~50 sites in 5 years) · weekly results · month-end within 5 working days.</li>
+          <li><b>“Off the rocks”</b> = operational cash-flow safety (not net profit; capex excluded).</li>
+          <li><b>Rearview → windshield:</b> 30/60/90-day projection + rolling-90-day gap analysis — the Caller is judged on predicting their card’s 90-day results.</li>
+          <li><b>Maritime maturity:</b> On the rocks → Off the rocks → Away from the dock → In the harbor → Navigate to the next new world.</li>
+          <li>The Source of Truth ring is split by the equator — financial SoT below, culture SoT above.</li>
+        </ul>
+        <a href="doctrine.html" style="font-size:12px">→ The Doctrine (read-only financial stance · Z-report rule)</a>
+      </div>
+      <div class="panel ringpanel" id="ring-blueseal">
+        <h3><span class="ring-bs">2 · Blue Seal</span> <span class="muted" style="font-weight:500">— middle · blue</span></h3>
+        <ul>
+          <li><b>“Every operation a member.”</b></li>
+          <li>The below-equator half is execution: <b>one of the 25 card squares is the Blue Seal connection / hook-up</b> — “hook yourself up to the Blue Seal and figure out how to give.”</li>
+          <li>The above-equator half is the <b>Social Impact Capitalism · Blue Seal initiative</b> band — the why/what of the same ring.</li>
+        </ul>
+        <a href="doctrine.html" style="font-size:12px">→ The Doctrine</a> &nbsp;·&nbsp;
+        <a href="loop.html" style="font-size:12px">→ Blue Seal certification (Learning Loop V13.0)</a>
+      </div>
+      <div class="panel ringpanel" id="ring-sm">
+        <h3><span class="ring-sm">3 · Sales &amp; Marketing</span> <span class="muted" style="font-weight:500">— outer · red</span></h3>
+        <ul>
+          <li>So primal it isn’t a connecting line — <b>deep colored piping</b> into every card, every Caller, and their agents.</li>
+          <li>Houses the <b>Babel Bridge “Prism”</b> gate: almost nothing leaves S&amp;M without passing through it.</li>
+          <li>Has its <b>own Dingo Caller and its own Dingo card</b> — “a RING unto itself.”</li>
+          <li>Toolset: CRM, marketing strategy, product challenger, product development, graphic artists, marketing AI agents — itself run 80/20.</li>
+        </ul>
+        <a href="fleet.html" style="font-size:12px">→ Agent Fleet (Babel Bridge explainer)</a>
+      </div>
+    </div>
+    <p class="footnote" style="margin-top:8px">
+      Alternative ring order (BrainDump dictation): equator → Blue Seal → Sales &amp; Marketing → Financial Source of Truth — the locked pictograph order shown above wins.
+    </p>
+
+    <!-- help-panel art -->
+    <details class="panel" style="margin-top:18px">
+      <summary class="ph" style="margin-bottom:0">Help — the concept art behind the model</summary>
+      <div class="grid2" style="margin-top:14px">
+        <figure>
+          <img src="assets/img/diamond-2d-concept.webp" loading="lazy"
+               alt="PEARL Diamond v3 concept art — the Cloud Butterfly Hunt Funnel feeding the stacked diamond rings">
+          <figcaption class="footnote" style="margin-top:6px">
+            PEARL Diamond v3 concept — the Cloud Butterfly Hunt Funnel feeding the diamond. Reference art only:
+            the interactive PEARL Diamond v4.3 is frozen at
+            <a href="https://learning-loop.manus.space" target="_blank" rel="noopener">learning-loop.manus.space</a> (never rebuilt; we link out).
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="assets/img/north-south-hemisphere.jpg" loading="lazy"
+               alt="A globe in space split in half — one hemisphere solid gold, the other a blue circuit-board network">
+          <figcaption class="footnote" style="margin-top:6px">
+            The HB1000 marriage — human brilliance married to the AI fleet. Note: this concept art reads gold-left;
+            the locked app-wide orientation is <b>blue-left / gold-right</b>, as in the diamond above.
+          </figcaption>
+        </figure>
+      </div>
+    </details>
+
+    <!-- PEARL lineage — where this model came from -->
+    <div class="panel" id="lineage" style="margin-top:18px">
+      <div class="ph">PEARL lineage — where this model came from</div>
+      <div class="grid2">
+        <figure>
+          <a href="https://learning-loop.manus.space/pearl-diamond-3d.html" target="_blank" rel="noopener">
+            <img src="assets/img/pearl-diamond-3d.jpeg" loading="lazy"
+                 alt="Screenshot of the PEARL Diamond 3D v4.3 — twelve stacked glowing rings forming a diamond in space, orange marketing piping spiralling down, butterfly swarm clusters at the sides">
+          </a>
+          <figcaption class="footnote">
+            PEARL Diamond <b style="color:var(--gold)">3D</b> v4.3 — the frozen external face — lives at
+            <a href="https://learning-loop.manus.space/pearl-diamond-3d.html" target="_blank" rel="noopener">learning-loop.manus.space</a>
+            (never rebuilt; we link out). Archived locally in <code>tour-archive/pearl-diamond-3d.html</code>.
+          </figcaption>
+        </figure>
+        <figure>
+          <a href="https://learning-loop.manus.space/pearl-diamond-2d.html" target="_blank" rel="noopener">
+            <img src="assets/img/pearl-diamond-2d.jpeg" loading="lazy"
+                 alt="Screenshot of the PEARL Diamond 2D map — a flattened node map with a brain render at the centre labelled HB1000 and a HOW TO READ THIS guide drawer open on the right">
+          </a>
+          <figcaption class="footnote">
+            PEARL Diamond <b style="color:var(--gold)">2D</b> map v4.3 — the frozen external face — lives at
+            <a href="https://learning-loop.manus.space/pearl-diamond-2d.html" target="_blank" rel="noopener">learning-loop.manus.space</a>
+            (never rebuilt; we link out). Archived locally in <code>tour-archive/pearl-diamond-2d.html</code>.
+          </figcaption>
+        </figure>
+      </div>
+      <p class="footnote" style="margin:10px 0 0">
+        These screenshots are the local visual record of the predecessor 3D/2D model views. The diamond above is their canon-corrected,
+        vocabulary-locked successor — the lineage routes through the never-rebuild rule: we link out, we never rebuild the frozen face.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW 2 — A DINGO CARD (live sample, real seed data) ==================== -->
+  <section id="view-card" class="view" role="tabpanel" aria-labelledby="tab-card">
+    <div class="cardwrap">
+      <div class="panel">
+        <div class="spread" style="align-items:flex-start">
+          <div>
+            <div class="ph">Real seed card · data/cards/pawn-princess-pp01.json</div>
+            <h2 style="margin-bottom:2px">A <b>Dingo Card</b> — the core component</h2>
+          </div>
+          <a class="btn gold-cta" href="card.html?card=pawn-princess-pp01.json">Open the full card — 2D ⇄ 3D →</a>
+        </div>
+        <p id="card-note" class="footnote" hidden></p>
+
+        <div class="ticker" style="margin-top:12px" aria-label="live ticker-tape KPIs (red / yellow / green)">
+          <div class="ticker-track" id="s-ticker-track"></div>
+        </div>
+
+        <div class="spread" style="align-items:flex-start; margin:14px 0 10px">
+          <div style="min-width:260px; flex:1">
+            <h3 id="s-store" style="margin-bottom:2px">…</h3>
+            <div class="vvline" id="s-vv"></div>
+            <div class="wiifmline" id="s-wiifm"></div>
+            <div class="callerline" id="s-caller"></div>
+          </div>
+          <div style="min-width:240px">
+            <div class="ph" style="margin-bottom:4px">80/20 roll-up — computed at render</div>
+            <div id="s-rollup"></div>
+            <div class="footnote">mean of <code>human</code> over the 24 non-PTK squares — computed, never asserted</div>
+          </div>
+        </div>
+
+        <div class="grid5" id="s-grid"></div>
+
+        <div class="cardfoot">
+          <span><b class="pillc">Dingo Caller</b> — “one neck to choke” populates the squares &amp; approves &nbsp;·&nbsp; <b>20%</b></span>
+          <span><b style="color:var(--cyan)">AI agent fleet</b> — does the work &nbsp;·&nbsp; <b>80%</b></span>
+        </div>
+      </div>
+
+      <div class="legend">
+        <b>Inside a Dingo Card:</b> a <b>5×5 grid of 25 activity squares</b>; the <b>centre square is PTK — Promises to Keep</b> (the AI promise engine — never a blank giveaway).
+        Every square carries KPIs, a red/yellow/green status, and an <b>80/20 human-vs-agent bar</b>. Across the top a <b>ticker-tape</b> shows whether the building is winning.
+        The card <i>is</i> the operating system — everything else is a field on it, a feed into it, or a score from it.
+        Click any square (or the gold button) for the full screen with the 3D building view and the square work-order drawer; click PTK for the dual ledger.
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== HUB — every page in the OS ==================== -->
+  <div class="sec-h">The <b>OS</b> — all 14 pages, one shell</div>
+  <div class="hub-grid" id="hub"></div>
+
+  <footer class="chrome-quotes">
+    “The agents bring the intelligence. The <b>HB1000</b> brings the brilliance.” &nbsp;·&nbsp;
+    “Brilliance can suggest anywhere. Authority can dispatch only in-lane.” &nbsp;·&nbsp;
+    “One dashboard. Many gauges. Every gauge has a mechanic.”
+  </footer>
+</main>
+
+<script src="assets/shell.js"></script>
+<script>
+'use strict';
+Shell.init('model');
+
+/* ---------- tabs ---------- */
+function showView(id, btn){
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  document.getElementById('view-' + id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+}
+if (location.hash === '#card') showView('card', document.getElementById('tab-card'));
+
+/* ---------- the sample Dingo card (REAL seed data) ----------
+   Primary source: data/cards/pawn-princess-pp01.json via Shell.loadJSON.
+   Fallback: an embedded copy of the SAME real card (identical content),
+   used only when fetch is blocked on file:// — no lorem ipsum, ever. */
+var PP01_FALLBACK = {
+  "store": "Pawn Princess — Store PP-01",
+  "caller": "Lauren (store manager)",
+  "vivid_vision": {
+    "purpose": "Dignified cash when life happens",
+    "bhag": "50 dignified stores in 5 years",
+    "values": ["Dignity", "Speed", "Transparency"]
+  },
+  "wiifm": "Run a balanced, trusted store — and get home on time.",
+  "ticker": [
+    {"k": "Cash", "v": "positive", "ryg": "green"},
+    {"k": "Noon SLA", "v": "✓", "ryg": "green"},
+    {"k": "Loans vs target", "v": "▼", "ryg": "yellow"},
+    {"k": "Lapsed loans", "v": "▲", "ryg": "red"},
+    {"k": "Reviews", "v": "4.8★", "ryg": "green"}
+  ],
+  "squares": [
+    {"id": "D1", "label": "Daily cash-out", "kpi": "balanced by close", "ryg": "green", "human": 20},
+    {"id": "D2", "label": "Noon reconciliation", "kpi": "by 12:00", "ryg": "green", "human": 20},
+    {"id": "D3", "label": "Pawn loans written", "kpi": "vs target", "ryg": "yellow", "human": 30},
+    {"id": "D4", "label": "Redemptions", "kpi": "rate", "ryg": "green", "human": 20},
+    {"id": "D5", "label": "Layaways", "kpi": "active", "ryg": "green", "human": 20},
+    {"id": "D6", "label": "Inventory aging", "kpi": "<90 days", "ryg": "yellow", "human": 40},
+    {"id": "D7", "label": "Lapsed loans", "kpi": "to forfeit", "ryg": "red", "human": 30},
+    {"id": "D8", "label": "Store presentation", "kpi": "clean & set", "ryg": "green", "human": 80},
+    {"id": "D9", "label": "Customer follow-up", "kpi": "calls done", "ryg": "yellow", "human": 20},
+    {"id": "D10", "label": "Staff schedule", "kpi": "covered", "ryg": "green", "human": 50},
+    {"id": "D11", "label": "Compliance log", "kpi": "police upload 24h", "ryg": "green", "human": 20},
+    {"id": "D12", "label": "Bank deposit", "kpi": "made & logged", "ryg": "green", "human": 60},
+    {"id": "PTK", "ptk": true},
+    {"id": "D14", "label": "Blue Seal give-back", "kpi": "hooked up", "ryg": "yellow", "human": 20},
+    {"id": "D15", "label": "Reviews", "kpi": "rating", "ryg": "green", "human": 20},
+    {"id": "D16", "label": "Safety checks", "kpi": "done", "ryg": "green", "human": 60},
+    {"id": "D17", "label": "Training", "kpi": "module", "ryg": "yellow", "human": 30},
+    {"id": "D18", "label": "Upsell / attach", "kpi": "rate", "ryg": "yellow", "human": 20},
+    {"id": "D19", "label": "Returns", "kpi": "handled", "ryg": "green", "human": 20},
+    {"id": "D20", "label": "Loss prevention", "kpi": "shrink", "ryg": "green", "human": 30},
+    {"id": "D21", "label": "Utilities", "kpi": "in budget", "ryg": "green", "human": 20},
+    {"id": "D22", "label": "Local outreach", "kpi": "events", "ryg": "yellow", "human": 40},
+    {"id": "D23", "label": "Supplies", "kpi": "stocked", "ryg": "green", "human": 50},
+    {"id": "D24", "label": "KPI review", "kpi": "weekly", "ryg": "green", "human": 20},
+    {"id": "D25", "label": "Month-end email", "kpi": "sent", "ryg": "yellow", "human": 20}
+  ]
+};
+
+var CARD_LINK = 'card.html?card=pawn-princess-pp01.json';
+
+function squareHTML(s){
+  if (s.ptk) {
+    return '<a class="sq ptk" href="ptk.html" title="PTK — Promises to Keep · the AI promise engine — kaboom → the dual ledger">' +
+      '<span class="id">PTK</span>' +
+      '<div class="label">PTK — Promises to Keep</div>' +
+      '<div class="kpi">the AI promise engine at the centre — kaboom → dual ledger</div>' +
+    '</a>';
+  }
+  var human = (s.human == null) ? 20 : Number(s.human);
+  return '<a class="sq" href="' + CARD_LINK + '" title="Open the full card — square detail drawer (KPIs · 80/20 slider · work orders)">' +
+    '<span class="id">' + Shell.esc(s.id) + '</span>' +
+    Shell.rygDot(s.ryg || 'green') +
+    '<div class="label">' + Shell.esc(s.label) + '</div>' +
+    '<div class="kpi">' + Shell.esc(s.kpi || '') + '</div>' +
+    '<div class="agentbar" style="width:' + Math.max(0, Math.min(100, 100 - human)) + '%"></div>' +
+  '</a>';
+}
+
+function renderSampleCard(data, usedFallback){
+  // ticker (RYG chips, click-through to the card)
+  document.getElementById('s-ticker-track').innerHTML = (data.ticker || []).map(function(t){
+    return '<a class="tk" href="' + CARD_LINK + '">' + Shell.rygDot(t.ryg) +
+      '<span class="k">' + Shell.esc(t.k) + '</span><span class="v">' + Shell.esc(t.v) + '</span></a>';
+  }).join('');
+
+  // header
+  document.getElementById('s-store').textContent = data.store || '';
+  var vv = data.vivid_vision || {};
+  document.getElementById('s-vv').innerHTML =
+    '<b>VIVID VISION</b> ' + Shell.esc(vv.purpose || '') +
+    ' · <i>' + Shell.esc(vv.bhag || '') + '</i> · ' +
+    (vv.values || []).map(Shell.esc).join(' · ');
+  document.getElementById('s-wiifm').innerHTML = '<b>WIIFM</b> ' + Shell.esc(data.wiifm || '');
+  var caller = data.caller || 'TBD — assign one Dingo Caller';
+  document.getElementById('s-caller').innerHTML = 'Dingo Caller — ' + Shell.esc(caller) +
+    (/TBD/i.test(caller) ? ' ' + Shell.pill('ORPHAN — assign one Dingo Caller', 'danger') : '');
+
+  // 80/20 roll-up — computed, never asserted
+  var working = (data.squares || []).filter(function(s){ return !s.ptk; });
+  var humanShare = working.length
+    ? Math.round(working.reduce(function(a, s){ return a + (s.human == null ? 20 : Number(s.human)); }, 0) / working.length)
+    : 20;
+  document.getElementById('s-rollup').innerHTML = Shell.splitBar(humanShare);
+
+  // 5×5 grid (PTK locked at index 12)
+  document.getElementById('s-grid').innerHTML = (data.squares || []).map(squareHTML).join('');
+
+  // provenance note
+  var note = document.getElementById('card-note');
+  if (usedFallback) {
+    note.hidden = false;
+    note.textContent = 'Loaded from this page’s embedded copy of data/cards/pawn-princess-pp01.json (same real data — fetch is blocked on file://). Serve over HTTP for the live JSON.';
+  } else {
+    note.hidden = false;
+    note.textContent = 'Live from data/cards/pawn-princess-pp01.json — real seed data, roll-up computed at render.';
+  }
+}
+
+Shell.loadJSON('data/cards/pawn-princess-pp01.json')
+  .then(function(d){ renderSampleCard(d, false); })
+  .catch(function(){ renderSampleCard(PP01_FALLBACK, true); });
+
+/* ---------- hub grid — every page in the OS + the frozen external face ---------- */
+(function buildHub(){
+  var html = Shell.pages.map(function(p){
+    var here = (p.id === 'model');
+    return '<a class="link-card" href="' + p.file + '">' +
+      '<div class="lc-t">' + Shell.esc(p.label) + (here ? ' <span class="pill gold">you are here</span>' : '') + '</div>' +
+      '<div class="lc-d">' + Shell.esc(p.sub) + '</div>' +
+      '<div class="lc-k">' + Shell.esc(p.file) + '</div>' +
+    '</a>';
+  }).join('');
+  html += '<a class="link-card" href="https://learning-loop.manus.space" target="_blank" rel="noopener">' +
+    '<div class="lc-t">PEARL Diamond <b>v4.3</b></div>' +
+    '<div class="lc-d">the frozen external face — the live diamond presentation. Never rebuilt; we link out.</div>' +
+    '<div class="lc-k">external · learning-loop.manus.space</div>' +
+  '</a>';
+  document.getElementById('hub').innerHTML = html;
+})();
+
+/* ---------- layer isolation — click a ring/band once to focus it; click again (or Esc) resets ---------- */
+(function isolation(){
+  var svg = document.querySelector('svg.osvg');
+  var bar = document.getElementById('iso-bar');
+  var barLabel = document.getElementById('iso-label');
+  var barOpen = document.getElementById('iso-open');
+  var barClear = document.getElementById('iso-clear');
+  if (!svg || !bar) return;
+  var current = null;
+
+  function clearIso(){
+    if (current) current.classList.remove('iso-focus');
+    current = null;
+    svg.classList.remove('isolating');
+    bar.hidden = true;
+  }
+
+  Array.prototype.forEach.call(svg.querySelectorAll('a[data-iso]'), function(a){
+    a.addEventListener('click', function(ev){
+      ev.preventDefault();
+      if (current === a){ clearIso(); return; }   // second click on the same layer → reset
+      if (current) current.classList.remove('iso-focus');
+      current = a;
+      a.classList.add('iso-focus');
+      svg.classList.add('isolating');
+      barLabel.textContent = a.getAttribute('data-iso');
+      barOpen.setAttribute('href', a.getAttribute('href'));
+      barOpen.textContent = 'open ' + (a.getAttribute('data-open') || a.getAttribute('href')) + ' →';
+      bar.hidden = false;
+    });
+  });
+
+  barClear.addEventListener('click', clearIso);
+  document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape') clearIso(); });
+})();
+</script>
+</body>
+</html>

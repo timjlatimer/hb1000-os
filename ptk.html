@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PTK — Promises to Keep | The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤝</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ===== PTK page-specific styles (tokens come from theme.css — LOCKED) ===== */
+
+/* title banner — IMG-03 (Phase-4 harvest, Tim-approved), CSS-cropped to ~3.5:1 with the title overlaid */
+.ptk-hero{position:relative; margin:0 0 14px; border:1px solid var(--line); border-radius:var(--radius-lg); overflow:hidden; aspect-ratio:3.5/1; min-height:120px}
+.ptk-hero img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 52%}
+.ptk-hero .veil{position:absolute; inset:0; background:linear-gradient(180deg, rgba(7,11,16,.12), rgba(7,11,16,.62) 78%, rgba(7,11,16,.82))}
+.ptk-hero h1{position:absolute; left:18px; right:18px; bottom:8px; margin:0; text-shadow:0 2px 14px rgba(0,0,0,.75)}
+
+/* dashboard strip */
+.dash{display:grid; grid-template-columns:repeat(auto-fit,minmax(118px,1fr)); gap:10px; margin:14px 0 6px}
+.dtile{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:10px 12px}
+.dtile .dv{font-size:24px; font-weight:900; color:#fff; font-variant-numeric:tabular-nums; line-height:1.1}
+.dtile .dl{font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-top:2px}
+.dtile .ds{font-size:10px; color:var(--soft); margin-top:1px}
+.dtile.hot .dv{color:var(--red)}
+.dtile.gold .dv{color:var(--gold)}
+.dtile.green .dv{color:var(--green)}
+.gradechip{display:inline-block; font-size:14px; font-weight:900; border:1.5px solid currentColor; border-radius:7px; padding:0 6px; margin-left:7px; vertical-align:3px; line-height:1.5}
+
+/* receipts + response grade (drawer) */
+.rcpt-note{font-size:11px; color:var(--gold-glass); background:rgba(232,181,77,.06); border:1px solid rgba(232,181,77,.35); border-radius:8px; padding:6px 10px; margin:6px 0 8px}
+.rg-btns{display:flex; gap:7px; flex-wrap:wrap; margin:8px 0 4px}
+.rg-btn{background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:7px 11px; font-weight:800; font-size:11px; letter-spacing:.06em; cursor:pointer; font-family:inherit}
+.rg-btn:hover{border-color:currentColor}
+.rg-btn.owned{color:var(--gold)} .rg-btn.repaired{color:var(--teal)}
+.rg-btn.minimized{color:var(--yellow)} .rg-btn.ghosted{color:var(--red)}
+.rg-btn.sel{border-color:currentColor; box-shadow:0 0 8px; background:rgba(255,255,255,.04)}
+
+/* testosterone thermometer */
+.therm{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:10px 12px; grid-column:span 2; min-width:200px}
+.therm .tt{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.therm .tv{font-size:20px; font-weight:900; color:#fff}
+.therm .tlab{font-size:12px; font-weight:800; letter-spacing:.08em}
+.therm .track{height:11px; border-radius:999px; background:#141e29; border:1px solid var(--line); overflow:hidden; margin:7px 0 5px}
+.therm .fill{height:100%; border-radius:999px; background:linear-gradient(90deg,var(--red),var(--yellow) 45%,var(--green)); transition:width .4s}
+.therm .tn{font-size:9.5px; color:var(--soft); line-height:1.35}
+
+/* the two ledgers */
+.ledgers{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:14px}
+@media (max-width:1020px){.ledgers{grid-template-columns:1fr}}
+.pcard{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg); padding:15px 15px 13px; border-top:3px solid var(--line)}
+.pcard.gave{border-top-color:var(--teal)}
+.pcard.recv{border-top-color:var(--orange)}
+.pcard .pc-h{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap}
+.pcard .pc-t{font-size:16px; font-weight:900}
+.pcard.gave .pc-t{color:var(--teal)}
+.pcard.recv .pc-t{color:var(--orange)}
+.pcard .pc-n{font-size:11px; color:var(--soft); margin-left:auto}
+.dletters{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:10px 0 7px}
+.dletters span{text-align:center; font-weight:900; font-size:15px; letter-spacing:.12em}
+.pcard.gave .dletters span{color:var(--teal); text-shadow:0 0 12px rgba(54,194,180,.45)}
+.pcard.recv .dletters span{color:var(--orange); text-shadow:0 0 12px rgba(255,184,107,.45)}
+
+.pgrid{display:grid; grid-template-columns:repeat(5,1fr); gap:8px}
+.psq{
+  position:relative; min-height:106px; padding:8px 9px 33px;
+  background:var(--panel-2); border:1px solid var(--line); border-left-width:3px;
+  border-radius:var(--radius); font-size:10.5px; cursor:pointer; overflow:hidden;
+  transition:border-color .15s;
+}
+.psq:hover{border-color:var(--gold)}
+.psq .who{font-weight:800; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.psq .what{color:var(--muted); line-height:1.32; margin-top:2px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
+.psq .made{position:absolute; left:9px; right:8px; bottom:18px; font-size:8.5px; font-weight:700; color:var(--soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.psq .when{position:absolute; left:9px; right:8px; bottom:6px; font-size:9.5px; font-weight:700; color:var(--soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+/* tile chips — receipt + response grade */
+.psq .cchips{position:absolute; top:4px; right:5px; display:flex; gap:3px; z-index:2}
+.psq .cchips .cc{font-size:8px; font-weight:800; letter-spacing:.05em; border:1px solid; border-radius:999px; padding:1px 5px; line-height:1.5; background:rgba(2,5,9,.55); white-space:nowrap}
+.cc.rcpt{color:var(--gold-glass); border-color:rgba(232,181,77,.55)}
+.cc.rg-owned{color:var(--gold); border-color:rgba(232,181,77,.65)}
+.cc.rg-repaired{color:var(--teal); border-color:rgba(54,194,180,.65)}
+.cc.rg-minimized{color:var(--yellow); border-color:rgba(232,194,77,.65)}
+.cc.rg-ghosted{color:var(--red); border-color:rgba(224,85,107,.65)}
+/* A9 groundwork — provenance + completion-audit chips */
+.cc.src-m{color:var(--muted); border-color:rgba(120,140,160,.55)}
+.cc.src-h{color:var(--cyan); border-color:rgba(81,167,249,.6)}
+.cc.aud-pending{color:var(--yellow); border-color:rgba(232,194,77,.6)}
+.cc.aud-verified{color:var(--green); border-color:rgba(70,198,109,.6)}
+.cc.aud-misreported{color:var(--red); border-color:rgba(224,85,107,.8); background:rgba(224,85,107,.18); box-shadow:0 0 7px rgba(224,85,107,.5)}
+.psq.st-out{border-left-color:var(--yellow)}      .psq.st-out .when{color:var(--yellow)}
+.psq.st-prog{border-left-color:var(--cyan)}       .psq.st-prog .when{color:var(--cyan)}
+.psq.st-over{border-left-color:var(--red); box-shadow:0 0 12px rgba(224,85,107,.28)} .psq.st-over .when{color:var(--red)}
+.psq.st-kept{border-left-color:var(--green)}      .psq.st-kept .when{color:var(--green)}
+.psq.st-broken{border-left-color:var(--red); opacity:.78} .psq.st-broken .what{text-decoration:line-through} .psq.st-broken .when{color:var(--red)}
+.psq.st-def{border-left-color:var(--purple)}      .psq.st-def .when{color:var(--purple)}
+.psq.st-cxl{opacity:.5}
+.psq.st-snz{border-left-color:var(--soft)}
+.psq.empty{border-style:dashed; border-left-width:1px; cursor:pointer; display:grid; place-items:center; color:var(--soft); font-weight:700; padding:8px}
+.psq.empty:hover{color:var(--gold)}
+.psq.centre{
+  background:linear-gradient(135deg,#2e230d,#5c4517 55%,#7d5e1f);
+  border:1px solid var(--gold); cursor:pointer; text-align:center;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  box-shadow:0 0 16px rgba(232,181,77,.28), inset 0 0 22px rgba(232,181,77,.14);
+  padding:8px;
+}
+.psq.centre .cz{font-size:15px; font-weight:900; color:var(--gold-glass); letter-spacing:.08em}
+.psq.centre .cs{font-size:9px; color:#cdb27a; line-height:1.3}
+@media (max-width:680px){
+  .pgrid{gap:5px} .psq{min-height:92px; padding:6px 7px 30px; font-size:9.5px}
+  .psq .what{-webkit-line-clamp:2}
+  .psq .made{bottom:16px; font-size:8px}
+  .dletters{gap:5px}
+}
+@media (max-width:480px){ .pcard{overflow-x:auto} .pgrid,.dletters{min-width:560px} }
+
+/* filters */
+.fbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0 0}
+.fbar .fnote{font-size:11px; color:var(--soft); font-style:italic}
+
+/* calendar scroll strip */
+.cal{display:flex; gap:6px; overflow-x:auto; padding:10px 4px 12px; scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){.cal{scroll-behavior:auto}}
+.cal .day{
+  flex:0 0 54px; border:1px solid var(--line); border-radius:8px; padding:5px 3px 4px;
+  text-align:center; cursor:pointer; background:var(--panel-2); transition:border-color .15s;
+}
+.cal .day:hover{border-color:var(--gold)}
+.cal .day .dw{font-size:8.5px; color:var(--soft); text-transform:uppercase; letter-spacing:.08em; font-weight:700}
+.cal .day .dn{font-size:15px; font-weight:800; color:var(--ink); line-height:1.2}
+.cal .day .mo{font-size:8.5px; color:var(--muted); font-weight:700; text-transform:uppercase; min-height:11px}
+.cal .day .marks{min-height:11px; display:flex; gap:2px; justify-content:center; align-items:center; margin-top:2px}
+.cal .day .marks i{width:6px; height:6px; border-radius:50%; display:inline-block}
+.cal .day .marks i.y{background:var(--yellow)} .cal .day .marks i.r{background:var(--red)}
+.cal .day .marks i.g{background:var(--green)} .cal .day .marks i.grey{background:var(--soft)}
+.cal .day .marks .mc{font-size:8px; color:var(--soft); font-weight:800}
+.cal .day.today{border-color:var(--gold); box-shadow:0 0 10px rgba(232,181,77,.4)}
+.cal .day.today .dn{color:var(--gold)}
+.cal .day.sel{border-color:var(--cyan); box-shadow:0 0 8px rgba(81,167,249,.4)}
+
+/* entry forms */
+.fld{display:flex; flex-direction:column; gap:3px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted)}
+input,select,textarea{
+  background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
+  color:var(--ink); padding:7px 9px; font-family:inherit; font-size:13px;
+}
+input:focus,select:focus,textarea:focus{outline:none; border-color:var(--gold)}
+textarea{resize:vertical; min-height:64px}
+.formgrid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px}
+.formgrid .full{grid-column:1 / -1}
+@media (max-width:680px){.formgrid{grid-template-columns:1fr}}
+
+/* drawer internals */
+#drawer-overlay{position:fixed; inset:0; background:rgba(2,5,9,.55); z-index:140; display:none}
+#drawer-overlay.open{display:block}
+.drawer .d-promise{font-size:15px; font-weight:700; color:var(--ink); line-height:1.4; margin:8px 0 10px}
+.drawer .meta-t td{font-size:12.5px; padding:5px 8px}
+.drawer .meta-t td:first-child{color:var(--soft); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; font-weight:800; width:108px}
+.drawer .alertline{
+  margin:10px 0; padding:9px 12px; border-radius:var(--radius); font-size:12.5px; font-weight:700;
+  background:rgba(224,85,107,.1); border:1px solid rgba(224,85,107,.5); color:#ff9aab;
+}
+.drawer .sugline{
+  margin:8px 0; padding:8px 12px; border-radius:var(--radius); font-size:12px;
+  background:rgba(232,194,77,.08); border:1px solid rgba(232,194,77,.45); color:var(--yellow);
+}
+.drawer .lockline{font-size:11px; color:var(--gold-glass); background:rgba(232,181,77,.07); border:1px solid rgba(232,181,77,.4); border-radius:8px; padding:6px 10px; margin:10px 0 6px}
+.drawer .hist{font-size:11.5px; color:var(--muted); margin:4px 0 0; padding-left:16px}
+.drawer .hist li{margin:2px 0}
+.drawer h3{margin-top:18px}
+
+/* toast */
+#toast{
+  position:fixed; bottom:26px; left:50%; transform:translateX(-50%); z-index:300;
+  background:var(--panel); border:1px solid var(--gold); color:var(--gold-glass);
+  border-radius:999px; padding:9px 20px; font-size:13px; font-weight:700;
+  box-shadow:0 8px 30px rgba(0,0,0,.55); display:none; max-width:88vw;
+}
+
+/* flytrap */
+.flypreview{margin-top:8px}
+.kaboom-strip{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
+.kaboom-strip img{width:150px; border-radius:8px; border:1px solid var(--line); flex:0 0 auto}
+</style>
+</head>
+<body>
+<main>
+
+  <figure class="ptk-hero">
+    <img src="assets/img/ptk-ledger-handshake.webp"
+         alt="Two hands meeting in a firm handshake above an open leather-bound ledger, a red wax seal beside it and a blank gold ribbon arcing above — the handshake is the promise; the ledger is the keeping of it">
+    <div class="veil" aria-hidden="true"></div>
+    <h1>PTK — <b>Promises to Keep</b></h1>
+  </figure>
+  <p class="muted" style="max-width:880px">
+    The <b style="color:var(--gold)">kaboom</b> dual ledger behind the gold centre square of every Dingo card.
+    Click PTK on any card and this is what explodes open: what you owe, and what others owe you.
+    <em>"This is a hyper accountability."</em> — Tim, 2026-03-24.
+    The centre square is an accountability engine — never empty.
+  </p>
+
+  <!-- ===== dashboard strip ===== -->
+  <div class="sec-h">Scoreboard <b>— computed at render, never asserted</b></div>
+  <div class="dash" id="dash" aria-live="polite"></div>
+
+  <!-- ===== OVERDUE exception strip ===== -->
+  <div class="sec-h">Overdue <b>— the 7-day rule</b> <span class="footnote">(computed from dueDate at render — never stored)</span></div>
+  <div id="alerts"></div>
+
+  <!-- ===== filters ===== -->
+  <div class="fbar" id="filters">
+    <span class="chip" data-f="all">All</span>
+    <span class="chip" data-f="today">Today's</span>
+    <span class="chip" data-f="outstanding">Outstanding</span>
+    <span class="chip" data-f="finished">Finished</span>
+    <span class="chip" id="daychip" style="display:none"></span>
+    <span class="fnote">Today's PTKs stay front and centre — they sort first on both cards.</span>
+  </div>
+
+  <!-- ===== the two 5×5 cards ===== -->
+  <div class="ledgers">
+    <section class="pcard gave" aria-label="PTKs I Gave">
+      <div class="pc-h">
+        <span class="pc-t">PTKs I Gave</span>
+        <span class="pill" style="color:var(--teal); border-color:rgba(54,194,180,.5)">my ledger — what I owe</span>
+        <span class="pc-n" id="gave-count"></span>
+      </div>
+      <div class="dletters" aria-hidden="true"><span>D</span><span>I</span><span>N</span><span>G</span><span>O</span></div>
+      <div class="pgrid" id="grid-gave"></div>
+    </section>
+    <section class="pcard recv" aria-label="PTKs Others Gave Me — Ghost Buster">
+      <div class="pc-h">
+        <span class="pc-t">PTKs Others Gave Me</span>
+        <span class="pill warn">GHOST BUSTER</span>
+        <span class="pc-n" id="recv-count"></span>
+      </div>
+      <div class="dletters" aria-hidden="true"><span>D</span><span>I</span><span>N</span><span>G</span><span>O</span></div>
+      <div class="pgrid" id="grid-recv"></div>
+    </section>
+  </div>
+
+  <!-- ===== entry: Flytrap + manual ===== -->
+  <div class="sec-h" id="entry">Capture <b>— Flytrap feeder funnel + manual entry</b></div>
+  <div class="grid2">
+    <div class="panel">
+      <div class="ph">🪤 Flytrap — free-text capture</div>
+      <p class="muted" style="font-size:12.5px">Type it like you'd say it. Flytrap auto-detects <b style="color:var(--teal)">gave</b> vs <b style="color:var(--orange)">received</b> and the due date, then fills the form for your review. Nothing is added until you approve it.</p>
+      <textarea id="fly-text" placeholder="I promised Lauren I'd send the Bravo follow-up by Friday&#10;Murphy promised he'd wire ResNexus into Track B by June 15"></textarea>
+      <div class="verdicts">
+        <button class="btn gold-cta" id="fly-parse" type="button">Parse with Flytrap</button>
+        <button class="btn" id="fly-clear" type="button">Clear</button>
+      </div>
+      <div class="flypreview" id="fly-preview"></div>
+    </div>
+    <div class="panel">
+      <div class="ph">✍️ Manual entry — review &amp; add</div>
+      <div class="formgrid">
+        <label class="fld">Direction
+          <select id="f-dir">
+            <option value="gave">I gave it (my ledger)</option>
+            <option value="received">Given to me (Ghost Buster)</option>
+          </select>
+        </label>
+        <label class="fld">Counterparty
+          <input id="f-who" type="text" placeholder="Lauren LaBossiere">
+        </label>
+        <label class="fld full">The promise
+          <input id="f-what" type="text" placeholder="send the Bravo-details follow-up">
+        </label>
+        <label class="fld">Due date
+          <input id="f-due" type="date">
+        </label>
+        <label class="fld">Difficulty (points = 10 + difficulty × 5)
+          <select id="f-diff">
+            <option value="1">1 — trivial (15 pts)</option>
+            <option value="2">2 — easy (20 pts)</option>
+            <option value="3" selected>3 — normal (25 pts)</option>
+            <option value="4">4 — hard (30 pts)</option>
+            <option value="5">5 — heroic (35 pts)</option>
+          </select>
+        </label>
+        <label class="fld">Level
+          <select id="f-level">
+            <option value="personal">personal</option>
+            <option value="corporate" selected>corporate</option>
+            <option value="strategy">strategy</option>
+          </select>
+        </label>
+        <label class="fld">Category
+          <select id="f-cat">
+            <option value="dingo_square">Dingo square</option>
+            <option value="initiative">initiative</option>
+            <option value="personal">personal</option>
+            <option value="team">team</option>
+            <option value="learning">learning</option>
+            <option value="ruby_red">Ruby Red</option>
+            <option value="other" selected>other</option>
+          </select>
+        </label>
+        <label class="fld full">Link to a Dingo card (optional)
+          <select id="f-card">
+            <option value="">— none —</option>
+            <option value="pawn-princess-pp01">Pawn Princess PP-01</option>
+            <option value="seba-hub-occupancy">Seba Hub Occupancy Engine</option>
+            <option value="door-to-door">Door-to-Door (superseded)</option>
+          </select>
+        </label>
+      </div>
+      <div class="verdicts">
+        <button class="btn approve" id="f-add" type="button">Add promise to the ledger</button>
+      </div>
+      <p class="footnote" id="f-conf"></p>
+    </div>
+  </div>
+
+  <!-- ===== focal promises on the live cards ===== -->
+  <div class="sec-h">The centre square on the live <b>Dingo cards</b></div>
+  <div class="panel">
+    <div class="kaboom-strip">
+      <img src="assets/img/showme-dingo-card.png" alt="The Dingo card with the gold PTK centre square">
+      <div style="flex:1; min-width:240px">
+        <p class="muted" style="font-size:12.5px; margin-top:0">Every Dingo card carries its <b style="color:var(--gold)">focal promise</b> in the gold centre square — the one-line sacred commitment the whole card serves. Clicking it lands here, on the dual ledger.</p>
+        <div id="focal"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== daily calendar scroll ===== -->
+  <div class="sec-h">Daily calendar <b>— auto-scrolled to today</b> <span class="footnote">(click a day to filter by due date; click again to clear)</span></div>
+  <div class="panel tight">
+    <div class="cal" id="cal"></div>
+  </div>
+
+  <!-- ===== rules + housekeeping ===== -->
+  <div class="grid2" style="margin-top:16px">
+    <div class="panel">
+      <div class="ph">The rules of the game (from <code>data/ptk-seed.json</code>)</div>
+      <div id="rules" class="muted" style="font-size:12.5px"></div>
+    </div>
+    <div class="panel">
+      <div class="ph">Phase 2 — the Promise Engine (deferred, consent-gated)</div>
+      <p class="muted" style="font-size:12.5px">
+        Nothing on this page scans email, Slack or Teams. The MVP is <b style="color:var(--gold)">manual entry + Flytrap free-text only</b>.
+        The Phase-2 Promise Engine starts with ONE channel, explicit opt-in, member-owned data and easy off switches — and even then, nudges are never auto-sent.
+      </p>
+      <p class="muted" style="font-size:12.5px">
+        <b style="color:var(--gold)">A9 groundwork (shipped, additive):</b> every promise now carries
+        <code>source</code> (✍️ manual default · 🤖 harvested enum ready), an optional <code>completion_level</code> (0–100),
+        <code>declared_by</code> (self&nbsp;|&nbsp;agent) and <code>audit_status</code> (pending&nbsp;|&nbsp;verified&nbsp;|&nbsp;misreported).
+        Self-declared completions stay <b>audit pending</b> until verified; a MISREPORTED verdict writes an escalation entry to
+        <code>localStorage["hb1000-integrity"]</code> — the feed the future daily integrity report will read.
+        The monitoring agent itself is Phase 2: the drawer's audit buttons are a labeled <b>simulation</b>.
+      </p>
+      <div class="ph" style="margin-top:14px">Nothing is trapped</div>
+      <div class="verdicts">
+        <button class="btn" id="exp-btn" type="button">Export ledger JSON</button>
+        <button class="btn" id="imp-btn" type="button">Import JSON</button>
+        <input type="file" id="imp-file" accept=".json,application/json" style="display:none">
+        <button class="btn decline" id="reset-btn" type="button">Reset local changes</button>
+      </div>
+      <p class="footnote">Local decisions persist to <code>localStorage["hb1000-ptk"]</code>; the seed file is never modified. <span id="src-note"></span></p>
+    </div>
+  </div>
+
+</main>
+
+<!-- promise detail drawer -->
+<div id="drawer-overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Promise detail"></aside>
+<div id="toast" role="status"></div>
+
+<!-- embedded fallback copy of data/ptk-seed.json so the page also renders off file:// (HTTP loads the live file) -->
+<script type="application/json" id="ptk-fallback">
+{
+  "meta": {
+    "title": "PTK — Promises to Keep: real seed promises (both ledgers, Bazaam-era format)",
+    "source": "hb1000-os/blueprint/ptk.md (v14 ptk_promises schema + canonical additions) · Bazaam PTK Daily Check-In emails (March 2026, proven live) · AI-Research-Ledger.md inbound (June 2026)",
+    "vocabulary": "PTKs I Gave (left card, teal) · PTKs Others Gave Me (right card, amber — Ghost Buster). The centre square is an accountability engine — the PTK engine, never a giveaway.",
+    "states": "promised → in_progress → kept | broken | deferred | cancelled",
+    "aging_rules": {
+      "gave": "OUTSTANDING (<7 days) → ⚠️ OVERDUE (7+ days) → COMPLETED (with date). OVERDUE is COMPUTED at render from dueDate — never stored.",
+      "received": "WAITING (<7d) → 🔴 OVERDUE (7+d) → NUDGED (with date + tone) → RECEIVED. Ghost Buster 14+ days → suggest URGENT nudge.",
+      "alert_string": "📤 PTK OVERDUE: You promised [person] you'd [thing] — now [X] days"
+    },
+    "scoring": {
+      "points": "10 + difficulty × 5 per kept promise",
+      "keep_rate": "totalKept / totalPromises × 100",
+      "grip_mechanism": "streak = consecutive days with zero broken promises; breaking a promise resets currentStreak to 0",
+      "testosterone_thermometer": { "value": 42, "label": "SLIPPING", "note": "Personal level only — hidden on corporate/strategy cards. Value as last seen on the live standalone PTK app (ptkcommit-l3qnncjk.manus.space, 2026-03-25): 'rises when you keep promises, drops when you break them.'" }
+    },
+    "nudge_tones": [
+      { "tone": "FRIENDLY", "emoji": "😊", "style": "soft, no pressure, relationship-preserving" },
+      { "tone": "DIRECT", "emoji": "📋", "style": "business-like, clear ask, specific timeline request" },
+      { "tone": "URGENT", "emoji": "🚨", "style": "firm, deadline-focused, consequence-aware" }
+    ],
+    "nudge_rule": "Drafts only — Tim sends (estate rule: Gmail is draft-only). Escalation suggestion after 7 silent days: 'You sent a FRIENDLY nudge 7 days ago with no response. Consider: 📋 DIRECT or 🚨 URGENT.'",
+    "bazaam_provenance": "The Bazaam-site PTK board ran live in production March 2026: daily 7 AM check-in email to all 5 participants (Tim, David, Jay, Bryan, John Frank). The 2026-03-26 check-in reported: full accountability score (0% complete), 2 overdue items (Doors & Roof Caps, Fix Overhead Door), 1 in progress (Optiprime), and all 16 outstanding promises across both ledgers, with a link to the live board.",
+    "engine_note": "MVP = manual entry + Flytrap free-text extraction only. NO email/Slack scanning — the PTK Promise Engine is Phase 2, explicit opt-in, member-owned data, easy off switches.",
+    "a9_fields": "Amendment A9 groundwork (additive, 2026-06-11): source = manual (default) | flytrap | harvested (enum ready - the Phase-2 promise engine is NOT built) | completion_level = 0-100 optional, self-declared progress | declared_by = self | agent (who declared the completion) | audit_status = pending | verified | misreported. Self-declared completions stay AUDIT PENDING until verified; MISREPORTED writes an escalation entry to localStorage hb1000-integrity (the future daily-report feed). The monitoring agent itself is Phase 2 - the drawer audit buttons are a labeled SIMULATION."
+  },
+  "promises": [
+    {
+      "id": "ptk-001",
+      "direction": "gave",
+      "promise": "Send the 'AI helper for the nightly cash-out — a few questions to build it' email to the Pawn Princess team",
+      "counterparty": "Diana Machado, Jarrett, Lauren LaBossiere + Samantha",
+      "category": "dingo_square",
+      "card": "pawn-princess-pp01",
+      "level": "corporate",
+      "dateMade": "2026-06-07",
+      "dueDate": "2026-06-07",
+      "status": "kept",
+      "completedAt": "2026-06-07",
+      "evidence": "Email sent 2026-06-07; two enthusiastic replies landed 2026-06-07/08 (see ai-research-ledger.json → inbound).",
+      "difficulty": 2,
+      "source": "manual",
+      "completion_level": 100,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": null,
+      "snoozedUntil": null,
+      "nudge_history": []
+    },
+    {
+      "id": "ptk-002",
+      "direction": "gave",
+      "promise": "Send Lauren the Bravo-details follow-up the moment her detailed reply lands (Gmail is draft-only — Tim sends)",
+      "counterparty": "Lauren LaBossiere (Pawn Princess)",
+      "category": "dingo_square",
+      "card": "pawn-princess-pp01",
+      "level": "corporate",
+      "dateMade": "2026-06-08",
+      "dueDate": "2026-06-12",
+      "status": "in_progress",
+      "completedAt": null,
+      "evidence": null,
+      "difficulty": 2,
+      "source": "manual",
+      "completion_level": 60,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": null,
+      "snoozedUntil": null,
+      "nudge_history": []
+    },
+    {
+      "id": "ptk-003",
+      "direction": "gave",
+      "promise": "Review Murphy's Fix-It pull requests in the shared Seba fleet repo",
+      "counterparty": "Murphy",
+      "category": "initiative",
+      "card": null,
+      "level": "corporate",
+      "dateMade": "2026-06-02",
+      "dueDate": "2026-06-12",
+      "status": "promised",
+      "completedAt": null,
+      "evidence": null,
+      "difficulty": 3,
+      "source": "manual",
+      "completion_level": null,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": null,
+      "snoozedUntil": null,
+      "nudge_history": [],
+      "notes": "Standing arrangement: Murphy develops directly in the private shared repo; Tim reviews via PRs."
+    },
+    {
+      "id": "ptk-004",
+      "direction": "received",
+      "promise": "Detailed answers to the 10 nightly cash-out questions — 'I'll sit down tonight to jump into these questions, let's get on this right away.'",
+      "counterparty": "Lauren LaBossiere (Pawn Princess)",
+      "category": "dingo_square",
+      "card": "pawn-princess-pp01",
+      "level": "corporate",
+      "dateMade": "2026-06-07",
+      "dueDate": "2026-06-08",
+      "status": "promised",
+      "completedAt": null,
+      "evidence": null,
+      "difficulty": 3,
+      "source": "manual",
+      "completion_level": null,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": null,
+      "snoozedUntil": null,
+      "nudge_history": [],
+      "notes": "The single most important gated answer: does Bravo produce its own end-of-day expected-drawer / over-short figure, and which report + export format carries it."
+    },
+    {
+      "id": "ptk-005",
+      "direction": "received",
+      "promise": "Run the Seba Hub Occupancy Engine as Dingo Caller — 'one neck to choke'; approve every outbound message nightly",
+      "counterparty": "Casey",
+      "category": "dingo_square",
+      "card": "seba-hub-occupancy",
+      "level": "corporate",
+      "dateMade": "2026-06-08",
+      "dueDate": null,
+      "status": "in_progress",
+      "completedAt": null,
+      "evidence": "Nightly console live at showme/seba-nightly (draft-only; verdicts in localStorage).",
+      "difficulty": 4,
+      "source": "manual",
+      "completion_level": 40,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": null,
+      "snoozedUntil": null,
+      "nudge_history": [],
+      "notes": "Standing assignment, not a dated deliverable. Acceptance verb: 'Yes, I accept this assignment.'"
+    },
+    {
+      "id": "ptk-006",
+      "direction": "received",
+      "promise": "Wire ResNexus self-booking (sebastays.com) into Track B of the Occupancy Engine",
+      "counterparty": "Murphy",
+      "category": "dingo_square",
+      "card": "seba-hub-occupancy",
+      "level": "corporate",
+      "dateMade": "2026-06-08",
+      "dueDate": "2026-06-15",
+      "status": "in_progress",
+      "completedAt": null,
+      "evidence": null,
+      "difficulty": 4,
+      "source": "manual",
+      "completion_level": 35,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": null,
+      "snoozedUntil": null,
+      "nudge_history": []
+    },
+    {
+      "id": "ptk-007",
+      "direction": "received",
+      "promise": "Doors & Roof Caps — Bazaam site",
+      "counterparty": "Bazaam crew (David / Jay / Bryan / John Frank)",
+      "category": "team",
+      "card": null,
+      "level": "corporate",
+      "dateMade": "2026-03-12",
+      "dueDate": "2026-03-26",
+      "status": "promised",
+      "completedAt": null,
+      "evidence": null,
+      "difficulty": 3,
+      "source": "manual",
+      "completion_level": null,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": "Tim (board owner)",
+      "snoozedUntil": null,
+      "nudge_history": [],
+      "notes": "From the PTK Daily Check-In — March 26, 2026 — Bazaam Site (listed OVERDUE then; the 7-day rule computes it OVERDUE now). This is the seed's worked OVERDUE example — computed at render, never stored."
+    },
+    {
+      "id": "ptk-008",
+      "direction": "received",
+      "promise": "Fix Overhead Door — Bazaam site",
+      "counterparty": "Bazaam crew (David / Jay / Bryan / John Frank)",
+      "category": "team",
+      "card": null,
+      "level": "corporate",
+      "dateMade": "2026-03-12",
+      "dueDate": "2026-03-26",
+      "status": "promised",
+      "completedAt": null,
+      "evidence": null,
+      "difficulty": 2,
+      "source": "manual",
+      "completion_level": null,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": "Tim (board owner)",
+      "snoozedUntil": null,
+      "nudge_history": [],
+      "notes": "Second overdue item from the 2026-03-26 Bazaam check-in."
+    },
+    {
+      "id": "ptk-009",
+      "direction": "received",
+      "promise": "Optiprime — Bazaam site",
+      "counterparty": "Bazaam crew (David / Jay / Bryan / John Frank)",
+      "category": "team",
+      "card": null,
+      "level": "corporate",
+      "dateMade": "2026-03-12",
+      "dueDate": null,
+      "status": "in_progress",
+      "completedAt": null,
+      "evidence": null,
+      "difficulty": 3,
+      "source": "manual",
+      "completion_level": 50,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": "Tim (board owner)",
+      "snoozedUntil": null,
+      "nudge_history": [],
+      "notes": "The one in-progress item from the 2026-03-26 Bazaam check-in."
+    },
+    {
+      "id": "ptk-010",
+      "direction": "gave",
+      "promise": "Revoke + delete the live OpenAI API key found in the Oct 7 Outlook email",
+      "counterparty": "myself (security hygiene)",
+      "category": "personal",
+      "card": null,
+      "level": "personal",
+      "dateMade": "2026-06-10",
+      "dueDate": "2026-06-11",
+      "status": "promised",
+      "completedAt": null,
+      "evidence": null,
+      "difficulty": 1,
+      "source": "flytrap",
+      "completion_level": null,
+      "declared_by": "self",
+      "audit_status": "pending",
+      "witness": null,
+      "snoozedUntil": null,
+      "nudge_history": [],
+      "notes": "Surfaced by the Outlook-Rescue-2025 sweep (⚠ flagged on the Show Me feed)."
+    }
+  ],
+  "focal_promises": [
+    { "card": "seba-hub-occupancy", "promise": "no empty night, no empty seat" },
+    { "card": "pawn-princess-pp01", "promise": null, "note": "No focal promise declared on the card yet — centre tile is display + manual for now (MVP scope lock). Caller to declare it." },
+    { "card": "door-to-door", "promise": "85% occupancy today", "note": "early draft — superseded by the Seba Hub Occupancy Engine card" }
+  ]
+}
+</script>
+
+<script src="assets/shell.js"></script>
+<script src="assets/prism.js"></script><!-- Babel Bridge prism widget — attaches ◇ to data-prism-id / data-prism elements; page degrades gracefully if absent -->
+<script>
+(function () {
+  'use strict';
+  Shell.init('ptk');
+
+  /* ================= state ================= */
+  var LS_KEY = 'hb1000-ptk';
+  var seed = null;                       // parsed ptk-seed.json
+  var seedStatusById = {};               // original seed statuses (for thermometer drift)
+  var local = { added: [], overrides: {}, view: {} };  // persisted to localStorage
+  var view = { filter: 'all', day: null };
+  var openId = null;                     // drawer
+  var usingFallback = false;
+
+  var CARD_NAMES = {
+    'pawn-princess-pp01': 'Pawn Princess PP-01',
+    'seba-hub-occupancy': 'Seba Hub Occupancy Engine',
+    'door-to-door': 'Door-to-Door (superseded)'
+  };
+  var CAT_LABEL = {
+    dingo_square: 'Dingo square', initiative: 'Initiative', personal: 'Personal',
+    team: 'Team', learning: 'Learning', ruby_red: 'Ruby Red', other: 'Other'
+  };
+  /* Response grade — the SECOND grade: not whether you broke it, but how you faced it.
+     Breaking is human; ghosting is the failure. */
+  var RESP = {
+    owned:     { label: 'OWNED IT',  color: 'var(--gold)',   pts: 4 },
+    repaired:  { label: 'REPAIRED',  color: 'var(--teal)',   pts: 3 },
+    minimized: { label: 'MINIMIZED', color: 'var(--yellow)', pts: 1 },
+    ghosted:   { label: 'GHOSTED',   color: 'var(--red)',    pts: 0 }
+  };
+  var RESP_ORDER = ['owned', 'repaired', 'minimized', 'ghosted'];
+  /* ===== A9 groundwork — provenance + completion audit (data model + UI states ONLY).
+     The monitoring agent is NOT built (Phase 2); the drawer carries a labeled SIMULATION
+     toggle instead, per the guard-banner law. source enum: manual (default) · flytrap ·
+     harvested (ready for the Phase-2 engine). Self-declared completions stay AUDIT PENDING
+     until verified; MISREPORTED writes an escalation entry to localStorage hb1000-integrity —
+     the future daily-report feed. ===== */
+  var INTEGRITY_KEY = 'hb1000-integrity';
+  var AUDIT = {
+    pending:     { tile: '⏳ AUDIT',       pill: '⏳ audit pending', cls: 'aud-pending',
+                   tip: 'Self-declared completion — audit pending until the A9 monitoring agent (Phase 2) verifies it' },
+    verified:    { tile: '✓ VERIFIED',    pill: '✓ audit verified', cls: 'aud-verified',
+                   tip: 'Completion verified by audit (simulated — the A9 monitoring agent is Phase 2)' },
+    misreported: { tile: '✗ MISREPORTED', pill: '✗ MISREPORTED',    cls: 'aud-misreported',
+                   tip: 'Audit found this self-declared completion misreported — escalated to the integrity feed (localStorage hb1000-integrity)' }
+  };
+  function srcChip(p) {
+    return p.source === 'harvested'
+      ? { icon: '🤖', label: 'harvested', cls: 'src-h',
+          tip: '🤖 harvested — captured by the Phase-2 promise engine (enum ready; the engine is not built and nothing scans)' }
+      : { icon: '✍️', label: p.source === 'flytrap' ? 'manual · flytrap' : 'manual', cls: 'src-m',
+          tip: p.source === 'flytrap'
+            ? '✍️ manual (via Flytrap free-text) — human reviewed and approved'
+            : '✍️ manual — typed and approved by the human' };
+  }
+  /* the completion audit applies to SELF-declared completions; agent-declared ones
+     will carry their own verification trail when the A9 agent ships */
+  function auditState(p) {
+    if (p.status !== 'kept' || p.declared_by === 'agent') return null;
+    return AUDIT[p.audit_status] ? p.audit_status : 'pending';
+  }
+  function writeIntegrity(entry) {
+    var arr = [];
+    try { arr = JSON.parse(localStorage.getItem(INTEGRITY_KEY)) || []; } catch (e) { /* fresh feed */ }
+    if (!Array.isArray(arr)) arr = [];
+    arr.push(entry);
+    try { localStorage.setItem(INTEGRITY_KEY, JSON.stringify(arr)); } catch (e) { /* private mode */ }
+  }
+  /* Babel Bridge canonical spectrum (locked): plain ⚪ (white light, default) ·
+     barstool 🔴 · timbit 🟡 · boardroom 🔵 · swiss ⬜ — picture 🟢 reserved v2.
+     Copy-block stacking uses the compression order Plain → Boardroom → Swiss → Barstool → Timbit. */
+  var VOICES = [
+    { key: 'plain',     chip: '⚪', name: 'PLAIN' },
+    { key: 'boardroom', chip: '🔵', name: 'BOARDROOM' },
+    { key: 'swiss',     chip: '⬜', name: 'SWISS' },
+    { key: 'barstool',  chip: '🔴', name: 'BARSTOOL' },
+    { key: 'timbit',    chip: '🟡', name: 'TIMBIT' }
+  ];
+
+  /* ================= date utils (local-midnight safe) ================= */
+  function parseISO(s) {
+    if (!s) return null;
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(String(s));
+    if (!m) return null;
+    return new Date(+m[1], +m[2] - 1, +m[3]);
+  }
+  function today0() { var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function isoOf(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function daysDiff(a, b) { return Math.round((a - b) / 864e5); }
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var DOW = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  function fmtFull(d) { return d ? (MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear()) : '—'; }
+  function fmtShort(d) { return d ? (MONTHS[d.getMonth()] + ' ' + d.getDate()) : '—'; }
+  var TODAY = today0(), TODAY_ISO = isoOf(TODAY);
+
+  /* ================= persistence ================= */
+  function loadLocal() {
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (raw) {
+        var o = JSON.parse(raw);
+        if (o && typeof o === 'object') {
+          local.added = Array.isArray(o.added) ? o.added : [];
+          local.overrides = (o.overrides && typeof o.overrides === 'object') ? o.overrides : {};
+          local.view = (o.view && typeof o.view === 'object') ? o.view : {};
+        }
+      }
+    } catch (e) { /* corrupted local state — start clean, seed is untouched */ }
+    if (local.view.filter) view.filter = local.view.filter;
+  }
+  function saveLocal() {
+    local.view.filter = view.filter;
+    try { localStorage.setItem(LS_KEY, JSON.stringify(local)); } catch (e) { /* storage full/blocked */ }
+  }
+  function setOverride(id, patch) {
+    var cur = local.overrides[id] || {};
+    Object.keys(patch).forEach(function (k) { cur[k] = patch[k]; });
+    local.overrides[id] = cur;
+    saveLocal();
+  }
+
+  /* ================= promise computation ================= */
+  function basePromises() {
+    var o = local.overrides;
+    var fromSeed = (seed.promises || []).map(function (p) {
+      var c = Object.assign({}, p, o[p.id] || {});
+      return c;
+    });
+    var added = local.added.map(function (p) { return Object.assign({}, p, o[p.id] || {}); });
+    return fromSeed.concat(added);
+  }
+  function isOpen(p) { return p.status === 'promised' || p.status === 'in_progress'; }
+  function isFinished(p) { return p.status === 'kept' || p.status === 'broken' || p.status === 'cancelled'; }
+  function pointsFor(p) { return p.pointsEarned != null ? p.pointsEarned : 10 + (p.difficulty || 3) * 5; }
+  function isSeedPromise(id) { return Object.prototype.hasOwnProperty.call(seedStatusById, id); }
+  function hasReceipt(p) { return !!(p.evidence || p.evidenceLink); }
+  /* PRISM CONTRACT — seed promises carry data-prism-id="ptk:<promiseId>"; spectrum resolves
+     against data/spectra.json; no spectrum = no icon (graceful absence, prism.js's rule). */
+  function prismAttr(p) { return isSeedPromise(p.id) ? ' data-prism-id="ptk:' + Shell.esc(p.id) + '"' : ''; }
+
+  function decorate(p) {
+    var due = parseISO(p.dueDate);
+    var past = (due && isOpen(p)) ? Math.max(0, daysDiff(TODAY, due)) : 0;
+    p._pastDue = past;
+    p._od = (past >= 7) ? past : 0;                       // OVERDUE per the 7-day rule — computed, never stored
+    var snz = parseISO(p.snoozedUntil);
+    p._snz = !!(snz && snz > TODAY && isOpen(p));         // hidden until date, then returns to pending
+    p._age = p.dateMade ? Math.max(0, daysDiff(TODAY, parseISO(p.dateMade))) : null;
+    // promise AGE — age since the promise was MADE, computed at render, never stored.
+    // A promise that shows its age never quietly dies.
+    p._ageTxt = (p._age == null) ? null : (p._age === 0 ? 'today' : p._age + ' day' + (p._age === 1 ? '' : 's') + ' ago');
+    p._madeTxt = p.dateMade ? ('Promised ' + fmtShort(parseISO(p.dateMade)) + ' — ' + p._ageTxt) : null;
+    p._dueToday = isOpen(p) && !p._snz && p.dueDate === TODAY_ISO;
+    // overlay label + cell class
+    var dueTxt = p.dueDate ? (p._dueToday ? 'due TODAY' : 'due ' + fmtShort(due)) : 'no date';
+    if (p._snz) { p._cls = 'st-snz'; p._overlay = '💤 SNOOZED → ' + fmtShort(snz); }
+    else if (p.status === 'kept') { p._cls = 'st-kept'; p._overlay = (p.direction === 'gave' ? 'COMPLETED ' : 'RECEIVED ') + (p.completedAt ? fmtShort(parseISO(p.completedAt)) : '') + ' · +' + pointsFor(p) + ' pts'; }
+    else if (p.status === 'broken') { p._cls = 'st-broken'; p._overlay = 'BROKEN — streak reset'; }
+    else if (p.status === 'deferred') { p._cls = 'st-def'; p._overlay = 'DEFERRED'; }
+    else if (p.status === 'cancelled') { p._cls = 'st-cxl'; p._overlay = 'CANCELLED'; }
+    else if (p._od) { p._cls = 'st-over'; p._overlay = (p.direction === 'gave' ? '⚠️ OVERDUE' : '🔴 OVERDUE') + ' · ' + p._od + 'd past due'; }
+    else if (p.direction === 'received' && (p.nudge_history || []).length && isOpen(p)) { p._cls = 'st-out'; p._overlay = 'NUDGED (' + p.nudge_history[p.nudge_history.length - 1].tone + ') · ' + dueTxt; }
+    else if (p.status === 'in_progress') { p._cls = 'st-prog'; p._overlay = 'IN PROGRESS · ' + dueTxt; }
+    else { p._cls = 'st-out'; p._overlay = (p.direction === 'gave' ? 'OUTSTANDING' : 'WAITING') + ' · ' + dueTxt; }
+    return p;
+  }
+  function allPromises() { return basePromises().map(decorate); }
+
+  /* ================= scoring (computed, never asserted) ================= */
+  function gripStreak(ps) {
+    // v14 logic: kept within ≤1 day of lastKept → streak+1, else reset to 1; broken resets to 0
+    var ev = [];
+    ps.forEach(function (p) {
+      if (p.status === 'kept') ev.push({ d: parseISO(p.completedAt || p.dueDate || p.dateMade) || TODAY, t: 'kept' });
+      if (p.status === 'broken') ev.push({ d: parseISO(p.brokenAt || p.completedAt || p.dateMade) || TODAY, t: 'broken' });
+    });
+    ev.sort(function (a, b) { return a.d - b.d; });
+    var streak = 0, last = null;
+    ev.forEach(function (e) {
+      if (e.t === 'broken') { streak = 0; last = null; return; }
+      streak = (last && daysDiff(e.d, last) <= 1) ? streak + 1 : 1;
+      last = e.d;
+    });
+    return streak;
+  }
+  function thermometer(ps) {
+    var t = (seed.meta && seed.meta.scoring && seed.meta.scoring.testosterone_thermometer) || { value: 42, label: 'SLIPPING' };
+    var base = Number(t.value) || 42;
+    var keptNew = 0, brokenNew = 0;
+    ps.forEach(function (p) {
+      var orig = seedStatusById[p.id];  // undefined for locally-added promises
+      if (p.status === 'kept' && orig !== 'kept') keptNew++;
+      if (p.status === 'broken' && orig !== 'broken') brokenNew++;
+    });
+    var v = Math.max(0, Math.min(100, base + keptNew * 4 - brokenNew * 6));
+    var label = v >= 75 ? 'ON FIRE' : v >= 55 ? 'RISING' : v >= 40 ? 'SLIPPING' : v >= 25 ? 'FADING' : 'DORMANT';
+    return { value: v, label: label, base: base, baseLabel: t.label };
+  }
+
+  /* ================= grades (computed, never asserted) ================= */
+  function letterGrade(rate) { return rate >= 90 ? 'A' : rate >= 80 ? 'B' : rate >= 70 ? 'C' : rate >= 60 ? 'D' : 'F'; }
+  function gradeColor(g) {
+    return (g === 'A' || g === 'B') ? 'var(--green)' : g === 'C' ? 'var(--yellow)' : g === 'D' ? 'var(--orange)' : 'var(--red)';
+  }
+  function responseStat(ps) {
+    // aggregate the SECOND grade across broken promises: owned 4 · repaired 3 · minimized 1 · ghosted 0
+    var broken = ps.filter(function (p) { return p.status === 'broken'; });
+    var graded = broken.filter(function (p) { return RESP[p.responseGrade]; });
+    if (!graded.length) return { letter: '—', broken: broken.length, graded: 0, avg: null };
+    var sum = 0;
+    graded.forEach(function (p) { sum += RESP[p.responseGrade].pts; });
+    var avg = sum / graded.length;
+    var letter = avg >= 3.5 ? 'A' : avg >= 2.5 ? 'B' : avg >= 1.5 ? 'C' : avg >= 0.5 ? 'D' : 'F';
+    return { letter: letter, broken: broken.length, graded: graded.length, avg: avg };
+  }
+
+  /* ================= render: dashboard ================= */
+  function renderDash(ps) {
+    var todayN = ps.filter(function (p) { return p._dueToday; }).length;
+    var outN = ps.filter(isOpen).length;
+    var odN = ps.filter(function (p) { return p._od > 0; }).length;
+    var keptList = ps.filter(function (p) { return p.status === 'kept'; });
+    var keptN = keptList.length;
+    var total = ps.length;
+    var keepRate = total ? Math.round(keptN / total * 100) : 0;   // totalKept / totalPromises × 100
+    var grade = letterGrade(keepRate);                            // letter grade A–F from the keep rate
+    var gc = gradeColor(grade);
+    var rs = responseStat(ps);
+    var rsColor = rs.avg == null ? 'var(--muted)' : rs.avg >= 2.5 ? 'var(--green)' : rs.avg >= 1.5 ? 'var(--yellow)' : 'var(--red)';
+    var streak = gripStreak(ps);
+    var pts = keptList.reduce(function (s, p) { return s + pointsFor(p); }, 0);
+    var th = thermometer(ps);
+    var el = document.getElementById('dash');
+    el.innerHTML =
+      tile(todayN, "Today's", 'due today, both ledgers', todayN ? 'gold' : '') +
+      tile(outN, 'Outstanding', 'open promises', '') +
+      tile(odN, 'Overdue', '7-day rule, computed', odN ? 'hot' : 'green') +
+      tile(keptN, 'Kept', '+' + pts + ' pts (10 + diff×5)', keptN ? 'green' : '') +
+      '<div class="dtile' + (keepRate >= 80 ? ' green' : '') + '"><div class="dv num">' + keepRate + '%' +
+        '<span class="gradechip" style="color:' + gc + '" title="Letter grade computed from the keep rate">' + grade + '</span></div>' +
+        '<div class="dl">Keep rate · grade</div><div class="ds">A≥90 · B≥80 · C≥70 · D≥60 · F&lt;60</div></div>' +
+      '<div class="dtile"><div class="dv num" style="color:' + rsColor + '">' + Shell.esc(rs.letter) + '</div>' +
+        '<div class="dl">Response grade</div>' +
+        '<div class="ds">' + (rs.broken ? rs.graded + '/' + rs.broken + ' broken graded — ' : '') + 'breaking is human; ghosting is the failure</div></div>' +
+      tile(streak, 'Streak', 'Grip Mechanism', streak ? 'gold' : '') +
+      '<div class="therm">' +
+        '<div class="tt"><span class="tv num">' + th.value + '</span>' +
+        '<span class="tlab" style="color:' + (th.value >= 55 ? 'var(--green)' : th.value >= 40 ? 'var(--yellow)' : 'var(--red)') + '">' + Shell.esc(th.label) + '</span></div>' +
+        '<div class="track"><div class="fill" style="width:' + th.value + '%"></div></div>' +
+        '<div class="tn">🌡️ Testosterone Thermometer — rises when you keep promises, drops when you break them. Personal level only; it drops off at corporate/strategy.</div>' +
+      '</div>';
+    function tile(v, l, s, k) {
+      return '<div class="dtile ' + k + '"><div class="dv num">' + Shell.esc(String(v)) + '</div><div class="dl">' + Shell.esc(l) + '</div><div class="ds">' + Shell.esc(s) + '</div></div>';
+    }
+  }
+
+  /* ================= render: OVERDUE exception strip ================= */
+  function renderAlerts(ps) {
+    var el = document.getElementById('alerts');
+    var rows = '';
+    ps.filter(function (p) { return p._od > 0 && p.direction === 'gave'; }).forEach(function (p) {
+      rows += '<div class="status-row bad" data-open="' + Shell.esc(p.id) + '" style="cursor:pointer">' +
+        '<span class="st">gave</span><span class="grow">📤 PTK OVERDUE: You promised ' + Shell.esc(p.counterparty) +
+        " you'd " + Shell.esc(p.promise) + ' — now ' + p._od + ' days</span>' + Shell.rygDot('red') + '</div>';
+    });
+    ps.filter(function (p) { return p._od > 0 && p.direction === 'received'; }).forEach(function (p) {
+      rows += '<div class="status-row bad" data-open="' + Shell.esc(p.id) + '" style="cursor:pointer">' +
+        '<span class="st">ghost buster</span><span class="grow">🔴 OVERDUE: ' + Shell.esc(p.counterparty) +
+        ' promised "' + Shell.esc(p.promise) + '" — now ' + p._od + ' days' +
+        (p._od >= 14 ? ' · <b style="color:var(--yellow)">14+ days → suggest 🚨 URGENT nudge</b>' : '') +
+        '</span>' + Shell.rygDot('red') + '</div>';
+    });
+    if (!rows) rows = '<div class="status-row ok"><span class="st">clear</span><span class="grow">No OVERDUE PTKs right now — the Grip holds.</span>' + Shell.rygDot('green') + '</div>';
+    el.innerHTML = rows;
+    el.querySelectorAll('[data-open]').forEach(function (r) {
+      r.addEventListener('click', function () { openDrawer(r.getAttribute('data-open')); });
+    });
+  }
+
+  /* ================= render: the two 5×5 cards ================= */
+  function passesFilter(p) {
+    if (view.day) return p.dueDate === view.day;
+    if (view.filter === 'today') return p._dueToday;
+    if (view.filter === 'outstanding') return isOpen(p) && !p._snz;
+    if (view.filter === 'finished') return isFinished(p);
+    return true; // All
+  }
+  function rank(p) {
+    if (p._dueToday) return 0;                       // Today's PTKs front and centre
+    if (p._od > 0) return 1;
+    if (p.status === 'in_progress') return 2;
+    if (p.status === 'promised' && !p._snz) return 3;
+    if (p._snz) return 4;
+    if (p.status === 'deferred') return 5;
+    if (p.status === 'kept') return 6;
+    return 7;
+  }
+  function sortFn(a, b) {
+    var r = rank(a) - rank(b); if (r) return r;
+    var ad = a.dueDate || '9999', bd = b.dueDate || '9999';
+    if (ad !== bd) return ad < bd ? -1 : 1;
+    return (a.dateMade || '') < (b.dateMade || '') ? -1 : 1;
+  }
+  function cellChips(p) {
+    var c = '', pad = 0;
+    if (p.status === 'broken' && RESP[p.responseGrade]) {
+      c += '<span class="cc rg-' + p.responseGrade + '" title="Response grade — ' + RESP[p.responseGrade].label +
+        '. Breaking is human; ghosting is the failure.">' + RESP[p.responseGrade].label + '</span>';
+      pad += 70;
+    }
+    /* A9 — completion-audit chip on kept self-declared promises (computed at render) */
+    var aud = auditState(p);
+    if (aud) {
+      c += '<span class="cc ' + AUDIT[aud].cls + '" title="' + Shell.esc(AUDIT[aud].tip) + '">' + AUDIT[aud].tile + '</span>';
+      pad += (aud === 'misreported') ? 86 : 56;
+    }
+    if (hasReceipt(p)) {
+      c += '<span class="cc rcpt" title="Receipt: ' + Shell.esc(p.evidence || p.evidenceLink) + '">🧾</span>';
+      pad += 24;
+    }
+    /* A9 — provenance chip: 🤖 harvested / ✍️ manual (emoji-only on the tile; full label in the drawer) */
+    var sc = srcChip(p);
+    c += '<span class="cc ' + sc.cls + '" title="' + Shell.esc(sc.tip) + '">' + sc.icon + '</span>';
+    pad += 24;
+    return { html: '<div class="cchips">' + c + '</div>', pad: pad };
+  }
+  function cellHTML(p) {
+    var cc = cellChips(p);
+    var chips = cc.html;
+    var whoPad = cc.pad ? ' style="padding-right:' + cc.pad + 'px"' : '';
+    return '<div class="psq ' + p._cls + '" data-id="' + Shell.esc(p.id) + '"' + prismAttr(p) + ' role="button" tabindex="0" ' +
+      'aria-label="' + Shell.esc(p.promise) + '">' +
+      chips +
+      '<div class="who"' + whoPad + '>' + Shell.esc(p.counterparty || '—') + '</div>' +
+      '<div class="what">' + Shell.esc(p.promise) + '</div>' +
+      (p._madeTxt ? '<div class="made">' + Shell.esc(p._madeTxt) + '</div>' : '') +
+      '<div class="when">' + Shell.esc(p._overlay) + '</div>' +
+      '</div>';
+  }
+  function centreHTML(dir) {
+    var sub = dir === 'gave' ? 'My ledger — what I owe' : 'Ghost Buster — what others owe me';
+    return '<div class="psq centre" data-centre="1" title="The centre square is an accountability engine — never empty. Click to add a promise.">' +
+      '<div class="cz">PTK</div><div class="cs">Promises to Keep</div><div class="cs">' + Shell.esc(sub) + '</div></div>';
+  }
+  function renderGrid(dir, gridId, countId, ps) {
+    var items = ps.filter(function (p) { return p.direction === dir && passesFilter(p); }).sort(sortFn);
+    var totalDir = ps.filter(function (p) { return p.direction === dir; }).length;
+    document.getElementById(countId).textContent = items.length + ' shown · ' + totalDir + ' total';
+    var html = '';
+    var more = Math.max(0, items.length - 24);
+    for (var i = 0; i < 25; i++) {
+      if (i === 12) { html += centreHTML(dir); continue; }
+      var idx = i < 12 ? i : i - 1;
+      if (idx < items.length) {
+        if (more && i === 24) {
+          html += '<div class="psq empty" data-add="' + dir + '">+' + (more + 1) + ' more — use the filters</div>';
+        } else {
+          html += cellHTML(items[idx]);
+        }
+      } else {
+        html += '<div class="psq empty" data-add="' + dir + '" role="button" tabindex="0">+ promise</div>';
+      }
+    }
+    var grid = document.getElementById(gridId);
+    grid.innerHTML = html;
+    grid.querySelectorAll('.psq[data-id]').forEach(function (c) {
+      var go = function () { openDrawer(c.getAttribute('data-id')); };
+      c.addEventListener('click', go);
+      c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    });
+    grid.querySelectorAll('.psq[data-add], .psq[data-centre]').forEach(function (c) {
+      c.addEventListener('click', function () {
+        var dirSel = c.getAttribute('data-add');
+        if (dirSel === 'gave' || dirSel === 'received') document.getElementById('f-dir').value = dirSel;
+        document.getElementById('entry').scrollIntoView({ behavior: 'smooth' });
+        setTimeout(function () { document.getElementById('f-what').focus(); }, 350);
+      });
+    });
+  }
+
+  /* ================= render: filters ================= */
+  function renderFilters() {
+    document.querySelectorAll('#filters .chip[data-f]').forEach(function (ch) {
+      ch.classList.toggle('on', !view.day && ch.getAttribute('data-f') === view.filter);
+    });
+    var dc = document.getElementById('daychip');
+    if (view.day) {
+      dc.style.display = '';
+      dc.classList.add('on');
+      dc.innerHTML = 'Due ' + Shell.esc(fmtShort(parseISO(view.day))) + ' <span class="x">×</span>';
+    } else { dc.style.display = 'none'; }
+  }
+
+  /* ================= render: focal promises ================= */
+  function renderFocal() {
+    var el = document.getElementById('focal');
+    var rows = (seed.focal_promises || []).map(function (f) {
+      var name = CARD_NAMES[f.card] || f.card;
+      var link = 'card.html?card=' + encodeURIComponent(f.card) + '.json';
+      var body = f.promise
+        ? '<b style="color:var(--gold)">“' + Shell.esc(f.promise) + '”</b>'
+        : '<span class="muted">no focal promise declared yet — Caller to declare it</span>';
+      var badge = (f.card === 'door-to-door') ? ' <span class="badge-superseded">superseded</span>' : '';
+      return '<div class="status-row ' + (f.promise ? 'ok' : 'warn') + '">' +
+        '<span class="grow"><a href="' + link + '">' + Shell.esc(name) + '</a>' + badge + ' — ' + body +
+        (f.note ? '<br><small class="soft">' + Shell.esc(f.note) + '</small>' : '') + '</span></div>';
+    }).join('');
+    el.innerHTML = rows;
+  }
+
+  /* ================= render: daily calendar ================= */
+  function renderCal(ps) {
+    var min = TODAY, max = addDays(TODAY, 21);
+    ps.forEach(function (p) {
+      [p.dateMade, p.dueDate].forEach(function (s) { var d = parseISO(s); if (d && d < min) min = d; });
+    });
+    min = addDays(min, -2);
+    var byDay = {};
+    ps.forEach(function (p) { if (p.dueDate) (byDay[p.dueDate] = byDay[p.dueDate] || []).push(p); });
+    var html = '', d = min, first = true;
+    while (d <= max) {
+      var iso = isoOf(d);
+      var list = byDay[iso] || [];
+      var dots = list.slice(0, 4).map(function (p) {
+        var k = p._od > 0 ? 'r' : p.status === 'kept' ? 'g' : isOpen(p) ? 'y' : 'grey';
+        return '<i class="' + k + '"></i>';
+      }).join('') + (list.length > 4 ? '<span class="mc">+' + (list.length - 4) + '</span>' : '');
+      var cls = 'day' + (iso === TODAY_ISO ? ' today' : '') + (iso === view.day ? ' sel' : '');
+      var mo = (first || d.getDate() === 1) ? MONTHS[d.getMonth()] : '';
+      html += '<div class="' + cls + '" data-day="' + iso + '" role="button" tabindex="0" aria-label="' + iso + ', ' + list.length + ' due">' +
+        '<div class="mo">' + mo + '</div><div class="dw">' + DOW[d.getDay()] + '</div>' +
+        '<div class="dn num">' + d.getDate() + '</div><div class="marks">' + dots + '</div></div>';
+      first = false; d = addDays(d, 1);
+    }
+    var cal = document.getElementById('cal');
+    cal.innerHTML = html;
+    cal.querySelectorAll('.day').forEach(function (c) {
+      var go = function () {
+        var iso2 = c.getAttribute('data-day');
+        view.day = (view.day === iso2) ? null : iso2;
+        renderAll(false);
+      };
+      c.addEventListener('click', go);
+      c.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+    });
+    // auto-scroll to today — synchronous instant jump (rAF/smooth never run in background tabs)
+    function jumpToToday() {
+      var t = cal.querySelector('.day.today');
+      if (!t) return;
+      var prev = cal.style.scrollBehavior;
+      cal.style.scrollBehavior = 'auto';
+      cal.scrollLeft = Math.max(0, t.offsetLeft - cal.offsetLeft - cal.clientWidth / 2 + 27);
+      cal.style.scrollBehavior = prev;
+    }
+    jumpToToday();
+    setTimeout(jumpToToday, 200); // backup once fonts/layout settle
+  }
+
+  /* ================= render: rules panel ================= */
+  function renderRules() {
+    var m = seed.meta || {};
+    var a = m.aging_rules || {};
+    var s = m.scoring || {};
+    document.getElementById('rules').innerHTML =
+      '<p><b style="color:var(--gold)">States:</b> ' + Shell.esc(m.states || '') + '</p>' +
+      '<p><b style="color:var(--teal)">Gave:</b> ' + Shell.esc(a.gave || '') + '</p>' +
+      '<p><b style="color:var(--orange)">Received:</b> ' + Shell.esc(a.received || '') + '</p>' +
+      '<p><b style="color:var(--red)">Alert:</b> <code>' + Shell.esc(a.alert_string || '') + '</code></p>' +
+      '<p><b>Scoring:</b> ' + Shell.esc(s.points || '') + ' · keep rate = ' + Shell.esc(s.keep_rate || '') + '</p>' +
+      '<p><b>Grip Mechanism:</b> ' + Shell.esc(s.grip_mechanism || '') + '</p>' +
+      '<p class="footnote">' + Shell.esc(m.bazaam_provenance || '') + '</p>';
+  }
+
+  /* ================= drawer ================= */
+  function findPromise(id) {
+    var ps = allPromises();
+    for (var i = 0; i < ps.length; i++) if (ps[i].id === id) return ps[i];
+    return null;
+  }
+  function firstName(c) {
+    var s = String(c || 'there').split(/[,(&+\/]| and /)[0].trim();
+    return s.split(' ')[0] || 'there';
+  }
+  function nudgeDrafts(p) {
+    var f = firstName(p.counterparty);
+    var made = fmtFull(parseISO(p.dateMade));
+    var due = p.dueDate ? fmtFull(parseISO(p.dueDate)) : null;
+    var past = Math.max(p._pastDue || 0, 1);
+    var firm = fmtFull(addDays(TODAY, 2));
+    var ageLine = due
+      ? '"' + p.promise + '" was due ' + due + ' and is now ' + past + ' days past.'
+      : '"' + p.promise + '" was promised on ' + made + ' and is still open.';
+    return [
+      { tone: 'FRIENDLY', emoji: '😊', style: 'soft, no pressure, relationship-preserving',
+        text: 'Hey ' + f + '! Hope all’s well. Just circling back on something from ' + made + ': "' + p.promise + '". No rush on my end — if anything’s in the way, tell me and I’ll help clear it. 😊 — Tim' },
+      { tone: 'DIRECT', emoji: '📋', style: 'business-like, clear ask, specific timeline request',
+        text: 'Hi ' + f + ' — following up on: "' + p.promise + '" (due ' + (due || 'no date set') + '). Where does it stand, and what date can I count on? A one-line reply is perfect. Thanks — Tim' },
+      { tone: 'URGENT', emoji: '🚨', style: 'firm, deadline-focused, consequence-aware',
+        text: f + ' — ' + ageLine + ' It’s blocking the next step. I need it confirmed by ' + firm + ', or we re-plan without it. Please reply today. — Tim' }
+    ];
+  }
+  function escalationLine(p) {
+    if (!(p.direction === 'received' && isOpen(p))) return null;
+    var nh = p.nudge_history || [];
+    if (nh.length) {
+      var last = nh[nh.length - 1];
+      var since = daysDiff(TODAY, parseISO(last.date) || TODAY);
+      if (since >= 7 && last.tone === 'FRIENDLY') return 'You sent a FRIENDLY nudge 7 days ago with no response. Consider: 📋 DIRECT or 🚨 URGENT.';
+      if (p._od >= 14 && last.tone !== 'URGENT') return '14+ days overdue → suggest 🚨 URGENT nudge.';
+      return null;
+    }
+    if (p._od >= 14) return '14+ days overdue → suggest 🚨 URGENT nudge.';
+    return null;
+  }
+  /* ================= Babel Bridge prism — nudge refraction =================
+     The prism expands FRAMING around the promise; the promise text itself is a
+     quote and renders verbatim in every color — never rewritten, never compressed.
+     Deterministic templates, authored here at draft time: no client-side generation, ever. */
+  function globalVoice() {
+    // one key, app-wide: hb1000-voice ∈ plain|barstool|timbit|boardroom|swiss.
+    // MIGRATION on read: the Swiss-pilot 2-value enum stored 'tim' → reads as 'plain'.
+    var v = null;
+    try { v = localStorage.getItem('hb1000-voice'); } catch (e) { /* private mode */ }
+    if (v === 'tim') v = 'plain';
+    var ok = { plain: 1, barstool: 1, timbit: 1, boardroom: 1, swiss: 1 };
+    return ok[v] ? v : 'plain';
+  }
+  function prismURL() {
+    try { return new URL('prism.html', location.href).href; } catch (e) { return 'prism.html'; }
+  }
+  function prismRegisters(p, n) {
+    var f = firstName(p.counterparty);
+    var made = fmtFull(parseISO(p.dateMade));
+    var due = p.dueDate ? fmtFull(parseISO(p.dueDate)) : null;
+    var pd = p._pastDue || 0;
+    var past = Math.max(pd, 1);
+    var firm = fmtFull(addDays(TODAY, 2));
+    var q = '“' + p.promise + '”';   // verbatim — quotes render as quotes in every color
+    var t = n.tone;
+    var barstool, timbit, boardroom;
+    if (t === 'FRIENDLY') {
+      barstool = 'Hey ' + f + ' — no stress, but ' + q + ' is still sitting on the board. Anything in the way? Say the word and we’ll clear it together. — Tim';
+      timbit = 'A promise made is a debt unpaid — friendly check on ' + q + '.';
+      boardroom = 'Hello ' + f + ' — a courteous follow-up on the commitment recorded ' + made + ': ' + q + '. When convenient, could you share its current status? No urgency implied — simply keeping the ledger current. With appreciation, Tim Latimer';
+    } else if (t === 'DIRECT') {
+      barstool = f + ', straight up: you said ' + q + '. Where’s it at, and when can I count on it? One line back is all I need. — Tim';
+      timbit = 'A promise made is a debt unpaid — need a date for ' + q + '.';
+      boardroom = 'Hello ' + f + ' — following up on the commitment recorded ' + made + ': ' + q + (due ? ' (due ' + due + ')' : '') + '. Could you confirm current status and an expected completion date? A brief written reply is sufficient. Regards, Tim Latimer';
+    } else { // URGENT
+      barstool = f + ' — barstool-straight: ' + q + ' is ' + past + ' days past and it’s holding things up. I need a date today, or we re-plan without it. — Tim';
+      timbit = 'A promise made is a debt unpaid — ' + past + ' days past: ' + q + '. Reply today.';
+      boardroom = 'Hello ' + f + ' — escalating the commitment recorded ' + made + ': ' + q + ', now ' + past + ' days past ' + (due ? 'the ' + due + ' due date' : 'the commitment') + '. This item is blocking dependent work; written confirmation of a completion date by ' + firm + ' is needed to hold the current plan. Regards, Tim Latimer';
+    }
+    var swiss = 'PROMISE RECORD' + (isSeedPromise(p.id) ? ' ptk:' + p.id : '') +
+      ' · COMMITMENT: ' + q +
+      ' · COUNTERPARTY: ' + (p.counterparty || '—') +
+      ' · MADE: ' + (p.dateMade || '—') +
+      ' · DUE: ' + (p.dueDate || 'none recorded') +
+      ' · STATUS: OPEN' + (pd > 0 ? ' — ' + pd + ' day(s) past due (computed at render)' : '') +
+      ' · TEMPERATURE: ' + t +
+      ' · REQUESTED ACTION: written status and a confirmed completion date.' +
+      ' Draft-only protocol — the sender approves every transmission.';
+    return { plain: n.text, barstool: barstool, timbit: timbit, boardroom: boardroom, swiss: swiss };
+  }
+  function prismCopyText(p, n) {
+    // pre-refracted block: the global-voice rendering leads, the other four colors stack under it
+    // (inline form — no scripts travel in a paste; the receiver reads, the prism rides along).
+    var reg = prismRegisters(p, n);
+    var voice = globalVoice();
+    var rule = '────────────────────';
+    var lines = [reg[voice] || reg.plain, '', rule, '◇ THE PRISM — other ways to read this (' + n.tone + ')'];
+    VOICES.forEach(function (v) {
+      if (v.key === voice) return;
+      lines.push('');
+      lines.push(v.chip + ' ' + v.name + ' — ' + reg[v.key]);
+    });
+    lines.push('');
+    lines.push(rule);
+    lines.push('Rendered by Babel Bridge — get your own prism → ' + prismURL());
+    return lines.join('\n');
+  }
+
+  function statusPill(p) {
+    if (p._snz) return Shell.pill('SNOOZED', '');
+    if (p._od) return Shell.pill('OVERDUE ' + p._od + 'd', 'danger');
+    var map = { promised: ['warn', p.direction === 'gave' ? 'OUTSTANDING' : 'WAITING'], in_progress: ['info', 'IN PROGRESS'], kept: ['good', p.direction === 'gave' ? 'KEPT' : 'RECEIVED'], broken: ['danger', 'BROKEN'], deferred: ['', 'DEFERRED'], cancelled: ['', 'CANCELLED'] };
+    var m = map[p.status] || ['', p.status];
+    return Shell.pill(m[1], m[0]);
+  }
+  function openDrawer(id) {
+    openId = id;
+    renderDrawer();
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawer-overlay').classList.add('open');
+    prismScan();
+  }
+  function closeDrawer() {
+    openId = null;
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawer-overlay').classList.remove('open');
+  }
+  function renderDrawer() {
+    var d = document.getElementById('drawer');
+    var p = openId && findPromise(openId);
+    if (!p) { d.innerHTML = ''; return; }
+    var dirPill = p.direction === 'gave'
+      ? '<span class="pill" style="color:var(--teal); border-color:rgba(54,194,180,.5)">I GAVE</span>'
+      : '<span class="pill warn">GHOST BUSTER — given to me</span>';
+    var rows = '';
+    function row(k, v, raw) { if (v == null || v === '') return; rows += '<tr><td>' + k + '</td><td>' + (raw ? v : Shell.esc(String(v))) + '</td></tr>'; }
+    row('Counterparty', p.counterparty);
+    row('Level', p.level + (p.level === 'personal' ? ' · 🌡️ thermometer applies' : ' · thermometer drops off'));
+    row('Category', CAT_LABEL[p.category] || p.category);
+    var scRow = srcChip(p);
+    row('Source', '<span title="' + Shell.esc(scRow.tip) + '">' + scRow.icon + ' ' + Shell.esc(scRow.label) + '</span>', true);
+    if (p.completion_level != null) {
+      row('Completion', p.completion_level + '% <small class="soft">— self-declared (A9' +
+        (p.status === 'kept' ? '; subject to the completion audit below' : '') + ')</small>' +
+        '<div style="height:7px;border-radius:4px;background:#16222e;max-width:180px;margin-top:4px">' +
+        '<i style="display:block;height:100%;width:' + Math.max(0, Math.min(100, +p.completion_level)) + '%;background:var(--cyan);border-radius:4px"></i></div>', true);
+    }
+    if (p.declared_by) row('Declared by', p.declared_by === 'agent' ? '🤖 agent' : '✍️ self');
+    var audRow = auditState(p);
+    if (audRow) {
+      var audCol = audRow === 'verified' ? 'var(--green)' : audRow === 'misreported' ? 'var(--red)' : 'var(--yellow)';
+      row('Audit', '<b style="color:' + audCol + '">' + AUDIT[audRow].pill + '</b> <small class="soft">— ' + Shell.esc(AUDIT[audRow].tip) + '</small>', true);
+    }
+    row('Difficulty', (p.difficulty || 3) + ' / 5 · worth ' + (10 + (p.difficulty || 3) * 5) + ' pts');
+    if (p.commitmentConfidence != null) row('Confidence', p.commitmentConfidence + ' / 100 (Commitment Confidence Score)');
+    if (p.card) row('Dingo card', '<a href="card.html?card=' + encodeURIComponent(p.card) + '.json">' + Shell.esc(CARD_NAMES[p.card] || p.card) + '</a>', true);
+    row('Promise age', p.dateMade
+      ? 'Promised ' + fmtFull(parseISO(p.dateMade)) + ' — <b style="color:var(--gold-glass)">' + Shell.esc(p._ageTxt) + '</b> <small class="soft">(computed at render)</small>'
+      : 'no date made recorded', true);
+    row('Due date', p.dueDate ? fmtFull(parseISO(p.dueDate)) : 'no date (standing)');
+    if (p.completedAt) row('Completed', fmtFull(parseISO(p.completedAt)));
+    if (p.witness) row('Witness', p.witness);
+    if (hasReceipt(p)) {
+      var evHtml = p.evidence ? Shell.esc(p.evidence) : '';
+      if (p.evidenceLink) {
+        var safeLink = /^https?:\/\//i.test(p.evidenceLink);
+        evHtml += (evHtml ? ' · ' : '') + (safeLink
+          ? '<a href="' + Shell.esc(p.evidenceLink) + '" target="_blank" rel="noopener">' + Shell.esc(p.evidenceLink) + '</a>'
+          : Shell.esc(p.evidenceLink));
+      }
+      row('🧾 Receipt', evHtml, true);
+    }
+    if (p.status === 'broken' && RESP[p.responseGrade]) {
+      row('Response grade', '<b style="color:' + RESP[p.responseGrade].color + '">' + RESP[p.responseGrade].label + '</b>' +
+        (p.responseGradedAt ? ' <small class="soft">(graded ' + Shell.esc(p.responseGradedAt) + ')</small>' : ''), true);
+    }
+    if (p.notes) row('Notes', p.notes);
+
+    var alertHtml = '';
+    if (p._od && p.direction === 'gave') {
+      alertHtml = '<div class="alertline">📤 PTK OVERDUE: You promised ' + Shell.esc(p.counterparty) + " you'd " + Shell.esc(p.promise) + ' — now ' + p._od + ' days</div>';
+    } else if (p._od && p.direction === 'received') {
+      alertHtml = '<div class="alertline">🔴 OVERDUE: ' + Shell.esc(p.counterparty) + ' promised "' + Shell.esc(p.promise) + '" — now ' + p._od + ' days</div>';
+    }
+    var esc1 = escalationLine(p);
+    var sugHtml = esc1 ? '<div class="sugline">' + Shell.esc(esc1) + '</div>' : '';
+
+    // status actions
+    function rgBtnsHTML(cur) {
+      var h = '<div class="rg-btns">';
+      RESP_ORDER.forEach(function (k) {
+        h += '<button type="button" class="rg-btn ' + k + (cur === k ? ' sel' : '') + '" data-rg="' + k + '">' + RESP[k].label + '</button>';
+      });
+      return h + '</div>';
+    }
+    var act = '';
+    if (isOpen(p) || p.status === 'deferred') {
+      var pts = 10 + (p.difficulty || 3) * 5;
+      act += '<h3>Update status — receipts first</h3>' +
+        '<div class="rcpt-note">🧾 Status is <b>determined by verifiable actions</b> — a kept promise without a receipt is just a claim.</div>' +
+        '<div class="formgrid" style="margin:0 0 8px">' +
+        '<label class="fld full">Receipt — one line of proof<input id="rcpt-text" type="text" placeholder="what verifiable action happened? (email sent, PR merged, door fixed…)"></label>' +
+        '<label class="fld full">Receipt link (optional)<input id="rcpt-link" type="url" placeholder="https://… (email, PR, photo, doc)"></label>' +
+        '</div>';
+      /* A9 — self-declared completion level (0–100, optional). The declaration is yours;
+         the audit (Phase-2 agent, simulated below once kept) is what makes it true. */
+      act += '<label class="fld full" style="margin:0 0 10px">Self-declared completion — <span id="cl-val" style="color:var(--cyan)">' +
+        (p.completion_level != null ? p.completion_level : 0) + '%</span>&nbsp;<small class="soft" style="text-transform:none;letter-spacing:0">(A9 — self-declared; audit pending until verified)</small>' +
+        '<input id="cl-range" type="range" min="0" max="100" step="5" value="' + (p.completion_level != null ? p.completion_level : 0) + '" style="accent-color:var(--cyan)">' +
+        '</label>';
+      act += '<div class="verdicts">';
+      if (p.status === 'promised') act += '<button class="btn" data-act="start" type="button">Start — in progress</button>';
+      if (p.status === 'deferred') act += '<button class="btn" data-act="resume" type="button">Resume — back to promised</button>';
+      act += '<button class="btn approve" data-act="kept" type="button">Mark KEPT (+' + pts + ' pts)</button>';
+      act += '<button class="btn decline" data-act="broken" type="button">Mark BROKEN</button>';
+      if (p.status !== 'deferred') act += '<button class="btn" data-act="deferred" type="button">Defer</button>';
+      act += '<button class="btn" data-act="cancelled" type="button">Cancel it</button>';
+      act += '</div>';
+      // the SECOND grade — revealed by Mark BROKEN; choosing a grade commits the break
+      act += '<div id="rg-panel" style="display:none">' +
+        '<div class="sugline">⚖️ The second grade — how did you face it? <b>Breaking is human; ghosting is the failure.</b> ' +
+        'The receipt fields above travel with the grade.</div>' +
+        rgBtnsHTML(null) +
+        '<div class="verdicts"><button class="btn" id="rg-cancel" type="button">Back — not breaking it</button></div>' +
+        '</div>';
+      if (isOpen(p)) {
+        // snooze
+        act += '<h3>Snooze</h3><div class="row">' +
+          '<input id="snz-date" type="date" value="' + isoOf(addDays(TODAY, 7)) + '" style="max-width:170px">' +
+          '<button class="btn" data-act="snooze" type="button">Snooze until date</button></div>' +
+          '<p class="footnote">It hides from Today’s/Outstanding until the date, then returns to pending with the snooze noted.</p>';
+      }
+    } else if (p.status === 'broken') {
+      act += '<h3>Response grade — the second grade</h3>' +
+        '<div class="sugline">⚖️ You are graded twice: once on the promise, once on how you faced the break. ' +
+        '<b>Breaking is human; ghosting is the failure.</b></div>' +
+        rgBtnsHTML(p.responseGrade || null) +
+        (RESP[p.responseGrade] ? '' : '<p class="footnote">No response grade yet — pick one. The ledger remembers how you faced it.</p>') +
+        '<h3>Update status</h3><div class="verdicts"><button class="btn" data-act="resume" type="button">Reopen — back to promised</button></div>';
+    } else {
+      /* A9 — completion audit (kept promises, self-declared). SIMULATION ONLY per the
+         guard-banner law: the monitoring agent is Phase 2 and is NOT built. */
+      var audAct = auditState(p);
+      if (audAct) {
+        act += '<h3>Completion audit — A9 groundwork</h3>' +
+          '<div class="lockline">🔒 SIMULATION — the A9 monitoring agent is NOT built (Phase 2). These buttons simulate its audit verdict locally so the UI states are real: nothing scans, nothing sends, nothing leaves this browser.</div>' +
+          '<div class="sugline">Self-declared completion' + (p.completion_level != null ? ' at <b>' + p.completion_level + '%</b>' : '') +
+          ' — audit state: <b>' + AUDIT[audAct].pill + '</b>. Self-declared completions stay “audit pending” until verified.</div>' +
+          '<div class="verdicts">' +
+          (audAct !== 'verified' ? '<button class="btn approve" data-audit="verified" type="button">✓ Simulate agent: VERIFY</button>' : '') +
+          (audAct !== 'misreported' ? '<button class="btn decline" data-audit="misreported" type="button">✗ Simulate agent: MISREPORTED</button>' : '') +
+          (audAct !== 'pending' ? '<button class="btn" data-audit="pending" type="button">Reset to audit pending</button>' : '') +
+          '</div>' +
+          (audAct === 'misreported' ? '<p class="footnote" style="color:var(--red)">⚠️ Escalated — an entry was written to <code>localStorage["hb1000-integrity"]</code>, the feed the future daily integrity report reads.</p>' : '');
+      }
+      act += '<h3>Update status</h3><div class="verdicts"><button class="btn" data-act="resume" type="button">Reopen — back to promised</button></div>';
+    }
+
+    // nudges (Ghost Buster side, open items only)
+    var nud = '';
+    if (p.direction === 'received' && isOpen(p)) {
+      nud += '<h3>Choose nudge — three pre-written drafts</h3>' +
+        '<div class="lockline">🔒 Draft-only — nothing sends. The human approves every move. Copy a draft; Tim sends it himself. ' +
+        '◇ “Copy with prism attached” carries all five colors + the Babel Bridge footer.</div>';
+      nudgeDrafts(p).forEach(function (n, i) {
+        var reg = prismRegisters(p, n);
+        // inline prism block (plain defaults to the element's own text — white light)
+        var inline = Shell.esc(JSON.stringify({ barstool: reg.barstool, timbit: reg.timbit, boardroom: reg.boardroom, swiss: reg.swiss }));
+        nud += '<div class="draft"><div class="dh">' + n.emoji + ' ' + n.tone + ' — ' + Shell.esc(n.style) + '</div>' +
+          '<span data-prism="' + inline + '">' + Shell.esc(n.text) + '</span>' +
+          '<div class="verdicts"><button class="btn" data-copy="' + i + '" type="button">Copy draft</button>' +
+          '<button class="btn gold-cta" data-pcopy="' + i + '" type="button">◇ Copy with prism attached</button>' +
+          '<button class="btn modify" data-lognudge="' + n.tone + '" type="button">Log nudge as sent (' + n.tone + ')</button></div></div>';
+      });
+    }
+
+    // histories
+    var hist = '';
+    var nh = p.nudge_history || [];
+    if (nh.length) {
+      hist += '<h3>Nudge history</h3><ul class="hist">' + nh.map(function (n) {
+        return '<li>' + Shell.esc(n.date) + ' — ' + Shell.esc(n.tone) + '</li>';
+      }).join('') + '</ul>';
+    }
+    var sh = p.snooze_history || [];
+    if (sh.length) {
+      hist += '<h3>Snooze history</h3><ul class="hist">' + sh.map(function (s, i) {
+        return '<li>Snooze #' + (i + 1) + ' until ' + Shell.esc(s.until) + ' <small class="soft">(set ' + Shell.esc(s.set) + ')</small></li>';
+      }).join('') + '</ul>';
+    }
+
+    var respPill = (p.status === 'broken' && RESP[p.responseGrade])
+      ? '<span class="pill" style="color:' + RESP[p.responseGrade].color + '; border-color:' + RESP[p.responseGrade].color + '">⚖️ ' + RESP[p.responseGrade].label + '</span>'
+      : '';
+    var rcptPill = hasReceipt(p) ? '<span class="pill gold">🧾 receipted</span>' : '';
+    /* A9 — provenance + audit pills (small chips: 🤖 harvested / ✍️ manual) */
+    var scPill0 = srcChip(p);
+    var srcPill = '<span class="pill" title="' + Shell.esc(scPill0.tip) + '">' + scPill0.icon + ' ' + Shell.esc(scPill0.label) + '</span>';
+    var aud0 = auditState(p);
+    var audPill = aud0
+      ? '<span class="pill ' + (aud0 === 'pending' ? 'warn' : aud0 === 'verified' ? 'good' : 'danger') + '" title="' + Shell.esc(AUDIT[aud0].tip) + '">' + AUDIT[aud0].pill + '</span>'
+      : '';
+    d.innerHTML =
+      '<span class="d-x" id="d-close" role="button" tabindex="0" aria-label="Close">✕</span>' +
+      '<div class="row">' + dirPill + statusPill(p) + respPill + rcptPill + srcPill + audPill + '</div>' +
+      '<div class="d-promise"' + prismAttr(p) + '>“' + Shell.esc(p.promise) + '”</div>' +
+      alertHtml + sugHtml +
+      '<table class="meta-t"><tbody>' + rows + '</tbody></table>' +
+      '<p class="footnote">🧾 Status is determined by verifiable actions — the receipt travels with the promise.</p>' +
+      act + nud + hist;
+
+    // wire drawer events
+    document.getElementById('d-close').addEventListener('click', closeDrawer);
+    d.querySelectorAll('[data-act]').forEach(function (b) {
+      b.addEventListener('click', function () { doAction(p, b.getAttribute('data-act'), b); });
+    });
+    d.querySelectorAll('[data-rg]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var g = b.getAttribute('data-rg');
+        if (!RESP[g]) return;
+        var cur = findPromise(p.id);
+        var patch = { responseGrade: g, responseGradedAt: TODAY_ISO };
+        if (cur.status !== 'broken') {
+          // breaking it NOW — the grade commits the break; receipt fields travel with it
+          var rt = document.getElementById('rcpt-text'), rl = document.getElementById('rcpt-link');
+          patch.status = 'broken';
+          patch.brokenAt = TODAY_ISO;
+          patch.snoozedUntil = null;
+          patch.evidence = (rt && rt.value.trim()) || cur.evidence || null;
+          patch.evidenceLink = (rl && rl.value.trim()) || cur.evidenceLink || null;
+        }
+        setOverride(p.id, patch);
+        var msgs = {
+          owned: 'BROKEN — graded OWNED IT. Breaking is human; you faced it straight.',
+          repaired: 'BROKEN — graded REPAIRED. The damage got fixed; the ledger remembers.',
+          minimized: 'BROKEN — graded MINIMIZED. Recorded honestly; the ledger remembers.',
+          ghosted: 'BROKEN — graded GHOSTED. Breaking is human; ghosting is the failure.'
+        };
+        toast(msgs[g]);
+        renderAll(true);
+      });
+    });
+    var rgCancel = document.getElementById('rg-cancel');
+    if (rgCancel) rgCancel.addEventListener('click', function () {
+      var panel = document.getElementById('rg-panel');
+      if (panel) panel.style.display = 'none';
+    });
+    /* A9 — self-declared completion slider (open promises) */
+    var clr = document.getElementById('cl-range');
+    if (clr) {
+      clr.addEventListener('input', function () {
+        var v = document.getElementById('cl-val');
+        if (v) v.textContent = this.value + '%';
+      });
+      clr.addEventListener('change', function () {
+        setOverride(p.id, { completion_level: +this.value, declared_by: 'self' });
+        toast('Completion self-declared at ' + this.value + '% — the audit (A9, Phase 2) is what verifies it.');
+        renderAll(true);
+      });
+    }
+    /* A9 — simulated audit verdicts (labeled SIMULATION; the agent is Phase 2, not built) */
+    d.querySelectorAll('[data-audit]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var st = b.getAttribute('data-audit');
+        if (!AUDIT[st]) return;
+        var cur = findPromise(p.id);
+        setOverride(p.id, { audit_status: st, auditAt: TODAY_ISO, auditBy: 'simulated-agent' });
+        if (st === 'misreported') {
+          /* escalation entry → the future daily-report feed */
+          writeIntegrity({
+            at: new Date().toISOString(),
+            type: 'ptk-misreport',
+            promiseId: cur.id,
+            promise: cur.promise,
+            counterparty: cur.counterparty || null,
+            card: cur.card || null,
+            level: cur.level || null,
+            declared_by: cur.declared_by || 'self',
+            completion_level: cur.completion_level != null ? cur.completion_level : null,
+            detail: 'Self-declared completion audited MISREPORTED (SIMULATED agent — A9 groundwork). Queued for the future daily integrity report.'
+          });
+          toast('✗ MISREPORTED — escalation written to the integrity feed (hb1000-integrity). Simulated agent; nothing sends.');
+        } else if (st === 'verified') {
+          toast('✓ Audit VERIFIED (simulated agent) — the completion stands.');
+        } else {
+          toast('Audit reset to pending.');
+        }
+        renderAll(true);
+      });
+    });
+    d.querySelectorAll('[data-copy]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var n = nudgeDrafts(findPromise(p.id))[+b.getAttribute('data-copy')];
+        copyText(n.text, b);
+      });
+    });
+    d.querySelectorAll('[data-pcopy]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var cur = findPromise(p.id);
+        var n = nudgeDrafts(cur)[+b.getAttribute('data-pcopy')];
+        copyText(prismCopyText(cur, n), b,
+          '◇ Copied with the prism attached — all five colors travel with it. You send it.');
+      });
+    });
+    d.querySelectorAll('[data-lognudge]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var tone = b.getAttribute('data-lognudge');
+        var cur = findPromise(p.id);
+        var nh2 = (cur.nudge_history || []).slice();
+        nh2.push({ date: TODAY_ISO, tone: tone });
+        setOverride(p.id, { nudge_history: nh2 });
+        toast(tone + ' nudge logged — remember: drafts only, Tim sends.');
+        renderAll(true);
+      });
+    });
+  }
+  function doAction(p, act, btn) {
+    if (act === 'start') { setOverride(p.id, { status: 'in_progress' }); toast('In progress.'); }
+    else if (act === 'kept') {
+      var rt = document.getElementById('rcpt-text'), rl = document.getElementById('rcpt-link');
+      var evText = (rt && rt.value.trim()) || '';
+      var evLink = (rl && rl.value.trim()) || '';
+      // receipts prompt: first click with no receipt asks for one; second click keeps without
+      if (!evText && !evLink && !hasReceipt(p) && btn && !btn.getAttribute('data-armed')) {
+        btn.setAttribute('data-armed', '1');
+        btn.textContent = 'Mark KEPT — no receipt?';
+        if (rt) rt.focus();
+        toast('🧾 Status is determined by verifiable actions — add a receipt, or click again to keep without one.');
+        return;
+      }
+      var pts = 10 + (p.difficulty || 3) * 5;
+      setOverride(p.id, {
+        status: 'kept', completedAt: TODAY_ISO, pointsEarned: pts,
+        evidence: evText || p.evidence || null,
+        evidenceLink: evLink || p.evidenceLink || null,
+        /* A9 — a human clicked it: self-declared, 100%, audit pending until verified */
+        completion_level: 100, declared_by: 'self', audit_status: 'pending'
+      });
+      toast('KEPT — +' + pts + ' pts.' + ((evText || evLink) ? ' Receipt on file. 🧾' : '') + ' Self-declared — audit pending (A9). The Grip holds. 💪');
+    }
+    else if (act === 'broken') {
+      // the break is not recorded until the SECOND grade is chosen — how did you face it?
+      var panel = document.getElementById('rg-panel');
+      if (panel) {
+        panel.style.display = 'block';
+        if (panel.scrollIntoView) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        toast('⚖️ Before it goes in the book — how did you face it? Pick the response grade.');
+        return;
+      }
+      setOverride(p.id, { status: 'broken', brokenAt: TODAY_ISO });
+      toast('Marked BROKEN — streak resets to 0. The Grip Mechanism remembers.');
+    }
+    else if (act === 'deferred') { setOverride(p.id, { status: 'deferred' }); toast('Deferred.'); }
+    else if (act === 'cancelled') { setOverride(p.id, { status: 'cancelled' }); toast('Cancelled.'); }
+    else if (act === 'resume') { setOverride(p.id, { status: 'promised', completedAt: null, brokenAt: null, pointsEarned: null, responseGrade: null, responseGradedAt: null, audit_status: 'pending', auditAt: null, auditBy: null, completion_level: null }); toast('Back on the board — promised.'); }
+    else if (act === 'snooze') {
+      var inp = document.getElementById('snz-date');
+      var until = inp && inp.value;
+      if (!until) { toast('Pick a snooze date first.'); return; }
+      var cur = findPromise(p.id);
+      var sh = (cur.snooze_history || []).slice();
+      sh.push({ until: until, set: TODAY_ISO });
+      setOverride(p.id, { snoozedUntil: until, snooze_history: sh });
+      toast('Snooze #' + sh.length + ' until ' + until + '.');
+    }
+    renderAll(true);
+  }
+
+  /* ================= clipboard + toast ================= */
+  function copyText(t, btn, msg) {
+    function done() {
+      if (btn) { var old = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(function () { btn.textContent = old; }, 1500); }
+      toast(msg || 'Draft copied — paste it where YOU choose to send it.');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(done, function () { legacyCopy(t); done(); });
+    } else { legacyCopy(t); done(); }
+  }
+  function legacyCopy(t) {
+    var ta = document.createElement('textarea');
+    ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* best effort */ }
+    document.body.removeChild(ta);
+  }
+  var toastTimer = null;
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg; t.style.display = 'block';
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.style.display = 'none'; }, 2800);
+  }
+
+  /* ================= Flytrap (free-text → form, human approves) ================= */
+  function parseLooseDate(sRaw) {
+    if (!sRaw) return null;
+    var s = sRaw.trim().toLowerCase().replace(/^the\s+/, '');
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);
+    if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+    if (s === 'today' || s === 'tonight' || s === 'eod' || s === 'end of day') return TODAY;
+    if (s === 'tomorrow') return addDays(TODAY, 1);
+    if (s === 'next week') return addDays(TODAY, 7);
+    if (/^end of (the )?week$/.test(s)) { var add = (5 - TODAY.getDay() + 7) % 7; return addDays(TODAY, add === 0 ? 7 : add); }
+    if (/^end of (the )?month$/.test(s)) return new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 0);
+    var days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    var di = days.indexOf(s.replace(/^next\s+/, ''));
+    if (di >= 0) {
+      var delta = (di - TODAY.getDay() + 7) % 7;
+      if (delta === 0 || /^next\s/.test(s)) delta += (delta === 0 ? 7 : 0);
+      return addDays(TODAY, delta === 0 ? 7 : delta);
+    }
+    var mn = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    m = /^([a-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?$/.exec(s);
+    if (m) {
+      var mi = mn.indexOf(m[1].slice(0, 3));
+      if (mi >= 0) {
+        var d2 = new Date(TODAY.getFullYear(), mi, +m[2]);
+        if (d2 < TODAY) d2 = new Date(TODAY.getFullYear() + 1, mi, +m[2]);
+        return d2;
+      }
+    }
+    m = /^(\d{1,2})\/(\d{1,2})$/.exec(s);
+    if (m) {
+      var d3 = new Date(TODAY.getFullYear(), +m[1] - 1, +m[2]);
+      if (d3 < TODAY) d3 = new Date(TODAY.getFullYear() + 1, +m[1] - 1, +m[2]);
+      return d3;
+    }
+    return null;
+  }
+  function flytrapParse(textRaw) {
+    var body = textRaw.trim().replace(/\s+/g, ' ');
+    if (!body) return { ok: false, why: 'Nothing to parse.' };
+    var dueISO = null, dueRaw = null, conf = 0;
+    var by = /\s+by\s+([^,;]+?)[\s.!]*$/i.exec(body);
+    if (by) {
+      dueRaw = by[1];
+      var d = parseLooseDate(dueRaw);
+      if (d) { dueISO = isoOf(d); body = body.slice(0, by.index); }
+    }
+    var dir = null, who = null, what = null;
+    var m = /^.*?\bI\s+promised\s+(.+?)\s+(?:that\s+)?I(?:['’]d|\s+would|\s+will)\s+(.+)$/i.exec(body);
+    if (m) { dir = 'gave'; who = m[1]; what = m[2]; conf = 80; }
+    if (!dir) {
+      m = /^(.+?)\s+promised\s+(?:me\s+)?(?:that\s+)?(?:(?:he|she|they)(?:['’]d|\s+would|\s+will)\s+|to\s+)(.+)$/i.exec(body);
+      if (m) { dir = 'received'; who = m[1]; what = m[2]; conf = 80; }
+    }
+    if (!dir) {
+      m = /^.*?\bI\s+owe\s+(.+?)\s+(.+)$/i.exec(body);
+      if (m) { dir = 'gave'; who = m[1]; what = m[2]; conf = 55; }
+    }
+    if (!dir) return { ok: false, why: 'Flytrap couldn’t find a promise pattern. Try: “I promised X I’d Y by Z” or “X promised to Y by Z”.' };
+    if (dueISO) conf += 12; else if (dueRaw) conf -= 10;
+    conf = Math.max(30, Math.min(95, conf));
+    return { ok: true, direction: dir, counterparty: who.trim(), promise: what.trim().replace(/[.!]+$/, ''), dueISO: dueISO, dueRaw: dueRaw, confidence: conf };
+  }
+  function wireFlytrap() {
+    document.getElementById('fly-parse').addEventListener('click', function () {
+      var r = flytrapParse(document.getElementById('fly-text').value);
+      var pv = document.getElementById('fly-preview');
+      if (!r.ok) {
+        pv.innerHTML = '<div class="status-row warn"><span class="st">flytrap</span><span class="grow">' + Shell.esc(r.why) + '</span></div>';
+        return;
+      }
+      document.getElementById('f-dir').value = r.direction;
+      document.getElementById('f-who').value = r.counterparty;
+      document.getElementById('f-what').value = r.promise;
+      if (r.dueISO) document.getElementById('f-due').value = r.dueISO;
+      document.getElementById('f-conf').textContent = 'Flytrap Commitment Confidence Score: ' + r.confidence + ' / 100 — review, then Add. Below 50 it’s a casual remark, not a commitment.';
+      pv.innerHTML = '<div class="status-row ok"><span class="st">parsed</span><span class="grow">' +
+        (r.direction === 'gave' ? '<b style="color:var(--teal)">I GAVE</b>' : '<b style="color:var(--orange)">GIVEN TO ME</b>') +
+        ' → ' + Shell.esc(r.counterparty) + ' — “' + Shell.esc(r.promise) + '”' +
+        (r.dueISO ? ' — due ' + Shell.esc(r.dueISO) : (r.dueRaw ? ' — couldn’t read date “' + Shell.esc(r.dueRaw) + '”' : ' — no due date')) +
+        ' · confidence ' + r.confidence + '/100. Review the form, then <b>Add</b> — you approve, Flytrap only drafts.</span></div>';
+      var flyConf = r.confidence;
+      document.getElementById('f-add').setAttribute('data-conf', String(flyConf));
+      toast('Flytrap parsed it — review & approve below.');
+    });
+    document.getElementById('fly-clear').addEventListener('click', function () {
+      document.getElementById('fly-text').value = '';
+      document.getElementById('fly-preview').innerHTML = '';
+    });
+  }
+
+  /* ================= manual add ================= */
+  function wireForm() {
+    document.getElementById('f-add').addEventListener('click', function () {
+      var what = document.getElementById('f-what').value.trim();
+      var who = document.getElementById('f-who').value.trim();
+      if (!what || !who) { toast('A promise needs both a counterparty and the thing promised.'); return; }
+      var confAttr = this.getAttribute('data-conf');
+      var p = {
+        id: 'ptk-local-' + Date.now().toString(36),
+        direction: document.getElementById('f-dir').value,
+        promise: what,
+        counterparty: who,
+        category: document.getElementById('f-cat').value,
+        card: document.getElementById('f-card').value || null,
+        level: document.getElementById('f-level').value,
+        dateMade: TODAY_ISO,
+        dueDate: document.getElementById('f-due').value || null,
+        status: 'promised',
+        completedAt: null,
+        evidence: null,
+        difficulty: +document.getElementById('f-diff').value,
+        source: confAttr ? 'flytrap' : 'manual',
+        commitmentConfidence: confAttr ? +confAttr : 100,
+        /* A9 groundwork — provenance + audit fields travel with every new promise */
+        completion_level: null,
+        declared_by: 'self',
+        audit_status: 'pending',
+        witness: null,
+        snoozedUntil: null,
+        nudge_history: []
+      };
+      local.added.push(p);
+      saveLocal();
+      this.removeAttribute('data-conf');
+      document.getElementById('f-what').value = '';
+      document.getElementById('f-who').value = '';
+      document.getElementById('f-due').value = '';
+      document.getElementById('f-conf').textContent = '';
+      document.getElementById('fly-preview').innerHTML = '';
+      toast('Promise on the board. ' + (p.direction === 'gave' ? 'Your ledger.' : 'Ghost Buster is watching.'));
+      renderAll(false);
+    });
+  }
+
+  /* ================= export / import / reset ================= */
+  function wireHousekeeping() {
+    document.getElementById('exp-btn').addEventListener('click', function () {
+      var payload = {
+        app: 'hb1000-ptk', exportedAt: new Date().toISOString(),
+        note: 'Local PTK state export — seed lives in data/ptk-seed.json and is never modified.',
+        local: local, merged: allPromises()
+      };
+      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'hb1000-ptk-export-' + TODAY_ISO + '.json';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      toast('Ledger exported — nothing is trapped.');
+    });
+    document.getElementById('imp-btn').addEventListener('click', function () {
+      document.getElementById('imp-file').click();
+    });
+    document.getElementById('imp-file').addEventListener('change', function () {
+      var f = this.files && this.files[0];
+      if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function () {
+        try {
+          var o = JSON.parse(rd.result);
+          var src = (o && o.local && typeof o.local === 'object') ? o.local : o;
+          if (!src || (!Array.isArray(src.added) && typeof src.overrides !== 'object')) throw new Error('shape');
+          local.added = Array.isArray(src.added) ? src.added : [];
+          local.overrides = (src.overrides && typeof src.overrides === 'object') ? src.overrides : {};
+          saveLocal();
+          toast('Imported — local ledger state replaced.');
+          renderAll(false);
+        } catch (e) { toast('That file doesn’t look like a PTK export.'); }
+      };
+      rd.readAsText(f);
+      this.value = '';
+    });
+    document.getElementById('reset-btn').addEventListener('click', function () {
+      if (!window.confirm('Reset local PTK changes? The seed file is untouched; only your local additions, status changes, snoozes and nudge logs are cleared.')) return;
+      local = { added: [], overrides: {}, view: {} };
+      try { localStorage.removeItem(LS_KEY); } catch (e) { /* ok */ }
+      view.day = null;
+      toast('Local changes cleared — back to the seed.');
+      renderAll(false);
+    });
+  }
+
+  /* ================= filters wiring ================= */
+  function wireFilters() {
+    document.querySelectorAll('#filters .chip[data-f]').forEach(function (ch) {
+      ch.addEventListener('click', function () {
+        view.filter = ch.getAttribute('data-f');
+        view.day = null;
+        saveLocal();
+        renderAll(false);
+      });
+    });
+    document.getElementById('daychip').addEventListener('click', function () {
+      view.day = null;
+      renderAll(false);
+    });
+  }
+
+  /* ================= prism rescan (dynamic renders) ================= */
+  function prismScan() {
+    // prism.js (Babel Bridge widget) attaches ◇ icons to data-prism-id / data-prism
+    // elements; rescan after dynamic renders. Guarded — the page is byte-normal without it.
+    if (window.Prism && typeof window.Prism.scan === 'function') {
+      try { window.Prism.scan(document); } catch (e) { /* widget's problem, not the ledger's */ }
+    }
+  }
+
+  /* ================= master render ================= */
+  function renderAll(keepDrawer) {
+    var ps = allPromises();
+    renderDash(ps);
+    renderAlerts(ps);
+    renderFilters();
+    renderGrid('gave', 'grid-gave', 'gave-count', ps);
+    renderGrid('received', 'grid-recv', 'recv-count', ps);
+    renderCal(ps);
+    if (keepDrawer && openId) renderDrawer();
+    prismScan();
+  }
+
+  /* ================= boot ================= */
+  function start(data, fallback) {
+    seed = data;
+    usingFallback = !!fallback;
+    (seed.promises || []).forEach(function (p) { seedStatusById[p.id] = p.status; });
+    loadLocal();
+    renderFocal();
+    renderRules();
+    wireFilters(); wireFlytrap(); wireForm(); wireHousekeeping();
+    document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+    document.getElementById('src-note').textContent = usingFallback
+      ? 'Data: embedded copy of data/ptk-seed.json (file:// mode — serve over HTTP for the live file).'
+      : 'Data: live from data/ptk-seed.json.';
+    renderAll(false);
+  }
+
+  Shell.loadJSON('data/ptk-seed.json')
+    .then(function (data) { start(data, false); })
+    .catch(function () {
+      // file:// or offline — use the embedded byte-equivalent copy so the page still works standalone
+      try {
+        var fb = JSON.parse(document.getElementById('ptk-fallback').textContent);
+        start(fb, true);
+      } catch (e) {
+        document.getElementById('alerts').innerHTML =
+          '<div class="status-row bad"><span class="st">data</span><span class="grow">Could not load data/ptk-seed.json. Serve the app over HTTP (e.g. <code>python -m http.server</code> in app/).</span></div>';
+      }
+    });
+})();
+</script>
+</body>
+</html>

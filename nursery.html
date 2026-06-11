@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Nursery — intake → scoring → graduation → registry · The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦋</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ---------- nursery page-specific ---------- */
+.tabbar{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 2px}
+section.view{display:none;margin-top:18px}
+section.view.on{display:block}
+
+.counts{display:flex;gap:22px;flex-wrap:wrap;margin:12px 0 2px}
+.counts .c{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.counts .c b{display:block;color:#fff;font-size:19px;font-weight:900;letter-spacing:0}
+
+.field{margin:10px 0}
+.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.field .hint{font-size:11px;color:var(--soft);font-style:italic;margin-top:3px}
+input[type=text],input[type=date],input[type=number],textarea,select{
+  width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
+  color:var(--ink);font-family:inherit;font-size:13.5px;padding:8px 10px;
+}
+textarea{min-height:92px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
+input[type=range]{width:100%;accent-color:var(--gold)}
+
+.srow{display:grid;grid-template-columns:1fr 56px;gap:6px 12px;align-items:center;
+  padding:10px 12px;margin:8px 0;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius)}
+.srow .sname{font-weight:700;font-size:13px;grid-column:1/3}
+.srow .sval{font-size:14px;font-weight:900;color:#fff;text-align:right}
+.srow .sval small{color:var(--muted);font-weight:600}
+.srow .anchor{grid-column:1/3;font-size:11.5px;color:var(--muted);font-style:italic}
+.srow .q{grid-column:1/3;font-size:11.5px;color:var(--soft)}
+
+.decision-chip{display:inline-flex;gap:8px;align-items:flex-start;padding:8px 14px;border-radius:10px;
+  border:1px dashed var(--yellow);background:rgba(232,194,77,.08);color:var(--yellow);
+  font-size:12.5px;font-weight:700;line-height:1.4;margin:8px 0}
+
+.board{display:grid;grid-template-columns:repeat(6,minmax(180px,1fr));gap:10px;align-items:start;margin:12px 0}
+@media(max-width:1200px){.board{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.board{grid-template-columns:1fr 1fr}}
+.col{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:10px;min-height:120px}
+.col .col-h{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.col .col-range{font-size:10px;color:var(--soft);margin-bottom:4px}
+.col .col-action{font-size:10.5px;color:var(--muted);font-style:italic;border-bottom:1px solid var(--line);padding-bottom:7px;margin-bottom:4px;line-height:1.4}
+.col.c-now .col-h{color:var(--green)} .col.c-next .col-h{color:var(--cyan)}
+.col.c-later .col-h{color:var(--yellow)} .col.c-park .col-h{color:var(--orange)}
+.col.c-kill .col-h{color:var(--red)} .col.c-germ .col-h{color:var(--muted)}
+.bcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:9px 10px;margin:8px 0;cursor:pointer;font-size:12px;transition:border-color .15s}
+.bcard:hover{border-color:var(--gold)}
+.bcard .bc-name{font-weight:700;line-height:1.3;margin-bottom:4px}
+.bcard .bc-meta{font-size:10.5px;color:var(--soft);margin-top:4px}
+.bcard .pill{font-size:9.5px;padding:1px 7px;margin:1px 2px 1px 0}
+
+.wsteps{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 16px}
+.wstep{padding:5px 12px;border:1px solid var(--line);border-radius:999px;font-size:11.5px;color:var(--soft);background:var(--panel-2)}
+.wstep.cur{border-color:var(--gold);color:var(--gold);font-weight:800}
+.wstep.done{border-color:rgba(70,198,109,.55);color:var(--green)}
+
+.lin-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;margin:8px 0;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);font-size:13px}
+.lin-row .from{color:var(--muted)}
+.lin-row .arrow{color:var(--gold);font-size:17px;font-weight:900}
+.lin-row .to{font-weight:800;color:#fff}
+.lin-row .note{flex-basis:100%;font-size:11.5px;color:var(--soft);font-style:italic}
+
+.grey-card{opacity:.55}
+.lb-rank{font-weight:900;color:var(--gold);font-size:14px}
+.grave{border-left:3px solid var(--soft);padding:12px 16px;margin:10px 0;background:var(--panel-2);border-radius:0 var(--radius) var(--radius) 0}
+.grave .g-name{font-weight:800}
+.grave .g-eulogy{font-style:italic;color:var(--muted);margin:5px 0}
+.grave .g-lesson{font-size:12.5px}
+.grave .g-lesson b{color:var(--teal)}
+.msg-ok{color:var(--green);font-size:12.5px;font-weight:700;margin:8px 0}
+.msg-bad{color:var(--red);font-size:12.5px;font-weight:700;margin:8px 0}
+.numchip{display:inline-block;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:2px 6px 2px 0;font-size:12.5px}
+.numchip b{color:var(--gold)}
+</style>
+</head>
+<body>
+<main>
+  <h1>The <b>Nursery</b></h1>
+  <p class="muted">Intake → scoring → graduation → registry. The inner ring of the two-ring Living Portfolio — germinating Cloud Butterflies, caught by Flypaper, formed by the Hunting Funnel. <b style="color:var(--gold)">Anyone can add a concept.</b></p>
+  <blockquote>Capture (Flypaper) → Nursery → Score (/100 → Now/Next/Later/Park/Kill — only “Now” activates) → Twin North Star Gate → Assignment (“named the Dingo Caller”) → Acceptance (“Yes, I accept this assignment”) → Outer ring / Active — it ships, gets scored, and the Genie remembers.</blockquote>
+  <div class="status-row warn"><span class="st">Honesty</span><span class="grow"><b>REAL:</b> the <span id="seedCount">40</span> rescued initiatives + real /400 scores (data/butterflies.json) and the Maven/Grace Innovation Index v1.4 (data/registry.json). <b>LOCAL:</b> captures, /100 scores, gate decisions and graduations persist to this browser’s localStorage only — nothing sends; export JSON to keep them.</span></div>
+  <div id="loadStatus"></div>
+  <div class="counts" id="counts"></div>
+  <div class="tabbar" id="tabbar"></div>
+
+  <!-- ============ 1. FLYPAPER INTAKE ============ -->
+  <section class="view" id="view-intake">
+    <div class="grid2">
+      <div class="panel">
+        <div class="ph">Flypaper — catch a Cloud Butterfly</div>
+        <p class="muted" style="font-size:12.5px">“Drop the idea into the Nursery (a Cloud Butterfly; Flypaper catches it).” Guardrail: <i>“Every new idea goes into the Nursery and waits its turn — it does <b>not</b> spawn repo #58.”</i></p>
+        <div id="nextNums" style="margin:10px 0"></div>
+        <form id="intakeForm">
+          <div class="field"><label for="f-title">Title *</label><input type="text" id="f-title" required></div>
+          <div class="field"><label for="f-core">Core Insight (verbatim) *</label><textarea id="f-core" required></textarea>
+            <div class="hint">Full paragraphs — never bullet-summarize Tim’s words. “Light touch out, depth on demand.”</div></div>
+          <div class="field"><label for="f-framework">Framework</label><input type="text" id="f-framework"></div>
+          <div class="field"><label for="f-thesis">Thesis (one sentence) *</label><input type="text" id="f-thesis" required>
+            <div class="hint">One italicized sentence — the distillation.</div></div>
+          <div class="field"><label for="f-barstool">Bar Stool Understanding *</label><textarea id="f-barstool" required></textarea>
+            <div class="hint">“Two beers in,” Grade-8, no corporate speak.</div></div>
+          <div class="grid2">
+            <div class="field"><label for="f-date">Capture date</label><input type="date" id="f-date"></div>
+            <div class="field"><label for="f-walk">Slumberland walk #</label><input type="number" id="f-walk" min="1"></div>
+          </div>
+          <div class="field"><label for="f-hunt">“Hunt conducted” note</label><input type="text" id="f-hunt" placeholder="e.g. Magic Time — first 30 minutes after waking"></div>
+          <div class="field"><label for="f-tags">Tags (comma-separated)</label><input type="text" id="f-tags"></div>
+          <button class="btn gold-cta" type="submit">Catch it — into the Nursery</button>
+        </form>
+        <div id="intakeMsg"></div>
+      </div>
+      <div>
+        <div class="panel" style="margin-bottom:14px">
+          <div class="ph">The butterfly record format (Protocol v4.0)</div>
+          <p style="font-size:13px">Title (Today #X, YTD #Y) → CORE INSIGHT → FRAMEWORK → <b style="color:var(--gold)">THESIS</b> → <b style="color:var(--teal)">BAR STOOL UNDERSTANDING</b> → SCORING → optional 🏷️ LEAN CANVAS FLAG → ASKS (one per named owner).</p>
+          <p class="muted" style="font-size:12.5px">Cloud Butterflies surface in <b>Magic Time</b> — the first 30 minutes after waking, on Slumberland walks. <b>Swarm Signal:</b> 3+ butterflies on one topic within 7 days means the unconscious is chewing on something important.</p>
+          <p class="footnote">Today # / YTD # are auto-assigned. The YTD number is anchored to the last synced registry anchor — <b>YTD #119, Jan 23, 2026 (Day 13)</b> — plus captures recorded here. An honest count, never a clean number.</p>
+        </div>
+        <div class="panel">
+          <div class="ph">Caught here (local)</div>
+          <div id="recentCaptures"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. SCORE /400 ============ -->
+  <section class="view" id="view-score"><div id="scoreWrap"></div></section>
+
+  <!-- ============ 3. NURSERY BOARD ============ -->
+  <section class="view" id="view-board"><div id="boardWrap"></div></section>
+
+  <!-- ============ 4. GRADUATION WIZARD ============ -->
+  <section class="view" id="view-wizard"><div id="wizardWrap"></div></section>
+
+  <!-- ============ 5. REGISTRY ============ -->
+  <section class="view" id="view-registry"><div id="registryWrap"></div></section>
+
+  <!-- ============ 6. LINEAGE ============ -->
+  <section class="view" id="view-lineage"><div id="lineageWrap"></div></section>
+
+  <!-- ============ 7. GRAVEYARD ============ -->
+  <section class="view" id="view-graveyard"><div id="graveWrap"></div></section>
+
+  <hr>
+  <div class="row">
+    <button class="btn" id="btnExport">Export local Nursery data (JSON)</button>
+    <label class="btn" style="cursor:pointer">Import JSON<input type="file" id="btnImport" accept=".json,application/json" style="display:none"></label>
+    <span class="footnote">Nothing is trapped: captures, scores, gate decisions and graduations export as one JSON file.</span>
+  </div>
+</main>
+
+<div class="drawer" id="drawer"></div>
+
+<script src="assets/shell.js"></script>
+<script>
+'use strict';
+Shell.init('nursery');
+var esc = Shell.esc;
+
+/* ---------------- localStorage state ---------------- */
+var LSK = { captures:'hb1000-nursery', scores:'hb1000-nursery-scores', registry:'hb1000-nursery-registry' };
+function lsLoad(k, fallback){ try{ var v = JSON.parse(localStorage.getItem(k)); return v == null ? fallback : v; }catch(e){ return fallback; } }
+function lsSave(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+
+var captures = lsLoad(LSK.captures, []);     // butterflies caught in this app
+var scores   = lsLoad(LSK.scores, {});       // per-id: {s400, timing, s100, barstool, cliche, trig_up, trig_down, killed, grad}
+var regLocal = lsLoad(LSK.registry, []);     // HB1000 OS registry — local graduates (Alexander's Library, finally built)
+
+function sc(id){ return scores[id] || {}; }
+function setSc(id, patch){
+  var cur = scores[id] || {};
+  Object.keys(patch).forEach(function(k){ cur[k] = patch[k]; });
+  scores[id] = cur; lsSave(LSK.scores, scores);
+}
+
+/* ---------------- data ---------------- */
+var DB = { b:null, reg:null, ns:null };
+var curTab = 'intake', drawerId = null, wizardSel = null, scoreSel = null;
+
+/* verbatim /400 anchors — UNIVERSAL_CLOUD_BUTTERFLY_PROTOCOL_v4.0 Part 5 */
+var ANCH400 = {
+  humanity:{ name:'“This can really change humanity” (Humanity)',
+    bands:[[90,'Paradigm-shifting'],[70,'Significant insight with broad implications'],[50,'Useful'],[30,'Interesting but narrow'],[1,'Limited']] },
+  business:{ name:'“This is a business idea” (Business)',
+    bands:[[90,'Clear, fundable, scalable'],[70,'Strong business potential (triggers Lean Canvas flag)'],[50,'Could become a business'],[30,'Tangential'],[1,'Not really']] },
+  fun:{ name:'“This is too much fun!” (Fun)',
+    bands:[[90,'Laugh-out-loud, pure joy'],[30,'(mid-band anchors elided in Protocol v4.0)'],[1,'Dry, serious']] },
+  wth:{ name:'“What the heck” (WTH)',
+    bands:[[90,'Mind-bending, “wait… WHAT?!”'],[30,'(mid-band anchors elided in Protocol v4.0)'],[1,'Totally expected']] }
+};
+function anchorFor(dim, val){
+  var bands = ANCH400[dim].bands;
+  for (var i=0;i<bands.length;i++){ if (val >= bands[i][0]) return bands[i][1]; }
+  return bands[bands.length-1][1];
+}
+
+/* verbatim /100 rubric — _SCORING_RUBRIC.md: five dimensions, 20 points each */
+var DIMS100 = [
+  { k:'right_time',   name:'Right Time',        q:'Is the world ready? Are we? Tide rising or falling?', top:'16–20 = “window wide open”' },
+  { k:'ns_fit',       name:'North Star Fit',    q:'Ladders to the Prime (MTP) AND a defined Local North Star?', top:'16–20 = “Bullseye… poster child”' },
+  { k:'monetization', name:'Monetization Fit',  q:'Can it pay rent within 90 days, or clear cross-subsidy path?', top:'16–20 = revenue ≤ 90 days' },
+  { k:'complexity',   name:'Complexity & Cost', q:'Kit car or moonshot? Higher = simpler.', top:'16–20 = “Configuration job… standing on shoulders”' },
+  { k:'dependency',   name:'Dependency Risk',   q:'Higher = fewer dependencies.', top:'16–20 = “ship it standalone”' }
+];
+/* verbatim bucket table */
+var BUCKETS = {
+  germ: { label:'Germinating', range:'no /100 yet', action:'“Every project gets scored before Tim spends a minute on it.”', kind:'' },
+  now:  { label:'Now',   range:'80–100', action:'Active. Council assigns Elder + workers. Daily cadence.', kind:'good' },
+  next: { label:'Next',  range:'60–79',  action:'Queued. Weekly review. Promote to Now when capacity opens.', kind:'info' },
+  later:{ label:'Later', range:'40–59',  action:'Parked with reason. Quarterly review.', kind:'warn' },
+  park: { label:'Park',  range:'20–39',  action:'Cold storage. Annual review.', kind:'warn' },
+  kill: { label:'Kill',  range:'0–19',   action:'Eulogy + lesson learned. Don’t litigate it again.', kind:'danger' }
+};
+var BUCKET_ORDER = ['germ','now','next','later','park','kill'];
+
+/* Maven Innovation Index #23–#30 — names only, added by the Apr 4 2026 work plan Part 6 (audits pending) */
+var MAVEN_23_30 = ['Loan Lane','Lender-Friendly Boots','Grace Rep Package','Ruby Network',
+  'Upstream Bankruptcy Trustee Playbook','Nuclear Option as Negotiating Leverage',
+  'Bankruptcy Pathway Coordination','Misery Metre (PTK KPI)'];
+
+/* ---------------- derived helpers ---------------- */
+function allItems(){
+  var seed = (DB.b && DB.b.butterflies) ? DB.b.butterflies : [];
+  return seed.concat(captures);
+}
+function itemById(id){
+  var hit = null;
+  allItems().forEach(function(b){ if (b.id === id) hit = b; });
+  return hit;
+}
+function eff400(b){
+  var local = sc(b.id).s400;
+  if (local) return { h:local.humanity, b:local.business, f:local.fun, w:local.wth,
+    total: local.humanity+local.business+local.fun+local.wth, src:'local' };
+  if (b.score) return { h:b.score.humanity, b:b.score.business, f:b.score.fun, w:b.score.wth, total:b.score.total, src:'real' };
+  return null;
+}
+function fmt400(s){
+  if (!s) return 'unscored (pre-rubric)';
+  if (s.h == null) return s.total + '/400 (total-only record)';
+  return s.h + '/' + s.b + '/' + s.f + '/' + s.w + ' = ' + s.total + '/400';
+}
+function leanFlag(b){
+  var s = eff400(b);
+  return b.lean_canvas_flag || !!(s && s.b != null && s.b >= 70);
+}
+function s100total(id){
+  var s = sc(id).s100;
+  if (!s) return null;
+  var t = 0; DIMS100.forEach(function(d){ t += Number(s[d.k] || 0); });
+  return t;
+}
+function bucketOf(id){
+  var t = s100total(id);
+  if (t == null) return null;
+  if (t >= 80) return 'now'; if (t >= 60) return 'next';
+  if (t >= 40) return 'later'; if (t >= 20) return 'park';
+  return 'kill';
+}
+function timingPressure(b){
+  var t = sc(b.id).timing;
+  if (!t) return false;
+  if (t.mode === 'gate') return t.gate === 'PASS';
+  if (t.mode === 'dim')  return Number(t.dim) >= 70;
+  return false;
+}
+function isKilled(id){ return !!sc(id).killed; }
+function isGraduated(id){ var g = sc(id).grad; return !!(g && g.done); }
+function isHalted(id){ var g = sc(id).grad; return !!(g && g.halted); }
+
+function boardItems(){
+  return allItems().filter(function(b){
+    var nurseryStage = (b.stage === 'nursery' || b.stage === 'scored');
+    return nurseryStage && !isKilled(b.id) && !isGraduated(b.id);
+  });
+}
+function outerItems(){
+  return allItems().filter(function(b){
+    return ['active','shipped','closed','converged','foundational'].indexOf(b.stage) >= 0;
+  });
+}
+/* Swarm Signal: 3+ butterflies within a 7-day window (the topic clusters of real harvest days) */
+function computeSwarm(items){
+  var dated = items.map(function(b){ return { b:b, t: Date.parse(b.first_seen || (b.captured_at||'').slice(0,10) || '') }; })
+                   .filter(function(x){ return !isNaN(x.t); });
+  items.forEach(function(b){ delete b._swarm; });
+  dated.forEach(function(x){
+    var n = dated.filter(function(y){ return Math.abs(y.t - x.t) <= 7*864e5; }).length;
+    if (n >= 3) x.b._swarm = n;
+  });
+}
+function triageSort(arr){
+  /* "Triage tells you sequence": timing pressure BEFORE score */
+  return arr.slice().sort(function(a,b){
+    var pa = timingPressure(a) ? 0 : 1, pb = timingPressure(b) ? 0 : 1;
+    if (pa !== pb) return pa - pb;
+    var sa = eff400(a), sb = eff400(b);
+    return ((sb && sb.total) || 0) - ((sa && sa.total) || 0);
+  });
+}
+function nextNumbers(){
+  var now = new Date(), today = now.toISOString().slice(0,10), year = today.slice(0,4);
+  var todayCount = captures.filter(function(c){ return (c.captured_at||'').slice(0,10) === today; }).length;
+  var ytdLocal = captures.filter(function(c){ return (c.captured_at||'').slice(0,4) === year; }).length;
+  return { today: todayCount + 1, ytd: 119 + ytdLocal + 1 };
+}
+
+/* ---------------- boot ---------------- */
+var TABS = [
+  ['intake','① Flypaper Intake'], ['score','② Score /400'], ['board','③ Nursery Board'],
+  ['wizard','④ Graduation Wizard'], ['registry','⑤ Registry'], ['lineage','⑥ Lineage'], ['graveyard','⑦ Graveyard']
+];
+
+Promise.all([
+  Shell.loadJSON('data/butterflies.json'),
+  Shell.loadJSON('data/registry.json'),
+  Shell.loadJSON('data/north-stars.json')
+]).then(function(res){
+  DB.b = res[0]; DB.reg = res[1]; DB.ns = res[2];
+  boot();
+}).catch(function(err){
+  document.getElementById('loadStatus').innerHTML =
+    '<div class="status-row bad"><span class="st">Data</span><span class="grow">Could not load seed JSON (' + esc(err.message) +
+    '). If you opened this file directly via file://, some browsers block JSON fetch — serve the app folder over HTTP (e.g. <code>python -m http.server</code>) and reload. Local capture still works.</span></div>';
+  DB.b = { butterflies: [], genealogy: [], meta: {} };
+  DB.reg = null; DB.ns = null;
+  boot();
+});
+
+function boot(){
+  renderTabs();
+  wireIntake();
+  wireExport();
+  renderAll();
+  setTab(curTab);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeDrawer(); });
+}
+function renderAll(){
+  renderCounts(); renderIntakeSide(); renderScore(); renderBoard();
+  renderWizard(); renderRegistry(); renderLineage(); renderGraveyard();
+}
+
+/* ---------------- tabs ---------------- */
+function renderTabs(){
+  var bar = document.getElementById('tabbar');
+  bar.innerHTML = TABS.map(function(t){
+    return '<span class="chip' + (t[0]===curTab?' on':'') + '" data-tab="' + t[0] + '">' + esc(t[1]) + '</span>';
+  }).join('');
+  bar.querySelectorAll('.chip').forEach(function(ch){
+    ch.addEventListener('click', function(){ setTab(ch.getAttribute('data-tab')); });
+  });
+}
+function setTab(t){
+  curTab = t;
+  TABS.forEach(function(x){
+    document.getElementById('view-' + x[0]).classList.toggle('on', x[0] === t);
+  });
+  renderTabs();
+}
+
+/* ---------------- counts strip ---------------- */
+function renderCounts(){
+  var seed = (DB.b.butterflies || []).length;
+  var seedEl = document.getElementById('seedCount');
+  if (seedEl) seedEl.textContent = seed;
+  var board = boardItems().length;
+  var grads = regLocal.length;
+  var kills = Object.keys(scores).filter(function(id){ return scores[id].killed; }).length;
+  document.getElementById('counts').innerHTML =
+    '<span class="c"><b>~250</b>raw captured (estimate)</span>' +
+    '<span class="c"><b>119</b>YTD confirmed by Jan 23</span>' +
+    '<span class="c"><b>' + seed + '</b>seeded here (real)</span>' +
+    '<span class="c"><b>' + board + '</b>on the Nursery board</span>' +
+    '<span class="c"><b>' + captures.length + '</b>caught in this app</span>' +
+    '<span class="c"><b>' + grads + '</b>graduated here</span>' +
+    '<span class="c"><b>' + kills + '</b>in the graveyard</span>';
+}
+
+/* ---------------- 1. intake ---------------- */
+function wireIntake(){
+  var dateEl = document.getElementById('f-date');
+  if (dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
+  document.getElementById('intakeForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var get = function(id){ return document.getElementById(id).value.trim(); };
+    var nums = nextNumbers();
+    var rec = {
+      id: 'local-' + Date.now(),
+      local: true,
+      name: get('f-title'),
+      core_insight: get('f-core'),
+      framework: get('f-framework'),
+      thesis: get('f-thesis'),
+      bar_stool: get('f-barstool'),
+      context: { date: get('f-date'), walk: get('f-walk'), hunt_note: get('f-hunt') },
+      tags: get('f-tags') ? get('f-tags').split(',').map(function(s){ return s.trim(); }).filter(Boolean) : [],
+      today_no: nums.today, ytd_no: nums.ytd,
+      captured_at: new Date().toISOString(),
+      first_seen: get('f-date') || new Date().toISOString().slice(0,10),
+      one_liner: get('f-thesis'),
+      era: '2026-app-capture', score: null, lean_canvas_flag: false,
+      stage: 'nursery', fork: 'universal', owner_asks: []
+    };
+    captures.unshift(rec); lsSave(LSK.captures, captures);
+    this.reset(); dateEl.value = new Date().toISOString().slice(0,10);
+    document.getElementById('intakeMsg').innerHTML =
+      '<p class="msg-ok">Caught. Assigned <b>Today #' + rec.today_no + ' · YTD ≈ #' + rec.ytd_no +
+      '</b> — it is now germinating on the Nursery board.</p>';
+    renderAll();
+  });
+}
+function renderIntakeSide(){
+  var nums = nextNumbers();
+  document.getElementById('nextNums').innerHTML =
+    '<span class="numchip">Next: <b>Today #' + nums.today + '</b></span>' +
+    '<span class="numchip">YTD ≈ <b>#' + nums.ytd + '</b> <small class="muted">(anchored: #119 @ Jan 23 + local)</small></span>';
+  var box = document.getElementById('recentCaptures');
+  if (!captures.length){
+    box.innerHTML = '<p class="muted" style="font-size:12.5px">Nothing caught here yet. The ' + ((DB.b && DB.b.butterflies) || []).length + ' seeded rescued initiatives already live on the board.</p>';
+    return;
+  }
+  box.innerHTML = captures.slice(0,8).map(function(c){
+    return '<div class="bcard" data-id="' + esc(c.id) + '"><div class="bc-name">' + esc(c.name) + '</div>' +
+      '<i style="font-size:11.5px;color:var(--muted)">' + esc(c.thesis) + '</i>' +
+      '<div class="bc-meta">Today #' + c.today_no + ' · YTD ≈ #' + c.ytd_no + ' · ' + esc((c.captured_at||'').slice(0,10)) + '</div></div>';
+  }).join('');
+  box.querySelectorAll('.bcard').forEach(function(el){
+    el.addEventListener('click', function(){ openDrawer(el.getAttribute('data-id')); });
+  });
+}
+
+/* ---------------- 2. score /400 ---------------- */
+function renderScore(){
+  var wrap = document.getElementById('scoreWrap');
+  var items = allItems();
+  if (!items.length){ wrap.innerHTML = '<p class="muted">No butterflies loaded.</p>'; return; }
+  if (!scoreSel || !itemById(scoreSel)) scoreSel = items[0].id;
+
+  var opts = function(list, label){
+    if (!list.length) return '';
+    return '<optgroup label="' + esc(label) + '">' + list.map(function(b){
+      return '<option value="' + esc(b.id) + '"' + (b.id===scoreSel?' selected':'') + '>' + esc(b.name) +
+        (b.score ? ' — real score ' + b.score.total + '/400' : '') + '</option>';
+    }).join('') + '</optgroup>';
+  };
+  var locals = items.filter(function(b){ return b.local; });
+  var seedUnscored = items.filter(function(b){ return !b.local && !b.score; });
+  var seedScored = items.filter(function(b){ return !b.local && b.score; });
+
+  wrap.innerHTML =
+    '<div class="grid2">' +
+      '<div class="panel">' +
+        '<div class="ph">Cloud Butterfly Score — four axes, each /100, TOTAL /400</div>' +
+        '<blockquote style="font-size:12.5px">Score each dimension from 1-100. Be honest — 70 is good, 85 is excellent, 95+ is rare.</blockquote>' +
+        '<div class="field"><label for="s400-sel">Butterfly</label><select id="s400-sel">' +
+          opts(locals,'Caught in this app') + opts(seedUnscored,'Seeded — unscored (pre-rubric)') + opts(seedScored,'Seeded — real recorded score') +
+        '</select></div>' +
+        '<div id="s400-panel"></div>' +
+      '</div>' +
+      '<div>' +
+        '<div class="panel" style="margin-bottom:14px">' +
+          '<div class="ph">Timing — the proposed 5th dimension</div>' +
+          '<div class="decision-chip">⚖️ OPEN DECISION — <b>Tim to decide:</b>&nbsp;Timing as a 5th /100 dimension (“The window is open NOW”) <u>vs</u> a Timing Gate (PASS/FAIL) assessed separately before Lean Canvas. Surfaced, never silently resolved.</div>' +
+          '<p class="muted" style="font-size:12.5px">Rationale: Bill Gross / Idealab — timing is <b>42%</b> of startup success. “Tim already suggested a 5th category may emerge. THIS IS IT.” Timing questions: regulatory window? tech enabler at critical mass? cultural shift? competitive vacuum? what if we wait 12 months?</p>' +
+          '<div id="timing-panel"></div>' +
+        '</div>' +
+        '<div class="panel">' +
+          '<div class="ph">The triage principle</div>' +
+          '<blockquote style="font-size:12.5px">“Butterflies should be triaged, not just scored. Scoring tells you quality. Triage tells you sequence. A butterfly with a 280/400 score but a closing regulatory window goes before a 340/400 butterfly with no timing pressure.”</blockquote>' +
+          '<p class="footnote">The Nursery board sorts every column by timing pressure first, then score. The full exception-first view lives on the <a href="command.html">Command Deck</a>.</p>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('s400-sel').addEventListener('change', function(){
+    scoreSel = this.value; buildScorePanel();
+  });
+  buildScorePanel();
+}
+
+function buildScorePanel(){
+  var b = itemById(scoreSel); if (!b) return;
+  var panel = document.getElementById('s400-panel');
+  var saved = sc(b.id).s400;
+  var start = {};
+  ['humanity','business','fun','wth'].forEach(function(k){
+    start[k] = saved ? saved[k] : (b.score && b.score[k.slice(0,8)] != null ? b.score[k] : 50);
+    if (start[k] == null) start[k] = 50;
+  });
+  // axis keys on seed records: humanity/business/fun/wth
+  if (!saved && b.score){
+    start.humanity = b.score.humanity != null ? b.score.humanity : 50;
+    start.business = b.score.business != null ? b.score.business : 50;
+    start.fun      = b.score.fun      != null ? b.score.fun      : 50;
+    start.wth      = b.score.wth      != null ? b.score.wth      : 50;
+  }
+
+  var realBlock = '';
+  if (b.score){
+    realBlock = '<div class="status-row ok"><span class="st">Real</span><span class="grow">Recorded real score: <b>' +
+      esc(fmt400({h:b.score.humanity,b:b.score.business,f:b.score.fun,w:b.score.wth,total:b.score.total})) + '</b>' +
+      (b.lean_canvas_flag ? ' · 🏷️ LEAN CANVAS FLAG' : '') +
+      ' — real recorded scores are never overwritten; the sliders below save a separate local assessment.</span></div>';
+  }
+
+  panel.innerHTML = realBlock +
+    ['humanity','business','fun','wth'].map(function(k){
+      return '<div class="srow">' +
+        '<div class="sname">' + esc(ANCH400[k].name) + '</div>' +
+        '<input type="range" min="1" max="100" value="' + start[k] + '" id="s4-' + k + '">' +
+        '<div class="sval"><b id="s4v-' + k + '">' + start[k] + '</b><small>/100</small></div>' +
+        '<div class="anchor" id="s4a-' + k + '">' + esc(anchorFor(k, start[k])) + '</div>' +
+      '</div>';
+    }).join('') +
+    '<div class="spread" style="margin:12px 0">' +
+      '<span class="kpi-big"><span id="s4-total">0</span><small> / 400 TOTAL</small></span>' +
+      '<span id="s4-flag"></span>' +
+    '</div>' +
+    '<button class="btn approve" id="s4-save">Save local /400 score</button> <span id="s4-msg"></span>';
+
+  var update = function(){
+    var t = 0;
+    ['humanity','business','fun','wth'].forEach(function(k){
+      var v = Number(document.getElementById('s4-' + k).value);
+      document.getElementById('s4v-' + k).textContent = v;
+      document.getElementById('s4a-' + k).textContent = anchorFor(k, v);
+      t += v;
+    });
+    document.getElementById('s4-total').textContent = t;
+    var biz = Number(document.getElementById('s4-business').value);
+    document.getElementById('s4-flag').innerHTML = biz >= 70
+      ? Shell.pill('🏷️ LEAN CANVAS FLAG — add to canvas review', 'gold')
+      : '<span class="footnote">Business ≥ 70 raises the 🏷️ LEAN CANVAS FLAG</span>';
+  };
+  ['humanity','business','fun','wth'].forEach(function(k){
+    document.getElementById('s4-' + k).addEventListener('input', update);
+  });
+  update();
+
+  document.getElementById('s4-save').addEventListener('click', function(){
+    var s = {};
+    ['humanity','business','fun','wth'].forEach(function(k){ s[k] = Number(document.getElementById('s4-' + k).value); });
+    setSc(b.id, { s400: s });
+    document.getElementById('s4-msg').innerHTML = '<span class="msg-ok">Saved (local).</span>';
+    renderCounts(); renderBoard();
+  });
+
+  buildTimingPanel(b);
+}
+
+function buildTimingPanel(b){
+  var box = document.getElementById('timing-panel'); if (!box) return;
+  var t = sc(b.id).timing || { mode:'dim', dim:50, gate:null };
+  box.innerHTML =
+    '<p style="font-size:12.5px;margin-top:4px"><b>' + esc(b.name) + '</b></p>' +
+    '<div class="row" style="margin:6px 0">' +
+      '<label style="font-size:12.5px"><input type="radio" name="tmode" value="dim"' + (t.mode==='dim'?' checked':'') + '> Format A — 5th dimension /100</label>' +
+      '<label style="font-size:12.5px"><input type="radio" name="tmode" value="gate"' + (t.mode==='gate'?' checked':'') + '> Format B — Timing Gate PASS/FAIL</label>' +
+    '</div>' +
+    '<div id="t-dim" style="display:' + (t.mode==='dim'?'block':'none') + '">' +
+      '<div class="srow"><div class="sname">Timing — “The window is open NOW”</div>' +
+      '<input type="range" min="1" max="100" value="' + (t.dim || 50) + '" id="t-slider">' +
+      '<div class="sval"><b id="t-val">' + (t.dim || 50) + '</b><small>/100</small></div></div>' +
+    '</div>' +
+    '<div id="t-gate" class="row" style="display:' + (t.mode==='gate'?'flex':'none') + '">' +
+      '<button class="btn approve" id="t-pass"' + (t.gate==='PASS'?' style="background:rgba(70,198,109,.2)"':'') + '>PASS — window open</button>' +
+      '<button class="btn decline" id="t-fail"' + (t.gate==='FAIL'?' style="background:rgba(224,85,107,.2)"':'') + '>FAIL — window closed</button>' +
+      '<span>' + (t.gate ? Shell.pill('Timing Gate: ' + t.gate, t.gate==='PASS'?'good':'danger') : '<span class="footnote">not assessed</span>') + '</span>' +
+    '</div>' +
+    '<p class="footnote" style="margin-top:8px">Timing pressure (dim ≥ 70 or Gate PASS) moves a card up the triage sort. Both formats record until Tim decides.</p>';
+
+  box.querySelectorAll('input[name=tmode]').forEach(function(r){
+    r.addEventListener('change', function(){
+      t.mode = this.value; setSc(b.id, { timing: t }); buildTimingPanel(b); renderBoard();
+    });
+  });
+  var sl = document.getElementById('t-slider');
+  if (sl) sl.addEventListener('input', function(){
+    document.getElementById('t-val').textContent = this.value;
+    t.dim = Number(this.value); setSc(b.id, { timing: t }); renderBoard();
+  });
+  var p = document.getElementById('t-pass'), f = document.getElementById('t-fail');
+  if (p) p.addEventListener('click', function(){ t.gate='PASS'; setSc(b.id,{timing:t}); buildTimingPanel(b); renderBoard(); });
+  if (f) f.addEventListener('click', function(){ t.gate='FAIL'; setSc(b.id,{timing:t}); buildTimingPanel(b); renderBoard(); });
+}
+
+/* ---------------- 3. board ---------------- */
+function renderBoard(){
+  var wrap = document.getElementById('boardWrap');
+  var items = boardItems();
+  computeSwarm(items);
+
+  var byCol = {}; BUCKET_ORDER.forEach(function(k){ byCol[k] = []; });
+  items.forEach(function(b){
+    var col = isHalted(b.id) ? 'park' : (bucketOf(b.id) || 'germ');
+    byCol[col].push(b);
+  });
+
+  var colsHtml = BUCKET_ORDER.map(function(k){
+    var info = BUCKETS[k];
+    var cards = triageSort(byCol[k]).map(function(b){ return boardCard(b); }).join('');
+    return '<div class="col c-' + k + '">' +
+      '<div class="col-h">' + esc(info.label) + '</div>' +
+      '<div class="col-range">' + esc(info.range) + ' · ' + byCol[k].length + ' card' + (byCol[k].length===1?'':'s') + '</div>' +
+      '<div class="col-action">' + esc(info.action) + '</div>' +
+      (cards || '<p class="footnote" style="margin-top:8px">empty — honest</p>') +
+    '</div>';
+  }).join('');
+
+  var outer = outerItems();
+  var outerRows = outer.map(function(b){
+    var stagePill =
+      b.stage === 'shipped' ? Shell.pill('shipped','good') :
+      b.stage === 'active' ? Shell.pill('active — outer ring','info') :
+      b.stage === 'closed' ? Shell.pill('closed — learning banked','warn') :
+      b.stage === 'converged' ? Shell.pill('converged → ' + (b.merged_into || ''), '') :
+      Shell.pill('foundational — apex','gold');
+    var link = b.live_link ? ' <a href="' + esc(b.live_link) + '" target="_blank" rel="noopener">live ↗</a>' : '';
+    return '<tr><td style="font-weight:700">' + esc(b.name) + '</td><td>' + stagePill + '</td>' +
+      '<td>' + esc(fmt400(eff400(b))) + '</td><td class="muted" style="font-size:12px">' + esc(b.stage_note || '') + link + '</td></tr>';
+  }).join('');
+
+  wrap.innerHTML =
+    '<div class="spread"><div>' +
+      '<p class="muted" style="font-size:12.5px;margin:0">The /100 rubric — five dimensions, 20 points each — computes the bucket at render. ' +
+      'Click a card to open its rubric, Barstool + Cliché, Right-Time triggers, and the kill/graduate paths. ' +
+      'Columns sort by <b>timing pressure first, then score</b> (the triage principle).</p>' +
+    '</div></div>' +
+    '<div class="board">' + colsHtml + '</div>' +
+    '<p class="footnote">⛔ HALT badge = parked at the Twin North Star Gate (a recorded decision, not a computed score). 🐝 = Swarm Signal: 3+ butterflies within 7 days. ' +
+    'Right-Time gut check on every card: <i>“What’s the trigger that flips this from Later → Now? What’s the trigger that flips this from Now → Park (window closed)?”</i></p>' +
+    '<div class="sec-h">Outer ring &amp; beyond — <b>not</b> in the Nursery (rendered fully in <a href="city.html">Dingo City</a>)</div>' +
+    '<div class="panel tight"><table><thead><tr><th>Initiative</th><th>Stage</th><th>/400</th><th>Note</th></tr></thead><tbody>' +
+    outerRows + '</tbody></table></div>';
+
+  wrap.querySelectorAll('.bcard[data-id]').forEach(function(el){
+    el.addEventListener('click', function(){ openDrawer(el.getAttribute('data-id')); });
+  });
+}
+
+function boardCard(b){
+  var s = eff400(b);
+  var t100 = s100total(b.id);
+  var pills = '';
+  pills += s ? Shell.pill(fmt400(s), s.src === 'local' ? 'info' : 'good') : Shell.pill('unscored (pre-rubric)','');
+  if (leanFlag(b)) pills += Shell.pill('🏷️ LEAN CANVAS','gold');
+  if (b._swarm) pills += Shell.pill('🐝 SWARM ×' + b._swarm,'warn');
+  if (b.revive_candidate) pills += Shell.pill('revive candidate','warn');
+  if (b.fork && b.fork.indexOf('ruby') === 0) pills += Shell.pill(b.fork,'ruby');
+  if (b.local) pills += Shell.pill('caught here','info');
+  if (timingPressure(b)) pills += Shell.pill('⏱ timing pressure','danger');
+  if (isHalted(b.id)) pills += Shell.pill('⛔ HALT at the Gate','danger');
+  if (t100 != null) pills += Shell.pill('/100: ' + t100 + ' → ' + BUCKETS[bucketOf(b.id)].label, BUCKETS[bucketOf(b.id)].kind);
+  return '<div class="bcard" data-id="' + esc(b.id) + '">' +
+    '<div class="bc-name">' + esc(b.name) + '</div>' + pills +
+    '<div class="bc-meta">' + esc(b.first_seen || '') + (b.slumberland ? ' · walk ' + esc(b.slumberland) : '') +
+    (b.stage_note ? ' · ' + esc(b.stage_note) : '') + '</div></div>';
+}
+
+/* ---------------- drawer (card detail + /100 rubric) ---------------- */
+function openDrawer(id){
+  drawerId = id;
+  var d = document.getElementById('drawer');
+  d.innerHTML = buildDrawer(itemById(id));
+  d.classList.add('open');
+  wireDrawer(itemById(id));
+}
+function closeDrawer(){
+  drawerId = null;
+  document.getElementById('drawer').classList.remove('open');
+}
+function buildDrawer(b){
+  if (!b) return '';
+  var s = sc(b.id), s400 = eff400(b), t100 = s100total(b.id), bk = bucketOf(b.id);
+  var s100 = s.s100 || {};
+  var cadence = { now:'Daily cadence', next:'Weekly review', later:'Quarterly review', park:'Annual review', kill:'Don’t litigate it again' };
+
+  var head =
+    '<span class="d-x" id="d-close" title="Close">✕</span>' +
+    '<h2 style="font-size:17px">' + esc(b.name) + '</h2>' +
+    '<p class="muted" style="font-size:12.5px">' + esc(b.one_liner || b.thesis || '') + '</p>' +
+    '<div>' + (s400 ? Shell.pill(fmt400(s400), s400.src==='local'?'info':'good') : Shell.pill('unscored (pre-rubric)','')) +
+    (leanFlag(b) ? Shell.pill('🏷️ LEAN CANVAS FLAG','gold') : '') +
+    (b.fork ? Shell.pill('fork: ' + b.fork, b.fork.indexOf('ruby')===0?'ruby':'') : '') +
+    Shell.pill('stage: ' + b.stage, '') + '</div>' +
+    (b.verbatim ? '<blockquote style="font-size:12.5px">' + esc(b.verbatim) + '</blockquote>' : '') +
+    (b.core_insight ? '<div class="sec-h">Core Insight (verbatim)</div><p style="font-size:12.5px;white-space:pre-wrap">' + esc(b.core_insight) + '</p>' : '') +
+    (b.bar_stool ? '<div class="sec-h">Bar Stool Understanding</div><p style="font-size:12.5px">' + esc(b.bar_stool) + '</p>' : '') +
+    ((b.owner_asks && b.owner_asks.length) ? '<div class="sec-h">Asks (one per named owner)</div>' + b.owner_asks.map(function(a){
+      return '<p style="font-size:12.5px;margin:2px 0"><b style="color:var(--teal)">' + esc(a.owner) + ':</b> ' + esc(a.ask) + '</p>'; }).join('') : '') +
+    '<p class="footnote">first seen ' + esc(b.first_seen || '—') + (b.slumberland ? ' · Slumberland walk ' + esc(b.slumberland) : '') +
+    ' · source: <code style="font-size:10px">' + esc(b.source_path || 'captured in this app') + '</code>' +
+    (b.weblink ? ' · <a href="' + esc(b.weblink) + '" target="_blank" rel="noopener">original email ↗</a>' : '') + '</p>';
+
+  if (isKilled(b.id)){
+    return head + '<div class="status-row bad"><span class="st">Killed</span><span class="grow">This card is in the graveyard. “Dead things don’t come back to life just because you love them.”</span></div>';
+  }
+  if (isGraduated(b.id)){
+    return head + '<div class="status-row ok"><span class="st">Graduated</span><span class="grow">Outer ring — Assigned &amp; Active. See the Registry tab (entry #' + esc(String((s.grad||{}).reg_no || '?')) + ') and <a href="city.html">Dingo City</a>.</span></div>';
+  }
+
+  var rubric =
+    '<div class="sec-h">The /100 rubric — <b>five dimensions × 20</b></div>' +
+    '<p class="footnote" style="margin-bottom:6px">“Every project gets scored before Tim spends a minute on it.”</p>' +
+    DIMS100.map(function(dm){
+      var v = s100[dm.k] != null ? s100[dm.k] : 10;
+      return '<div class="srow">' +
+        '<div class="sname">' + esc(dm.name) + ' <small class="muted">/20</small></div>' +
+        '<input type="range" min="0" max="20" value="' + v + '" id="r100-' + dm.k + '">' +
+        '<div class="sval"><b id="r100v-' + dm.k + '">' + v + '</b><small>/20</small></div>' +
+        '<div class="q">' + esc(dm.q) + ' <i>(' + esc(dm.top) + ')</i></div>' +
+      '</div>';
+    }).join('') +
+    '<div class="spread" style="margin:10px 0">' +
+      '<span class="kpi-big"><span id="r100-total">' + (t100 == null ? '—' : t100) + '</span><small> / 100</small></span>' +
+      '<span id="r100-bucket">' + (bk ? Shell.pill(BUCKETS[bk].label + ' — ' + BUCKETS[bk].action, BUCKETS[bk].kind) : Shell.pill('not yet scored','')) + '</span>' +
+    '</div>' +
+    '<p class="footnote" id="r100-cadence">' + (bk ? 'Review cadence: ' + cadence[bk] : 'Buckets: Now 80–100 · Next 60–79 · Later 40–59 · Park 20–39 · Kill 0–19. Computed at render, never asserted.') + '</p>';
+
+  var dayOne =
+    '<div class="sec-h">Barstool &amp; Cliché — required <b>day one</b>, “before any token gets spent”</div>' +
+    '<div class="field"><label>Barstool Summary (3–5 sentences — what it IS, who it’s FOR, why it MATTERS)</label>' +
+      '<textarea id="d-barstool">' + esc(s.barstool || b.bar_stool || '') + '</textarea></div>' +
+    '<div class="field"><label>Cliché Summary (one t-shirt phrase — the operating philosophy, not the marketing line)</label>' +
+      '<input type="text" id="d-cliche" value="' + esc(s.cliche || '') + '"></div>' +
+    '<div class="sec-h">Right-Time triggers (required on every card)</div>' +
+    '<div class="field"><label>Trigger: Later → Now</label><input type="text" id="d-trigup" value="' + esc(s.trig_up || '') + '" placeholder="What flips this open?"></div>' +
+    '<div class="field"><label>Trigger: Now → Park (window closed)</label><input type="text" id="d-trigdown" value="' + esc(s.trig_down || '') + '" placeholder="What closes the window?"></div>' +
+    '<button class="btn approve" id="d-save">Save card (local)</button> <span id="d-msg"></span>';
+
+  var killBlock =
+    '<div class="sec-h" style="color:var(--red)">Kill (computed 0–19 only)</div>' +
+    '<div id="d-killwrap">' + (bk === 'kill'
+      ? '<p class="footnote">The rubric computes Kill. Write the eulogy + the lesson — then it rests in the graveyard, visible forever.</p>' +
+        '<div class="field"><label>Eulogy</label><textarea id="d-eulogy"></textarea></div>' +
+        '<div class="field"><label>Lesson learned</label><textarea id="d-lesson"></textarea></div>' +
+        '<button class="btn decline" id="d-kill">Confirm Kill — eulogy + lesson written</button> <span id="d-killmsg"></span>'
+      : '<p class="footnote">Not available — this card does not compute to Kill (0–19). Buckets are computed, never asserted.</p>') +
+    '</div>';
+
+  var gradBlock =
+    '<div class="sec-h" style="color:var(--green)">Graduate</div>' +
+    (bk === 'now'
+      ? '<button class="btn gold-cta" id="d-grad">Start the Graduation Wizard →</button>'
+      : '<p class="footnote">“Only ‘Now’ cards activate” — hard gate. This card computes ' + (bk ? '<b>' + BUCKETS[bk].label + '</b>' : 'no /100 yet') + '.</p>');
+
+  return head + rubric + dayOne + killBlock + gradBlock;
+}
+
+function wireDrawer(b){
+  var d = document.getElementById('drawer');
+  var x = document.getElementById('d-close');
+  if (x) x.addEventListener('click', closeDrawer);
+  if (!b || isKilled(b.id) || isGraduated(b.id)) return;
+
+  var refresh = function(){
+    var t = 0, any = false;
+    DIMS100.forEach(function(dm){
+      var el = document.getElementById('r100-' + dm.k);
+      if (el){ t += Number(el.value); any = true;
+        document.getElementById('r100v-' + dm.k).textContent = el.value; }
+    });
+    if (!any) return;
+    document.getElementById('r100-total').textContent = t;
+    var bk = t >= 80 ? 'now' : t >= 60 ? 'next' : t >= 40 ? 'later' : t >= 20 ? 'park' : 'kill';
+    document.getElementById('r100-bucket').innerHTML = Shell.pill(BUCKETS[bk].label + ' — ' + BUCKETS[bk].action, BUCKETS[bk].kind);
+  };
+  DIMS100.forEach(function(dm){
+    var el = document.getElementById('r100-' + dm.k);
+    if (el) el.addEventListener('input', refresh);
+  });
+
+  var saveBtn = document.getElementById('d-save');
+  if (saveBtn) saveBtn.addEventListener('click', function(){
+    var s100 = {};
+    DIMS100.forEach(function(dm){ s100[dm.k] = Number(document.getElementById('r100-' + dm.k).value); });
+    setSc(b.id, {
+      s100: s100,
+      barstool: document.getElementById('d-barstool').value.trim(),
+      cliche: document.getElementById('d-cliche').value.trim(),
+      trig_up: document.getElementById('d-trigup').value.trim(),
+      trig_down: document.getElementById('d-trigdown').value.trim()
+    });
+    document.getElementById('d-msg').innerHTML = '<span class="msg-ok">Saved.</span>';
+    renderAll();
+    openDrawer(b.id); // rebuild with the new computed bucket + kill/grad availability
+  });
+
+  var killBtn = document.getElementById('d-kill');
+  if (killBtn) killBtn.addEventListener('click', function(){
+    var e = document.getElementById('d-eulogy').value.trim();
+    var l = document.getElementById('d-lesson').value.trim();
+    if (!e || !l){
+      document.getElementById('d-killmsg').innerHTML = '<span class="msg-bad">Eulogy + lesson are both required. “Don’t litigate it again.”</span>';
+      return;
+    }
+    setSc(b.id, { killed: { eulogy: e, lesson: l, at: new Date().toISOString() } });
+    closeDrawer(); renderAll(); setTab('graveyard');
+  });
+
+  var gradBtn = document.getElementById('d-grad');
+  if (gradBtn) gradBtn.addEventListener('click', function(){
+    wizardSel = b.id; closeDrawer(); renderWizard(); setTab('wizard');
+  });
+}
+
+/* ---------------- 4. graduation wizard ---------------- */
+function renderWizard(){
+  var wrap = document.getElementById('wizardWrap');
+  var eligible = boardItems().filter(function(b){
+    var g = sc(b.id).grad;
+    return bucketOf(b.id) === 'now' || (g && g.step >= 2 && !g.done && !g.halted);
+  });
+  var halted = allItems().filter(function(b){ return isHalted(b.id); });
+  var grads = allItems().filter(function(b){ return isGraduated(b.id); });
+
+  if (wizardSel && !eligible.some(function(b){ return b.id === wizardSel; })) wizardSel = null;
+  if (!wizardSel && eligible.length) wizardSel = eligible[0].id;
+
+  var stepsLabels = ['1 · Now-only', '2 · Twin North Star Gate', '3 · Assign the Dingo Caller', '4 · Acceptance', '5 · Outer ring + Registry'];
+
+  var html =
+    '<div class="panel">' +
+      '<div class="ph">Graduation — the gate wizard</div>' +
+      '<blockquote style="font-size:12.5px">“Only ‘Now’ cards activate.” · “No Dingo card is issued without the Caller declaring its Local North Star and showing how it rhymes with the Prime North Star.” · “Accountability is explicit and opt-in.”</blockquote>';
+
+  if (!eligible.length){
+    html += '<div class="status-row warn"><span class="st">Gate</span><span class="grow">' +
+      'No card currently computes to <b>Now (80–100)</b> on the /100 rubric — that is the honest state of the seed data. ' +
+      'Score a card on the <a href="#" id="w-goboard">Nursery Board</a> first. “Only ‘Now’ cards activate” — hard gate, never a warning.</span></div></div>';
+  } else {
+    var b = itemById(wizardSel);
+    var g = sc(b.id).grad || { step: 1, log: [] };
+    var stepNow = g.step || 1;
+
+    html += '<div class="field"><label>Card at the gate (computed bucket must be Now)</label><select id="w-sel">' +
+      eligible.map(function(x){
+        return '<option value="' + esc(x.id) + '"' + (x.id===wizardSel?' selected':'') + '>' + esc(x.name) + ' — /100: ' + s100total(x.id) + '</option>';
+      }).join('') + '</select></div>';
+
+    html += '<div class="wsteps">' + stepsLabels.map(function(lb, i){
+      var n = i + 1;
+      var cls = n < stepNow ? 'done' : (n === stepNow ? 'cur' : '');
+      return '<span class="wstep ' + cls + '">' + esc(lb) + '</span>';
+    }).join('') + '</div>';
+
+    if (stepNow === 1){
+      html += '<div class="status-row ok"><span class="st">Step 1</span><span class="grow"><b>' + esc(b.name) +
+        '</b> computes <b>Now (' + s100total(b.id) + '/100)</b> — the only bucket that activates.</span></div>' +
+        '<button class="btn approve" id="w-start">Proceed to the Twin North Star Gate →</button>';
+    }
+    else if (stepNow === 2){
+      var prime = (DB.ns && DB.ns.prime) ? DB.ns.prime.statement : '(Prime North Star — see north-star.html)';
+      var litmus = (DB.ns && DB.ns.prime) ? DB.ns.prime.litmus : '';
+      html += '<div class="sec-h">Step 2 — the <b>Twin North Star Gate</b> (hard halt, never a warning)</div>' +
+        '<blockquote style="font-size:12.5px"><b style="color:var(--gold)">PRIME:</b> ' + esc(prime) + (litmus ? '<br><small class="muted">' + esc(litmus) + '</small>' : '') + '</blockquote>' +
+        '<div class="field"><label>Declare the Local North Star</label><input type="text" id="w-lns" value="' + esc(g.local_ns || '') + '" placeholder="One sentence — this card’s own star"></div>' +
+        '<div class="field"><label>How it rhymes with the Prime</label><textarea id="w-rhyme">' + esc(g.rhyme || '') + '</textarea>' +
+        '<div class="hint">Declare it properly in the <a href="north-star.html">North Star Builder</a> (the 11-question worksheet) — this gate records the declaration.</div></div>' +
+        '<div class="verdicts">' +
+          '<button class="btn approve" id="w-gate-approve">Approve — it rhymes, open the gate</button>' +
+          '<button class="btn modify" id="w-gate-modify">Modify — keep working the declaration</button>' +
+          '<button class="btn decline" id="w-gate-decline">Decline — HALT → Park</button>' +
+        '</div>' +
+        '<p class="footnote">Decline parks the card: “No tokens burned, no agent spawned.”</p>' +
+        '<div id="w-msg"></div>';
+    }
+    else if (stepNow === 3){
+      html += '<div class="sec-h">Step 3 — <b>Assignment</b>: the HB1000 moderator names the Dingo Caller</div>' +
+        '<p class="muted" style="font-size:12.5px">One accountable human — “the one neck to choke.” The moderator (Tim, in the SIC deployment) assigns a person + names them the Dingo Caller.</p>' +
+        '<p style="font-size:12.5px"><b style="color:var(--gold)">Local North Star:</b> ' + esc(g.local_ns || '') + '</p>' +
+        '<div class="field"><label>Dingo Caller (person)</label>' +
+        '<input type="text" id="w-caller" list="w-people" value="' + esc(g.caller || '') + '" placeholder="Name the one neck to choke">' +
+        '<datalist id="w-people"><option>Tim</option><option>Lauren</option><option>Casey</option><option>Fidel</option><option>Murphy</option><option>Sam</option><option>Samantha</option><option>Thomas</option><option>Robert</option><option>Eric</option></datalist></div>' +
+        '<button class="btn approve" id="w-assign">Name the Dingo Caller →</button><div id="w-msg"></div>';
+    }
+    else if (stepNow === 4){
+      html += '<div class="sec-h">Step 4 — <b>Acceptance</b> (explicit and opt-in)</div>' +
+        '<p style="font-size:13px"><b style="color:var(--teal)">' + esc(g.caller || '') + '</b>, you are named the Dingo Caller for <b>' + esc(b.name) + '</b>.<br>' +
+        'Local North Star: <i>' + esc(g.local_ns || '') + '</i></p>' +
+        '<p class="muted" style="font-size:12.5px">By accepting, the Caller hooks themselves to their Dingo card and their PTK, and connects their own systems/tools. Caller populates the squares &amp; approves · 20% — the AI agent fleet does the work · 80%.</p>' +
+        '<button class="btn gold-cta" id="w-accept">Yes, I accept this assignment</button>';
+    }
+    else if (stepNow === 5){
+      var cardJSON = g.card ? JSON.stringify(g.card, null, 2) : '';
+      html += '<div class="status-row ok"><span class="st">Done</span><span class="grow"><b>' + esc(b.name) +
+        '</b> graduated to the outer ring — Assigned &amp; Active. Registry entry <b>#' + esc(String(g.reg_no)) + '</b> appended to the HB1000 OS Innovation Index (local).</span></div>' +
+        '<table style="margin:10px 0"><tbody>' +
+        '<tr><th>Registry #</th><td>#' + esc(String(g.reg_no)) + '</td></tr>' +
+        '<tr><th>Dingo Caller</th><td>' + esc(g.caller || '') + '</td></tr>' +
+        '<tr><th>Local North Star</th><td>' + esc(g.local_ns || '') + '</td></tr>' +
+        '<tr><th>Accepted</th><td>' + esc(g.accepted_at || '') + '</td></tr>' +
+        '</tbody></table>' +
+        '<p style="font-size:12.5px">A 5×5 Dingo card was instantiated — 25 activity squares, <b style="color:var(--gold)">PTK — Promises to Keep</b> at the centre (index 12). The Caller now populates the squares. ' +
+        'Download the card JSON and drop it in <code>data/cards/</code> to open it in the <a href="card.html">Dingo Card</a> renderer; the building appears in <a href="city.html">Dingo City</a>; its promise engine lives in <a href="ptk.html">PTK</a>.</p>' +
+        '<button class="btn" id="w-download">Download Dingo card JSON</button>' +
+        '<textarea style="margin-top:10px;min-height:140px;font-family:ui-monospace,Consolas,monospace;font-size:11px" readonly>' + esc(cardJSON) + '</textarea>';
+    }
+    html += '</div>';
+  }
+
+  /* halted + graduated side lists */
+  if (halted.length){
+    html += '<div class="sec-h" style="color:var(--red)">Halted at the Gate → Park</div>' +
+      halted.map(function(b){
+        var g = sc(b.id).grad;
+        return '<div class="status-row bad"><span class="st">HALT</span><span class="grow"><b>' + esc(b.name) + '</b> — ' +
+          esc((g && g.halted_at) ? g.halted_at.slice(0,10) : '') + ' · “No tokens burned, no agent spawned.”</span></div>';
+      }).join('');
+  }
+  if (grads.length){
+    html += '<div class="sec-h" style="color:var(--green)">Graduated here — outer ring</div>' +
+      grads.map(function(b){
+        var g = sc(b.id).grad;
+        return '<div class="status-row ok"><span class="st">#' + esc(String(g.reg_no)) + '</span><span class="grow"><b>' + esc(b.name) +
+          '</b> · Dingo Caller: ' + esc(g.caller || '') + ' · accepted ' + esc((g.accepted_at||'').slice(0,10)) + '</span></div>';
+      }).join('');
+  }
+
+  wrap.innerHTML = html;
+  wireWizard();
+}
+
+function wireWizard(){
+  var sel = document.getElementById('w-sel');
+  if (sel) sel.addEventListener('change', function(){ wizardSel = this.value; renderWizard(); });
+  var goBoard = document.getElementById('w-goboard');
+  if (goBoard) goBoard.addEventListener('click', function(e){ e.preventDefault(); setTab('board'); });
+  if (!wizardSel) return;
+  var b = itemById(wizardSel); if (!b) return;
+  var g = sc(b.id).grad || { step: 1, log: [] };
+  var log = function(ev){ (g.log = g.log || []).push({ at: new Date().toISOString(), event: ev }); };
+
+  var start = document.getElementById('w-start');
+  if (start) start.addEventListener('click', function(){
+    g.step = 2; log('Step 1 passed — computed Now (' + s100total(b.id) + '/100)');
+    setSc(b.id, { grad: g }); renderWizard();
+  });
+
+  var ga = document.getElementById('w-gate-approve');
+  if (ga) ga.addEventListener('click', function(){
+    var lns = document.getElementById('w-lns').value.trim();
+    var rh = document.getElementById('w-rhyme').value.trim();
+    if (!lns || !rh){
+      document.getElementById('w-msg').innerHTML = '<p class="msg-bad">Both the Local North Star and the rhyme are required — the gate captures the declaration before any work (or token) is spent.</p>';
+      return;
+    }
+    g.local_ns = lns; g.rhyme = rh; g.step = 3; log('Twin North Star Gate APPROVED');
+    setSc(b.id, { grad: g }); renderWizard();
+  });
+  var gm = document.getElementById('w-gate-modify');
+  if (gm) gm.addEventListener('click', function(){
+    g.local_ns = document.getElementById('w-lns').value.trim();
+    g.rhyme = document.getElementById('w-rhyme').value.trim();
+    log('Gate MODIFY — declaration draft saved');
+    setSc(b.id, { grad: g });
+    document.getElementById('w-msg').innerHTML = '<p class="msg-ok">Draft saved — keep working the declaration.</p>';
+  });
+  var gd = document.getElementById('w-gate-decline');
+  if (gd) gd.addEventListener('click', function(){
+    g.halted = true; g.halted_at = new Date().toISOString(); log('Gate DECLINED — HALT → Park. No tokens burned, no agent spawned.');
+    setSc(b.id, { grad: g }); wizardSel = null; renderAll();
+  });
+
+  var asg = document.getElementById('w-assign');
+  if (asg) asg.addEventListener('click', function(){
+    var c = document.getElementById('w-caller').value.trim();
+    if (!c){ document.getElementById('w-msg').innerHTML = '<p class="msg-bad">Name the Dingo Caller — one accountable owner.</p>'; return; }
+    g.caller = c; g.step = 4; log('Assigned — named the Dingo Caller: ' + c);
+    setSc(b.id, { grad: g }); renderWizard();
+  });
+
+  var acc = document.getElementById('w-accept');
+  if (acc) acc.addEventListener('click', function(){
+    g.accepted_at = new Date().toISOString();
+    g.step = 5; g.done = true;
+    g.reg_no = regLocal.length + 1;
+    g.card = makeCard(b, g);
+    log('“Yes, I accept this assignment” — graduated to the outer ring; registry entry #' + g.reg_no);
+    regLocal.push({
+      no: g.reg_no, name: b.name, caller: g.caller, local_north_star: g.local_ns,
+      graduated_at: g.accepted_at, source: 'graduated via nursery.html — Twin North Star Gate + acceptance recorded'
+    });
+    lsSave(LSK.registry, regLocal);
+    setSc(b.id, { grad: g });
+    renderAll();
+  });
+
+  var dl = document.getElementById('w-download');
+  if (dl) dl.addEventListener('click', function(){
+    downloadJSON(g.card, slug(b.name) + '.json');
+  });
+}
+
+function makeCard(b, g){
+  var squares = [];
+  for (var i = 0; i < 25; i++){
+    if (i === 12){ squares.push({ id:'PTK', ptk:true }); }
+    else {
+      var n = i < 12 ? i + 1 : i; // D1–D12 then D13–D24
+      squares.push({ id:'D' + n, label:'', kpi:'', ryg:'green', human:20 });
+    }
+  }
+  return {
+    store: b.name,
+    caller: g.caller + ' — one neck to choke',
+    vivid_vision: { purpose:'', bhag:'', values:[] },
+    wiifm: '',
+    local_north_star: g.local_ns,
+    rhymes_with_prime: g.rhyme,
+    ticker: [],
+    squares: squares,
+    promises: [],
+    _note: 'Instantiated by the Nursery graduation wizard. The Dingo Caller populates the squares & approves (20%); the AI agent fleet does the work (80%). Validation for complete: purpose ≤8 words, BHAG, ≥1 value, WIIFM, named Caller.'
+  };
+}
+function slug(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,48); }
+function downloadJSON(obj, filename){
+  var blob = new Blob([JSON.stringify(obj, null, 2)], { type:'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+}
+
+/* ---------------- 5. registry ---------------- */
+function renderRegistry(){
+  var wrap = document.getElementById('registryWrap');
+  var html = '';
+
+  /* honest counters */
+  html += '<div class="panel" style="margin-bottom:14px"><div class="ph">The honest count — YTD counter</div>' +
+    '<div class="counts">' +
+      '<span class="c"><b>~250</b>raw butterflies captured (estimate)</span>' +
+      '<span class="c"><b>119</b>YTD confirmed by Jan 23, 2026 (Day 13)</span>' +
+      '<span class="c"><b>' + (DB.b.butterflies||[]).length + '</b>seeded in this app</span>' +
+      '<span class="c"><b>' + captures.length + '</b>caught here</span>' +
+      '<span class="c"><b>' + regLocal.length + '</b>graduated here</span>' +
+    '</div>' +
+    '<p class="footnote">“The Innovation Index only registers butterflies that graduated into initiatives” — raw butterflies ≈ 250; the registry counts graduates. ' +
+    'This registry is the reconciliation of three incompatible numbering systems (Jan YTD #1–133 · April catalogue 01–26 / Maven Index · Babel CCB №001–005) — Alexander’s Library, finally built.</p></div>';
+
+  /* local OS registry */
+  html += '<div class="panel" style="margin-bottom:14px"><div class="ph">HB1000 OS Innovation Index — graduated here (local)</div>';
+  if (!regLocal.length){
+    html += '<p class="muted" style="font-size:12.5px">No graduates yet — honest. The wizard appends a numbered entry the moment a Dingo Caller says “Yes, I accept this assignment.”</p>';
+  } else {
+    html += '<table><thead><tr><th>#</th><th>Name</th><th>Dingo Caller</th><th>Local North Star</th><th>Graduated</th></tr></thead><tbody>' +
+      regLocal.map(function(r){
+        return '<tr><td class="lb-rank">#' + esc(String(r.no)) + '</td><td style="font-weight:700">' + esc(r.name) + '</td><td>' + esc(r.caller) +
+          '</td><td class="muted" style="font-size:12px">' + esc(r.local_north_star) + '</td><td>' + esc((r.graduated_at||'').slice(0,10)) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+  html += '</div>';
+
+  /* top scorers leaderboard */
+  var scored = allItems().map(function(b){ return { b:b, s:eff400(b) }; })
+    .filter(function(x){ return x.s && x.s.total != null; })
+    .sort(function(a,b){ return b.s.total - a.s.total; }).slice(0, 10);
+  html += '<div class="panel" style="margin-bottom:14px"><div class="ph">🏆 TOP SCORERS — ALL-TIME <small class="muted" style="text-transform:none;letter-spacing:0">(pattern preserved from the January registry)</small></div>' +
+    '<table><thead><tr><th>Rank</th><th>Butterfly</th><th>H/B/F/W</th><th>Total /400</th><th>Stage</th></tr></thead><tbody>' +
+    scored.map(function(x, i){
+      var s = x.s;
+      return '<tr><td class="lb-rank">' + (i+1) + '</td><td style="font-weight:700">' + esc(x.b.name) + (leanFlag(x.b) ? ' 🏷️' : '') + '</td>' +
+        '<td class="num">' + (s.h != null ? s.h + '/' + s.b + '/' + s.f + '/' + s.w : '— (total-only)') + '</td>' +
+        '<td class="num" style="font-weight:900;color:var(--gold)">' + s.total + '</td><td>' + esc(x.b.stage) + '</td></tr>';
+    }).join('') + '</tbody></table></div>';
+
+  /* Maven sibling registry */
+  if (DB.reg){
+    var m = DB.reg.meta || {};
+    html += '<div class="panel ruby-accent"><div class="ph">Maven/Grace Innovation Index — the <b style="color:#ff8d86">ruby-red</b> sibling registry (cross-linked, never duplicated)</div>' +
+      '<p class="muted" style="font-size:12.5px">' + esc(m.honest_count_note || '') + '</p>' +
+      '<p class="footnote">' + esc(m.fork_note || '') + '</p>' +
+      '<table><thead><tr><th>#</th><th>Innovation</th><th>Uniqueness</th><th>Impact (Ruby Red)</th><th>Complexity</th><th>Build Status</th><th>Risk</th></tr></thead><tbody>' +
+      (DB.reg.innovations || []).map(function(n){
+        var bs = n.build_status;
+        var bsLabel = bs >= 100 ? '100 — Live' : bs >= 75 ? bs + ' — Substantial' : bs >= 50 ? bs + ' — MVP' : bs >= 25 ? bs + ' — Conceptual' : bs + ' — Not started';
+        return '<tr><td class="num">' + n.n + '</td><td style="font-weight:700">' + esc(n.name) +
+          '<div class="muted" style="font-size:11px;font-weight:400">' + esc(n.one_liner) + '</div></td>' +
+          '<td class="num">' + n.uniqueness + '</td><td class="num">' + n.impact + '</td><td class="num">' + n.complexity + '</td>' +
+          '<td>' + Shell.pill(bsLabel, bs >= 75 ? 'good' : bs >= 50 ? 'warn' : 'danger') + '</td>' +
+          '<td style="font-size:11px">' + esc(n.risk_flag || '—') + '</td></tr>';
+      }).join('') + '</tbody></table>' +
+      '<p class="footnote" style="margin-top:10px"><b>#23–#30</b> (added by the Apr 4, 2026 work plan, Part 6 — names registered, full audits pending): ' +
+      MAVEN_23_30.map(function(nm, i){ return '#' + (23+i) + ' ' + esc(nm); }).join(' · ') +
+      '. A stray “Initiative #37” reference suggests the living index kept growing — 30 is the verified floor.</p>' +
+      '<blockquote style="font-size:12.5px">' + esc(DB.reg.closing_line || '') + '</blockquote></div>';
+  } else {
+    html += '<div class="status-row warn"><span class="st">Data</span><span class="grow">data/registry.json did not load — the Maven/Grace sibling registry is unavailable.</span></div>';
+  }
+
+  wrap.innerHTML = html;
+}
+
+/* ---------------- 6. lineage ---------------- */
+function renderLineage(){
+  var wrap = document.getElementById('lineageWrap');
+  var gen = (DB.b && DB.b.genealogy) ? DB.b.genealogy : [];
+  var converged = allItems().filter(function(b){ return b.stage === 'converged'; });
+
+  var html =
+    '<div class="panel" style="margin-bottom:14px"><div class="ph">The concept genealogy — <b>ideas merge, never die</b></div>' +
+    '<p class="muted" style="font-size:12.5px">Convergence is a feature of this estate. Convergence renders as grey + an arrow — never deletion. The frozen external face, the PEARL Diamond v4.3, lives at <a href="https://learning-loop.manus.space" target="_blank" rel="noopener">learning-loop.manus.space ↗</a> (link out, never rebuild).</p>' +
+    gen.map(function(g){
+      return '<div class="lin-row"><span class="from">' + esc(g.from) + '</span><span class="arrow">→</span><span class="to">' + esc(g.to) + '</span>' +
+        '<span class="note">' + esc(g.note || '') + '</span></div>';
+    }).join('') + '</div>';
+
+  html += '<div class="panel" style="margin-bottom:14px"><div class="ph">The fork that defines the product split (Feb 15, 2026 — verbatim)</div>' +
+    '<blockquote style="font-size:12.5px">“There is a mini version of this inside of... the sector of serving the left out, left behind and working poor. There’s a mini version of this in Grace... called Big Mama and her assistant Grace helping you out in your life. And then there is this universal version here that I am doing. And I think they are completely two different systems... This is your operating system for being human.”</blockquote>' +
+    '<p style="font-size:12.5px"><b style="color:#ff8d86">ruby-red fork</b> = Grace / Big Mama / Maven — the mini HB1000 for Ruby Red. <b style="color:var(--gold)">universal fork</b> = the HB1000 OS — the universal engine. Both descend from Mom’s Data Village.</p></div>';
+
+  if (converged.length){
+    html += '<div class="sec-h">Converged butterflies (greyed in the rings — alive inside their successors)</div><div class="grid3">' +
+      converged.map(function(b){
+        return '<div class="bcard grey-card" data-id="' + esc(b.id) + '"><div class="bc-name">' + esc(b.name) + '</div>' +
+          '<div style="font-size:12px"><span class="arrow" style="color:var(--gold)">→</span> merged into <b>' + esc(b.merged_into || '?') + '</b></div>' +
+          '<div class="bc-meta">' + esc(b.first_seen || '') + '</div></div>';
+      }).join('') + '</div>';
+  }
+
+  html += '<p class="footnote" style="margin-top:14px">Bar Stool Wisdom of Slumberland 554: <i>“Four butterflies before sunrise. We don’t delete the drafts; that’s where the gold dust is.”</i></p>';
+
+  wrap.innerHTML = html;
+  wrap.querySelectorAll('.bcard[data-id]').forEach(function(el){
+    el.addEventListener('click', function(){ openDrawer(el.getAttribute('data-id')); });
+  });
+}
+
+/* ---------------- 7. graveyard ---------------- */
+function renderGraveyard(){
+  var wrap = document.getElementById('graveWrap');
+  var killed = Object.keys(scores).filter(function(id){ return scores[id].killed; }).map(function(id){
+    var b = itemById(id);
+    return { id:id, name: b ? b.name : id, k: scores[id].killed };
+  });
+  var closedSeed = allItems().filter(function(b){ return b.stage === 'closed'; });
+
+  var html = '<div class="panel"><div class="ph">🪦 The Graveyard — Kill = eulogy + lesson learned</div>' +
+    '<blockquote style="font-size:12.5px">“Eulogy + lesson learned. Don’t litigate it again.” · Kill-or-Continue: “dead things don’t come back to life just because you love them.”</blockquote>';
+
+  if (!killed.length){
+    html += '<p class="muted" style="font-size:12.5px">Empty — honest. No card has computed to Kill (0–19) and been confirmed with an eulogy here yet. Killed cards stay visible forever; the lesson is the point.</p>';
+  } else {
+    html += killed.map(function(x){
+      return '<div class="grave"><div class="g-name">' + esc(x.name) + ' <small class="muted">· killed ' + esc((x.k.at||'').slice(0,10)) + '</small></div>' +
+        '<div class="g-eulogy">“' + esc(x.k.eulogy) + '”</div>' +
+        '<div class="g-lesson"><b>Lesson:</b> ' + esc(x.k.lesson) + '</div></div>';
+    }).join('');
+  }
+  html += '</div>';
+
+  if (closedSeed.length){
+    html += '<div class="sec-h">Closed — learning banked (<b>not</b> killed; done, lesson kept)</div>' +
+      closedSeed.map(function(b){
+        return '<div class="status-row warn"><span class="st">Closed</span><span class="grow"><b>' + esc(b.name) + '</b> — ' +
+          esc(b.one_liner || '') + (b.stage_note ? ' <i>(' + esc(b.stage_note) + ')</i>' : '') + '</span></div>';
+      }).join('');
+  }
+
+  wrap.innerHTML = html;
+}
+
+/* ---------------- export / import ---------------- */
+function wireExport(){
+  document.getElementById('btnExport').addEventListener('click', function(){
+    downloadJSON({
+      exported_at: new Date().toISOString(),
+      app: 'hb1000-os nursery.html',
+      captures: captures, scores: scores, registry_local: regLocal
+    }, 'hb1000-nursery-export.json');
+  });
+  document.getElementById('btnImport').addEventListener('change', function(){
+    var f = this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      try{
+        var data = JSON.parse(rd.result);
+        if (!data || typeof data !== 'object') throw new Error('not an object');
+        if (data.captures) { captures = data.captures; lsSave(LSK.captures, captures); }
+        if (data.scores)   { scores = data.scores;     lsSave(LSK.scores, scores); }
+        if (data.registry_local) { regLocal = data.registry_local; lsSave(LSK.registry, regLocal); }
+        renderAll();
+        alert('Imported. Local Nursery state replaced from the file.');
+      }catch(e){ alert('Import failed: ' + e.message); }
+    };
+    rd.readAsText(f);
+    this.value = '';
+  });
+}
+</script>
+</body>
+</html>

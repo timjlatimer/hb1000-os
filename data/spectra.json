@@ -1,0 +1,683 @@
+{
+  "meta": {
+    "title": "Babel Bridge — the spectra registry (pre-authored prism blocks, MVP set)",
+    "compiled": "2026-06-11",
+    "spectrum": "Canonical 5-color spectrum, LOCKED: plain (⚪ white light, default) · barstool (🔴) · timbit (🟡) · boardroom (🔵) · swiss (⬜). picture (🟢) reserved v2 — never authored here.",
+    "law": [
+      "Real data only — every register is derived from the named source; no facts are invented anywhere in this file.",
+      "Verbatim-locked canon (locked: true) is NEVER re-voiced: the plain register carries the sacred line untouched; every other color is a framing expansion that quotes the line exactly — never rewrites, never compresses. Locked timbit registers are verbatim fragments of the line itself.",
+      "Computed states (OVERDUE, roll-ups, counts) are never asserted in prose — dates are stated, the renderer does the math.",
+      "All spectra are agent-authored at seed time and shipped for Tim's review — nothing is ever generated client-side (the static app has no API key and never will).",
+      "Voice contracts: barstool = Tim's plain-spoken warmth, blunt with care; timbit = 3–10 word compressed bite; boardroom = professional-calm executive narrative; swiss = neutral institutional precision."
+    ],
+    "sources": {
+      "cards": "data/cards/pawn-princess-pp01.json · seba-hub-occupancy.json · door-to-door.json (vivid_vision + wiifm fields, verbatim)",
+      "ptk": "data/ptk-seed.json (the 10 real seed promises — promise text verbatim in plain)",
+      "doctrine": "doctrine.html core lines (verbatim chrome lines, BLUEPRINT §2.2; swiss registers reuse the page's reviewed Swiss Protocol pilot prose where it exists)",
+      "timbits": "data/timbits.json core[] — mapped field-for-field: quote→plain (locked), barstool→barstool (Raw Tim mode), context→boardroom (Culture Agent mode), structured derivation→swiss (Swiss Protocol mode, same shape culture.html renders), timbit→timbit (the cliché / bumper-sticker)."
+    },
+    "review": "Authored by the prism-core builder from the named sources; pending Tim's review (ship-it-ugly: seed now, review on the card).",
+    "keys": "Key convention (LAW, matches the consumers): card:<cardFile>:vv | card:<cardFile>:wiifm (card.html header) · ptk:<promiseId> (ptk.html + the card PTK centre square) · doc-* (doctrine.html core lines) · tm-* (the 25 timbits, culture.html fast-follow)."
+  },
+  "spectra": {
+    "card:pawn-princess-pp01:vv": {
+      "title": "Vivid Vision — Pawn Princess PP-01",
+      "locked": true,
+      "plain": "Purpose: “Dignified cash when life happens.” BHAG: “50 dignified stores in 5 years.” Values: Dignity · Speed · Transparency.",
+      "barstool": "Somebody's month just broke — a flat tire, a short paycheque — and they need cash today without being made to feel small about it. That's the whole vision: “Dignified cash when life happens.” And the big goal is exactly what it says: “50 dignified stores in 5 years” — fifty places that run on dignity, speed, and transparency.",
+      "timbit": "“Dignified cash when life happens.”",
+      "boardroom": "Pawn Princess store PP-01 operates under a declared Vivid Vision. Purpose, verbatim: “Dignified cash when life happens.” The stated BHAG — “50 dignified stores in 5 years” — is protected by three core values: Dignity, Speed, and Transparency. Every square on the store's Dingo Card is expected to serve that line.",
+      "swiss": "Record: Vivid Vision — Pawn Princess PP-01. Purpose (verbatim): “Dignified cash when life happens.” BHAG (verbatim): “50 dignified stores in 5 years.” Core values: Dignity; Speed; Transparency. Caller: Lauren (store manager). Status: verbatim-locked — framing may expand, the lines never change.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/cards/pawn-princess-pp01.json → vivid_vision"
+      }
+    },
+    "card:pawn-princess-pp01:wiifm": {
+      "title": "WIIFM — Pawn Princess PP-01",
+      "plain": "Run a balanced, trusted store — and get home on time.",
+      "barstool": "Here's what's in it for Lauren: the drawer balances, nobody's chasing a short deposit, the store has a good name in town — and she's not stuck there till nine fixing paperwork. Balanced, trusted, home on time. That's the deal.",
+      "timbit": "Balanced drawer. Trusted store. Home on time.",
+      "boardroom": "For the store manager, the value proposition is operational: a store that reconciles cleanly, holds customer trust, and closes on schedule — accountability delivered without overtime.",
+      "swiss": "Beneficiary: store manager (Dingo Caller — Lauren). Stated benefits: (1) balanced daily reconciliation; (2) sustained customer trust; (3) on-time close. Source: WIIFM line, card pawn-princess-pp01.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/cards/pawn-princess-pp01.json → wiifm"
+      }
+    },
+    "card:seba-hub-occupancy:vv": {
+      "title": "Vivid Vision — Seba Hub Occupancy Engine",
+      "locked": true,
+      "plain": "Purpose: “Fill what we already have — no empty night, no empty seat.” BHAG: “Every weekend a wedding, every cabin full, every season alive at Seba Hub.” Values: Hospitality · Stewardship · Dignity.",
+      "barstool": "The cabins are built. The domes are built. The wedding venue is sitting right there. The vision isn't to build more — it's “Fill what we already have — no empty night, no empty seat.” The big goal says it plain: “Every weekend a wedding, every cabin full, every season alive at Seba Hub.” Hospitality, stewardship, dignity — that's how it gets filled.",
+      "timbit": "“No empty night, no empty seat.”",
+      "boardroom": "The Seba Hub Occupancy Engine's declared purpose, verbatim: “Fill what we already have — no empty night, no empty seat.” Its BHAG: “Every weekend a wedding, every cabin full, every season alive at Seba Hub.” The card's values — Hospitality, Stewardship, Dignity — govern every outreach the engine drafts; existing capacity is treated as perishable inventory.",
+      "swiss": "Record: Vivid Vision — Seba Hub Occupancy Engine. Purpose (verbatim): “Fill what we already have — no empty night, no empty seat.” BHAG (verbatim): “Every weekend a wedding, every cabin full, every season alive at Seba Hub.” Core values: Hospitality; Stewardship; Dignity. Caller: Casey. Status: verbatim-locked.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/cards/seba-hub-occupancy.json → vivid_vision"
+      }
+    },
+    "card:seba-hub-occupancy:wiifm": {
+      "title": "WIIFM — Seba Hub Occupancy Engine",
+      "plain": "Rep: warm intros to people already looking. Seba: perishable capacity stops leaking — empty nights become revenue.",
+      "barstool": "Two people win here. The rep gets warm intros — folks who already raised their hand, not cold doors. And Seba stops watching empty cabins burn money, because an empty night is revenue you never get back. It expires at sunrise.",
+      "timbit": "Empty nights become revenue.",
+      "boardroom": "The incentive structure serves both parties: representatives receive qualified, warm introductions to prospects already in-market, while Seba Hub converts perishable unsold capacity — nights that expire worthless — into booked revenue.",
+      "swiss": "Beneficiaries: (1) sales representative — warm, pre-qualified introductions; (2) Seba Hub — recovery of perishable capacity (unsold nights → bookings). Source: WIIFM line, card seba-hub-occupancy.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/cards/seba-hub-occupancy.json → wiifm"
+      }
+    },
+    "card:door-to-door:vv": {
+      "title": "Vivid Vision — Door-to-Door Occupancy Drive (superseded draft)",
+      "locked": true,
+      "plain": "Purpose: “Every unit full, every season — dignity through occupancy.” BHAG (superseded draft): 85% occupancy, daily, across every site. Values: Dignity · Hustle · Honesty.",
+      "barstool": "The early draft said it straight: “Every unit full, every season — dignity through occupancy.” Eighty-five percent occupancy, every day, every site — powered by dignity, hustle, and honesty. This card's been superseded — the Seba Hub Occupancy Engine carries the plan now — but the purpose line still holds up.",
+      "timbit": "“Every unit full, every season.”",
+      "boardroom": "The Door-to-Door Occupancy Drive draft declared its purpose, verbatim: “Every unit full, every season — dignity through occupancy,” targeting 85% daily occupancy across every site under three values: Dignity, Hustle, Honesty. The card is retained as a superseded draft; its successor is the Seba Hub Occupancy Engine.",
+      "swiss": "Record: Vivid Vision — Door-to-Door Occupancy Drive. Purpose (verbatim): “Every unit full, every season — dignity through occupancy.” BHAG target: 85% occupancy, daily, all sites. Core values: Dignity; Hustle; Honesty. Caller: TBD. Status: SUPERSEDED — successor card: seba-hub-occupancy. Verbatim-locked.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/cards/door-to-door.json → vivid_vision (superseded; the BHAG's legacy site name is rendered per the locked vocabulary — Seba Hub, never the legacy spelling)"
+      }
+    },
+    "card:door-to-door:wiifm": {
+      "title": "WIIFM — Door-to-Door Occupancy Drive (superseded draft)",
+      "plain": "Rep: a warm list + a script that works = you earn well. Site: full rooms, steady revenue, no empty-season panic.",
+      "barstool": "For the rep it's simple: a warm list and a script that actually works means you actually earn. For the site it's fuller rooms and steady money — no white-knuckle empty season. (Early draft — the Seba Hub Occupancy Engine runs this play now.)",
+      "timbit": "Warm list. Working script. Full rooms.",
+      "boardroom": "The draft proposed aligned incentives: representatives earn well from a warm lead list and a proven script, while each site gains occupancy stability and predictable revenue. Retained as a superseded draft — the plan now lives in the Seba Hub Occupancy Engine.",
+      "swiss": "Beneficiaries: (1) representative — earnings via qualified list and script; (2) site — occupancy and revenue stability. Status: superseded — successor card: seba-hub-occupancy. Source: WIIFM line, card door-to-door.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/cards/door-to-door.json → wiifm"
+      }
+    },
+    "ptk:ptk-001": {
+      "title": "PTK — the cash-out questions email (kept)",
+      "plain": "Send the “AI helper for the nightly cash-out — a few questions to build it” email to the Pawn Princess team",
+      "barstool": "Tim told the Pawn Princess crew he'd send the cash-out questions email — and he did, same day it was due. Two enthusiastic replies came back within a day. Promise made, promise kept.",
+      "timbit": "Asked the team. Same day. Kept.",
+      "boardroom": "Commitment: deliver the nightly cash-out scoping questions to the Pawn Princess team (Diana Machado, Jarrett, Lauren LaBossiere, Samantha). Status as recorded: kept — sent 2026-06-07, with two enthusiastic replies received within 24 hours.",
+      "swiss": "PTK ptk-001. Direction: gave. Counterparty: Diana Machado, Jarrett, Lauren LaBossiere + Samantha. Made: 2026-06-07. Due: 2026-06-07. Status: kept (completed 2026-06-07). Evidence: two replies, 2026-06-07/08 — see ai-research-ledger.json → inbound.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-001"
+      }
+    },
+    "ptk:ptk-002": {
+      "title": "PTK — the Bravo-details follow-up to Lauren",
+      "plain": "Send Lauren the Bravo-details follow-up the moment her detailed reply lands (Gmail is draft-only — Tim sends)",
+      "barstool": "The second Lauren's answers land, the Bravo follow-up goes out — and Tim hits send himself, because Gmail stays draft-only in this shop. Due by the 12th. In motion.",
+      "timbit": "Her reply lands, the follow-up flies.",
+      "boardroom": "Commitment: dispatch the Bravo-details follow-up to Lauren LaBossiere upon receipt of her detailed reply. Channel discipline applies: Gmail is draft-only — Tim sends personally. Due 2026-06-12; in progress.",
+      "swiss": "PTK ptk-002. Direction: gave. Counterparty: Lauren LaBossiere (Pawn Princess). Made: 2026-06-08. Due: 2026-06-12. Status: in_progress. Constraint: draft-only channel; human dispatch only.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-002"
+      }
+    },
+    "ptk:ptk-003": {
+      "title": "PTK — review Murphy's Fix-It pull requests",
+      "plain": "Review Murphy's Fix-It pull requests in the shared Seba fleet repo",
+      "barstool": "Murphy builds straight into the shared repo; Tim's end of the deal is reviewing the pull requests. That's the standing arrangement — due by the 12th.",
+      "timbit": "Murphy builds. Tim reviews. That's the deal.",
+      "boardroom": "Commitment: review Murphy's Fix-It pull requests in the private shared Seba fleet repository, under the standing arrangement in which Murphy develops directly and Tim reviews via PR. Due 2026-06-12.",
+      "swiss": "PTK ptk-003. Direction: gave. Counterparty: Murphy. Made: 2026-06-02. Due: 2026-06-12. Status: promised. Mechanism: pull-request review, private shared repository.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-003"
+      }
+    },
+    "ptk:ptk-004": {
+      "title": "PTK — Lauren's answers to the 10 cash-out questions",
+      "plain": "Detailed answers to the 10 nightly cash-out questions — “I'll sit down tonight to jump into these questions, let's get on this right away.”",
+      "barstool": "Lauren said it herself: “I'll sit down tonight to jump into these questions, let's get on this right away.” The big one buried in those ten questions: does Bravo spit out its own end-of-day expected-drawer number — and which report carries it?",
+      "timbit": "Ten answers. One gating number.",
+      "boardroom": "Awaited: Lauren LaBossiere's detailed answers to the ten nightly cash-out questions, committed in her own words — “I'll sit down tonight to jump into these questions, let's get on this right away.” The gating item: whether Bravo produces its own end-of-day expected-drawer / over-short figure, and in which report and export format.",
+      "swiss": "PTK ptk-004. Direction: received. Counterparty: Lauren LaBossiere (Pawn Princess). Made: 2026-06-07. Due: 2026-06-08. Status: promised. Gating datum: Bravo end-of-day expected-drawer / over-short figure — report and export format.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-004 (Lauren's quote rendered verbatim in every register)"
+      }
+    },
+    "ptk:ptk-005": {
+      "title": "PTK — Casey runs the Occupancy Engine as Dingo Caller",
+      "plain": "Run the Seba Hub Occupancy Engine as Dingo Caller — “one neck to choke”; approve every outbound message nightly",
+      "barstool": "Casey took the wheel on the Occupancy Engine — one neck to choke — and every single outbound message gets her yes before it moves. Not a dated deliverable; a standing post, accepted in the canonical words: “Yes, I accept this assignment.”",
+      "timbit": "One neck. Every message approved.",
+      "boardroom": "Standing assignment: Casey serves as Dingo Caller for the Seba Hub Occupancy Engine, approving every outbound message nightly. Acceptance given in the canonical form: “Yes, I accept this assignment.” The nightly console runs draft-only; verdicts stay with the human.",
+      "swiss": "PTK ptk-005. Direction: received. Counterparty: Casey. Made: 2026-06-08. Due: none — standing assignment. Status: in_progress. Control: human approval on all outbound; draft-only console (verdicts in localStorage).",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-005"
+      }
+    },
+    "ptk:ptk-006": {
+      "title": "PTK — ResNexus self-booking into Track B",
+      "plain": "Wire ResNexus self-booking (sebastays.com) into Track B of the Occupancy Engine",
+      "barstool": "Murphy's wiring sebastays.com self-booking into Track B of the engine — so the people who'd rather book themselves just can, no phone tag. Due the 15th, and it's moving.",
+      "timbit": "Self-booking, wired into Track B.",
+      "boardroom": "Commitment: integrate ResNexus self-booking (sebastays.com) into Track B of the Seba Hub Occupancy Engine. Owner: Murphy. Due 2026-06-15; in progress.",
+      "swiss": "PTK ptk-006. Direction: received. Counterparty: Murphy. Made: 2026-06-08. Due: 2026-06-15. Status: in_progress. Scope: ResNexus self-booking (sebastays.com) → Track B.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-006"
+      }
+    },
+    "ptk:ptk-007": {
+      "title": "PTK — Doors & Roof Caps, Bazaam site",
+      "plain": "Doors & Roof Caps — Bazaam site",
+      "barstool": "The Bazaam crew promised doors and roof caps back in mid-March, due March 26 — and the board is still waiting on it. This is the seed's honest worked example: the 7-day rule does the overdue math at render time, nobody hand-stamps it.",
+      "timbit": "Promised in March. Still on the board.",
+      "boardroom": "Outstanding from the Bazaam crew (David, Jay, Bryan, John Frank): Doors & Roof Caps, committed 2026-03-12 with a due date of 2026-03-26, as recorded in the March 26 PTK Daily Check-In. Its OVERDUE state is computed from the due date at render — never stored.",
+      "swiss": "PTK ptk-007. Direction: received. Counterparty: Bazaam crew (David / Jay / Bryan / John Frank). Made: 2026-03-12. Due: 2026-03-26. Status: promised. Witness: Tim (board owner). Aging: computed at render per the 7-day rule.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-007"
+      }
+    },
+    "ptk:ptk-008": {
+      "title": "PTK — Fix Overhead Door, Bazaam site",
+      "plain": "Fix Overhead Door — Bazaam site",
+      "barstool": "Second one from the same March check-in: the overhead door still needs fixing. Same crew, same dates — committed March 12, due March 26, still open on the board.",
+      "timbit": "The overhead door is still waiting.",
+      "boardroom": "Outstanding from the Bazaam crew: Fix Overhead Door, committed 2026-03-12, due 2026-03-26 — the second open item from the 2026-03-26 Bazaam PTK Daily Check-In.",
+      "swiss": "PTK ptk-008. Direction: received. Counterparty: Bazaam crew (David / Jay / Bryan / John Frank). Made: 2026-03-12. Due: 2026-03-26. Status: promised. Provenance: PTK Daily Check-In, 2026-03-26.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-008"
+      }
+    },
+    "ptk:ptk-009": {
+      "title": "PTK — Optiprime, Bazaam site",
+      "plain": "Optiprime — Bazaam site",
+      "barstool": "Optiprime is the one that's actually moving — the crew has it in progress, no hard date on it. One of three from that March check-in, and the only one rolling.",
+      "timbit": "The one that's moving.",
+      "boardroom": "In progress with the Bazaam crew: Optiprime — recorded as the single in-progress item in the 2026-03-26 PTK Daily Check-In; no fixed due date.",
+      "swiss": "PTK ptk-009. Direction: received. Counterparty: Bazaam crew (David / Jay / Bryan / John Frank). Made: 2026-03-12. Due: none recorded. Status: in_progress. Provenance: PTK Daily Check-In, 2026-03-26.",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-009"
+      }
+    },
+    "ptk:ptk-010": {
+      "title": "PTK — revoke the live OpenAI API key",
+      "plain": "Revoke + delete the live OpenAI API key found in the Oct 7 Outlook email",
+      "barstool": "There's a live API key sitting in an old October email. The promise: kill it — revoke it, delete it, done. The Outlook sweep caught it and flagged it on the feed; due the very next day, because keys don't get grace periods.",
+      "timbit": "Live key found. Kill it today.",
+      "boardroom": "Security-hygiene commitment: revoke and delete the live OpenAI API key discovered in the October 7 Outlook email. Surfaced by the Outlook-Rescue-2025 sweep and flagged on the Show Me feed; due 2026-06-11.",
+      "swiss": "PTK ptk-010. Direction: gave (to self). Category: personal — security hygiene. Made: 2026-06-10. Due: 2026-06-11. Status: promised. Source: flytrap — Outlook-Rescue-2025 sweep (⚠ flagged on the Show Me feed).",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "data/ptk-seed.json → ptk-010"
+      }
+    },
+    "doc-intelligence-brilliance": {
+      "title": "Doctrine — intelligence vs brilliance",
+      "locked": true,
+      "plain": "The agents bring the intelligence. The HB1000 brings the brilliance.",
+      "barstool": "The agents are smart — scary smart, around the clock. But smart isn't the same as brilliant. The judgment, the taste, the call that actually matters? That's the human. “The agents bring the intelligence. The HB1000 brings the brilliance.”",
+      "timbit": "“The HB1000 brings the brilliance.”",
+      "boardroom": "The fleet contributes capability at scale — research, drafting, analysis, monitoring. The human contributes what boards actually rely on: judgment, vision, and final authority. The maxim, quoted exactly: “The agents bring the intelligence. The HB1000 brings the brilliance.”",
+      "swiss": "Division of responsibility, stated formally: the agent fleet supplies analytical and executional capacity; the human principal supplies judgment, vision, and final authority. Operating maxim, verbatim: “The agents bring the intelligence. The HB1000 brings the brilliance.”",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "doctrine.html verbatim chrome line; swiss register reuses the page's reviewed Swiss Protocol pilot prose"
+      }
+    },
+    "doc-8020": {
+      "title": "Doctrine — the 80/20 Rule",
+      "locked": true,
+      "plain": "Let the agents swing the hammers. The HB1000 holds the blueprint.",
+      "barstool": "Eighty-twenty isn't a slogan, it's a tripwire: the agents carry at least 80% of the load, and the moment the human's share creeps past 20, the bar turns red and the Council asks why. “Let the agents swing the hammers. The HB1000 holds the blueprint.”",
+      "timbit": "“Let the agents swing the hammers.”",
+      "boardroom": "The 80/20 covenant allocates execution to the agent fleet — a minimum 80% share — and reserves for the human principal the work only human brilliance can do: vision, values, sensitive gates, sign-off. Breaches surface automatically: a human share above 20% turns the split bar red for Council triage. Maxim, verbatim: “Let the agents swing the hammers. The HB1000 holds the blueprint.”",
+      "swiss": "Execution is delegated to the agent fleet; architectural control and accountability remain with the human principal. Covenant threshold: human share ≤ 20%, breach state computed at render. Operating maxim, verbatim: “Let the agents swing the hammers. The HB1000 holds the blueprint.”",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "doctrine.html §1; swiss register extends the page's reviewed Swiss Protocol pilot prose"
+      }
+    },
+    "doc-lanes": {
+      "title": "Doctrine — Authority Lanes",
+      "locked": true,
+      "plain": "Brilliance can suggest anywhere. Authority can dispatch only in-lane.",
+      "barstool": "Anybody can spot a problem anywhere — say it, flag it, suggest the fix. But you only get to send agents into your own lane. Outside your lane it becomes a suggestion the lane owner can take or leave. “Brilliance can suggest anywhere. Authority can dispatch only in-lane.”",
+      "timbit": "“Authority can dispatch only in-lane.”",
+      "boardroom": "The authority-lane rule separates insight from dispatch rights: any HB1000 may raise a Fix-It Suggestion anywhere in the organization, but agent dispatch is restricted to the suggester's own lane — out-of-lane items route to the responsible owner's approval queue, protecting against accidental overreach. Verbatim: “Brilliance can suggest anywhere. Authority can dispatch only in-lane.”",
+      "swiss": "Rule: suggestion rights are universal; dispatch rights are lane-scoped. Out-of-lane observations generate a Fix-It Suggestion routed to the lane owner. Authority status per ticket: in_lane · suggestion_only · admin_review. Maxim, verbatim: “Brilliance can suggest anywhere. Authority can dispatch only in-lane.”",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "doctrine.html §2"
+      }
+    },
+    "doc-two-shop": {
+      "title": "Doctrine — the Two-Shop Test",
+      "locked": true,
+      "plain": "The key is independence, not a fixed model brand.",
+      "barstool": "Same as your car: you don't bet serious money on one mechanic's opinion. Two independent diagnoses — Canadian Tire AND the trusted local garage — then compare where they agree, where they fight, and what each one's afraid of. “The key is independence, not a fixed model brand.”",
+      "timbit": "“The key is independence.”",
+      "boardroom": "Before serious work is dispatched, the Two-Shop Test requires two independent diagnoses — different models, or separately prompted specialists — with the agreement and disagreement analysis shown to the human before the dispatch button enables. As the doctrine states: “The key is independence, not a fixed model brand.”",
+      "swiss": "Control: two_shop_test.required = true on qualifying tickets. Inputs: shop A and shop B diagnoses, independently produced. Outputs: agreement[], disagreement[], recommended_repair_path. Gate: the disagreement analysis precedes dispatch approval. Principle, verbatim: “The key is independence, not a fixed model brand.”",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "doctrine.html §3"
+      }
+    },
+    "doc-baseline": {
+      "title": "Doctrine — baseline, never final",
+      "locked": true,
+      "plain": "Every output is a baseline, never final.",
+      "barstool": "Nothing we ship is the last word — it's the starting line for the next 1%. Today's 78 is tomorrow's baseline, and somebody — human or agent — is going to beat it. “Every output is a baseline, never final.”",
+      "timbit": "“Every output is a baseline.”",
+      "boardroom": "Standing Order #7 in operation: each deliverable is logged with a score against a declared baseline and treated as the floor for the next improvement cycle, never as a finished ceiling. Verbatim: “Every output is a baseline, never final.”",
+      "swiss": "Provision: Standing Order #7. Effect: all outputs enter the ledger as dated, scored baselines; improvement candidates are measured as lift against baseline. Verbatim: “Every output is a baseline, never final.”",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "doctrine.html §5 / Standing Order #7"
+      }
+    },
+    "doc-ship-ugly": {
+      "title": "Doctrine — the Ship-It-Ugly gate (the soul rule)",
+      "locked": true,
+      "plain": "Ship it ugly. Use it daily. Success = “the card was used yesterday” — NOT “the card is complete.”",
+      "barstool": "The last thirty versions died of polish. So the rule is blunt: ship it ugly, use it daily, and the only question that counts each morning is — was the card used yesterday? Not “is it pretty.” Not “is it done.” Used.",
+      "timbit": "“Ship it ugly. Use it daily.”",
+      "boardroom": "The Ship-It-Ugly gate inverts the usual quality sequence: a working card in daily use outranks a polished card awaiting completion. The binary success metric — “the card was used yesterday” — gates all expansion: no second card and no new feature until one card has been used live for consecutive days.",
+      "swiss": "Gate: Ship-It-Ugly. Metric: binary — card used yesterday (yes/no); an N-consecutive-days counter gates expansion. Documented failure mode: perfect-and-decorate. Verbatim: “Ship it ugly. Use it daily. Success = ‘the card was used yesterday’ — NOT ‘the card is complete.’”",
+      "meta": {
+        "authored_by": "prism-core (agent-authored, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "doctrine.html §6 / the soul rule, BLUEPRINT header"
+      }
+    },
+    "flypaper-explainer": {
+      "title": "The Flypaper — what is a Cloud Butterfly?",
+      "locked": false,
+      "plain": "Cloud Butterflies are ideas, insights, and inspirations that come from No Man’s Land — the space between sleep and waking. Catch them here before they fly away.",
+      "barstool": "You know that genius idea you had in the shower that was gone by breakfast? This is the sticky paper. Dump it here, half-asleep, typos and all.",
+      "timbit": "Catch it before it flies.",
+      "boardroom": "A zero-friction intake for pre-conscious insight capture, feeding the HB1000 innovation pipeline’s scoring and triage stages.",
+      "swiss": "PURPOSE — pre-conscious insight capture\nWINDOW — No Man’s Land (sleep ⇄ waking)\nPROTOCOL — v4.0 · /400 self-score\nCOUNTERS — Day · Today · YTD (machine-owned)",
+      "meta": {
+        "authored_by": "verify (agent-authored per FLYPAPER-LANDING-SPEC §5, pending Tim's review)",
+        "authored_at": "2026-06-11",
+        "source": "FLYPAPER-LANDING-SPEC.md §5 — identical to the inline fallback shipped in flypaper.html / library.html (registry block wins at load)"
+      }
+    },
+    "tm-01": {
+      "title": "Timbit tm-01 — It's expensive to be poor",
+      "locked": true,
+      "plain": "It's expensive to be poor — and that's the crime we fix.",
+      "barstool": "You know what costs the most? Being broke. Bank fees when you have no money. Payday loans. Cheap stuff that breaks and you buy it again. The system charges you extra for being poor. That's not bad luck. That's the design.",
+      "timbit": "The system charges you extra for being poor.",
+      "boardroom": "The gangsterism of poverty. The system is designed to keep people poor. Ruby Red is choosing between groceries, her kid's hockey, and a flat tire. That's not a personal failure — that's a design failure.",
+      "swiss": "Record tm-01 · code J-R (Tim Rants). Principle, verbatim: “It's expensive to be poor — and that's the crime we fix.” Context: The gangsterism of poverty. The system is designed to keep people poor. Ruby Red is choosing between groceries, her kid's hockey, and a flat tire. That's not a personal failure — that's a design failure.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-01: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-02": {
+      "title": "Timbit tm-02 — The system is designed to keep people poor",
+      "locked": true,
+      "plain": "The system is designed to keep people poor — and we are here to redesign the system.",
+      "barstool": "It's not an accident. The fees, the interest rates, the lack of access — it's all built that way. We're not here to hand out fish. We're here to rebuild the pond so people can fish themselves.",
+      "timbit": "Don't hand out fish. Rebuild the pond.",
+      "boardroom": "Social Impact Capitalism isn't charity. It's a structural intervention. We don't hand out fish. We rebuild the pond.",
+      "swiss": "Record tm-02 · code J-R (Tim Rants). Principle, verbatim: “The system is designed to keep people poor — and we are here to redesign the system.” Context: Social Impact Capitalism isn't charity. It's a structural intervention. We don't hand out fish. We rebuild the pond.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-02: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-03": {
+      "title": "Timbit tm-03 — We solve everything",
+      "locked": true,
+      "plain": "We solve everything. Not some things. Everything.",
+      "barstool": "We don't get to pick the easy problems. If it's in front of us, it's ours. That's the whole deal. You don't get to say 'that's not my department' when someone needs help.",
+      "timbit": "If it's in front of you, it's yours.",
+      "boardroom": "The HB1000 SIC Solve Everything Team doesn't cherry-pick. If it's in front of us, we solve it. That's the mandate.",
+      "swiss": "Record tm-03 · code J-R (Tim Rants). Principle, verbatim: “We solve everything. Not some things. Everything.” Context: The HB1000 SIC Solve Everything Team doesn't cherry-pick. If it's in front of us, we solve it. That's the mandate.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-03: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-04": {
+      "title": "Timbit tm-04 — Business as a Force for Good",
+      "locked": true,
+      "plain": "Business as a Force for Good is not a tagline — it's an operating system.",
+      "barstool": "It's not something you put on a poster. It's the filter you run every decision through. Does this make things better? If not, why are we doing it?",
+      "timbit": "Every decision runs through one filter: is this a force for good?",
+      "boardroom": "Every decision, every hire, every product, every meeting — filtered through: is this a force for good? If not, why are we doing it?",
+      "swiss": "Record tm-04 · code J-R (Tim Rants). Principle, verbatim: “Business as a Force for Good is not a tagline — it's an operating system.” Context: Every decision, every hire, every product, every meeting — filtered through: is this a force for good? If not, why are we doing it?",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-04: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-05": {
+      "title": "Timbit tm-05 — The gangsterism of poverty",
+      "locked": true,
+      "plain": "The gangsterism of poverty is real — and silence is complicity.",
+      "barstool": "Poverty isn't bad luck. It's enforced. There are systems that profit from keeping people poor. Saying nothing about it means you're okay with it. We're not okay with it.",
+      "timbit": "Silence about poverty is complicity in it.",
+      "boardroom": "Poverty isn't accidental. It's enforced. The structures that keep people poor are intentional. Naming it is the first act of resistance.",
+      "swiss": "Record tm-05 · code J-R (Tim Rants). Principle, verbatim: “The gangsterism of poverty is real — and silence is complicity.” Context: Poverty isn't accidental. It's enforced. The structures that keep people poor are intentional. Naming it is the first act of resistance.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-05: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-06": {
+      "title": "Timbit tm-06 — Did you get your Timmy's today?",
+      "locked": true,
+      "plain": "Did you get your Timmy's today?",
+      "barstool": "You brush your teeth every day, right? Culture is the same thing. You don't do it once a year at the offsite. You do it every single day. Did you get yours today?",
+      "timbit": "Culture is a daily vitamin, not an annual retreat.",
+      "boardroom": "Culture is a daily practice, not an annual retreat. You take your vitamins every day. You get your Timmy's every day.",
+      "swiss": "Record tm-06 · code J-I (Tim Isms). Principle, verbatim: “Did you get your Timmy's today?” Context: Culture is a daily practice, not an annual retreat. You take your vitamins every day. You get your Timmy's every day.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-06: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-07": {
+      "title": "Timbit tm-07 — Robust Collaboration + Robust Communication",
+      "locked": true,
+      "plain": "Robust Collaboration plus Robust Communication equals Impact.",
+      "barstool": "You want to know the formula? Talk to each other, actually. Work together, actually. That's it. Two things. Impact follows.",
+      "timbit": "Talk + work together = impact. That's the whole formula.",
+      "boardroom": "The formula. Not complicated. Not optional. The two inputs that produce the one output that matters.",
+      "swiss": "Record tm-07 · code J-I (Tim Isms). Principle, verbatim: “Robust Collaboration plus Robust Communication equals Impact.” Context: The formula. Not complicated. Not optional. The two inputs that produce the one output that matters.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-07: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-08": {
+      "title": "Timbit tm-08 — Tone from the top",
+      "locked": true,
+      "plain": "Tone from the top — everything else is noise.",
+      "barstool": "The team doesn't do what you say. They do what you do. If you're late, they're late. If you're honest, they're honest. The tone comes from the top. Always.",
+      "timbit": "They watch what you do, not what you say.",
+      "boardroom": "Culture doesn't come from HR. It doesn't come from a poster on the wall. It comes from what the leader does when nobody's watching — and everybody's watching.",
+      "swiss": "Record tm-08 · code J-I (Tim Isms). Principle, verbatim: “Tone from the top — everything else is noise.” Context: Culture doesn't come from HR. It doesn't come from a poster on the wall. It comes from what the leader does when nobody's watching — and everybody's watching.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-08: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-09": {
+      "title": "Timbit tm-09 — Never ask permission",
+      "locked": true,
+      "plain": "Never ask permission. Just do it. Then tell me.",
+      "barstool": "You don't need my permission. I told you the goal. Go get it. Then tell me what you did. Permission culture is the killer of good work.",
+      "timbit": "Permission culture kills momentum.",
+      "boardroom": "Autonomy is the gift. Explain the end goal, then run with it. Permission culture kills momentum. We don't do permission culture here.",
+      "swiss": "Record tm-09 · code J-I (Tim Isms). Principle, verbatim: “Never ask permission. Just do it. Then tell me.” Context: Autonomy is the gift. Explain the end goal, then run with it. Permission culture kills momentum. We don't do permission culture here.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-09: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-10": {
+      "title": "Timbit tm-10 — Fueled by JOY",
+      "locked": true,
+      "plain": "Fueled by JOY.",
+      "barstool": "If nobody's having fun, something's wrong. Joy isn't a bonus. It's a signal. When people are joyful, they're doing their best work. When they're not, find out why.",
+      "timbit": "Joy is a leading indicator, not a luxury.",
+      "boardroom": "If it doesn't bring joy, we're doing it wrong. Joy is not a luxury. It's a leading indicator of sustainable performance.",
+      "swiss": "Record tm-10 · code J-I (Tim Isms). Principle, verbatim: “Fueled by JOY.” Context: If it doesn't bring joy, we're doing it wrong. Joy is not a luxury. It's a leading indicator of sustainable performance.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-10: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-11": {
+      "title": "Timbit tm-11 — Every person deserves dignity",
+      "locked": true,
+      "plain": "Every person deserves dignity. Full stop.",
+      "barstool": "Not the people who've earned it. Not the people who deserve it by your standards. Every person. That's the floor. Not the ceiling. The floor.",
+      "timbit": "Dignity is the floor, not the ceiling.",
+      "boardroom": "Not some people. Not people who've earned it. Every person. This is non-negotiable. It's the floor, not the ceiling.",
+      "swiss": "Record tm-11 · code J-I (Tim Isms). Principle, verbatim: “Every person deserves dignity. Full stop.” Context: Not some people. Not people who've earned it. Every person. This is non-negotiable. It's the floor, not the ceiling.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-11: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-12": {
+      "title": "Timbit tm-12 — The wet computer between our ears",
+      "locked": true,
+      "plain": "The wet computer between our ears is the most underutilized technology on the planet.",
+      "barstool": "You've got the most powerful computer ever built sitting between your ears. And most of us are running it at maybe 10%. The whole game is figuring out how to run it at 100.",
+      "timbit": "You're running a supercomputer at 10%.",
+      "boardroom": "Human Brilliance 1000. The HB1000 framework starts with the premise that every person in the room is carrying a supercomputer. Our job is to create the conditions where it runs at full capacity.",
+      "swiss": "Record tm-12 · code J-T (Tim Talks). Principle, verbatim: “The wet computer between our ears is the most underutilized technology on the planet.” Context: Human Brilliance 1000. The HB1000 framework starts with the premise that every person in the room is carrying a supercomputer. Our job is to create the conditions where it runs at full capacity.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-12: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-13": {
+      "title": "Timbit tm-13 — The marriage between human and AI",
+      "locked": true,
+      "plain": "The marriage between human and AI is the most important relationship of our generation.",
+      "barstool": "It's not a competition. It's a marriage. You bring the empathy, the judgment, the values. AI brings the scale, the memory, the speed. Together you're unstoppable. Separately you're both limited.",
+      "timbit": "Human + AI = unstoppable. Human vs AI = both limited.",
+      "boardroom": "Not human versus AI. Not AI replacing human. A marriage — which means both parties have to show up, both have to grow, and both have to be honest about what they bring to the table.",
+      "swiss": "Record tm-13 · code J-T (Tim Talks). Principle, verbatim: “The marriage between human and AI is the most important relationship of our generation.” Context: Not human versus AI. Not AI replacing human. A marriage — which means both parties have to show up, both have to grow, and both have to be honest about what they bring to the table.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-13: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-14": {
+      "title": "Timbit tm-14 — Move 37",
+      "locked": true,
+      "plain": "Move 37 is what happens when you stop playing the game everyone else is playing.",
+      "barstool": "AlphaGo made a move that every expert said was wrong. It won the game. The best ideas always look wrong at first. If everyone thinks it's a good idea, it's probably too late.",
+      "timbit": "If everyone agrees it's a good idea, you're probably too late.",
+      "boardroom": "AlphaGo's Move 37 wasn't in any human playbook. It looked wrong. It was genius. The best ideas in this organization will look wrong at first. That's how you know they're right.",
+      "swiss": "Record tm-14 · code J-T (Tim Talks). Principle, verbatim: “Move 37 is what happens when you stop playing the game everyone else is playing.” Context: AlphaGo's Move 37 wasn't in any human playbook. It looked wrong. It was genius. The best ideas in this organization will look wrong at first. That's how you know they're right.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-14: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-15": {
+      "title": "Timbit tm-15 — North Star thinking",
+      "locked": true,
+      "plain": "North Star thinking means you navigate by something that doesn't move.",
+      "barstool": "Everything is changing all the time. The only way to navigate is to find something that doesn't change. Your values. Your mission. Your why. That's your North Star. Look up.",
+      "timbit": "When everything moves, navigate by what doesn't.",
+      "boardroom": "Strategy changes. Tactics change. Markets change. The North Star doesn't. When everything is uncertain, you look up. That's what the Prime North Star is for.",
+      "swiss": "Record tm-15 · code J-T (Tim Talks). Principle, verbatim: “North Star thinking means you navigate by something that doesn't move.” Context: Strategy changes. Tactics change. Markets change. The North Star doesn't. When everything is uncertain, you look up. That's what the Prime North Star is for.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-15: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-16": {
+      "title": "Timbit tm-16 — Cloud Butterfly",
+      "locked": true,
+      "plain": "Cloud Butterfly — the idea that a thought, properly released, can change the weather on the other side of the world.",
+      "barstool": "A butterfly flaps its wings and somewhere a storm starts. That's how ideas work. One thought, shared at the right moment, can change everything. That's why we write things down.",
+      "timbit": "One thought, shared right, can change everything.",
+      "boardroom": "Ideas have leverage. A single insight, shared at the right moment with the right person, can cascade into something that changes systems. That's why we document everything. That's why Timmyisms exist.",
+      "swiss": "Record tm-16 · code J-T (Tim Talks). Principle, verbatim: “Cloud Butterfly — the idea that a thought, properly released, can change the weather on the other side of the world.” Context: Ideas have leverage. A single insight, shared at the right moment with the right person, can cascade into something that changes systems. That's why we document everything. That's why Timmyisms exist.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-16: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-17": {
+      "title": "Timbit tm-17 — Your next mistake will be adorable.",
+      "locked": true,
+      "plain": "Your next mistake will be adorable.",
+      "barstool": "You're sitting there worried about messing up. And the fortune cookie — the golden one, on Mother's Day — says: relax. Your next mistake is going to be adorable. Not catastrophic. Not career-ending. Adorable. Like a puppy knocking over a water bowl. Just adorable.",
+      "timbit": "Imperfection is endearing. Your next mistake is already adorable.",
+      "boardroom": "Found inside a golden fortune cookie at Tim's Mother's Day brunch, May 10, 2026. Not a warning. Not a threat. A permission slip. The universe reminding you that imperfection is endearing, not disqualifying. Mistakes are how you know you're trying. And the next one? Already adorable.",
+      "swiss": "Record tm-17 · code J-B (Timbits). Principle, verbatim: “Your next mistake will be adorable.” Context: Found inside a golden fortune cookie at Tim's Mother's Day brunch, May 10, 2026. Not a warning. Not a threat. A permission slip. The universe reminding you that imperfection is endearing, not disqualifying. Mistakes are how you know you're trying. And the next one? Already adorable.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-17: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-18": {
+      "title": "Timbit tm-18 — Good luck is trying to catch up to you.",
+      "locked": true,
+      "plain": "Good luck is trying to catch up to you. Slow down so it can.",
+      "barstool": "You're grinding. You're hustling. You're moving so fast you can barely breathe. And the universe is standing there going — hey, I've got something for you. But you keep running past it. Slow down. Just for a second. Let it catch up.",
+      "timbit": "Stillness is a strategy. Good luck needs a target that isn't moving.",
+      "boardroom": "Second golden fortune cookie from Tim's Mother's Day brunch, May 10, 2026. A gentle rebuke to the hustle culture that mistakes speed for progress. Good luck isn't hiding from you — it's chasing you. The problem is you're running too fast for it to land. Stillness is a strategy.",
+      "swiss": "Record tm-18 · code J-B (Timbits). Principle, verbatim: “Good luck is trying to catch up to you. Slow down so it can.” Context: Second golden fortune cookie from Tim's Mother's Day brunch, May 10, 2026. A gentle rebuke to the hustle culture that mistakes speed for progress. Good luck isn't hiding from you — it's chasing you. The problem is you're running too fast for it to land. Stillness is a strategy.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-18: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-19": {
+      "title": "Timbit tm-19 — There's no THE way",
+      "locked": true,
+      "plain": "There's my way. There's your way. But there is no THE way.",
+      "barstool": "You know that person who's absolutely certain their way is THE way? Under pressure, under stress, under ego — everyone does it. Your way works for you. My way works for me. But nobody gets to own THE way.",
+      "timbit": "Your way ≠ THE way.",
+      "boardroom": "Nietzsche said it: 'You have your way. I have my way. As for the right way, the correct way, and the only way, it does not exist.' Tim's version: under cognitive load, anxiety, hierarchy, or ego, people mistake their personal way for THE universal way. Watch for it. It's everywhere.",
+      "swiss": "Record tm-19 · code J-B (Timbits). Principle, verbatim: “There's my way. There's your way. But there is no THE way.” Context: Nietzsche said it: 'You have your way. I have my way. As for the right way, the correct way, and the only way, it does not exist.' Tim's version: under cognitive load, anxiety, hierarchy, or ego, people mistake their personal way for THE universal way. Watch for it. It's everywhere.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-19: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-20": {
+      "title": "Timbit tm-20 — Your action speaks so loud",
+      "locked": true,
+      "plain": "Your action speaks so loud I can't hear a word you're saying.",
+      "barstool": "You know that person who says all the right things and then does the opposite? We all do it sometimes. But here's the thing — nobody hears the words after a while. They just watch what you do. Your actions are broadcasting 24/7 whether you like it or not.",
+      "timbit": "What you do is louder than anything you'll ever say.",
+      "boardroom": "Classic Tim. What you DO drowns out what you SAY — every single time. The meeting where you said culture matters but checked your phone the whole time? We noticed. The email you sent at midnight after saying 'we respect boundaries'? We noticed. Actions are the loudest thing in any room.",
+      "swiss": "Record tm-20 · code J-B (Timbits). Principle, verbatim: “Your action speaks so loud I can't hear a word you're saying.” Context: Classic Tim. What you DO drowns out what you SAY — every single time. The meeting where you said culture matters but checked your phone the whole time? We noticed. The email you sent at midnight after saying 'we respect boundaries'? We noticed. Actions are the loudest thing in any room.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-20: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-21": {
+      "title": "Timbit tm-21 — The Two Golden Rules",
+      "locked": true,
+      "plain": "Rule #1: People don't care how much you know until they know how much you care. Rule #2: He with the gold gets to make all the rules.",
+      "barstool": "Okay so there are two golden rules. The first one — the good one — says people don't care what you know until they know you care about them. That's it. Lead with care. The second one — the one that runs most of the world — says whoever has the money makes the rules. Same word 'gold.' Two completely different games. One builds people up. One extracts from them. Here's the question: which one is your boss running? Which one are YOU running? Because you're running one of them right now, whether you know it or not.",
+      "timbit": "Same word. Two opposite worlds. Which golden rule are you actually running?",
+      "boardroom": "Same word. Two completely opposite operating systems. Golden Rule #1 is the servant leadership version — the one Tim uses, the one SIC and BAFFG are built on. It's about being heard, being known, being felt. You do your best work on the day you concentrate most on making a difference for your people. The final word — 'care' — is the most significant piece to understand. Golden Rule #2 is the power-first, extraction-first version. The one that built the system Babel Bridge is trying to fix. The one that capitalist capitalists typically use. The contrast tells the whole SIC story: one leads with empathy, the other leads with power. Which golden rule is your organization running on?",
+      "swiss": "Record tm-21 · code J-B (Timbits). Principle, verbatim: “Rule #1: People don't care how much you know until they know how much you care. Rule #2: He with the gold gets to make all the rules.” Context: Same word. Two completely opposite operating systems. Golden Rule #1 is the servant leadership version — the one Tim uses, the one SIC and BAFFG are built on. It's about being heard, being known, being felt. You do your best work on the day you concentrate most on making a difference for your people. The final word — 'care' — is the most significant piece to understand. Golden Rule #2 is the power-first, extraction-first version. The one that built the system Babel Bridge is trying to fix. The one that capitalist capitalists typically use. The contrast tells the whole SIC story: one leads with empathy, the other leads with power. Which golden rule is your organization running on?",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-21: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-22": {
+      "title": "Timbit tm-22 — Transparency is kindness",
+      "locked": true,
+      "plain": "Transparency is kindness.",
+      "barstool": "You think you're being kind by not saying the hard thing. You're not. The kindest thing you can do is be honest. Clearly. Without cruelty, but without hiding it either.",
+      "timbit": "Honesty is the kindest thing.",
+      "boardroom": "Timmy's two bits. The most compassionate thing you can do is tell the truth clearly.",
+      "swiss": "Record tm-22 · code J-B (Timbits). Principle, verbatim: “Transparency is kindness.” Context: Timmy's two bits. The most compassionate thing you can do is tell the truth clearly.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-22: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-23": {
+      "title": "Timbit tm-23 — Be autonomous",
+      "locked": true,
+      "plain": "Be autonomous — explain the end goal, then let me run with it.",
+      "barstool": "Tell me where we're going. Don't tell me how to get there. I'll figure out the how. That's the deal. That's how good work gets done.",
+      "timbit": "Tell me the destination. I'll find the road.",
+      "boardroom": "Timmy's two bits. The instruction manual for working with Tim. And for working with anyone who wants to do their best work.",
+      "swiss": "Record tm-23 · code J-B (Timbits). Principle, verbatim: “Be autonomous — explain the end goal, then let me run with it.” Context: Timmy's two bits. The instruction manual for working with Tim. And for working with anyone who wants to do their best work.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-23: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-24": {
+      "title": "Timbit tm-24 — Social Impact Capitalism",
+      "locked": true,
+      "plain": "Social Impact Capitalism — putting a ding in the universe.",
+      "barstool": "You can make money and make a difference at the same time. They're not opposites. The ding in the universe is real. It's Ruby Red's flat tire, fixed. It's her kid's hockey paid for. That's the ding.",
+      "timbit": "Make money. Make a difference. Same thing.",
+      "boardroom": "Timmy's two bits. Steve Jobs said it. We mean it. The ding is measurable. The ding is Ruby Red's flat tire, fixed.",
+      "swiss": "Record tm-24 · code J-B (Timbits). Principle, verbatim: “Social Impact Capitalism — putting a ding in the universe.” Context: Timmy's two bits. Steve Jobs said it. We mean it. The ding is measurable. The ding is Ruby Red's flat tire, fixed.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-24: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    },
+    "tm-25": {
+      "title": "Timbit tm-25 — Human Brilliance 1000",
+      "locked": true,
+      "plain": "Human Brilliance 1000 — because 1000% is the only setting we know.",
+      "barstool": "We don't do 80%. We don't do 'good enough.' HB1000 means you believe every person in the room is capable of 1000% — and you create the conditions to prove it.",
+      "timbit": "Every person is capable of 1000%. Create the conditions.",
+      "boardroom": "Timmy's two bits. HB1000 is not a team name. It's a standard. It's what we expect of ourselves and what we believe every human is capable of.",
+      "swiss": "Record tm-25 · code J-B (Timbits). Principle, verbatim: “Human Brilliance 1000 — because 1000% is the only setting we know.” Context: Timmy's two bits. HB1000 is not a team name. It's a standard. It's what we expect of ourselves and what we believe every human is capable of.",
+      "meta": {
+        "authored_by": "prism-core (field-for-field mapping — nothing authored)",
+        "authored_at": "2026-06-11",
+        "source": "data/timbits.json core → tm-25: quote→plain (verbatim), barstool→barstool (Raw Tim), context→boardroom (Culture Agent), derived→swiss (Swiss Protocol structured view), timbit→timbit (the cliché)"
+      }
+    }
+  }
+}

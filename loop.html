@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learning Loop V13.0 — The Genie Release · The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧞</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ---------- loop.html page-local styles ---------- */
+.loop-cols{display:grid; grid-template-columns:1fr 360px; gap:14px; align-items:start}
+@media (max-width:1000px){.loop-cols{grid-template-columns:1fr}}
+
+/* phase stepper */
+.stepper{display:grid; grid-template-columns:repeat(9,1fr); gap:6px; margin:10px 0 4px}
+@media (max-width:900px){.stepper{grid-template-columns:repeat(3,1fr)}}
+.step{
+  background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius);
+  padding:8px 9px; font-size:10.5px; line-height:1.3; cursor:pointer; position:relative;
+  transition:border-color .15s;
+}
+.step .n{font-weight:900; font-size:12px; color:var(--soft)}
+.step .pn{font-weight:700; color:var(--muted)}
+.step .pp{color:var(--soft); font-size:9.5px}
+.step.done{border-color:rgba(70,198,109,.5)}
+.step.done .n{color:var(--green)}
+.step.current{border-color:var(--gold); box-shadow:0 0 10px rgba(232,181,77,.25)}
+.step.current .n,.step.current .pn{color:var(--gold)}
+.step.locked{opacity:.55}
+.step-caption{font-size:12.5px; color:var(--muted); margin:4px 0 10px}
+.step-caption b{color:var(--gold)}
+
+/* score strip */
+.scorestrip{display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg); padding:14px 18px; margin:10px 0}
+.scorestrip .thres{font-size:11px; color:var(--soft); width:100%}
+.dimbars{flex:1; min-width:240px}
+.dimbar{display:flex; align-items:center; gap:8px; margin:4px 0; font-size:11px}
+.dimbar .dl{width:110px; color:var(--muted); flex:0 0 auto}
+.dimbar .track{flex:1; height:9px; background:#141e29; border:1px solid var(--line); border-radius:5px; position:relative; overflow:hidden}
+.dimbar .fill{position:absolute; left:0; top:0; bottom:0; background:var(--cyan); opacity:.85}
+.dimbar .fill.final{background:var(--green)}
+.dimbar .tick{position:absolute; top:-1px; bottom:-1px; width:1px; background:var(--gold); opacity:.8}
+.dimbar .dv{width:64px; text-align:right; color:var(--ink); font-variant-numeric:tabular-nums; flex:0 0 auto}
+
+/* GREEN / BLUE / AMBER suggestion chips */
+.gchip{display:inline-flex; align-items:center; gap:6px; padding:2px 9px; border-radius:999px; font-size:10.5px; font-weight:800; letter-spacing:.04em; border:1px solid}
+.gchip.GREEN{color:var(--green); border-color:rgba(70,198,109,.55); background:rgba(70,198,109,.08)}
+.gchip.BLUE{color:var(--blue); border-color:rgba(116,166,255,.55); background:rgba(116,166,255,.08)}
+.gchip.AMBER{color:var(--orange); border-color:rgba(255,184,107,.55); background:rgba(255,184,107,.08)}
+.sugg-row{display:flex; gap:8px; align-items:center; padding:7px 10px; margin:5px 0; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); font-size:12.5px}
+.sugg-row .grow{flex:1}
+.sugg-row .x{cursor:pointer; color:var(--soft)}
+.sugg-row .x:hover{color:var(--red)}
+
+/* certificate block + Blue Seal */
+pre.cert{
+  background:#0a1018; border:1px solid var(--blue); border-radius:var(--radius);
+  color:#cfe2ff; font-family:'JetBrains Mono',ui-monospace,Consolas,monospace;
+  font-size:12px; line-height:1.6; padding:14px 16px; overflow-x:auto; white-space:pre;
+}
+pre.cert.conditional{border-color:var(--orange); color:#ffe3c4}
+.blueseal{
+  width:96px; height:96px; border-radius:50%; flex:0 0 auto;
+  border:3px double var(--blue); color:var(--blue);
+  display:grid; place-items:center; text-align:center;
+  font-size:10px; font-weight:900; letter-spacing:.1em; text-transform:uppercase;
+  background:radial-gradient(circle, rgba(116,166,255,.14), transparent 70%);
+  box-shadow:0 0 18px rgba(116,166,255,.35);
+}
+.blueseal.conditional{border-color:var(--orange); color:var(--orange); box-shadow:0 0 14px rgba(255,184,107,.3); background:radial-gradient(circle, rgba(255,184,107,.1), transparent 70%); filter:saturate(.8)}
+.blueseal.none{border-color:var(--soft); color:var(--soft); box-shadow:none; background:none; opacity:.6}
+.blueseal .v13{font-size:8.5px; font-weight:600; letter-spacing:.06em}
+
+/* phase ledger */
+#ledger-panel table td,#ledger-panel table th{font-size:11.5px; padding:5px 7px}
+#ledger-panel .st-complete{color:var(--green); font-weight:800; font-size:10px; letter-spacing:.06em}
+#ledger-panel .st-progress{color:var(--gold); font-weight:800; font-size:10px; letter-spacing:.06em}
+#ledger-panel .st-pending{color:var(--soft); font-size:10px}
+#ledger-panel .st-halt{color:var(--red); font-weight:800; font-size:10px}
+
+/* guardians */
+.guardian{background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:11px 13px; margin:8px 0}
+.guardian .gname{font-weight:800; color:var(--gold-glass); font-size:13px}
+.guardian .grole{font-size:11px; color:var(--muted)}
+.guardian textarea{margin-top:6px}
+
+/* drift panel */
+.drift-row{display:flex; gap:9px; align-items:center; flex-wrap:wrap; padding:7px 10px; margin:5px 0; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); font-size:12px}
+.drift-row code{flex:0 0 auto}
+.drift-row select{width:auto}
+
+/* forms */
+.fld{margin:10px 0}
+.fld label{display:block; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:4px}
+.fld .hint{font-size:11px; color:var(--soft); margin-top:3px}
+input[type=text],input[type=number],textarea,select{
+  width:100%; background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
+  color:var(--ink); font-family:inherit; font-size:13px; padding:7px 10px;
+}
+input[type=number]{width:84px}
+textarea{min-height:58px; resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none; border-color:var(--gold)}
+.checkline{display:flex; gap:9px; align-items:flex-start; font-size:13px; margin:6px 0; cursor:pointer}
+.checkline input{width:auto; margin-top:3px}
+.dimgrid{display:grid; grid-template-columns:repeat(5,1fr); gap:9px}
+@media (max-width:900px){.dimgrid{grid-template-columns:1fr 1fr}}
+.dimcell{background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:9px 10px}
+.dimcell .dn{font-size:11px; font-weight:800; color:var(--gold-glass)}
+.dimcell .dq{font-size:10px; color:var(--soft); line-height:1.35; margin:3px 0 6px}
+.dimcell input[type=number]{width:100%}
+.dimcell input[type=text]{margin-top:5px; font-size:11.5px}
+
+/* hard halt banner */
+.halt{
+  border:1px solid var(--red); background:rgba(224,85,107,.09); color:#ffb9c4;
+  border-radius:var(--radius); padding:10px 14px; font-size:13px; font-weight:700; margin:10px 0;
+}
+.halt b{color:var(--red)}
+
+/* modal */
+.modal-back{position:fixed; inset:0; background:rgba(2,5,9,.82); z-index:300; display:none; align-items:center; justify-content:center; padding:20px}
+.modal-back.open{display:flex}
+.modal{max-width:580px; width:96vw; max-height:88vh; overflow-y:auto; background:var(--panel); border:1px solid var(--gold); border-radius:var(--radius-lg); padding:20px 22px; box-shadow:0 18px 70px rgba(0,0,0,.7)}
+
+/* liturgy */
+.liturgy{
+  text-align:center; font-size:19px; font-weight:900; color:var(--gold);
+  padding:26px 16px; border:1px solid rgba(232,181,77,.5); border-radius:var(--radius-lg);
+  background:radial-gradient(circle, rgba(232,181,77,.1), transparent 75%); margin:16px 0;
+}
+.liturgy small{display:block; font-size:11px; color:var(--muted); font-weight:500; margin-top:8px}
+
+/* toast */
+#toast{position:fixed; right:18px; bottom:18px; z-index:400; background:var(--panel); border:1px solid var(--gold); border-radius:var(--radius); color:var(--ink); padding:10px 16px; font-size:13px; display:none; max-width:340px; box-shadow:0 8px 30px rgba(0,0,0,.6)}
+
+.note-sim{font-size:11.5px; color:var(--soft); font-style:italic; margin:6px 0 12px}
+.fixture-list{font-size:12px; color:var(--muted); margin:4px 0; padding-left:18px}
+.fixture-list li{margin:2px 0}
+.invoke code{display:block; margin:5px 0; padding:6px 10px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Learning Loop Protocol <b>V13.0</b> — “The Genie Release”</h1>
+  <div class="row" style="margin:-4px 0 10px">
+    <span class="pill gold">V13.0 — current and only</span>
+    <span class="pill">V8–V12.9.1 archived</span>
+    <span class="pill warn">V14 = data-model donor only — behaviors pending Tim's confirmation</span>
+    <span class="pill info">Quick Scan = Phase 0 + Phase 1 only</span>
+  </div>
+
+  <blockquote>
+    “Learning Loop — the recursive engine every deliverable runs through (the thing that makes it
+    <b style="color:var(--gold)">a loop people run, not a protocol people read</b>).”
+  </blockquote>
+  <blockquote>
+    <b style="color:var(--gold)">The North Star Rule:</b> “The Learning Loop has NO built-in North Star. It is a completely
+    neutral engine. Before every run, the North Star must be declared.” — No North Star → <b style="color:var(--red)">HALT</b>
+    (a hard halt, not a warning · Standing Order #10).
+  </blockquote>
+
+  <div class="row" style="margin:10px 0 4px">
+    <a class="link-card" style="max-width:430px" href="https://learning-loop.manus.space" target="_blank" rel="noopener">
+      <div class="lc-t">PEARL Diamond <b>v4.3</b> — the frozen face</div>
+      <div class="lc-d">learning-loop.manus.space — never rebuilt; the live site stays the “face.” This tracker is the runnable successor.</div>
+      <div class="lc-k">External · opens in a new tab</div>
+    </a>
+  </div>
+
+  <!-- ============ THE NINE PHASES ============ -->
+  <div class="sec-h">The nine phases — stored <b>0–8</b>, displayed “Step n of 9”</div>
+  <div id="phase-overview" class="panel tight"><span class="muted">Loading protocol table from data/loop-fixtures.json…</span></div>
+  <p class="footnote">Thresholds: <b style="color:var(--gold)">80/100 baseline gate</b> (Phase 1) ·
+    <b style="color:var(--blue)">90/100 certification, no dimension below 18/20</b> (Phase 6).
+    All scores calibrated through the North Star lens — not generic quality, but fitness for the specific person the deliverable serves.</p>
+
+  <!-- ============ CERTIFIED RUNS (FIXTURES) ============ -->
+  <div class="sec-h">Certified runs — <b>real fixtures</b> (data/loop-fixtures.json)</div>
+  <div id="fixtures" class="grid2"><div class="panel"><span class="muted">Loading the 2 certified runs…</span></div></div>
+
+  <!-- ============ OPEN DECISIONS ============ -->
+  <div class="sec-h">Open decisions — <b>Tim to decide</b> (surfaced, never silently resolved)</div>
+  <div class="panel tight" id="open-decisions">
+    <div class="status-row warn"><span class="st">Open</span><span class="grow">Canonical default intensity: Master Package says DRIVEN 85%; the Get'rDone run logged DRIVEN (75%). The % is stored with every run; <b>default 85% pending Tim's confirmation</b>.</span></div>
+    <div class="status-row warn"><span class="st">Open</span><span class="grow">V14 <i>behaviors</i> (state-machine JSON contracts, Assumption Audit, GitHub-anchored constitutional memory, 24 enforcement rules) — <b>pending Tim's confirmation</b>. V14 schema is the data-model donor only.</span></div>
+    <div class="status-row warn"><span class="st">Open</span><span class="grow">Get'rDone 15%-Rule ambiguity — the Judge held Accuracy at 16/20: “a design decision, not a documentation error. It requires Tim's resolution.” Condition stands until resolved. <a href="command.html">Route via the HIL queue →</a></span></div>
+  </div>
+
+  <!-- ============ RUN TRACKER ============ -->
+  <div class="sec-h">Run tracker — <b>per-Dingo-card</b> V13.0 runs</div>
+  <p class="note-sim">🔒 The two certified runs above are real historical fixtures. Runs you create below are <b>local tracking records</b> (saved to this browser's localStorage) — real protocol, simulated persistence. Nothing sends; Approve / Modify / Decline are the only verbs at every gate.</p>
+
+  <div class="row" style="margin-bottom:8px">
+    <button class="btn gold-cta" id="btn-new-full">▶ New Full Run</button>
+    <button class="btn" id="btn-new-quick">⚡ Quick Scan</button>
+    <button class="btn" id="btn-export">Export JSON</button>
+    <button class="btn" id="btn-import">Import JSON</button>
+    <button class="btn" id="btn-reset">Reset active run</button>
+    <input type="file" id="import-file" accept=".json,application/json" style="display:none">
+  </div>
+
+  <div id="tracker">
+    <div id="stepper-wrap"></div>
+    <div id="scorestrip-wrap"></div>
+    <div class="loop-cols">
+      <section id="phase-workspace" class="panel"></section>
+      <aside id="ledger-panel" class="panel tight">
+        <div class="ph">Phase Ledger — always visible</div>
+        <div id="ledger-table"></div>
+        <p class="footnote" style="margin-top:8px">Anti-collapse enforcement: every phase writes a row; one phase per approval; Phase Completion Proof required; no phase skipping (<code>phase_skip</code> is itself a drift type).</p>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ============ EVOLUTION QUEUE ============ -->
+  <div class="sec-h">Evolution queue — Phase-5 amendments, <b>human-gated</b></div>
+  <div id="evolution" class="panel tight"></div>
+
+  <!-- ============ LEARNING LEDGER ============ -->
+  <div class="sec-h">Learning Ledger — <b>append-only</b> (the Genie's writes)</div>
+  <div id="ledger-log" class="panel tight"></div>
+
+  <p class="footnote" style="margin-top:22px">
+    Do NOT build here: the V15–V20 dual-runner race, swarm-mind orchestration, memory-loss-probability math, V14's GitHub clone/push sequence — reference material only.
+    Pre-V13 engines (SCORE/GAP/FIX/ACTION · ULL-P) retired by Quick Scan; “Diminishing Returns Flag” survives as vocabulary.
+    Spawned DINGO cards are handed to <a href="nursery.html">the Nursery</a>. The certified deliverable's host surface is the <a href="card.html">Dingo Card</a>.
+  </p>
+</main>
+
+<!-- Mid-Protocol Self-Audit modal -->
+<div class="modal-back" id="midaudit-back" role="dialog" aria-modal="true" aria-label="Mid-Protocol Self-Audit">
+  <div class="modal">
+    <h2>★ Mid-Protocol <b>Self-Audit</b></h2>
+    <p class="muted" style="font-size:12.5px">Hard gate — before producing any Phase 4 output, verify all 8 points. The gate blocks until 8/8.</p>
+    <div id="midaudit-list"></div>
+    <div class="verdicts">
+      <button class="btn approve" id="midaudit-verify" disabled>Approve — 8/8 verified · open Phase 4</button>
+      <button class="btn" id="midaudit-close">Modify — return to the run</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  Shell.init('loop');
+
+  /* =================== canon constants (locked vocabulary) =================== */
+  var PRIME = "Help people get more out of life — not by force, but by example. Believe in abundance — of potential, of solutions, of impact. Put a Ding in the Universe through Social Impact Capitalism (S.I.C.) — Business as a Force for Good.";
+
+  var PHASES = [
+    { phase: 0, name: "System of Intake",                persona: "The Sorter" },
+    { phase: 1, name: "System of Record",                persona: "The Assessor" },
+    { phase: 2, name: "System of Innovation",            persona: "Best Practice Junkie (BPJ)" },
+    { phase: 3, name: "System of Adversarial Integrity", persona: "Society of Guardians" },
+    { phase: 4, name: "System of Communication",         persona: "The Presenter" },
+    { phase: 5, name: "System of Evolution",             persona: "Protocol Engineer" },
+    { phase: 6, name: "System of Certification",         persona: "The Judge" },
+    { phase: 7, name: "Drift Agent",                     persona: "The Watchman" },
+    { phase: 8, name: "The Genie",                       persona: "Persistent Learning Agent" }
+  ];
+
+  var DIMS = [
+    { k: "Completeness",  q: "Does it cover everything the North Star needs to make their specific decision?" },
+    { k: "Clarity",       q: "Can the North Star understand this given their cognitive load, reading level, and available attention?" },
+    { k: "Accuracy",      q: "Are the facts correct AND relevant to the North Star's specific situation and constraints?" },
+    { k: "Depth",         q: "Is there enough depth for the North Star to act, without so much that it overwhelms them?" },
+    { k: "Actionability", q: "Can the North Star act on this with the resources, time, and energy they actually have?" }
+  ];
+
+  var GUARDIANS = [
+    { name: "Devil's Advocate",       role: "Attack every assumption",   focus: "Feasibility, blind spots, unintended consequences" },
+    { name: "The North Star's Voice", role: "Represent the end user",    focus: "Empathy, accessibility, real-world usability" },
+    { name: "The Pragmatist",         role: "Evaluate implementation",   focus: "Timelines, resources, contingency plans" }
+  ];
+
+  var AUDIT_DIMS = [
+    { k: "Language barriers",      d: "non-English speakers, jargon, reading level" },
+    { k: "Digital divide",         d: "no internet, no smartphone, limited tech literacy" },
+    { k: "Physical accessibility", d: "hearing, vision, mobility" },
+    { k: "Time poverty",           d: "minimum viable action for busy/exhausted people" },
+    { k: "Emotional accessibility",d: "shame, anxiety, fear, imposter syndrome" }
+  ];
+
+  var DRIFT_TYPES = ["scope_creep", "north_star_deviation", "phase_skip", "threshold_lowered", "rabbit_hole", "feature_drift", "intensity_drift"];
+  var SEVERITIES = ["none", "minor", "moderate", "major", "critical"];
+
+  var SALTS = [
+    { k: "contextReset",                label: "Context reset" },
+    { k: "criticalLensActivated",       label: "Critical lens activated" },
+    { k: "northStarAlignmentChecked",   label: "North Star alignment checked" },
+    { k: "adversarialPostureAdopted",   label: "Adversarial posture adopted" },
+    { k: "judgmentReadinessConfirmed",  label: "Judgment readiness confirmed" }
+  ];
+
+  var MID_AUDIT = [
+    "Phases 0-3 all marked complete with scores in the Phase Ledger",
+    "Each phase executed as separate responses with human approval between them",
+    "Each phase produced a Phase Completion Proof with real scores",
+    "Phase 0 explicitly confirmed the North Star",
+    "Every Phase Completion Proof includes North Star Alignment",
+    "All KPI scores calibrated through the North Star lens",
+    "Phase 3 included full Accessibility & Inclusion Audit",
+    "Running KPI total is consistent"
+  ];
+
+  var SPIRIT_DIMS = ["Intent Integrity", "Tone Fidelity", "Innovation Relevance", "Empathy Preservation / North Star Alignment"];
+
+  var KNOWN_CARDS = [
+    { id: "", label: "— none (free-standing deliverable) —" },
+    { id: "pawn-princess-pp01", label: "Pawn Princess PP-01 (Caller: Lauren)" },
+    { id: "seba-hub-occupancy", label: "Seba Hub Occupancy Engine (Caller: Casey)" },
+    { id: "door-to-door",       label: "Door-to-Door (superseded draft)" }
+  ];
+
+  var HEAVY = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+  var LITURGY = "The Genie persists. The Loop remembers. The work continues.";
+
+  var LS_RUN = "hb1000-loop-run", LS_LEDGER = "hb1000-loop-ledger", LS_EVO = "hb1000-loop-evolution";
+
+  var esc = Shell.esc;
+  function $(id) { return document.getElementById(id); }
+  function lsGet(k, fb) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable (file:// private mode) — run continues in memory */ } }
+
+  var run = lsGet(LS_RUN, null);
+  var learningLedger = lsGet(LS_LEDGER, []);
+  var evolutionQueue = lsGet(LS_EVO, []);
+  var fixtures = null;
+
+  function saveRun() { lsSet(LS_RUN, run); }
+  function toast(msg) {
+    var t = $("toast"); t.textContent = msg; t.style.display = "block";
+    clearTimeout(toast._h); toast._h = setTimeout(function () { t.style.display = "none"; }, 3400);
+  }
+
+  /* =================== run factory =================== */
+  function newRun(mode) {
+    var salts = {}; SALTS.forEach(function (s) { salts[s.k] = false; });
+    var spirit = {}; SPIRIT_DIMS.forEach(function (d) { spirit[d] = "INTACT"; });
+    run = {
+      sessionId: "LL-" + Date.now().toString(36).toUpperCase(),
+      protocolVersion: "V13.0",
+      mode: mode, /* 'full' | 'quick' */
+      status: "running",
+      createdAt: new Date().toISOString(),
+      deliverable: "", description: "", dingoCardId: "",
+      params: {
+        localNS: "", rhyme: "", prime: PRIME,
+        ethics: "Purpose with Profit",
+        intensity: "DRIVEN", intensityPct: 85,
+        executionMode: "KPI-Only",
+        move37: true, erc: true, ercNote: "",
+        salts: salts, nsConfirmed: false
+      },
+      currentPhase: 0,
+      ledger: {},               /* phase -> {kpi, status, completedAt, proof} */
+      baselineDims: null,       /* {dimKey: {score, gap}} */
+      suggestions: [],          /* {label, text, pts} */
+      swarm: { orphan: "", pure: "" },
+      guardians: GUARDIANS.map(function (g) { return { name: g.name, challenge: "", response: "", mitigation: "", verdict: "PASS" }; }),
+      audit: AUDIT_DIMS.map(function (a) { return { dim: a.k, result: "PASS", note: "" }; }),
+      midAudit: MID_AUDIT.map(function () { return false; }),
+      midAuditDone: false,
+      phase4: { presentation: false, refdocs: false, delta: 0 },
+      phase5: { spirit: spirit, giftBack: "", amendments: [] },
+      finalDims: null, certification: null, conditionText: "", blueSealStampedAt: null,
+      drift: DRIFT_TYPES.map(function (t) { return { type: t, severity: "none", evidence: "", hitl: null, rollbackExecuted: false }; }),
+      skipAttempts: [],
+      genie: { giftProject: "", giftLoop: "", learnings: "", dingoCards: [], ledgerWritten: false }
+    };
+    saveRun();
+  }
+
+  /* =================== computed (never asserted) =================== */
+  function baselineTotal() {
+    if (!run || !run.baselineDims) return null;
+    return DIMS.reduce(function (s, d) { return s + Number(run.baselineDims[d.k].score || 0); }, 0);
+  }
+  function p2pts() { return run ? run.suggestions.reduce(function (s, x) { return s + Number(x.pts || 0); }, 0) : 0; }
+  function projectedFinal() { var b = baselineTotal(); return (b == null) ? null : Math.min(100, b + p2pts()); }
+  function runningTotal() {
+    var b = baselineTotal(); if (b == null) return null;
+    var t = b;
+    if (run.ledger[2]) t = Math.min(100, t + p2pts());
+    if (run.ledger[4]) t = Math.min(100, t + Number(run.phase4.delta || 0));
+    return t;
+  }
+  function finalTotal() {
+    if (!run || !run.finalDims) return null;
+    return DIMS.reduce(function (s, d) { return s + Number(run.finalDims[d.k] || 0); }, 0);
+  }
+  function certOf(total, dimVals) {
+    var min = Math.min.apply(null, dimVals);
+    if (total < 85 || min < 15) return "NOT CERTIFIED";
+    if (total >= 90 && min >= 18) return "CERTIFIED";
+    return "CONDITIONAL";
+  }
+  function guardianVerdict() {
+    var v = "PASS";
+    run.guardians.forEach(function (g) {
+      if (g.verdict === "FAIL") v = "FAIL";
+      else if (g.verdict === "PASS with reservations" && v !== "FAIL") v = "PASS with reservations";
+    });
+    return v;
+  }
+  function spiritCount() {
+    return SPIRIT_DIMS.reduce(function (n, d) { return n + (run.phase5.spirit[d] === "INTACT" ? 1 : 0); }, 0);
+  }
+  function driftFindings() { return run.drift.filter(function (d) { return d.severity !== "none"; }); }
+  function driftOverall() {
+    var f = driftFindings();
+    if (!f.length) return { status: "clean", label: "CLEAR — Zero drift detected across all 7 dimensions." };
+    var order = { minor: 1, moderate: 2, major: 3, critical: 4 };
+    var max = f.reduce(function (m, d) { return Math.max(m, order[d.severity] || 0); }, 0);
+    var status = max >= 4 ? "critical_drift" : (max >= 2 ? "significant_drift" : "minor_drift");
+    return { status: status, label: f.length + " drift finding(s) — rollup: " + status.replace("_", " ").toUpperCase() };
+  }
+  function gateComplete() {
+    if (!run) return false;
+    var p = run.params;
+    var saltsOk = SALTS.every(function (s) { return p.salts[s.k]; });
+    var ercOk = !p.erc || (p.ercNote || "").trim().length > 0;
+    return (run.deliverable || "").trim() && (p.localNS || "").trim() && (p.rhyme || "").trim() && p.nsConfirmed && saltsOk && ercOk;
+  }
+
+  /* =================== ledger writes =================== */
+  function proofFromInputs() {
+    var alignEl = $("proof-align"), noteEl = $("proof-note");
+    return {
+      northStarAlignment: alignEl ? alignEl.value : "ALIGNED",
+      northStarNote: noteEl ? noteEl.value : ""
+    };
+  }
+  function completePhase(phase, kpi, before, after) {
+    var proof = proofFromInputs();
+    proof.scoreBefore = (before == null ? null : before);
+    proof.scoreAfter = (after == null ? null : after);
+    proof.delta = (before != null && after != null) ? (after - before) : null;
+    run.ledger[phase] = { kpi: kpi, status: "COMPLETE", completedAt: new Date().toISOString(), proof: proof };
+    run.currentPhase = phase + 1;
+    saveRun();
+  }
+  function declineRun(phase) {
+    run.ledger[phase] = { kpi: "—", status: "DECLINED", completedAt: new Date().toISOString(), proof: {} };
+    run.status = "halted";
+    saveRun(); renderTracker();
+    toast("Run halted at Phase " + phase + " — recorded. Nothing was sent.");
+  }
+
+  /* =================== shared UI bits =================== */
+  function proofBlock() {
+    return '<div class="panel tight" style="margin-top:12px">' +
+      '<div class="ph">Phase Completion Proof — required</div>' +
+      '<div class="row">' +
+        '<div style="flex:0 0 220px"><label class="muted" style="font-size:11px">North Star Alignment</label>' +
+          '<select id="proof-align"><option>ALIGNED</option><option>PARTIAL</option><option>DRIFTING</option></select></div>' +
+        '<div style="flex:1; min-width:200px"><label class="muted" style="font-size:11px">North Star note (how this phase served the declared North Star)</label>' +
+          '<input type="text" id="proof-note" placeholder="calibrated through the North Star lens…"></div>' +
+      '</div></div>';
+  }
+  function gateButtons(approveLabel, approveId, declineId) {
+    return '<div class="verdicts">' +
+      '<button class="btn approve" id="' + approveId + '">' + esc(approveLabel) + '</button>' +
+      '<button class="btn modify" id="' + approveId + '-modify">Modify — keep editing this phase</button>' +
+      '<button class="btn decline" id="' + declineId + '">Decline — HALT the run</button>' +
+    '</div>';
+  }
+  function bindGate(approveId, declineId, onApprove) {
+    var a = $(approveId); if (a) a.addEventListener("click", onApprove);
+    var m = $(approveId + "-modify"); if (m) m.addEventListener("click", function () {
+      toast("Phase remains open — edit, then Approve to record the Phase Completion Proof.");
+    });
+    var d = $(declineId); if (d) d.addEventListener("click", function () { declineRun(run.currentPhase); });
+  }
+
+  /* =================== stepper + caption =================== */
+  function renderStepper() {
+    var wrap = $("stepper-wrap");
+    if (!run) { wrap.innerHTML = ""; return; }
+    var cur = run.currentPhase;
+    var cap = "";
+    if (run.status === "halted") {
+      cap = '<div class="step-caption"><b>RUN HALTED</b> — declined at a gate. Start a new run to continue.</div>';
+    } else if (run.status === "completed") {
+      cap = '<div class="step-caption"><b>RUN COMPLETE</b> — all 9 steps recorded. ' + esc(LITURGY) + '</div>';
+    } else {
+      var p = PHASES[cur];
+      cap = '<div class="step-caption"><b>Step ' + (cur + 1) + ' of 9</b> — Phase ' + cur + " · " + esc(p.name) + " · Persona: " + esc(p.persona) +
+        (run.mode === "quick" ? ' · <span class="pill info">QUICK SCAN — Phases 0 + 1 only</span>' : "") + "</div>";
+    }
+    var steps = PHASES.map(function (p) {
+      var cls = "step";
+      var done = !!run.ledger[p.phase] && run.ledger[p.phase].status === "COMPLETE";
+      if (done) cls += " done";
+      else if (p.phase === cur && run.status === "running") cls += " current";
+      else if (p.phase > cur) cls += " locked";
+      return '<div class="' + cls + '" data-phase="' + p.phase + '" title="Phase ' + p.phase + " — " + esc(p.name) + '">' +
+        '<div class="n">' + (done ? "✓ " : "") + "Step " + (p.phase + 1) + "/9</div>" +
+        '<div class="pn">' + esc(p.name) + "</div>" +
+        '<div class="pp">' + esc(p.persona) + "</div></div>";
+    }).join("");
+    wrap.innerHTML = cap + '<div class="stepper">' + steps + "</div>";
+    wrap.querySelectorAll(".step").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var ph = Number(el.getAttribute("data-phase"));
+        if (run.status !== "running") return;
+        if (ph > run.currentPhase) {
+          run.skipAttempts.push({ ts: new Date().toISOString(), from: run.currentPhase, to: ph });
+          saveRun();
+          toast("No phase skipping — attempt logged as phase_skip drift evidence (" + run.skipAttempts.length + " on record). The Watchman will see it in Phase 7.");
+        } else if (ph < run.currentPhase) {
+          toast("Phase " + ph + " is COMPLETE — its Phase Completion Proof is in the ledger. (Rework happens via a Guardian FAIL, not by re-opening phases.)");
+        }
+      });
+    });
+  }
+
+  /* =================== score strip =================== */
+  function dimBarRow(label, baseVal, finalVal) {
+    var bw = baseVal == null ? 0 : Math.min(100, baseVal / 20 * 100);
+    var fw = finalVal == null ? 0 : Math.min(100, finalVal / 20 * 100);
+    return '<div class="dimbar"><span class="dl">' + esc(label) + "</span>" +
+      '<span class="track">' +
+        (finalVal != null ? '<span class="fill final" style="width:' + fw + '%"></span>' : "") +
+        '<span class="fill" style="width:' + bw + '%;' + (finalVal != null ? "opacity:.45" : "") + '"></span>' +
+        '<span class="tick" style="left:75%" title="15 — Phase-1 floor"></span>' +
+        '<span class="tick" style="left:90%" title="18 — certification floor"></span>' +
+      "</span>" +
+      '<span class="dv num">' + (baseVal == null ? "—" : baseVal) + (finalVal != null ? " → " + finalVal : "") + "/20</span></div>";
+  }
+  function ring(label, val, cls, note) {
+    var v = val == null ? 0 : val;
+    return '<div class="gauge"><div class="scoreRing sm ' + cls + '" style="--val:' + v + '">' +
+      '<span class="val num">' + (val == null ? "—" : val) + '</span></div>' +
+      '<div><div class="glabel">' + esc(label) + '</div><div class="gnote">' + esc(note || "") + "</div></div></div>";
+  }
+  function renderScoreStrip() {
+    var wrap = $("scorestrip-wrap");
+    if (!run) { wrap.innerHTML = ""; return; }
+    var b = baselineTotal(), r = runningTotal(), pj = (run.ledger[2] ? projectedFinal() : null), f = (run.ledger[6] ? finalTotal() : null);
+    var fcls = f == null ? "cyan" : (f >= 90 ? "green" : (f >= 85 ? "yellow" : "red"));
+    var bars = DIMS.map(function (d) {
+      return dimBarRow(d.k,
+        run.baselineDims ? Number(run.baselineDims[d.k].score || 0) : null,
+        run.finalDims ? Number(run.finalDims[d.k] || 0) : null);
+    }).join("");
+    wrap.innerHTML = '<div class="scorestrip">' +
+      ring("Baseline", b, "cyan", "Phase 1 · gate 80") +
+      ring("Running total", r, "yellow", "live") +
+      ring("Projected final", pj, "cyan", "Phase 2 estimate") +
+      ring("Final", f, fcls, "Phase 6 · certify 90 + all dims 18+") +
+      '<div class="dimbars">' + bars + '</div>' +
+      '<div class="thres">5 dimensions × 20 = 100 · gold ticks = 15 (Phase-1 floor) and 18 (certification floor) · cyan = baseline, green = final · computed from entered scores, never asserted.</div>' +
+    "</div>";
+  }
+
+  /* =================== phase ledger panel =================== */
+  function renderLedgerPanel() {
+    var el = $("ledger-table");
+    if (!run) {
+      el.innerHTML = '<p class="muted" style="font-size:12px">No active run. The Phase Ledger fills live as phases complete — the exact shape of the Get&#39;rDone executive-summary table.</p>';
+      return;
+    }
+    var rows = PHASES.map(function (p) {
+      var L = run.ledger[p.phase];
+      var st, kpi;
+      if (L && L.status === "COMPLETE") { st = '<span class="st-complete">COMPLETE</span>'; kpi = esc(L.kpi); }
+      else if (L && L.status === "DECLINED") { st = '<span class="st-halt">DECLINED</span>'; kpi = "—"; }
+      else if (p.phase === run.currentPhase && run.status === "running") { st = '<span class="st-progress">IN PROGRESS</span>'; kpi = "…"; }
+      else { st = '<span class="st-pending">—</span>'; kpi = ""; }
+      var proofTip = (L && L.proof && L.proof.northStarAlignment) ?
+        ' title="Proof: NS alignment ' + esc(L.proof.northStarAlignment) + (L.proof.northStarNote ? " — " + esc(L.proof.northStarNote) : "") + '"' : "";
+      return "<tr" + proofTip + "><td>" + p.phase + "</td><td>" + esc(p.name) + "</td><td>" + esc(p.persona) + "</td><td>" + kpi + "</td><td>" + st + "</td></tr>";
+    }).join("");
+    el.innerHTML = '<table><thead><tr><th>#</th><th>Phase</th><th>Persona</th><th>KPI Score</th><th>Status</th></tr></thead><tbody>' + rows + "</tbody></table>";
+  }
+
+  /* =================== phase workspaces =================== */
+  function renderWorkspace() {
+    var ws = $("phase-workspace");
+    if (!run) {
+      ws.innerHTML =
+        '<div class="ph">No active run</div>' +
+        '<p class="muted">Every deliverable on a Dingo card can be put through a V13.0 run — that is what makes the Learning Loop <i>a loop people run, not a protocol people read</i>.</p>' +
+        '<div class="invoke"><div class="ph" style="margin-top:12px">Invocation commands (verbatim)</div>' +
+          "<code>Run the Learning Loop Protocol V13.0 on [deliverable description].</code>" +
+          "<code>Quick Scan [deliverable description].</code>" +
+          "<code>Install the Learning Loop Genie in this environment.</code></div>" +
+        '<div class="verdicts"><button class="btn gold-cta" id="ws-new-full">▶ New Full Run</button>' +
+        '<button class="btn" id="ws-new-quick">⚡ Quick Scan (Phase 0 + 1 only)</button></div>';
+      var f = $("ws-new-full"); if (f) f.addEventListener("click", function () { startRun("full"); });
+      var q = $("ws-new-quick"); if (q) q.addEventListener("click", function () { startRun("quick"); });
+      return;
+    }
+    if (run.status === "halted") {
+      ws.innerHTML = '<div class="ph">Run halted</div>' +
+        '<div class="halt"><b>HALT recorded.</b> The run was declined at Phase ' + run.currentPhase + ". No tokens burned, no agent spawned. The ledger keeps the record.</div>" +
+        '<div class="verdicts"><button class="btn gold-cta" id="ws-new-full">▶ Start a new Full Run</button>' +
+        '<button class="btn" id="ws-new-quick">⚡ New Quick Scan</button></div>';
+      var f2 = $("ws-new-full"); if (f2) f2.addEventListener("click", function () { startRun("full"); });
+      var q2 = $("ws-new-quick"); if (q2) q2.addEventListener("click", function () { startRun("quick"); });
+      return;
+    }
+    if (run.status === "completed") { renderDone(ws); return; }
+    if (run.mode === "quick" && run.currentPhase >= 2) { renderQuickReport(ws); return; }
+    switch (run.currentPhase) {
+      case 0: renderPhase0(ws); break;
+      case 1: renderPhase1(ws); break;
+      case 2: renderPhase2(ws); break;
+      case 3: renderPhase3(ws); break;
+      case 4: renderPhase4(ws); break;
+      case 5: renderPhase5(ws); break;
+      case 6: renderPhase6(ws); break;
+      case 7: renderPhase7(ws); break;
+      case 8: renderPhase8(ws); break;
+      default: renderDone(ws);
+    }
+  }
+
+  /* ---------- PHASE 0 — the HARD GATE ---------- */
+  function renderPhase0(ws) {
+    var p = run.params;
+    var saltsHtml = SALTS.map(function (s) {
+      return '<label class="checkline"><input type="checkbox" data-salt="' + s.k + '"' + (p.salts[s.k] ? " checked" : "") + "> " + esc(s.label) + "</label>";
+    }).join("");
+    var cardOpts = KNOWN_CARDS.map(function (c) {
+      return '<option value="' + esc(c.id) + '"' + (run.dingoCardId === c.id ? " selected" : "") + ">" + esc(c.label) + "</option>";
+    }).join("");
+    ws.innerHTML =
+      '<div class="ph">Phase 0 — System of Intake · The Sorter · <span style="color:var(--red)">THE HARD GATE</span></div>' +
+      '<div id="halt-banner"></div>' +
+      '<div class="fld"><label>Deliverable under review *</label><input type="text" id="f-deliverable" value="' + esc(run.deliverable) + '" placeholder="e.g. Seba Hub winter occupancy plan v2"></div>' +
+      '<div class="fld"><label>Dingo card (optional — this run tracks against the card)</label><select id="f-card">' + cardOpts + "</select>" +
+        '<div class="hint">Per-Dingo-card tracking: the certified output stamps the card via the Blue Seal service ring.</div></div>' +
+      '<div class="panel tight" style="margin:12px 0"><div class="ph">North Star declaration — required before every run</div>' +
+        '<p style="font-size:12px"><b style="color:var(--gold)">Prime North Star (verbatim):</b> <span class="muted">' + esc(PRIME) + "</span></p>" +
+        '<div class="fld"><label>Local North Star for this run *</label><input type="text" id="f-localns" value="' + esc(p.localNS) + '" placeholder="e.g. Make the Get&#39;rDone Model so clear an HB1000 reads it and says &#39;I&#39;m in.&#39;">' +
+          '<div class="hint">Default when unspecified: Ruby Red (“No North Star specified. Defaulting to Ruby Red.”) — but Ruby Red is a Local for Maven / Corner Banker / Pulse ONLY (Standing Order #2). Picking it elsewhere gets a warning.</div></div>' +
+        '<div class="fld"><label>How it rhymes with the Prime *</label><input type="text" id="f-rhyme" value="' + esc(p.rhyme) + '" placeholder="the diaspora line — how this Local interprets the shared text"></div>' +
+        '<label class="checkline"><input type="checkbox" id="f-nsconfirmed"' + (p.nsConfirmed ? " checked" : "") + "> <b>North Star Confirmed: YES</b> — required. No North Star → HALT.</label>" +
+        '<div id="rubyred-warn"></div></div>' +
+      '<div class="grid2">' +
+        '<div class="fld"><label>Ethics Framework</label><select id="f-ethics">' +
+          ["Purpose with Profit", "Profit with Purpose", "Profit with Profit"].map(function (o) { return "<option" + (p.ethics === o ? " selected" : "") + ">" + o + "</option>"; }).join("") + "</select></div>" +
+        '<div class="fld"><label>Execution Mode</label><select id="f-mode">' +
+          ["Dashboard", "KPI-Only"].map(function (o) { return "<option" + (p.executionMode === o ? " selected" : "") + ">" + o + "</option>"; }).join("") + "</select></div>" +
+        '<div class="fld"><label>Intensity</label><div class="row"><select id="f-intensity" style="flex:1">' +
+          ["CASUAL", "ENGAGED", "DRIVEN", "PRIMAL", "PRIMAL+"].map(function (o) { return "<option" + (p.intensity === o ? " selected" : "") + ">" + o + "</option>"; }).join("") +
+          '</select><input type="number" id="f-intensitypct" min="0" max="100" value="' + Number(p.intensityPct) + '"><span class="muted" style="font-size:12px">%</span></div>' +
+          '<div class="hint">CASUAL 25 · PRIMAL 95 · PRIMAL+ 100. The % is stored with the run; canonical default 85% <b>pending Tim&#39;s confirmation</b>.</div></div>' +
+        '<div class="fld"><label>Toggles</label>' +
+          '<label class="checkline"><input type="checkbox" id="f-move37"' + (p.move37 ? " checked" : "") + "> Move 37 Extreme — ON (V13.0 default — all 9 phases)</label>" +
+          '<label class="checkline"><input type="checkbox" id="f-erc"' + (p.erc ? " checked" : "") + "> Emotional Reality Check — ON</label></div>" +
+      "</div>" +
+      '<div class="fld"><label>Emotional Reality Check — acknowledge the human stakes' + (p.erc ? " *" : "") + "</label>" +
+        '<textarea id="f-ercnote" placeholder="e.g. This project serves communities facing real flood risk… Every deliverable must be grounded in that reality.">' + esc(p.ercNote) + "</textarea></div>" +
+      '<div class="panel tight" style="margin:12px 0"><div class="ph">Smelling Salts — context health scan (all 5 required → PASS)</div>' + saltsHtml +
+        '<div class="hint">Pass log example: “PASSED — Context intact. No drift detected. North Star loaded.”</div></div>' +
+      '<p class="footnote">Routing decision: FULL LOOP vs Quick Scan was made when you started this run (' + (run.mode === "quick" ? "Quick Scan — Phases 0 + 1 only" : "FULL LOOP — all 9 phases") + "). Exit line recorded on Approve: <i>“Phase 0 Status: COMPLETE. Proceed to Phase 1.”</i></p>" +
+      proofBlock() +
+      gateButtons("Approve — Phase 0 COMPLETE · proceed to Phase 1", "g0-approve", "g0-decline");
+
+    function syncGate() {
+      var ok = gateComplete();
+      var btn = $("g0-approve"); if (btn) btn.disabled = !ok;
+      $("halt-banner").innerHTML = ok ? "" :
+        '<div class="halt"><b>No North Star → HALT.</b> The gate blocks the submit until the deliverable, Local North Star, rhyme line, North Star Confirmed: YES, all 5 Smelling Salts' + (run.params.erc ? ", and the Emotional Reality Check note" : "") + " are in. A hard halt, not a warning.</div>";
+      var w = $("rubyred-warn");
+      var ns = (run.params.localNS || "").toLowerCase();
+      var cardOk = ["pawn-princess-pp01", ""].indexOf(run.dingoCardId) === -1 ? false : true;
+      if (ns.indexOf("ruby red") >= 0) {
+        w.innerHTML = '<div class="status-row warn"><span class="st">SO-2</span><span class="grow">Ruby Red is one Local North Star — Maven / Corner Banker / Pulse only. Confirm this deliverable is in that lane before proceeding (Standing Order #2).</span></div>';
+      } else { w.innerHTML = ""; }
+      void cardOk;
+    }
+    $("f-deliverable").addEventListener("input", function (e) { run.deliverable = e.target.value; saveRun(); syncGate(); });
+    $("f-card").addEventListener("change", function (e) { run.dingoCardId = e.target.value; saveRun(); });
+    $("f-localns").addEventListener("input", function (e) { run.params.localNS = e.target.value; saveRun(); syncGate(); });
+    $("f-rhyme").addEventListener("input", function (e) { run.params.rhyme = e.target.value; saveRun(); syncGate(); });
+    $("f-nsconfirmed").addEventListener("change", function (e) { run.params.nsConfirmed = e.target.checked; saveRun(); syncGate(); });
+    $("f-ethics").addEventListener("change", function (e) { run.params.ethics = e.target.value; saveRun(); });
+    $("f-mode").addEventListener("change", function (e) { run.params.executionMode = e.target.value; saveRun(); });
+    $("f-intensity").addEventListener("change", function (e) {
+      run.params.intensity = e.target.value;
+      var preset = { "CASUAL": 25, "PRIMAL": 95, "PRIMAL+": 100, "DRIVEN": 85 };
+      if (preset[e.target.value] != null) { run.params.intensityPct = preset[e.target.value]; $("f-intensitypct").value = preset[e.target.value]; }
+      saveRun();
+    });
+    $("f-intensitypct").addEventListener("input", function (e) { run.params.intensityPct = Number(e.target.value) || 0; saveRun(); });
+    $("f-move37").addEventListener("change", function (e) { run.params.move37 = e.target.checked; saveRun(); });
+    $("f-erc").addEventListener("change", function (e) { run.params.erc = e.target.checked; saveRun(); syncGate(); });
+    $("f-ercnote").addEventListener("input", function (e) { run.params.ercNote = e.target.value; saveRun(); syncGate(); });
+    ws.querySelectorAll("[data-salt]").forEach(function (el) {
+      el.addEventListener("change", function () { run.params.salts[el.getAttribute("data-salt")] = el.checked; saveRun(); syncGate(); });
+    });
+    bindGate("g0-approve", "g0-decline", function () {
+      if (!gateComplete()) { toast("HALT — the gate is not satisfied."); return; }
+      completePhase(0, "N/A", null, null);
+      toast("Phase 0 Status: COMPLETE. Proceed to Phase 1.");
+      renderTracker();
+    });
+    syncGate();
+  }
+
+  /* ---------- PHASE 1 — The Assessor ---------- */
+  function renderPhase1(ws) {
+    if (!run.baselineDims) {
+      run.baselineDims = {};
+      DIMS.forEach(function (d) { run.baselineDims[d.k] = { score: 14, gap: "" }; });
+      saveRun();
+    }
+    var cells = DIMS.map(function (d) {
+      var v = run.baselineDims[d.k];
+      return '<div class="dimcell"><div class="dn">' + esc(d.k) + ' /20</div><div class="dq">' + esc(d.q) + "</div>" +
+        '<input type="number" min="0" max="20" data-dim="' + esc(d.k) + '" value="' + Number(v.score) + '">' +
+        '<input type="text" data-gap="' + esc(d.k) + '" value="' + esc(v.gap) + '" placeholder="GAP — what&#39;s missing">' +
+      "</div>";
+    }).join("");
+    ws.innerHTML =
+      '<div class="ph">Phase 1 — System of Record · The Assessor · threshold <span style="color:var(--gold)">80/100</span></div>' +
+      '<p class="muted" style="font-size:12.5px">Rigorous baseline across the 5 dimensions, through the North Star lens. Honesty rule (ULL-P heritage): “First drafts are usually 60-70. Don&#39;t score your own V1 at 85 just to look good.”</p>' +
+      '<div class="dimgrid">' + cells + "</div>" +
+      '<div class="fld"><label>Critical findings (design decisions get flagged for Tim — never silently fixed)</label>' +
+        '<textarea id="f-critical" placeholder="e.g. Critical Finding: The 15% Ambiguity — a design decision flagged for Tim, not silently fixed.">' + esc(run.criticalFindings || "") + "</textarea></div>" +
+      '<div id="p1-status"></div>' +
+      proofBlock() +
+      gateButtons("Approve — record baseline · proceed", "g1-approve", "g1-decline");
+
+    function syncP1() {
+      var total = baselineTotal();
+      var vals = DIMS.map(function (d) { return Number(run.baselineDims[d.k].score || 0); });
+      var min = Math.min.apply(null, vals);
+      var ok = total >= 80 && min >= 15;
+      $("p1-status").innerHTML = ok
+        ? '<div class="status-row ok"><span class="st">PASS</span><span class="grow">BASELINE TOTAL <b class="num">' + total + "/100</b> — ≥80 and no dimension below 15. Proceed with identified gaps.</span></div>"
+        : '<div class="status-row bad"><span class="st">BELOW</span><span class="grow">BASELINE TOTAL <b class="num">' + total + "/100</b> (min dimension " + min + "/20). Below threshold → fix-and-rescore before proceeding. Approve stays blocked.</span></div>";
+      var btn = $("g1-approve"); if (btn) btn.disabled = !ok;
+      renderScoreStrip();
+    }
+    ws.querySelectorAll("[data-dim]").forEach(function (el) {
+      el.addEventListener("input", function () {
+        var v = Math.max(0, Math.min(20, Number(el.value) || 0));
+        run.baselineDims[el.getAttribute("data-dim")].score = v; saveRun(); syncP1();
+      });
+    });
+    ws.querySelectorAll("[data-gap]").forEach(function (el) {
+      el.addEventListener("input", function () { run.baselineDims[el.getAttribute("data-gap")].gap = el.value; saveRun(); });
+    });
+    $("f-critical").addEventListener("input", function (e) { run.criticalFindings = e.target.value; saveRun(); });
+    bindGate("g1-approve", "g1-decline", function () {
+      var total = baselineTotal();
+      completePhase(1, total + "/100 baseline", null, total);
+      if (run.mode === "quick") { toast("Quick Scan complete — Phases 0 + 1 only."); }
+      else { toast("Baseline recorded: " + total + "/100. Phase 2 — Best Practice Junkie."); }
+      renderTracker();
+    });
+    syncP1();
+  }
+
+  /* ---------- QUICK SCAN report ---------- */
+  function renderQuickReport(ws) {
+    var b = baselineTotal();
+    var rows = DIMS.map(function (d) { return { k: d.k, score: Number(run.baselineDims[d.k].score || 0), gap: run.baselineDims[d.k].gap }; });
+    var sorted = rows.slice().sort(function (a, b2) { return a.score - b2.score; });
+    var est = rows.reduce(function (s, r) { return s + Math.max(0, 18 - r.score); }, 0);
+    est = Math.min(est, 100 - b);
+    ws.innerHTML =
+      '<div class="ph">Quick Scan — COMPLETE (Phase 0 + Phase 1 only)</div>' +
+      '<div class="row" style="margin:8px 0">' + ring("Baseline", b, b >= 80 ? "green" : "red", "5×20 through the North Star lens") +
+        ring("Est. full-protocol", Math.min(100, b + est), "cyan", "estimated improvement ≈ +" + est + " pts") + "</div>" +
+      '<div class="ph" style="margin-top:14px">Top gaps (lowest dimensions first)</div>' +
+      "<table><thead><tr><th>Dimension</th><th>Score</th><th>Gap</th></tr></thead><tbody>" +
+      sorted.map(function (r) { return "<tr><td>" + esc(r.k) + '</td><td class="num">' + r.score + "/20</td><td>" + esc(r.gap || "—") + "</td></tr>"; }).join("") +
+      "</tbody></table>" +
+      '<p class="footnote">Estimate = sum of each dimension&#39;s gap to the 18/20 certification floor, capped at 100 — computed from your entered scores, never asserted. The full protocol (Phases 2–8) is where the points come from.</p>' +
+      '<div class="verdicts">' +
+        '<button class="btn approve" id="qs-promote">Approve — promote to FULL RUN (continue at Phase 2)</button>' +
+        '<button class="btn" id="qs-new">New run</button>' +
+      "</div>";
+    $("qs-promote").addEventListener("click", function () {
+      run.mode = "full"; saveRun(); renderTracker();
+      toast("Promoted to FULL RUN — Phases 0 + 1 already in the ledger; continuing at Phase 2. (Continuation, not a skip.)");
+    });
+    $("qs-new").addEventListener("click", function () { startPicker(); });
+  }
+
+  /* ---------- PHASE 2 — BPJ ---------- */
+  function renderPhase2(ws) {
+    var sugg = run.suggestions.map(function (s, i) {
+      return '<div class="sugg-row"><span class="gchip ' + esc(s.label) + '">' + esc(s.label) + '</span>' +
+        '<span class="grow">' + esc(s.text) + '</span><span class="num muted">+' + Number(s.pts || 0) + ' pts</span>' +
+        '<span class="x" data-del="' + i + '" title="remove">✕</span></div>';
+    }).join("") || '<p class="muted" style="font-size:12px">No suggestions yet — add labeled suggestions below.</p>';
+    var swarmHtml = run.params.move37 ?
+      '<div class="grid2" style="margin-top:10px">' +
+        '<div class="fld"><label>Swarm Mind One — JTBD Orphan Hunter</label>' +
+          '<textarea id="f-orphan" placeholder="what job is this phase trying to do, and who else in the world — in medicine, aviation, law, science, intelligence — has already solved that job? List the stolen solutions per domain.">' + esc(run.swarm.orphan) + "</textarea>" +
+          '<div class="hint">JTBD IS Clayton Christensen — the single most important Timmyisms correction.</div></div>' +
+        '<div class="fld"><label>Swarm Mind Two — Pure Innovation Swarm</label>' +
+          '<textarea id="f-pure" placeholder="frontier ideas that simply did not exist before — rate each BREAKTHROUGH / VISIONARY / DISRUPTIVE.">' + esc(run.swarm.pure) + "</textarea></div>" +
+      "</div>" :
+      '<p class="footnote">Move 37 Extreme is OFF for this run — Swarm Minds parked.</p>';
+    ws.innerHTML =
+      '<div class="ph">Phase 2 — System of Innovation · Best Practice Junkie (BPJ)</div>' +
+      '<p class="muted" style="font-size:12.5px">External research, gap analysis, <b>labeled suggestions</b>: <span class="gchip GREEN">GREEN</span> directly applicable · <span class="gchip BLUE">BLUE</span> novel combination (technically sound, needs testing) · <span class="gchip AMBER">AMBER</span> advanced concept (V2/V3 territory, needs deeper work).</p>' +
+      "<div>" + sugg + "</div>" +
+      '<div class="row" style="margin:10px 0">' +
+        '<select id="s-label" style="width:110px"><option>GREEN</option><option>BLUE</option><option>AMBER</option></select>' +
+        '<input type="text" id="s-text" style="flex:1; min-width:200px" placeholder="the suggestion…">' +
+        '<input type="number" id="s-pts" min="0" max="20" value="2" title="estimated improvement points">' +
+        '<button class="btn" id="s-add">Add</button>' +
+      "</div>" +
+      '<div id="p2-status"></div>' +
+      swarmHtml +
+      proofBlock() +
+      gateButtons("Approve — log suggestions · proceed to the Guardians", "g2-approve", "g2-decline");
+    function syncP2() {
+      var pts = p2pts(), proj = projectedFinal();
+      $("p2-status").innerHTML = '<div class="status-row ok"><span class="st">EST</span><span class="grow">Estimated improvement <b class="num">+' + pts + " pts</b> → post-innovation projected <b class=\"num\">" + proj + "/100</b> — logged to the ledger on Approve.</span></div>";
+      renderScoreStrip();
+    }
+    $("s-add").addEventListener("click", function () {
+      var t = $("s-text").value.trim();
+      if (!t) { toast("Write the suggestion first."); return; }
+      run.suggestions.push({ label: $("s-label").value, text: t, pts: Number($("s-pts").value) || 0 });
+      saveRun(); renderWorkspace(); renderScoreStrip();
+    });
+    ws.querySelectorAll("[data-del]").forEach(function (el) {
+      el.addEventListener("click", function () { run.suggestions.splice(Number(el.getAttribute("data-del")), 1); saveRun(); renderWorkspace(); renderScoreStrip(); });
+    });
+    var fo = $("f-orphan"); if (fo) fo.addEventListener("input", function (e) { run.swarm.orphan = e.target.value; saveRun(); });
+    var fp = $("f-pure"); if (fp) fp.addEventListener("input", function (e) { run.swarm.pure = e.target.value; saveRun(); });
+    bindGate("g2-approve", "g2-decline", function () {
+      completePhase(2, "+" + p2pts() + " pts → projected " + projectedFinal() + "/100", baselineTotal(), projectedFinal());
+      renderTracker();
+    });
+    syncP2();
+  }
+
+  /* ---------- PHASE 3 — Society of Guardians ---------- */
+  function renderPhase3(ws) {
+    var gHtml = run.guardians.map(function (g, i) {
+      var meta = GUARDIANS[i];
+      return '<div class="guardian"><div class="gname">' + esc(g.name) + '</div>' +
+        '<div class="grole">' + esc(meta.role) + " · Focus: " + esc(meta.focus) + "</div>" +
+        '<textarea data-gch="' + i + '" placeholder="Challenge…">' + esc(g.challenge) + "</textarea>" +
+        '<textarea data-grs="' + i + '" placeholder="Response…">' + esc(g.response) + "</textarea>" +
+        '<textarea data-gmt="' + i + '" placeholder="Mitigation…">' + esc(g.mitigation) + "</textarea>" +
+        '<div class="row" style="margin-top:6px"><span class="muted" style="font-size:11px">Verdict:</span>' +
+        '<select data-gvd="' + i + '" style="width:auto">' +
+          ["PASS", "PASS with reservations", "FAIL"].map(function (o) { return "<option" + (g.verdict === o ? " selected" : "") + ">" + o + "</option>"; }).join("") +
+        "</select></div></div>";
+    }).join("");
+    var aHtml = run.audit.map(function (a, i) {
+      var meta = AUDIT_DIMS[i];
+      return "<tr><td><b>" + esc(a.dim) + "</b><br><span class=\"soft\" style=\"font-size:10.5px\">" + esc(meta.d) + "</span></td>" +
+        '<td><select data-avd="' + i + '" style="width:auto">' +
+          ["PASS", "AMBER", "FAIL"].map(function (o) { return "<option" + (a.result === o ? " selected" : "") + ">" + o + "</option>"; }).join("") +
+        "</select></td>" +
+        '<td><input type="text" data-ant="' + i + '" value="' + esc(a.note) + '" placeholder="constraint / finding"></td></tr>';
+    }).join("");
+    ws.innerHTML =
+      '<div class="ph">Phase 3 — System of Adversarial Integrity · Society of Guardians</div>' +
+      gHtml +
+      '<div class="ph" style="margin-top:14px">Accessibility &amp; Inclusion Audit — mandatory, 5 dimensions</div>' +
+      "<table><thead><tr><th>Dimension</th><th>Result</th><th>Note</th></tr></thead><tbody>" + aHtml + "</tbody></table>" +
+      '<div id="p3-status"></div>' +
+      proofBlock() +
+      gateButtons("Approve — record verdicts · toward Phase 4", "g3-approve", "g3-decline");
+    function syncP3() {
+      var v = guardianVerdict();
+      var ambers = run.audit.filter(function (a) { return a.result === "AMBER"; });
+      var fails = run.audit.filter(function (a) { return a.result === "FAIL"; });
+      var html = "";
+      if (v === "FAIL") {
+        html += '<div class="status-row bad"><span class="st">FAIL</span><span class="grow">A Guardian FAIL forces rework (lineage rule from V8.2: FAIL → back to Phase 1). Approve becomes “rework”.</span></div>';
+      } else {
+        html += '<div class="status-row ok"><span class="st">' + esc(v === "PASS" ? "PASS" : "PASS*") + '</span><span class="grow">Phase 3 Verdict: ' + esc(v) + ".</span></div>";
+      }
+      if (ambers.length) html += '<div class="status-row warn"><span class="st">' + ambers.length + ' AMBER</span><span class="grow">AMBERs become <b>binding design constraints</b> on the card: ' + esc(ambers.map(function (a) { return a.dim + (a.note ? " (" + a.note + ")" : ""); }).join(" · ")) + "</span></div>";
+      if (fails.length) html += '<div class="status-row bad"><span class="st">' + fails.length + ' FAIL</span><span class="grow">Audit FAILs must be addressed before certification.</span></div>';
+      $("p3-status").innerHTML = html;
+      var btn = $("g3-approve");
+      if (btn) btn.textContent = (v === "FAIL") ? "Approve — record FAIL · rework from Phase 1" : "Approve — record verdicts · toward Phase 4";
+    }
+    ws.querySelectorAll("[data-gch]").forEach(function (el) { el.addEventListener("input", function () { run.guardians[Number(el.getAttribute("data-gch"))].challenge = el.value; saveRun(); }); });
+    ws.querySelectorAll("[data-grs]").forEach(function (el) { el.addEventListener("input", function () { run.guardians[Number(el.getAttribute("data-grs"))].response = el.value; saveRun(); }); });
+    ws.querySelectorAll("[data-gmt]").forEach(function (el) { el.addEventListener("input", function () { run.guardians[Number(el.getAttribute("data-gmt"))].mitigation = el.value; saveRun(); }); });
+    ws.querySelectorAll("[data-gvd]").forEach(function (el) { el.addEventListener("change", function () { run.guardians[Number(el.getAttribute("data-gvd"))].verdict = el.value; saveRun(); syncP3(); }); });
+    ws.querySelectorAll("[data-avd]").forEach(function (el) { el.addEventListener("change", function () { run.audit[Number(el.getAttribute("data-avd"))].result = el.value; saveRun(); syncP3(); }); });
+    ws.querySelectorAll("[data-ant]").forEach(function (el) { el.addEventListener("input", function () { run.audit[Number(el.getAttribute("data-ant"))].note = el.value; saveRun(); }); });
+    bindGate("g3-approve", "g3-decline", function () {
+      var v = guardianVerdict();
+      if (v === "FAIL") {
+        delete run.ledger[1]; delete run.ledger[2]; delete run.ledger[3];
+        run.currentPhase = 1; saveRun(); renderTracker();
+        toast("Guardian FAIL — back to Phase 1 (rework). The Assessor re-scores.");
+        return;
+      }
+      completePhase(3, v, null, null);
+      renderTracker();
+    });
+    syncP3();
+  }
+
+  /* ---------- MID-PROTOCOL SELF-AUDIT + PHASE 4 ---------- */
+  function openMidAudit() {
+    var list = $("midaudit-list");
+    list.innerHTML = MID_AUDIT.map(function (q, i) {
+      return '<label class="checkline"><input type="checkbox" data-ma="' + i + '"' + (run.midAudit[i] ? " checked" : "") + "> " + (i + 1) + ". " + esc(q) + "</label>";
+    }).join("");
+    var back = $("midaudit-back");
+    back.classList.add("open");
+    function syncMA() {
+      $("midaudit-verify").disabled = !run.midAudit.every(Boolean);
+    }
+    list.querySelectorAll("[data-ma]").forEach(function (el) {
+      el.addEventListener("change", function () { run.midAudit[Number(el.getAttribute("data-ma"))] = el.checked; saveRun(); syncMA(); });
+    });
+    syncMA();
+  }
+  function renderPhase4(ws) {
+    if (!run.midAuditDone) {
+      ws.innerHTML =
+        '<div class="ph">★ Mid-Protocol Self-Audit — hard gate before Phase 4</div>' +
+        '<div class="halt"><b>Phase 4 is locked.</b> Before producing any Phase 4 output, the 8-point Mid-Protocol Self-Audit must verify 8/8.</div>' +
+        '<div class="verdicts"><button class="btn gold-cta" id="open-midaudit">Open the Mid-Protocol Self-Audit</button></div>';
+      $("open-midaudit").addEventListener("click", openMidAudit);
+      return;
+    }
+    var p4 = run.phase4;
+    ws.innerHTML =
+      '<div class="ph">Phase 4 — System of Communication · The Presenter</div>' +
+      '<p class="muted" style="font-size:12.5px">“Swiss-style presentation + downloadable reference documents (BOTH mandatory).” The Barstool Conversation format is the Swiss-style equivalent for non-technical North Stars — “it translates complex concepts into consumable, visual-friendly language.”</p>' +
+      '<label class="checkline"><input type="checkbox" id="f-pres"' + (p4.presentation ? " checked" : "") + "> Swiss-style presentation (or Barstool equivalent) produced</label>" +
+      '<label class="checkline"><input type="checkbox" id="f-docs"' + (p4.refdocs ? " checked" : "") + "> Downloadable reference documents produced</label>" +
+      '<div class="fld"><label>Clarity delta (points gained from communication work)</label>' +
+        '<input type="number" id="f-p4delta" min="0" max="20" value="' + Number(p4.delta) + '">' +
+        '<div class="hint">Get&#39;rDone fixture: “+2 pts, running score 90/100.”</div></div>' +
+      '<div id="p4-status"></div>' +
+      proofBlock() +
+      gateButtons("Approve — log clarity delta · proceed", "g4-approve", "g4-decline");
+    function syncP4() {
+      var both = p4.presentation && p4.refdocs;
+      var btn = $("g4-approve"); if (btn) btn.disabled = !both;
+      var rt = Math.min(100, (baselineTotal() || 0) + p2pts() + Number(p4.delta || 0));
+      $("p4-status").innerHTML = both
+        ? '<div class="status-row ok"><span class="st">OK</span><span class="grow">+' + Number(p4.delta || 0) + " pts, running score <b class=\"num\">" + rt + "/100</b>.</span></div>"
+        : '<div class="status-row bad"><span class="st">BOTH</span><span class="grow">Both artifacts are mandatory — Approve stays blocked until both boxes are checked.</span></div>';
+    }
+    $("f-pres").addEventListener("change", function (e) { p4.presentation = e.target.checked; saveRun(); syncP4(); });
+    $("f-docs").addEventListener("change", function (e) { p4.refdocs = e.target.checked; saveRun(); syncP4(); });
+    $("f-p4delta").addEventListener("input", function (e) { p4.delta = Math.max(0, Number(e.target.value) || 0); saveRun(); syncP4(); renderScoreStrip(); });
+    bindGate("g4-approve", "g4-decline", function () {
+      var before = Math.min(100, (baselineTotal() || 0) + p2pts());
+      var after = Math.min(100, before + Number(p4.delta || 0));
+      completePhase(4, "+" + Number(p4.delta || 0) + " pts, running score " + after + "/100", before, after);
+      renderTracker();
+    });
+    syncP4();
+  }
+
+  /* ---------- PHASE 5 — Protocol Engineer ---------- */
+  function renderPhase5(ws) {
+    var p5 = run.phase5;
+    var spiritHtml = SPIRIT_DIMS.map(function (d, i) {
+      return '<div class="row" style="margin:5px 0"><span style="flex:1; font-size:12.5px">' + esc(d) + "</span>" +
+        '<select data-sp="' + i + '" style="width:auto">' +
+          ["INTACT", "DRIFTED"].map(function (o) { return "<option" + (p5.spirit[d] === o ? " selected" : "") + ">" + o + "</option>"; }).join("") +
+        "</select></div>";
+    }).join("");
+    var amendHtml = p5.amendments.map(function (a, i) {
+      return '<div class="sugg-row"><span class="pill warn">pending</span><span class="grow"><b>' + esc(a.title) + "</b> — " + esc(a.rationale) + '</span><span class="x" data-amdel="' + i + '">✕</span></div>';
+    }).join("") || '<p class="muted" style="font-size:12px">No amendments proposed on this run.</p>';
+    ws.innerHTML =
+      '<div class="ph">Phase 5 — System of Evolution · Protocol Engineer</div>' +
+      '<div class="ph" style="margin-top:10px">Spirit Check — 4 drift dimensions, each with evidence</div>' + spiritHtml +
+      '<div class="ph" style="margin-top:14px">Proposed amendments → evolution queue (pending human approval)</div>' + amendHtml +
+      '<div class="row" style="margin:8px 0">' +
+        '<input type="text" id="am-title" style="flex:1; min-width:160px" placeholder="amendment title">' +
+        '<input type="text" id="am-rat" style="flex:2; min-width:200px" placeholder="proposed change + rationale">' +
+        '<button class="btn" id="am-add">Queue amendment</button></div>' +
+      '<div class="fld"><label>Gamification Gift-Back (achievement or reusable template this run gives back)</label>' +
+        '<input type="text" id="f-giftback" value="' + esc(p5.giftBack) + '" placeholder="e.g. Achievement Unlocked: &#39;Orphan Collector&#39; · a reusable Barstool template"></div>' +
+      '<div id="p5-status"></div>' +
+      proofBlock() +
+      gateButtons("Approve — record Spirit Check · proceed to The Judge", "g5-approve", "g5-decline");
+    function syncP5() {
+      var n = spiritCount();
+      $("p5-status").innerHTML = '<div class="status-row ' + (n === 4 ? "ok" : "warn") + '"><span class="st">' + n + '/4</span><span class="grow">Spirit Check ' + n + "/4 INTACT" + (n < 4 ? " — drifted dimensions need evidence and surface in Phase 7." : ".") + "</span></div>";
+    }
+    ws.querySelectorAll("[data-sp]").forEach(function (el) {
+      el.addEventListener("change", function () { p5.spirit[SPIRIT_DIMS[Number(el.getAttribute("data-sp"))]] = el.value; saveRun(); syncP5(); });
+    });
+    ws.querySelectorAll("[data-amdel]").forEach(function (el) {
+      el.addEventListener("click", function () { p5.amendments.splice(Number(el.getAttribute("data-amdel")), 1); saveRun(); renderWorkspace(); });
+    });
+    $("am-add").addEventListener("click", function () {
+      var t = $("am-title").value.trim(), r = $("am-rat").value.trim();
+      if (!t) { toast("Amendment needs a title."); return; }
+      p5.amendments.push({ title: t, rationale: r, status: "pending" });
+      saveRun(); renderWorkspace();
+    });
+    $("f-giftback").addEventListener("input", function (e) { p5.giftBack = e.target.value; saveRun(); });
+    bindGate("g5-approve", "g5-decline", function () {
+      p5.amendments.forEach(function (a) {
+        evolutionQueue.push({ ts: new Date().toISOString(), run: run.deliverable, sessionId: run.sessionId, title: a.title, rationale: a.rationale, status: "pending", reviewedBy: null, reviewedAt: null });
+      });
+      lsSet(LS_EVO, evolutionQueue);
+      completePhase(5, "Spirit Check " + spiritCount() + "/4 INTACT", null, null);
+      renderTracker(); renderEvolution();
+    });
+    syncP5();
+  }
+
+  /* ---------- PHASE 6 — The Judge (Blue Seal) ---------- */
+  function renderPhase6(ws) {
+    if (!run.finalDims) {
+      run.finalDims = {};
+      DIMS.forEach(function (d) { run.finalDims[d.k] = Number(run.baselineDims[d.k].score || 0); });
+      saveRun();
+    }
+    var cells = DIMS.map(function (d) {
+      return '<div class="dimcell"><div class="dn">' + esc(d.k) + ' /20</div>' +
+        '<div class="dq">baseline ' + Number(run.baselineDims[d.k].score || 0) + "/20</div>" +
+        '<input type="number" min="0" max="20" data-fdim="' + esc(d.k) + '" value="' + Number(run.finalDims[d.k]) + '"></div>';
+    }).join("");
+    ws.innerHTML =
+      '<div class="ph">Phase 6 — System of Certification · The Judge · <span style="color:var(--blue)">THE BLUE SEAL STAMP</span></div>' +
+      '<p class="muted" style="font-size:12.5px">Final audit at <b>90/100, no dimension below 18/20</b>. CERTIFIED 90+ all dims 18+ · CONDITIONAL 85-89, or one dimension below 18 but above 15 · NOT CERTIFIED below 85, or any dimension below 15. The Judge does not inflate: a fix that is “a design decision, not a documentation error… requires Tim&#39;s resolution.”</p>' +
+      '<div class="dimgrid">' + cells + "</div>" +
+      '<div class="fld" id="cond-wrap" style="display:none"><label>Condition (verbatim — required for CONDITIONAL)</label>' +
+        '<input type="text" id="f-cond" value="' + esc(run.conditionText) + '" placeholder="e.g. Full certification upon resolution of 15% Rule ambiguity"></div>' +
+      '<div id="p6-status"></div>' +
+      '<div class="row" style="margin:12px 0; align-items:flex-start"><div id="seal-prev"></div><div style="flex:1; min-width:260px" id="cert-prev"></div></div>' +
+      proofBlock() +
+      gateButtons("Approve — stamp & record the certificate", "g6-approve", "g6-decline");
+    function certNow() {
+      var vals = DIMS.map(function (d) { return Number(run.finalDims[d.k] || 0); });
+      var total = vals.reduce(function (a, b) { return a + b; }, 0);
+      return { total: total, vals: vals, cert: certOf(total, vals) };
+    }
+    function buildCertBlock(c) {
+      var scoreLine = c.cert === "CONDITIONAL" ? c.total + "/100 — CERTIFIED (CONDITIONAL)" : c.total + "/100 — " + c.cert;
+      var driftLabel = run.skipAttempts.length ? run.skipAttempts.length + " phase_skip attempt(s) flagged" : "NONE";
+      var spiritLabel = spiritCount() === 4 ? "INTACT" : "DRIFTED (" + spiritCount() + "/4)";
+      var lines = [HEAVY,
+        "LEARNING LOOP V13.0 CERTIFICATION",
+        "Deliverable: " + (run.deliverable || "[name]"),
+        "Score: " + scoreLine];
+      if (c.cert === "CONDITIONAL" && (run.conditionText || "").trim()) lines.push("Condition: " + run.conditionText.trim());
+      lines.push("North Star: " + run.params.localNS + " — " + run.params.ethics);
+      lines.push("Intensity: " + run.params.intensity + " (" + run.params.intensityPct + "%) | Drift: " + driftLabel + " | Spirit: " + spiritLabel);
+      lines.push("Date: " + new Date().toISOString().slice(0, 10));
+      lines.push(HEAVY);
+      return lines.join("\n");
+    }
+    function syncP6() {
+      var c = certNow();
+      run.certification = c.cert; saveRun();
+      $("cond-wrap").style.display = c.cert === "CONDITIONAL" ? "block" : "none";
+      var sealCls = c.cert === "CERTIFIED" ? "" : (c.cert === "CONDITIONAL" ? " conditional" : " none");
+      $("seal-prev").innerHTML = '<div class="blueseal' + sealCls + '"><div>Blue Seal<br>' + esc(c.cert) + '<div class="v13">V13.0</div></div></div>';
+      $("cert-prev").innerHTML = '<pre class="cert' + (c.cert === "CONDITIONAL" ? " conditional" : "") + '">' + esc(buildCertBlock(c)) + "</pre>" +
+        (c.cert === "CONDITIONAL" ? '<div class="status-row warn"><span class="st">HIL</span><span class="grow">CONDITIONAL: the stamp renders amber with the condition verbatim. “Resolve condition” routes to Tim — <a href="command.html">the HIL queue on the Command Deck</a>.</span></div>' : "") +
+        (c.cert === "NOT CERTIFIED" ? '<div class="status-row bad"><span class="st">NO</span><span class="grow">NOT CERTIFIED — below 85 or a dimension below 15. Record it honestly; rework runs again.</span></div>' : "");
+      var statusCls = c.cert === "CERTIFIED" ? "ok" : (c.cert === "CONDITIONAL" ? "warn" : "bad");
+      $("p6-status").innerHTML = '<div class="status-row ' + statusCls + '"><span class="st">' + c.total + '/100</span><span class="grow">Computed verdict: <b>' + esc(c.cert) + "</b> (min dimension " + Math.min.apply(null, c.vals) + "/20) — computed from the entered scores, never asserted.</span></div>";
+      var btn = $("g6-approve");
+      if (btn) btn.disabled = (c.cert === "CONDITIONAL" && !(run.conditionText || "").trim());
+      renderScoreStrip();
+    }
+    ws.querySelectorAll("[data-fdim]").forEach(function (el) {
+      el.addEventListener("input", function () {
+        run.finalDims[el.getAttribute("data-fdim")] = Math.max(0, Math.min(20, Number(el.value) || 0));
+        saveRun(); syncP6();
+      });
+    });
+    $("f-cond").addEventListener("input", function (e) { run.conditionText = e.target.value; saveRun(); syncP6(); });
+    bindGate("g6-approve", "g6-decline", function () {
+      var c = certNow();
+      run.certification = c.cert;
+      run.certificateBlock = buildCertBlock(c);
+      if (c.cert !== "NOT CERTIFIED") run.blueSealStampedAt = new Date().toISOString();
+      var kpiLabel = c.cert === "CONDITIONAL" ? c.total + "/100 — CERTIFIED (CONDITIONAL)" : c.total + "/100 — " + c.cert;
+      completePhase(6, kpiLabel, runningTotal(), c.total);
+      renderTracker();
+      toast(c.cert === "CERTIFIED" ? "Blue Seal stamped. The Watchman takes over — Phase 7." : "Verdict recorded: " + c.cert + ". Phase 7 — Drift Agent.");
+    });
+    syncP6();
+  }
+
+  /* ---------- PHASE 7 — Drift Agent ---------- */
+  function renderPhase7(ws) {
+    var rows = run.drift.map(function (d, i) {
+      var sevOpts = SEVERITIES.map(function (s) { return "<option" + (d.severity === s ? " selected" : "") + ">" + s + "</option>"; }).join("");
+      var hitl = "";
+      if (d.severity !== "none") {
+        if (d.hitl === "accepted") hitl = '<span class="pill good">HiTL: accepted</span>';
+        else if (d.hitl === "rejected") hitl = '<span class="pill danger">HiTL: rejected → rollback ' + (d.rollbackExecuted ? "executed" : "queued") + "</span>";
+        else hitl = '<button class="btn approve" data-acc="' + i + '" style="padding:3px 10px; font-size:11px">Approve — accept drift</button>' +
+                    '<button class="btn decline" data-rej="' + i + '" style="padding:3px 10px; font-size:11px">Decline — reject → rollback</button>';
+      }
+      var prefill = (d.type === "phase_skip" && !d.evidence && run.skipAttempts.length) ?
+        run.skipAttempts.length + " skip attempt(s) logged by the tracker" : d.evidence;
+      return '<div class="drift-row"><code>' + esc(d.type) + "</code>" +
+        '<select data-sev="' + i + '">' + sevOpts + "</select>" +
+        '<input type="text" data-ev="' + i + '" style="flex:1; min-width:160px" value="' + esc(prefill) + '" placeholder="evidence (original vs current state)">' +
+        hitl + "</div>";
+    }).join("");
+    var ov = driftOverall();
+    var pendingHitl = driftFindings().some(function (d) { return !d.hitl; });
+    ws.innerHTML =
+      '<div class="ph">Phase 7 — Drift Agent · The Watchman</div>' +
+      '<p class="muted" style="font-size:12.5px">Ongoing alignment monitoring + environment-wide scanning. The seven drift types each get a row; severity NONE / MINOR / MODERATE / MAJOR / CRITICAL. Findings need an HiTL decision; rejected drift triggers rollback (Rollback Coordinates: checkpointId, phase, score, timestamp).</p>' +
+      rows +
+      '<div class="status-row ' + (ov.status === "clean" ? "ok" : (ov.status === "minor_drift" ? "warn" : "bad")) + '"><span class="st">' + esc(ov.status.replace("_", " ")) + '</span><span class="grow">Drift Agent Verdict: ' + esc(ov.label) + "</span></div>" +
+      (pendingHitl ? '<div class="halt"><b>HiTL pending.</b> Every finding needs an accept/reject decision before the scan closes.</div>' : "") +
+      proofBlock() +
+      gateButtons("Approve — close the drift scan · summon The Genie", "g7-approve", "g7-decline");
+    ws.querySelectorAll("[data-sev]").forEach(function (el) {
+      el.addEventListener("change", function () {
+        var d = run.drift[Number(el.getAttribute("data-sev"))];
+        d.severity = el.value;
+        if (d.severity === "none") { d.hitl = null; d.rollbackExecuted = false; }
+        saveRun(); renderWorkspace();
+      });
+    });
+    ws.querySelectorAll("[data-ev]").forEach(function (el) {
+      el.addEventListener("input", function () { run.drift[Number(el.getAttribute("data-ev"))].evidence = el.value; saveRun(); });
+    });
+    ws.querySelectorAll("[data-acc]").forEach(function (el) {
+      el.addEventListener("click", function () { run.drift[Number(el.getAttribute("data-acc"))].hitl = "accepted"; saveRun(); renderWorkspace(); });
+    });
+    ws.querySelectorAll("[data-rej]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var d = run.drift[Number(el.getAttribute("data-rej"))];
+        d.hitl = "rejected";
+        d.rollbackCoordinates = { checkpointId: run.sessionId + "-P" + (run.currentPhase - 1), phase: run.currentPhase - 1, score: runningTotal(), timestamp: new Date().toISOString() };
+        d.rollbackExecuted = true;
+        saveRun(); renderWorkspace();
+        toast("Rollback logged → " + d.rollbackCoordinates.checkpointId + " (score " + d.rollbackCoordinates.score + "). Recorded, human-decided — nothing auto-applied.");
+      });
+    });
+    var btn = $("g7-approve"); if (btn) btn.disabled = pendingHitl;
+    bindGate("g7-approve", "g7-decline", function () {
+      var o = driftOverall();
+      completePhase(7, o.status === "clean" ? "CLEAR — zero drift across all 7 dimensions" : o.label, null, null);
+      renderTracker();
+    });
+  }
+
+  /* ---------- PHASE 8 — The Genie ---------- */
+  function renderPhase8(ws) {
+    var g = run.genie;
+    var b = baselineTotal(), f = finalTotal();
+    var kpiRows = DIMS.map(function (d) {
+      var bv = Number(run.baselineDims[d.k].score || 0), fv = Number(run.finalDims[d.k] || 0);
+      return "<tr><td>" + esc(d.k) + '</td><td class="num">' + bv + '/20</td><td class="num">' + fv + '/20</td><td class="num">' + (fv - bv >= 0 ? "+" : "") + (fv - bv) + "</td></tr>";
+    }).join("");
+    var labelCounts = { GREEN: 0, BLUE: 0, AMBER: 0 };
+    run.suggestions.forEach(function (s) { labelCounts[s.label] = (labelCounts[s.label] || 0) + 1; });
+    var cards = g.dingoCards.map(function (c, i) {
+      var pcls = c.priority === "CRITICAL" ? "danger" : (c.priority === "HIGH" ? "warn" : "info");
+      return '<div class="sugg-row"><span class="pill ' + pcls + '">' + esc(c.priority) + '</span><span class="grow">' + esc(c.title) + '</span><span class="x" data-dcdel="' + i + '">✕</span></div>';
+    }).join("") || '<p class="muted" style="font-size:12px">No DINGO cards spawned yet.</p>';
+    ws.innerHTML =
+      '<div class="ph">Phase 8 — The Genie · Persistent Learning Agent · PERSISTENCE</div>' +
+      '<div class="ph" style="margin-top:10px">1 · Cumulative KPI Report (computed)</div>' +
+      "<table><thead><tr><th>Dimension</th><th>Baseline</th><th>Final</th><th>Δ</th></tr></thead><tbody>" + kpiRows +
+      '<tr><td><b>TOTAL</b></td><td class="num"><b>' + b + '</b></td><td class="num"><b>' + f + '</b></td><td class="num"><b>' + (f - b >= 0 ? "+" : "") + (f - b) + "</b></td></tr></tbody></table>" +
+      '<p class="footnote">Run stats — suggestions: <span class="gchip GREEN">GREEN ' + labelCounts.GREEN + '</span> <span class="gchip BLUE">BLUE ' + labelCounts.BLUE + '</span> <span class="gchip AMBER">AMBER ' + labelCounts.AMBER + "</span> · Guardian verdict: " + esc(guardianVerdict()) + " · amendments proposed: " + run.phase5.amendments.length + " · drift findings: " + driftFindings().length + " · certification: " + esc(run.certification || "—") + "</p>" +
+      '<div class="fld"><label>2 · The Gift to the Project *</label><textarea id="f-giftproj" placeholder="The certified output becomes a vault artifact: &#39;Any future AI touching this project should load this document before responding.&#39;">' + esc(g.giftProject) + "</textarea></div>" +
+      '<div class="fld"><label>3 · The Gift to the Loop *</label><textarea id="f-giftloop" placeholder="What this run taught the protocol — e.g. &#39;V13.0 at DRIVEN intensity with Move 37 Extreme is the correct version for early-stage physical product concepts.&#39;">' + esc(g.giftLoop) + "</textarea></div>" +
+      '<div class="fld"><label>4 · Key Learnings for Persistence</label><textarea id="f-learnings" placeholder="named, transferable lessons">' + esc(g.learnings) + "</textarea></div>" +
+      '<div class="ph" style="margin-top:12px">5 · DINGO Cards generated by this run → <a href="nursery.html">the Nursery</a></div>' + cards +
+      '<div class="row" style="margin:8px 0">' +
+        '<input type="text" id="dc-title" style="flex:1; min-width:180px" placeholder="DINGO card title">' +
+        '<select id="dc-pri" style="width:130px"><option>CRITICAL</option><option>HIGH</option><option selected>MEDIUM</option></select>' +
+        '<button class="btn" id="dc-add">Spawn</button></div>' +
+      '<div class="panel tight" style="margin:12px 0"><div class="ph">6 · Persistence installation — the offer to stay</div>' +
+        '<p style="font-size:12.5px" class="muted">The Genie remains resident on this record; future runs preload all prior Learning Ledger entries. Writes are append-only (doctrine rules-engine item 6). <b>Redact $ figures and PII before the write — review your text.</b></p></div>' +
+      proofBlock() +
+      '<div class="verdicts">' +
+        '<button class="btn approve" id="g8-approve">Approve — The Genie writes the Learning Ledger (append-only)</button>' +
+        '<button class="btn modify" id="g8-approve-modify">Modify — keep editing this phase</button>' +
+        '<button class="btn decline" id="g8-decline">Decline — HALT the run</button>' +
+      "</div>";
+    function syncP8() {
+      var ok = (g.giftProject || "").trim() && (g.giftLoop || "").trim();
+      var btn = $("g8-approve"); if (btn) btn.disabled = !ok;
+    }
+    $("f-giftproj").addEventListener("input", function (e) { g.giftProject = e.target.value; saveRun(); syncP8(); });
+    $("f-giftloop").addEventListener("input", function (e) { g.giftLoop = e.target.value; saveRun(); syncP8(); });
+    $("f-learnings").addEventListener("input", function (e) { g.learnings = e.target.value; saveRun(); });
+    $("dc-add").addEventListener("click", function () {
+      var t = $("dc-title").value.trim();
+      if (!t) { toast("The DINGO card needs a title."); return; }
+      g.dingoCards.push({ title: t, priority: $("dc-pri").value });
+      saveRun(); renderWorkspace();
+    });
+    ws.querySelectorAll("[data-dcdel]").forEach(function (el) {
+      el.addEventListener("click", function () { g.dingoCards.splice(Number(el.getAttribute("data-dcdel")), 1); saveRun(); renderWorkspace(); });
+    });
+    bindGate("g8-approve", "g8-decline", function () {
+      var entry = {
+        ts: new Date().toISOString(),
+        sessionId: run.sessionId,
+        protocolVersion: run.protocolVersion,
+        deliverable: run.deliverable,
+        dingoCardId: run.dingoCardId || null,
+        northStar: { local: run.params.localNS, rhyme: run.params.rhyme, ethics: run.params.ethics },
+        intensity: run.params.intensity + " (" + run.params.intensityPct + "%)",
+        baseline: baselineTotal(), final: finalTotal(),
+        certification: run.certification, conditionText: run.conditionText || null,
+        blueSealStampedAt: run.blueSealStampedAt,
+        certificateBlock: run.certificateBlock || null,
+        giftToProject: g.giftProject, giftToLoop: g.giftLoop, keyLearnings: g.learnings,
+        dingoCardsSpawned: g.dingoCards.slice(),
+        driftStatus: driftOverall().status,
+        liturgy: LITURGY
+      };
+      learningLedger.push(entry);
+      lsSet(LS_LEDGER, learningLedger);
+      g.ledgerWritten = true;
+      completePhase(8, g.dingoCards.length + " DINGO card" + (g.dingoCards.length === 1 ? "" : "s") + " spawned" + (g.dingoCards.length ? " (" + g.dingoCards.map(function (c) { return c.priority; }).filter(function (v, i, a) { return a.indexOf(v) === i; }).join("/") + ")" : ""), null, null);
+      run.status = "completed";
+      saveRun(); renderTracker(); renderLearningLedger();
+      toast("Appended to the Learning Ledger. " + LITURGY);
+    });
+    syncP8();
+  }
+
+  /* ---------- completed view ---------- */
+  function renderDone(ws) {
+    var f = finalTotal(), b = baselineTotal();
+    var sealCls = run.certification === "CERTIFIED" ? "" : (run.certification === "CONDITIONAL" ? " conditional" : " none");
+    ws.innerHTML =
+      '<div class="ph">Run complete — ' + esc(run.deliverable || "deliverable") + "</div>" +
+      '<div class="row" style="align-items:flex-start; margin:8px 0">' +
+        '<div class="blueseal' + sealCls + '"><div>Blue Seal<br>' + esc(run.certification || "—") + '<div class="v13">V13.0</div></div></div>' +
+        '<div style="flex:1; min-width:240px">' +
+          (run.certificateBlock ? '<pre class="cert' + (run.certification === "CONDITIONAL" ? " conditional" : "") + '">' + esc(run.certificateBlock) + "</pre>" : "") +
+          '<p class="muted" style="font-size:12.5px">Improvement journey: <b class="num">' + b + "</b> (baseline) → <b class=\"num\">" + f + "</b> (final). " +
+          (run.genie.dingoCards.length ? run.genie.dingoCards.length + " DINGO card(s) handed to <a href=\"nursery.html\">the Nursery</a>. " : "") +
+          'The Genie is <span class="pill gold">RESIDENT</span> — future runs preload all prior ledger entries.</p>' +
+        "</div></div>" +
+      '<div class="liturgy">“' + esc(LITURGY) + '”<small>— the closing liturgy, verbatim. Recorded in the append-only Learning Ledger below.</small></div>' +
+      '<div class="verdicts"><button class="btn gold-cta" id="done-new">▶ New Full Run</button><button class="btn" id="done-quick">⚡ Quick Scan</button></div>';
+    $("done-new").addEventListener("click", function () { startRun("full"); });
+    $("done-quick").addEventListener("click", function () { startRun("quick"); });
+  }
+
+  /* =================== fixtures (real data) =================== */
+  function renderFixtures(data) {
+    var meta = data.meta.protocol;
+    $("phase-overview").innerHTML =
+      "<table><thead><tr><th>#</th><th>Step</th><th>Phase</th><th>Persona</th><th>What it does</th></tr></thead><tbody>" +
+      meta.phases.map(function (p) {
+        return "<tr><td>" + p.phase + "</td><td>Step " + (p.phase + 1) + "/9</td><td><b>" + esc(p.name) + "</b></td><td>" + esc(p.persona) + '</td><td style="font-size:12px" class="muted">' + esc(p.note) + "</td></tr>";
+      }).join("") + "</tbody></table>" +
+      '<p class="footnote" style="margin-top:8px">' + esc(meta.numbering_note) + " · Dimensions: " + esc(meta.dimensions.join(" · ")) + "</p>";
+
+    var hc = null, gd = null;
+    data.runs.forEach(function (r) { if (r.id === "run-honeycomb") hc = r; if (r.id === "run-getrdone") gd = r; });
+
+    var html = "";
+    if (hc) {
+      html += '<div class="panel">' +
+        '<div class="spread"><h3 style="margin:0">' + esc(hc.deliverable) + "</h3>" + Shell.pill(hc.certification, "good") + "</div>" +
+        '<p class="muted" style="font-size:12px">' + esc(hc.date) + " · " + esc(hc.intensity) + " · " + esc(hc.execution_mode) + " · Move 37 Extreme: " + esc(hc.move_37_extreme) + "</p>" +
+        '<div class="row" style="margin:10px 0">' + ring("Baseline", hc.baseline, "cyan", "") + ring("Final", hc.final, "green", esc(hc.certification_note)) + "</div>" +
+        '<div class="status-row ok"><span class="st">Salts</span><span class="grow">' + esc(hc.smelling_salts) + "</span></div>" +
+        '<div class="status-row ok"><span class="st">ERC</span><span class="grow">' + esc(hc.north_star_note) + "</span></div>" +
+        '<p style="font-size:12.5px; margin-top:10px"><b>' + hc.stats.orphan_solutions + " orphaned solutions</b> " +
+          '<span class="gchip GREEN">GREEN ' + hc.stats.orphan_solution_labels.GREEN + '</span> ' +
+          '<span class="gchip BLUE">BLUE ' + hc.stats.orphan_solution_labels.BLUE + '</span> ' +
+          '<span class="gchip AMBER">AMBER ' + hc.stats.orphan_solution_labels.AMBER + "</span></p>" +
+        '<ul class="fixture-list">' + hc.stats.orphan_domains.map(function (d) { return "<li>" + esc(d) + "</li>"; }).join("") + "</ul>" +
+        '<p style="font-size:12.5px"><b>Move 37 frontier ideas:</b> ' + esc(hc.stats.move_37_frontier_ideas.join(" · ")) + "</p>" +
+        '<p style="font-size:12.5px" class="muted">' + hc.stats.accessibility_design_constraints + " accessibility design constraints · " + hc.stats.protocol_amendments + " protocol amendments · drift: " + esc(hc.stats.drift) + "</p>" +
+        '<p style="font-size:12.5px"><b style="color:var(--gold)">Gift-Back:</b> ' + esc(hc.gift_back) + "</p>" +
+        '<p style="font-size:12.5px"><b style="color:var(--gold)">Gift to the Loop:</b> ' + esc(hc.gift_to_the_loop) + "</p>" +
+        "<blockquote style=\"font-size:12.5px\">" + esc(hc.closing_voice) + "</blockquote>" +
+        '<p class="footnote">Source: ' + esc(hc.source_path) + "</p></div>";
+    }
+    if (gd) {
+      html += '<div class="panel">' +
+        '<div class="spread"><h3 style="margin:0">' + esc(gd.deliverable) + "</h3>" + Shell.pill("CERTIFIED (CONDITIONAL)", "warn") + "</div>" +
+        '<p class="muted" style="font-size:12px">' + esc(gd.date) + " · " + esc(gd.intensity) + " · " + esc(gd.execution_mode) + " · Prime: “" + esc(gd.north_star.prime) + "” · Local: “" + esc(gd.north_star.local) + "”</p>" +
+        '<p style="font-size:12.5px"><b>Improvement journey:</b> ' + esc(gd.improvement_journey) + "</p>" +
+        '<div class="ph" style="margin-top:10px">Phase Ledger — Executive Summary (the exact tracker shape)</div>' +
+        "<table><thead><tr><th>#</th><th>Phase</th><th>Persona</th><th>KPI Score</th><th>Status</th></tr></thead><tbody>" +
+        gd.phase_ledger.map(function (r) {
+          return "<tr><td>" + r.phase + "</td><td>" + esc(r.name) + "</td><td>" + esc(r.persona) + "</td><td>" + esc(r.kpi) + '</td><td><span style="color:var(--green); font-weight:800; font-size:10px">' + esc(r.status) + "</span></td></tr>";
+        }).join("") + "</tbody></table>" +
+        '<pre class="cert conditional" style="margin-top:10px">' + esc(gd.certificate_block) + "</pre>" +
+        '<div class="status-row warn"><span class="st">Open</span><span class="grow">' + esc(gd.condition_note) + "</span></div>" +
+        '<p style="font-size:12.5px"><b>Genie:</b> ' + gd.genie_outputs.dingo_cards_generated + " DINGO cards generated (" + esc(gd.genie_outputs.dingo_cards_priority_range) + ") · Gift-Back: " + esc(gd.genie_outputs.gift_back) + "</p>" +
+        "<blockquote style=\"font-size:12.5px\">" + esc(gd.closing_liturgy) + "</blockquote>" +
+        '<p class="footnote">Source: ' + esc(gd.source_path) + "</p></div>";
+    }
+    $("fixtures").innerHTML = html || '<div class="panel"><p class="muted">No runs found in the fixture file.</p></div>';
+  }
+  function renderFixtureFallback() {
+    var msg = '<p class="muted" style="font-size:12.5px">Could not load <code>data/loop-fixtures.json</code> — when opened directly from disk some browsers block local fetch. Serve the app over HTTP (e.g. <code>python -m http.server</code> in <code>app/</code>) to see the 2 certified runs (Honeycomb Fence 82→92 CERTIFIED · Get&#39;rDone 82→90 CONDITIONAL). The tracker below still works.</p>';
+    $("phase-overview").innerHTML =
+      "<table><thead><tr><th>#</th><th>Step</th><th>Phase</th><th>Persona</th></tr></thead><tbody>" +
+      PHASES.map(function (p) { return "<tr><td>" + p.phase + "</td><td>Step " + (p.phase + 1) + "/9</td><td><b>" + esc(p.name) + "</b></td><td>" + esc(p.persona) + "</td></tr>"; }).join("") +
+      "</tbody></table>" + msg;
+    $("fixtures").innerHTML = '<div class="panel">' + msg + "</div>";
+  }
+
+  /* =================== evolution queue =================== */
+  function renderEvolution() {
+    var el = $("evolution");
+    if (!evolutionQueue.length) {
+      el.innerHTML = '<p class="muted" style="font-size:12.5px">No amendments queued yet. Phase 5 proposes them; they land here <b>pending</b> — protocol self-improvement stays human-gated. (The 2 fixture runs proposed amendments in their own era — e.g. the Barstool-format amendment from Get&#39;rDone.)</p>';
+      return;
+    }
+    el.innerHTML = evolutionQueue.map(function (a, i) {
+      var pill = a.status === "approved" ? Shell.pill("approved", "good") : (a.status === "rejected" ? Shell.pill("rejected", "danger") : Shell.pill("pending", "warn"));
+      var btns = a.status === "pending" ?
+        '<span class="verdicts" style="margin:0">' +
+        '<button class="btn approve" style="padding:3px 10px; font-size:11px" data-evapp="' + i + '">Approve</button>' +
+        '<button class="btn modify" style="padding:3px 10px; font-size:11px" data-evmod="' + i + '">Modify</button>' +
+        '<button class="btn decline" style="padding:3px 10px; font-size:11px" data-evrej="' + i + '">Decline</button></span>' :
+        '<span class="footnote">reviewed ' + esc((a.reviewedAt || "").slice(0, 10)) + "</span>";
+      return '<div class="sugg-row">' + pill + '<span class="grow"><b>' + esc(a.title) + "</b> — " + esc(a.rationale || "") + ' <span class="soft">(' + esc(a.run || "") + ")</span></span>" + btns + "</div>";
+    }).join("");
+    el.querySelectorAll("[data-evapp]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var a = evolutionQueue[Number(b.getAttribute("data-evapp"))];
+        a.status = "approved"; a.reviewedBy = "human gate (this browser)"; a.reviewedAt = new Date().toISOString();
+        lsSet(LS_EVO, evolutionQueue); renderEvolution();
+      });
+    });
+    el.querySelectorAll("[data-evrej]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var a = evolutionQueue[Number(b.getAttribute("data-evrej"))];
+        a.status = "rejected"; a.reviewedBy = "human gate (this browser)"; a.reviewedAt = new Date().toISOString();
+        lsSet(LS_EVO, evolutionQueue); renderEvolution();
+      });
+    });
+    el.querySelectorAll("[data-evmod]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var a = evolutionQueue[Number(b.getAttribute("data-evmod"))];
+        var nv = prompt("Modify the amendment (stays pending):", a.rationale || a.title);
+        if (nv != null) { a.rationale = nv; lsSet(LS_EVO, evolutionQueue); renderEvolution(); }
+      });
+    });
+  }
+
+  /* =================== learning ledger (append-only) =================== */
+  function renderLearningLedger() {
+    var el = $("ledger-log");
+    if (!learningLedger.length) {
+      el.innerHTML = '<p class="muted" style="font-size:12.5px">No Genie entries yet — complete a Phase 8 to append the first. Entries are append-only: “Any future AI touching this project should load this document before responding.” “If it is not in the vault, it does not exist.”</p>';
+      return;
+    }
+    el.innerHTML = learningLedger.slice().reverse().map(function (e) {
+      var pill = e.certification === "CERTIFIED" ? Shell.pill("CERTIFIED", "good") : (e.certification === "CONDITIONAL" ? Shell.pill("CONDITIONAL", "warn") : Shell.pill(e.certification || "—", "danger"));
+      return '<div class="sugg-row" style="align-items:flex-start">' + pill +
+        '<span class="grow"><b>' + esc(e.deliverable || "(unnamed)") + "</b> · " + esc((e.ts || "").slice(0, 10)) +
+        ' · <span class="num">' + esc(String(e.baseline)) + " → " + esc(String(e.final)) + "</span>/100 · NS: " + esc(e.northStar && e.northStar.local || "—") +
+        (e.dingoCardsSpawned && e.dingoCardsSpawned.length ? " · " + e.dingoCardsSpawned.length + " DINGO card(s) spawned" : "") +
+        (e.conditionText ? ' · <span class="soft">Condition: ' + esc(e.conditionText) + "</span>" : "") +
+        '<br><span class="soft" style="font-size:11px">Gift to the Loop: ' + esc(e.giftToLoop || "—") + "</span></span></div>";
+    }).join("") +
+    '<p class="footnote" style="margin-top:6px">' + learningLedger.length + " entr" + (learningLedger.length === 1 ? "y" : "ies") + " · append-only — Reset clears only the active run, never this ledger.</p>";
+  }
+
+  /* =================== toolbar =================== */
+  function startRun(mode) {
+    if (run && run.status === "running" && !confirm("A run is in progress (" + (run.deliverable || "unnamed") + ", Phase " + run.currentPhase + "). Start a new one and discard it?")) return;
+    newRun(mode); renderTracker();
+    toast(mode === "quick" ? "Quick Scan — Phase 0 gate first. The gate applies to every run." : "Full run — Phase 0, The Sorter. No North Star → HALT.");
+  }
+  function startPicker() { run = null; saveRun(); renderTracker(); }
+
+  $("btn-new-full").addEventListener("click", function () { startRun("full"); });
+  $("btn-new-quick").addEventListener("click", function () { startRun("quick"); });
+  $("btn-reset").addEventListener("click", function () {
+    if (!run) { toast("No active run."); return; }
+    if (confirm("Reset the active run? The append-only Learning Ledger and evolution queue are kept.")) {
+      run = null; localStorage.removeItem(LS_RUN); renderTracker();
+    }
+  });
+  $("btn-export").addEventListener("click", function () {
+    var blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), protocol: "Learning Loop Protocol V13.0 — The Genie Release", run: run, learningLedger: learningLedger, evolutionQueue: evolutionQueue }, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "hb1000-loop-export.json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    toast("Exported — nothing is trapped in localStorage.");
+  });
+  $("btn-import").addEventListener("click", function () { $("import-file").click(); });
+  $("import-file").addEventListener("change", function (e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var data = JSON.parse(rd.result);
+        if (!confirm("Import will replace the active run and merge ledger entries. Continue?")) return;
+        if (data.run !== undefined) { run = data.run; saveRun(); }
+        if (Array.isArray(data.learningLedger)) {
+          data.learningLedger.forEach(function (en) {
+            if (!learningLedger.some(function (x) { return x.ts === en.ts && x.sessionId === en.sessionId; })) learningLedger.push(en);
+          });
+          lsSet(LS_LEDGER, learningLedger);
+        }
+        if (Array.isArray(data.evolutionQueue)) { evolutionQueue = data.evolutionQueue; lsSet(LS_EVO, evolutionQueue); }
+        renderTracker(); renderEvolution(); renderLearningLedger();
+        toast("Imported.");
+      } catch (err) { toast("Import failed — not valid JSON."); }
+      e.target.value = "";
+    };
+    rd.readAsText(f);
+  });
+
+  /* modal buttons */
+  $("midaudit-verify").addEventListener("click", function () {
+    if (!run || !run.midAudit.every(Boolean)) return;
+    run.midAuditDone = true; saveRun();
+    $("midaudit-back").classList.remove("open");
+    renderTracker();
+    toast("Mid-Protocol Self-Audit: 8/8 verified. Phase 4 — The Presenter — is open.");
+  });
+  $("midaudit-close").addEventListener("click", function () { $("midaudit-back").classList.remove("open"); });
+
+  /* =================== master render =================== */
+  function renderTracker() {
+    renderStepper();
+    renderScoreStrip();
+    renderLedgerPanel();
+    renderWorkspace();
+  }
+
+  renderTracker();
+  renderEvolution();
+  renderLearningLedger();
+
+  Shell.loadJSON("data/loop-fixtures.json")
+    .then(function (data) { fixtures = data; renderFixtures(data); })
+    .catch(function (err) {
+      console.warn("loop.html: fixture load failed (expected on file:// without a server):", err && err.message);
+      renderFixtureFallback();
+    });
+})();
+</script>
+</body>
+</html>

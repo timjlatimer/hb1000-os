@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Culture Chaser + Timbits — The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ================= page-specific: Culture Chaser (Stage-2 thin scoreboard) ================= */
+
+/* header strip */
+.cc-head{display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; margin-bottom:6px}
+.cc-head .lead{flex:1; min-width:280px}
+.optin{
+  flex:0 0 auto; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg);
+  padding:12px 16px; max-width:300px;
+}
+.optin .o-t{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:6px}
+.optin .o-note{font-size:11px; color:var(--soft); margin-top:7px; line-height:1.4}
+.switch{display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none}
+.switch .trk{width:46px; height:24px; border-radius:999px; background:#1a2632; border:1px solid var(--line); position:relative; transition:background .15s}
+.switch .trk::after{content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--soft); transition:left .15s, background .15s}
+.switch.on .trk{background:rgba(70,198,109,.25); border-color:rgba(70,198,109,.6)}
+.switch.on .trk::after{left:24px; background:var(--green)}
+.switch .sw-l{font-size:13px; font-weight:800}
+.switch.on .sw-l{color:var(--green)}
+.switch:not(.on) .sw-l{color:var(--muted)}
+
+/* race track lanes + the Chaser line */
+.race{position:relative; padding:6px 0 2px}
+.race-lanes{--lane-l:215px; --lane-r:120px}
+@media (max-width:680px){.race-lanes{--lane-l:118px; --lane-r:78px} .lane .l-name{font-size:11px} .lane .l-score{font-size:10.5px}}
+.lane{position:relative; display:grid; grid-template-columns:var(--lane-l) 1fr var(--lane-r); gap:10px; align-items:center; padding:9px 0; border-bottom:1px dashed rgba(32,48,63,.7)}
+.lane:last-child{border-bottom:0}
+.lane .l-name{font-size:12.5px; font-weight:700; line-height:1.3}
+.lane .l-name .who{display:block; font-size:10.5px; font-weight:500; color:var(--soft)}
+.lane .l-trk{position:relative; height:22px; background:#101a25; border:1px solid var(--line); border-radius:7px; overflow:hidden}
+.lane .l-fill{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg, rgba(81,167,249,.55), rgba(232,181,77,.6)); border-right:2px solid var(--gold)}
+.lane .l-score{font-size:12px; font-weight:800; white-space:nowrap}
+.lane .l-score small{color:var(--muted); font-weight:600}
+.lane.caught .l-fill{background:linear-gradient(90deg, rgba(224,85,107,.35), rgba(224,85,107,.5)); border-right-color:var(--red)}
+.race-lanes{position:relative}
+.chaser-line{
+  position:absolute; top:-6px; bottom:-2px; width:3px; background:var(--red); z-index:5;
+  box-shadow:0 0 10px rgba(224,85,107,.9), 0 0 26px rgba(224,85,107,.5);
+  animation:cc-pulse 1.4s ease-in-out infinite;
+}
+.chaser-line .ch-tag{
+  position:absolute; top:-20px; left:50%; transform:translateX(-50%);
+  font-size:9.5px; font-weight:900; letter-spacing:.08em; color:var(--red); white-space:nowrap; text-transform:uppercase;
+}
+.chaser-line.fever{animation:cc-pulse .5s ease-in-out infinite; box-shadow:0 0 16px rgba(224,85,107,1), 0 0 40px rgba(224,85,107,.7)}
+@keyframes cc-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.chaser-line{animation:none}}
+.race-meta{display:flex; gap:16px; flex-wrap:wrap; margin-top:14px; font-size:12px; color:var(--muted)}
+.race-meta b{color:var(--ink)}
+.race-meta .spd{color:var(--red); font-weight:800}
+.caught-badge{display:inline-block; font-size:9.5px; font-weight:900; letter-spacing:.07em; color:#fff; background:var(--red); border-radius:4px; padding:1px 6px; margin-left:6px; cursor:pointer}
+.winner-badge{display:inline-block; font-size:9.5px; font-weight:900; letter-spacing:.07em; color:#1a1206; background:var(--gold); border-radius:4px; padding:1px 6px; margin-left:6px}
+
+/* week strip — Sat→Thu race days, Friday celebration */
+.week{display:grid; grid-template-columns:repeat(7,1fr); gap:7px; margin-top:14px}
+.wday{background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:7px 4px; text-align:center; font-size:11px; color:var(--muted)}
+.wday .d{font-weight:800; font-size:12px; color:var(--ink)}
+.wday.race .tagln{color:var(--cyan)}
+.wday.fri{border-color:rgba(232,181,77,.45)}
+.wday.fri .d{color:var(--gold)}
+.wday.today{border-color:var(--gold); background:rgba(232,181,77,.08); box-shadow:0 0 10px rgba(232,181,77,.18)}
+.wday .tagln{font-size:9.5px; letter-spacing:.04em}
+
+/* interventions ladder */
+.ladder{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+@media (max-width:900px){.ladder{grid-template-columns:1fr}}
+.lvl{background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:13px 15px}
+.lvl .lv-n{font-size:10.5px; font-weight:900; letter-spacing:.12em; text-transform:uppercase}
+.lvl .lv-t{font-weight:800; font-size:15px; margin:2px 0 5px}
+.lvl p{font-size:12px; color:var(--muted); margin:0 0 10px}
+.lvl.l1 .lv-n{color:var(--teal)} .lvl.l2 .lv-n{color:var(--yellow)} .lvl.l3 .lv-n{color:var(--red)}
+.queue-row{display:flex; gap:10px; align-items:center; padding:7px 10px; margin:5px 0; background:var(--panel-2); border:1px solid var(--line); border-radius:8px; font-size:12px}
+.queue-row .q-lv{font-size:9.5px; font-weight:900; letter-spacing:.06em; border-radius:4px; padding:1px 6px; flex:0 0 auto}
+.queue-row .q-lv.a{color:var(--teal); border:1px solid rgba(54,194,180,.5)}
+.queue-row .q-lv.t{color:var(--yellow); border:1px solid rgba(232,194,77,.5)}
+.queue-row .grow{flex:1; color:var(--muted)}
+.queue-row .grow b{color:var(--ink)}
+.queue-row .btn{padding:3px 10px; font-size:11px}
+
+/* hard rules */
+.hard-rules li{margin:7px 0; font-size:13px}
+.hard-rules b{color:var(--gold)}
+
+/* toasts */
+#toasts{position:fixed; right:18px; bottom:18px; z-index:300; display:flex; flex-direction:column; gap:10px; max-width:360px}
+.toast{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:12px 15px;
+  box-shadow:0 10px 40px rgba(0,0,0,.6); font-size:12.5px; animation:cc-in .25s ease;
+}
+@keyframes cc-in{from{transform:translateY(12px); opacity:0}to{transform:none; opacity:1}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
+.toast .t-h{font-size:10px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; margin-bottom:4px}
+.toast.aspirin{border-color:rgba(54,194,180,.6)} .toast.aspirin .t-h{color:var(--teal)}
+.toast.treatment{border-color:rgba(232,194,77,.6)} .toast.treatment .t-h{color:var(--yellow)}
+.toast.fever{border-color:rgba(224,85,107,.7)} .toast.fever .t-h{color:var(--red)}
+.toast .t-q{color:var(--ink); font-style:italic}
+.toast .t-src{font-size:10.5px; color:var(--soft); margin-top:5px}
+.toast .t-act{margin-top:8px; display:flex; gap:8px}
+.toast .t-act .btn{padding:4px 12px; font-size:11px}
+
+/* catch modal */
+.cc-modal{position:fixed; inset:0; background:rgba(2,5,9,.9); z-index:400; display:none; align-items:center; justify-content:center; padding:24px}
+.cc-modal.open{display:flex}
+.cc-modal .box{
+  background:var(--panel); border:1px solid rgba(224,85,107,.65); border-radius:var(--radius-lg);
+  max-width:680px; width:100%; max-height:88vh; overflow-y:auto; padding:24px 26px;
+  box-shadow:0 0 60px rgba(224,85,107,.25);
+}
+.cc-modal h2.caught{color:var(--red); font-size:27px; letter-spacing:.04em; margin-bottom:2px}
+.cc-modal .sub{color:var(--muted); font-size:12.5px; margin-bottom:14px}
+.alt-tabs{display:flex; gap:7px; margin:12px 0 10px}
+.alt-tabs .chip.on{border-color:var(--red); color:var(--red); background:rgba(224,85,107,.1)}
+.alt-body{background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:13px 15px; font-size:13px; min-height:96px}
+.alt-body .ab-h{font-size:10px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--soft); margin-bottom:5px}
+.breach{background:rgba(224,85,107,.08); border:1px solid rgba(224,85,107,.4); border-radius:var(--radius); padding:11px 14px; font-size:13px; margin:10px 0}
+.breach b{color:var(--red)}
+
+/* timbits library */
+.mode-bar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0}
+.mode-bar .lbl{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+.lib-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:13px; margin-top:12px}
+@media (max-width:760px){.lib-grid{grid-template-columns:1fr}}
+.tb-card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg); padding:15px 17px; transition:border-color .15s; scroll-margin-top:20px}
+.tb-card:hover{border-color:rgba(232,181,77,.55)}
+.tb-card.featured{border-color:rgba(232,181,77,.6); box-shadow:0 0 14px rgba(232,181,77,.12)}
+.tb-card.flash{border-color:var(--gold); box-shadow:0 0 22px rgba(232,181,77,.45)}
+.tb-card .tb-top{display:flex; gap:7px; align-items:center; flex-wrap:wrap; margin-bottom:5px}
+.tb-card .tb-title{font-weight:800; font-size:14.5px; flex:1; min-width:150px}
+.tb-card .tb-quote{color:var(--gold-glass); font-style:italic; font-size:13px; margin:4px 0 7px}
+.tb-card .tb-body{font-size:12.5px; color:var(--muted); line-height:1.5}
+.tb-card .tb-voice{font-size:9.5px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:var(--soft); margin-bottom:3px}
+.bumper{
+  margin-top:10px; background:linear-gradient(135deg, rgba(232,181,77,.14), rgba(232,181,77,.05));
+  border:1px solid rgba(232,181,77,.4); border-radius:8px; padding:7px 11px;
+  font-weight:800; font-size:12.5px; color:var(--gold);
+}
+.bumper small{display:block; font-weight:700; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); margin-bottom:2px}
+/* .swiss key-value grid styles promoted to assets/theme.css (Swiss Protocol pilot) */
+
+/* collisions three-tier */
+.tier{margin:8px 0}
+.tier .tr-h{font-size:9.5px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--soft); margin-bottom:2px}
+.tier.giant .tr-h{color:var(--purple)} .tier.bar .tr-h{color:var(--teal)}
+.tier p{font-size:12.5px; color:var(--muted); margin:0}
+
+/* audit */
+.audit-input{width:100%; min-height:150px; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius);
+  color:var(--ink); font-family:inherit; font-size:13px; padding:12px 14px; resize:vertical}
+.audit-input:focus{outline:none; border-color:var(--gold)}
+.dimbar{margin:9px 0}
+.dimbar .d-top{display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px}
+.dimbar .d-top b{color:var(--ink)} .dimbar .d-top .w{color:var(--soft)}
+.dimbar .d-trk{height:9px; background:#141e29; border:1px solid var(--line); border-radius:6px; overflow:hidden}
+.dimbar .d-fill{height:100%}
+.dignity-block{
+  background:rgba(224,85,107,.12); border:2px solid var(--red); border-radius:var(--radius);
+  padding:14px 17px; margin:12px 0; font-size:13.5px;
+}
+.dignity-block b{color:var(--red)}
+.rec-row{display:flex; gap:9px; align-items:flex-start; padding:8px 11px; margin:6px 0; background:var(--panel-2); border:1px solid var(--line); border-radius:8px; font-size:12.5px}
+.rec-row .grow{flex:1; color:var(--muted)} .rec-row .grow b{color:var(--ink)}
+.rec-row a{white-space:nowrap; font-size:11.5px}
+
+/* roadmap stage-4 */
+.roadmap{border:1px dashed rgba(232,181,77,.5); background:rgba(232,181,77,.04)}
+.roadmap .rm-tags{display:flex; flex-wrap:wrap; gap:5px; margin-top:9px}
+.notice-bad{background:rgba(224,85,107,.08); border:1px solid rgba(224,85,107,.45); border-radius:var(--radius); padding:11px 14px; font-size:12.5px; color:var(--ink); margin:12px 0}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- ============ HEADER ============ -->
+  <div class="cc-head">
+    <div class="lead">
+      <h1>Culture <b>Chaser</b> + Timbits</h1>
+      <p class="muted" style="max-width:640px">
+        The engagement layer of the OS — <i>"a rigorous, AI-driven accountability protocol disguised as a game."</i>
+        Tim's lock, verbatim: <b style="color:var(--gold)">"NOT a standalone product — it's a part of this whole model."</b>
+        This is the <b>Stage-2 thin scoreboard</b>; the full race is a roadmap card below (Stage 4).
+      </p>
+      <blockquote style="margin:10px 0 8px">"The Culture Chaser scales Tim." Today he manually inserts best practices via talking-head Tim / Timisms / Timbits.
+      The Chaser inserts them on his behalf — by chasing the culture that lines up with the best practices.</blockquote>
+      <p class="footnote">REAL: the Timbits library (25 core + 22 glossary + 6 Serendipitous Collisions, verbatim from <code>data/timbits.json</code>) and the 3 seeded Dingo cards.
+      COMPUTED at render: every score, split, rank, and catch (from card RYG + the clock — never asserted).
+      SIMULATED: intervention triggers — Stage 2 scans no email, no Slack, no meetings.</p>
+    </div>
+    <div class="optin">
+      <div class="o-t">Nudge engine — master opt-in</div>
+      <div class="switch" id="optin-switch" role="switch" aria-checked="false" tabindex="0">
+        <span class="trk"></span><span class="sw-l" id="optin-label">OFF — opted out</span>
+      </div>
+      <div class="o-note">Opt-in by doctrine, with an easy off switch. When OFF: no toasts, no auto-catch pop-ups.
+      The scoreboard stays visible (it reads card data, not people). Nothing scans. Nothing sends. Ever.</div>
+    </div>
+  </div>
+
+  <!-- ============ TODAY'S RACE ============ -->
+  <div class="sec-h">Today's race — <b>the daily 100</b> · joint human + agent score</div>
+  <div class="grid2" style="grid-template-columns:1.55fr 1fr">
+    <div class="panel">
+      <div class="ph">The Chaser track · <span id="race-day-label"></span></div>
+      <div class="race">
+        <div class="race-lanes" id="race-lanes"><p class="muted">Loading the three real Dingo cards…</p></div>
+      </div>
+      <div class="race-meta">
+        <span>Chaser position <b id="chaser-pos">—</b></span>
+        <span>Chaser speed <span class="spd" id="chaser-speed">—</span> <small class="soft">(accelerates toward end of day · physics cap ×3.0)</small></span>
+        <span id="winner-line"></span>
+      </div>
+      <p class="footnote" style="margin-top:8px">The Chaser advances on the clock: 07:00 start → 18:00 end-of-day, accelerating as the day runs out.
+      A card behind the red line is <b>CAUGHT</b> — click its badge for the diagnostic. You don't run toward a goal; you run away from failure.</p>
+      <div class="week" id="week-strip"></div>
+      <p class="footnote" style="margin-top:7px">The work week is <b>Saturday → Thursday</b>. Friday is for celebration and reset — "a built-in Sabbath for the mind."
+      Celebration runs Thursday afternoon through Friday.</p>
+      <div class="verdicts" style="margin-top:10px">
+        <button class="btn" id="btn-preview-catch">Preview the "I JUST GOT CAUGHT!" diagnostic</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph">Rules of the game — what earns points</div>
+      <blockquote style="margin:6px 0 10px; font-size:13px">"60/40 today — human 60, agent 40 — and they hit 100." Often it's reversed (10 human / 90 agent),
+      because the agents live in our culture more consistently than the human-in-the-loop does.</blockquote>
+      <p class="muted" style="font-size:12px; margin-bottom:4px"><b style="color:var(--green)">LIVE</b> — computed right now from the real card JSON:</p>
+      <ul class="muted" style="font-size:12.5px; margin:0 0 10px; padding-left:18px">
+        <li>Green square held = <b class="num" style="color:var(--ink)">+4</b> · yellow = <b class="num" style="color:var(--ink)">+2</b> · red = <b class="num" style="color:var(--ink)">0</b></li>
+        <li>PTK centre square (the focal promise) = <b class="num" style="color:var(--ink)">+4</b> → max <b class="num" style="color:var(--ink)">100</b></li>
+        <li>Human/agent split = each square's points × its 80/20 share — computed, never asserted</li>
+      </ul>
+      <p class="muted" style="font-size:12px; margin-bottom:4px"><b style="color:var(--yellow)">ROADMAP</b> — Stage-4 trackers (the full rules of the game):</p>
+      <ul class="muted" style="font-size:12.5px; margin:0; padding-left:18px">
+        <li>Clean handoff <b>+5</b> · dropped baton → Chaser +10% for <i>both</i> passer and receiver</li>
+        <li>Agenda-complete meeting <b>+5</b> · logged learning in the Learning Loop <b>+10</b></li>
+        <li>Ruby Red named in a decision <b>+2</b> · gratitude log <b>+3</b> · kept PTK <b>+10</b></li>
+        <li>Serendipitous Collision that produces an artifact <b>+5</b></li>
+      </ul>
+      <hr>
+      <div class="ph">Live scoreboard — first to 100 is celebrated</div>
+      <div id="scoreboard"><p class="muted">Computing…</p></div>
+      <p class="footnote">Company-wide ranks. Per-division ranks arrive as more cards activate. Daily winner is declared at Morning Roll Call —
+      and the winner's pattern becomes a Sourdough Starter recipe card (opt-in to share, anonymous to receive).</p>
+    </div>
+  </div>
+
+  <!-- ============ IMMUNE SYSTEM / INTERVENTIONS ============ -->
+  <div class="sec-h">The Immune System — <b>graduated micro-interventions</b> · diagnostic, not punitive</div>
+  <div class="grid2" style="grid-template-columns:1.55fr 1fr">
+    <div class="panel">
+      <div class="ph">The escalation ladder</div>
+      <div class="ladder">
+        <div class="lvl l1">
+          <div class="lv-n">Level 1</div>
+          <div class="lv-t">The Aspirin</div>
+          <p>A playful Timbit pop-up. The gentlest unit of correction, in Tim's voice, pulled live from the library.</p>
+          <button class="btn" data-demo="aspirin">Preview an Aspirin</button>
+        </div>
+        <div class="lvl l2">
+          <div class="lv-n">Level 2</div>
+          <div class="lv-t">The Treatment</div>
+          <p>A formal best-practice citation that requires acknowledgment. Names the Antibody Agent and the breached practice.</p>
+          <button class="btn" data-demo="treatment">Preview a Treatment</button>
+        </div>
+        <div class="lvl l3">
+          <div class="lv-n">Level 3</div>
+          <div class="lv-t">The Fever</div>
+          <p>The Chaser itself visibly accelerates. The last resort — a healthy immune system resolves 90% of issues before fever.</p>
+          <button class="btn" data-demo="fever">Preview the Fever</button>
+        </div>
+      </div>
+      <hr>
+      <div class="ph">Intervention queue — wired to data the OS already has</div>
+      <p class="muted" style="font-size:12px">Derived at render from the real cards: a yellow square queues an Aspirin; a red square queues a Treatment.
+      No email/Slack/meeting NLP exists in Stage 2 — these triggers are card-state only.</p>
+      <div id="queue"></div>
+      <p class="footnote" id="immune-memory-line">Immune Memory (this browser): 0 acknowledgments logged.</p>
+      <p class="footnote">Rate limit: at most <b>one</b> automatic nudge per page load. "Auto-immune disease" — nudge spam → alert fatigue — is the named failure mode.</p>
+    </div>
+
+    <div class="panel">
+      <div class="ph">Hard rules — doctrine, not décor</div>
+      <ul class="hard-rules" style="padding-left:18px; margin:0">
+        <li><b>"Immune System, not a Police System."</b> Catcher Car, not the Police Car. Every catch is a learning mechanism.</li>
+        <li>Every catch names the <b>specific best practice breached</b> and refracts through the Babel Bridge at the right Feynman altitude (Street / Boardroom / Architect).</li>
+        <li><b>The Dignity Test is a blocking gate:</b> "Would you be comfortable if your mother went through this?"</li>
+        <li><b>No streak-shaming.</b> No raw social-comparison mechanics (BP-060/061 — gamification and raw tracking are top motivation killers).</li>
+        <li><b>The internal game never touches Ruby-Red-facing surfaces</b> (BP-063/066 — defaults hit low-income users 3× harder). Two surfaces, kept separate.</li>
+        <li><b>Joint human + agent score.</b> AI co-racers can be caught too — and humans help repair them. Radical Collaboration.</li>
+        <li>Winner patterns propagate as <b>Sourdough Starters</b>: opt-in for the winner, anonymous by default for the recipient. "It removes ego from the equation."</li>
+        <li><b>Rate-limited interventions.</b> Healthy immune system resolves 90% pre-fever; minimum effective dose per person (Immune Memory).</li>
+        <li><b>Master opt-in with an easy off switch.</b> Nothing auto-applies. Nothing auto-sends. The human approves every move.</li>
+        <li><b>Sat–Thu work week; Friday is for celebration and reset.</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ TIMBITS LIBRARY ============ -->
+  <div class="sec-h">The Timbits library — <b>25 core Timmyisms</b>, verbatim · "the fuel"</div>
+  <div class="panel">
+    <blockquote style="margin:0 0 10px">"The Culture Chaser is the engine, but the Timmyisms and the HB1000 best practice library are the fuel."</blockquote>
+    <div class="mode-bar">
+      <span class="lbl v-tim">One brain, three voices:</span>
+      <span class="lbl v-swiss">One source, three renderings:</span>
+      <span class="chip mode-chip" data-mode="raw">Raw Tim</span>
+      <span class="chip mode-chip" data-mode="agent">Culture Agent</span>
+      <span class="chip mode-chip" data-mode="swiss">Swiss Protocol</span>
+    </div>
+    <p class="footnote" style="margin:2px 0 8px">Babel Bridge refraction over the same verbatim entries: <b>Raw Tim</b> renders the Barstool voice (blunt, with care) ·
+    <b>Culture Agent</b> renders the boardroom framing · <b>Swiss Protocol</b> renders the structured data view. The quotes and Timbits never change — only the lens.</p>
+    <div class="mode-bar">
+      <span class="lbl">Menu:</span>
+      <span class="chip cat-chip on" data-cat="all">All 25</span>
+      <span class="chip cat-chip" data-cat="rant">Tim Rants · J-R</span>
+      <span class="chip cat-chip" data-cat="ism">Tim Isms · J-I</span>
+      <span class="chip cat-chip" data-cat="talk">Tim Talks · J-T</span>
+      <span class="chip cat-chip" data-cat="timbit">Timbits · J-B</span>
+      <span class="chip cat-chip" data-cat="featured">★ Featured</span>
+      <input id="lib-search" type="search" placeholder="search the canon…" style="background:var(--panel-2); border:1px solid var(--line); border-radius:999px; color:var(--ink); font-family:inherit; font-size:12px; padding:4px 13px; min-width:170px">
+    </div>
+    <p class="muted" style="font-size:12px" id="lib-menu-line"></p>
+    <div class="lib-grid" id="lib-grid"><p class="muted">Loading data/timbits.json…</p></div>
+  </div>
+
+  <!-- ============ GLOSSARY ============ -->
+  <div class="sec-h">The Timbits <b>glossary</b> — 22 foundational entries</div>
+  <div class="panel" style="overflow-x:auto">
+    <div id="glossary"><p class="muted">Loading…</p></div>
+  </div>
+
+  <!-- ============ SERENDIPITOUS COLLISIONS ============ -->
+  <div class="sec-h">Serendipitous <b>Collisions</b> — "the meeting after the meeting" · 6 three-tier entries</div>
+  <div class="panel">
+    <p class="muted" style="font-size:12.5px">Informal interactions are the most potent engines of alignment. In the full game the Chaser accelerates ×1.5 <i>during</i> a collision —
+    and rewards ×0.5 for the next hour if it produces an artifact (a shared note, a Dingo card update, an insight pushed to the Cloud Butterfly).
+    The Alignment Formula: <b style="color:var(--gold)">Robust Collaboration + Robust Communication = Impact.</b></p>
+    <div class="lib-grid" id="collisions"></div>
+  </div>
+
+  <!-- ============ CULTURE AUDIT ============ -->
+  <div class="sec-h">Culture <b>Audit</b> — paste a transcript · 5 weighted dimensions · 8 Antibody Agents</div>
+  <div class="panel">
+    <p class="muted" style="font-size:12.5px">Paste real meeting notes, a Slack thread, or an email chain. The audit runs <b>entirely in this page</b> —
+    client-side port of the prototype's <code>POST /api/culture-audit</code> pipeline. Nothing is sent anywhere.
+    Weights: <b>Tone 25</b> · <b>Ruby Red Alignment 25</b> · <b>Energy 20</b> · <b>Agenda 15</b> · <b>Promise 15</b>.</p>
+    <textarea id="audit-text" class="audit-input" placeholder="Paste a real transcript here — meeting notes, a Slack thread, an email chain. Minimum ~20 words for a meaningful read."></textarea>
+    <div class="verdicts">
+      <button class="btn gold-cta" id="btn-audit">Run Culture Audit</button>
+      <button class="btn" id="btn-audit-clear">Clear</button>
+    </div>
+    <div id="audit-out" style="margin-top:14px"></div>
+  </div>
+
+  <!-- ============ STAGE 4 ROADMAP ============ -->
+  <div class="sec-h">Roadmap — <b>Stage 4</b> · the full race (not built, on purpose)</div>
+  <div class="panel roadmap">
+    <div class="spread">
+      <h3 style="margin:0">The Circuit Board — "the strategy IS the track"</h3>
+      <span class="pill warn">ROADMAP CARD · STAGE 4 · NOT BUILT</span>
+    </div>
+    <p class="muted" style="font-size:13px; margin-top:8px">
+      The full Culture Chaser: the active Dingo card at centre, a glowing circuit-path track forming its border, the user a blue node,
+      3–4 <b>AI co-racers</b> (silver — they can be caught too), and <b>the Catcher Car</b> — a pulsing red line tracing the circuit behind you.
+      Dual-track racing on the Twin North Stars: the Prime track asks <i>HOW</i> you work; the Local track <i>IS</i> your current Dingo card and asks <i>WHAT</i> you work.
+      "You cannot outrun bad behavior with sheer velocity."
+    </p>
+    <div class="rm-tags">
+      <span class="pill">Catcher Car</span><span class="pill">Transition Zones — handoffs ×2.0, Friday Afternoon Drift ×1.8</span>
+      <span class="pill">Dropped Baton +10% both</span><span class="pill">Sprint Credits</span>
+      <span class="pill">Joy Genie — "boing!", 60 s pause, bank 3, giftable</span>
+      <span class="pill">Zombie Random Events ×8 — Surprise Fire · Calendar Hijack · Scope Creep Monster · Communication Breakdown · Tech Gremlin · Decision Vacuum · Resource Raid · Friday 4 PM Bomb</span>
+      <span class="pill">Sourdough Starter — Young / Developing / Mature · Colony Health</span>
+      <span class="pill">Murmuration — lift / drag ±5% · Murmuration Dashboard</span>
+      <span class="pill">Immune Memory</span><span class="pill">Move 37 — JTBD (Clayton Christensen) is the evaluation lens</span>
+      <span class="pill">Talking Head phases 2–4 — voice via KIE.ai</span>
+      <span class="pill">White-label four layers — Universal Engine · IP Vault · Persona Matrix · Integration Hooks</span>
+      <span class="pill gold">"Cultural insurance policy"</span>
+    </div>
+    <p class="footnote" style="margin-top:10px">Strategy score 12/15 (R3 · A5 · P4), adopting team org-wide (high load) → <b>deliberate rollout, later</b>.
+    Physics, when built: Joy Genie override → zone multiplier → murmuration ±5% → collision 0.5×/1.5× → zombie penalties → fever → cap ×3.0. Game loop ticks every 1 s.</p>
+  </div>
+
+  <!-- ============ FOOTER LINKS ============ -->
+  <div class="sec-h">Drill <b>chain</b></div>
+  <div class="hub-grid">
+    <a class="link-card" href="card.html?card=pawn-princess-pp01.json"><div class="lc-t">Dingo <b>Card</b></div><div class="lc-d">The track IS the Dingo card. Open Pawn Princess PP-01 — the reference card.</div><div class="lc-k">card.html</div></a>
+    <a class="link-card" href="ptk.html"><div class="lc-t"><b>PTK</b> — Promises to Keep</div><div class="lc-d">The Promise Agent's home: the dual ledger, keep-rate, and the moral KPI.</div><div class="lc-k">ptk.html</div></a>
+    <a class="link-card" href="loop.html"><div class="lc-t">Learning <b>Loop</b> V13.0</div><div class="lc-d">"Caught" events feed the Loop — failures become systemic improvements.</div><div class="lc-k">loop.html</div></a>
+    <a class="link-card" href="doctrine.html"><div class="lc-t">The <b>Doctrine</b></div><div class="lc-d">AI Research, the best-practice library (BP-001→105), and the Standing Orders.</div><div class="lc-k">doctrine.html</div></a>
+  </div>
+  <p class="footnote">Stage-2 thin scoreboard per the OS synthesis ruling. "Ship it ugly. Use it daily." — the metric is "the card was used yesterday."</p>
+
+</main>
+
+<!-- toasts -->
+<div id="toasts" aria-live="polite"></div>
+
+<!-- catch modal -->
+<div class="cc-modal" id="catch-modal" role="dialog" aria-modal="true" aria-label="I just got caught diagnostic">
+  <div class="box">
+    <div class="spread">
+      <h2 class="caught">I JUST GOT CAUGHT!</h2>
+      <button class="btn" id="catch-close">Close</button>
+    </div>
+    <div class="sub">Diagnostic, not punitive — the race is over for today; the learning is not. (Dark Souls "YOU DIED" energy, immune-system intent.)</div>
+    <div id="catch-body"></div>
+    <div class="alt-tabs" id="alt-tabs">
+      <span class="chip on" data-alt="street">Street</span>
+      <span class="chip" data-alt="boardroom">Boardroom</span>
+      <span class="chip" data-alt="architect">Architect</span>
+    </div>
+    <div class="alt-body" id="alt-body"></div>
+    <div class="verdicts" style="margin-top:14px">
+      <button class="btn approve" id="catch-ack">Acknowledge — log to the Learning Loop</button>
+    </div>
+    <p class="footnote" style="margin-top:8px">Every catch links the specific best practice breached and refracts via the Babel Bridge at your Feynman altitude.
+    Acknowledgments train Immune Memory (stored in this browser only).</p>
+  </div>
+</div>
+
+<script src="assets/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  Shell.init('culture');
+
+  /* ---------------- utilities ---------------- */
+  var $  = function (s, el) { return (el || document).querySelector(s); };
+  var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
+  var esc = Shell.esc;
+
+  function loadData(path) {
+    return Shell.loadJSON(path).catch(function () {
+      // file:// fallback (some browsers allow XHR where fetch is blocked)
+      return new Promise(function (resolve, reject) {
+        try {
+          var x = new XMLHttpRequest();
+          x.open('GET', path, true);
+          x.onload = function () {
+            try { resolve(JSON.parse(x.responseText)); } catch (e) { reject(e); }
+          };
+          x.onerror = function () { reject(new Error('Could not load ' + path)); };
+          x.send();
+        } catch (e) { reject(e); }
+      });
+    });
+  }
+
+  function store(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+  function read(key, dflt) { try { return localStorage.getItem(key) || dflt; } catch (e) { return dflt; } }
+
+  /* ---------------- the 8 Antibody Agents (prototype ids — built canon) ---------------- */
+  var ANTIBODY = {
+    'agent-agenda':         { name: 'Agenda Agent',         detects: 'drift, no structure, circular discussion, missing action items', metric: 'Agenda adherence %',                 timbit: 'tm-07' },
+    'agent-tone':           { name: 'Tone Agent',           detects: 'passive-aggression, blame, sarcasm, interruptions',              metric: 'Constructive communication ratio',   timbit: 'tm-22' },
+    'agent-velocity':       { name: 'Velocity Agent',       detects: 'decision latency, analysis paralysis, perfectionism — "polishing the cannonball"', metric: 'Decision-to-action cycle time', timbit: 'tm-09' },
+    'agent-context-switch': { name: 'Context Switch Agent', detects: 'topic fragmentation, cognitive overload',                        metric: 'Topic coherence score',              timbit: 'tm-15' },
+    'agent-silo':           { name: 'Silo Agent',           detects: 'information hoarding, "not my department"',                      metric: 'Information accessibility score',    timbit: 'tm-03' },
+    'agent-empathy':        { name: 'Empathy Agent',        detects: 'missing Ruby Red references, dehumanizing language',             metric: 'Ruby Red alignment score',           timbit: 'tm-11' },
+    'agent-promise':        { name: 'Promise Agent',        detects: 'commitments without timelines, dropped follow-ups',              metric: 'Promise completion rate',            timbit: 'tm-20' },
+    'agent-energy':         { name: 'Energy Agent',         detects: 'burnout language, cynicism, declining participation',            metric: 'Team energy sustainability index',   timbit: 'tm-10' }
+  };
+
+  function agentForSquare(sq) {
+    var t = ((sq.label || '') + ' ' + (sq.kpi || '')).toLowerCase();
+    if (/promise|ptk|close-out|follow-up|month-end/.test(t)) return 'agent-promise';
+    if (/agenda|meeting/.test(t))                            return 'agent-agenda';
+    if (/churn|customer|member|review|outreach|referral/.test(t)) return 'agent-empathy';
+    if (/training|morale|staff|schedule/.test(t))            return 'agent-energy';
+    return 'agent-velocity';
+  }
+
+  /* ---------------- state ---------------- */
+  var TB = null;            // timbits.json
+  var TEAMS = [];           // computed from the 3 real cards
+  /* page mode follows the global voice (hb1000-voice): swiss→swiss, tim→raw — same rule as the
+     hb-voice-change handler below, so load and toggle can never disagree. Only the page-local
+     'agent' mode overrides it (and never leaks into the global key). */
+  var MODE = read('hb1000-culture-mode', '');
+  if (MODE !== 'agent') MODE = (Shell.voice() === 'swiss') ? 'swiss' : 'raw';
+  var CAT = 'all';
+  var SEARCH = '';
+  var OPTIN = read('hb1000-culture-optin', 'off') === 'on';
+  var FEVER_UNTIL = 0;
+  var AUTO_NUDGED = false;  // rate limit: max one auto-nudge per page load
+  var prevCaught = {};
+
+  /* ---------------- opt-in toggle ---------------- */
+  function renderOptin() {
+    var sw = $('#optin-switch');
+    sw.classList.toggle('on', OPTIN);
+    sw.setAttribute('aria-checked', OPTIN ? 'true' : 'false');
+    $('#optin-label').textContent = OPTIN ? 'ON — opted in' : 'OFF — opted out';
+  }
+  $('#optin-switch').addEventListener('click', function () {
+    OPTIN = !OPTIN;
+    store('hb1000-culture-optin', OPTIN ? 'on' : 'off');
+    renderOptin();
+  });
+  $('#optin-switch').addEventListener('keydown', function (e) {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); $('#optin-switch').click(); }
+  });
+  renderOptin();
+
+  /* ---------------- score computation (computed, never asserted) ---------------- */
+  var PTS = { green: 4, yellow: 2, red: 0 };
+
+  function computeTeam(card, file, superseded) {
+    var pts = 0, humanPts = 0, reds = [], yellows = [];
+    (card.squares || []).forEach(function (sq) {
+      var p, h;
+      if (sq.ptk) { p = 4; h = 20; }
+      else {
+        p = PTS[(sq.ryg || 'green')] || 0;
+        h = (sq.human == null) ? 20 : Number(sq.human);
+        if (sq.ryg === 'red') reds.push(sq);
+        if (sq.ryg === 'yellow') yellows.push(sq);
+      }
+      pts += p;
+      humanPts += p * h / 100;
+    });
+    var score = Math.round(pts);
+    var human = Math.round(humanPts);
+    return {
+      file: file, name: card.store || file,
+      caller: card.caller || 'TBD — assign one Dingo Caller',
+      score: score, human: human, agent: score - human,
+      reds: reds, yellows: yellows, superseded: !!superseded
+    };
+  }
+
+  /* ---------------- the Chaser (clock-driven, EOD acceleration) ---------------- */
+  var DAY_START = 7, DAY_END = 18, EXP = 2.4;
+
+  function dayFrac() {
+    var n = new Date();
+    var h = n.getHours() + n.getMinutes() / 60 + n.getSeconds() / 3600;
+    return Math.min(1, Math.max(0, (h - DAY_START) / (DAY_END - DAY_START)));
+  }
+  function isFriday() { return new Date().getDay() === 5; }
+  function chaserPos() {
+    if (isFriday()) return 0;
+    var pos = 100 * Math.pow(dayFrac(), EXP);
+    if (Date.now() < FEVER_UNTIL) pos = Math.min(100, pos + 8);
+    return pos;
+  }
+  function chaserSpeed() {
+    var p = dayFrac();
+    var v = EXP * Math.pow(p, EXP - 1);
+    if (Date.now() < FEVER_UNTIL) v += 0.6;
+    return Math.min(3, Math.max(0.1, v));
+  }
+
+  /* ---------------- race + scoreboard render ---------------- */
+  function renderRace() {
+    var lanes = $('#race-lanes');
+    if (!TEAMS.length) return;
+    var cp = chaserPos();
+    var fri = isFriday();
+
+    var html = TEAMS.map(function (t) {
+      var caught = !fri && t.score < cp;
+      var winner = t.score >= 100;
+      var badge = '';
+      if (winner) badge = '<span class="winner-badge">FIRST TO 100 — CELEBRATED</span>';
+      else if (caught) badge = '<span class="caught-badge" data-team="' + esc(t.file) + '" title="Open the diagnostic">CAUGHT — why?</span>';
+      var sup = t.superseded ? ' <span class="badge-superseded">superseded</span>' : '';
+      return '<div class="lane' + (caught ? ' caught' : '') + '">' +
+        '<div class="l-name">' + esc(t.name) + sup + badge +
+          '<span class="who">Dingo Caller: ' + esc(t.caller) + '</span></div>' +
+        '<div class="l-trk"><div class="l-fill" style="width:' + t.score + '%"></div></div>' +
+        '<div class="l-score num">' + t.score + '<small> /100 · H' + t.human + ' / A' + t.agent + '</small></div>' +
+      '</div>';
+    }).join('');
+
+    if (!fri) {
+      html += '<div class="chaser-line' + (Date.now() < FEVER_UNTIL ? ' fever' : '') + '" style="left:calc(var(--lane-l) + 10px + (100% - var(--lane-l) - var(--lane-r) - 20px) * ' + (cp / 100) + ')">' +
+              '<span class="ch-tag">THE CHASER</span></div>';
+    }
+    lanes.innerHTML = html;
+
+    $$('.caught-badge', lanes).forEach(function (b) {
+      b.addEventListener('click', function () { openCatch(b.getAttribute('data-team')); });
+    });
+
+    $('#chaser-pos').textContent = fri ? 'parked' : (Math.round(cp) + ' / 100');
+    $('#chaser-speed').textContent = fri ? '—' : ('×' + chaserSpeed().toFixed(1));
+
+    // winner line
+    var leader = TEAMS.slice().sort(function (a, b) { return b.score - a.score; })[0];
+    var w = TEAMS.filter(function (t) { return t.score >= 100; });
+    $('#winner-line').innerHTML = w.length
+      ? '🎉 <b>' + esc(w[0].name) + '</b> hit 100 — daily winner, celebrated at Morning Roll Call'
+      : 'No one has hit 100 yet — leader: <b>' + esc(leader.name) + '</b>' + (leader.superseded ? ' (superseded card)' : '') +
+        ' at ' + leader.score + '. The Chaser is gaining.';
+
+    // auto catch pop-up only on a fresh transition, only when opted in
+    TEAMS.forEach(function (t) {
+      var caught = !fri && t.score < cp;
+      if (caught && prevCaught[t.file] === false && OPTIN) openCatch(t.file);
+      prevCaught[t.file] = caught;
+    });
+  }
+
+  function renderScoreboard() {
+    var ranked = TEAMS.slice().sort(function (a, b) { return b.score - a.score; });
+    $('#scoreboard').innerHTML =
+      '<table><thead><tr><th>#</th><th>Card / team</th><th>Joint score</th><th>Split H/A</th></tr></thead><tbody>' +
+      ranked.map(function (t, i) {
+        var medal = i === 0 ? ' 🏆' : '';
+        var sup = t.superseded ? ' <span class="badge-superseded">superseded</span>' : '';
+        return '<tr><td class="num">' + (i + 1) + medal + '</td>' +
+          '<td><a href="card.html?card=' + esc(t.file) + '">' + esc(t.name) + '</a>' + sup +
+          '<br><small class="soft">' + esc(t.caller) + '</small></td>' +
+          '<td class="num"><b>' + t.score + '</b> <small>/100</small></td>' +
+          '<td class="num"><span style="color:var(--gold)">' + t.human + '</span> / <span style="color:var(--cyan)">' + t.agent + '</span></td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  function renderWeek() {
+    var labels = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    var idxMap = { 6: 0, 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6 };
+    var today = idxMap[new Date().getDay()];
+    $('#week-strip').innerHTML = labels.map(function (d, i) {
+      var fri = i === 6;
+      var cls = 'wday' + (fri ? ' fri' : ' race') + (i === today ? ' today' : '');
+      var tag = fri ? '🎉 celebrate + reset' : 'race day';
+      return '<div class="' + cls + '"><div class="d">' + d + '</div><div class="tagln">' + tag + '</div></div>';
+    }).join('');
+    $('#race-day-label').textContent = isFriday()
+      ? 'Friday — the Chaser rests. Celebrate the week.'
+      : labels[today] + ' — race day (' + new Date().toLocaleDateString() + ')';
+  }
+
+  /* ---------------- "I JUST GOT CAUGHT!" diagnostic ---------------- */
+  var CURRENT_CATCH = null;
+
+  function timbitById(id) {
+    if (!TB) return null;
+    var all = TB.core || [];
+    for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
+    return null;
+  }
+
+  function openCatch(file) {
+    var t = null;
+    TEAMS.forEach(function (x) { if (x.file === file) t = x; });
+    if (!t) t = TEAMS.slice().sort(function (a, b) { return a.score - b.score; })[0];
+    if (!t) return;
+
+    var sq = t.reds[0] || t.yellows[0] || { label: 'Daily 100 not reached', kpi: 'score below the Chaser at end of day' };
+    var agentId = agentForSquare(sq);
+    var ag = ANTIBODY[agentId];
+    var tb = timbitById(ag.timbit);
+    CURRENT_CATCH = { team: t, sq: sq, agentId: agentId, ag: ag, tb: tb };
+
+    var cpNow = chaserPos();
+    var isPreview = cpNow <= t.score;
+    $('#catch-body').innerHTML =
+      '<div class="breach">' + (isPreview ? '<b>PREVIEW — end-of-day simulation.</b> At 18:00 the Chaser reaches 100; anything below 100 is caught.<br>' : '') +
+      '<b>' + esc(t.name) + '</b> — caught at <b class="num">' + t.score + '/100</b> with the Chaser at <b class="num">' +
+      Math.round(isPreview ? 100 : cpNow) + '</b>.<br>' +
+      'Breached best practice: <b>' + esc(ag.name) + '</b> — ' + esc(ag.detects) + '.<br>' +
+      'Trigger square: <b>' + esc(sq.id || '—') + ' · ' + esc(sq.label) + '</b> (' + esc(sq.kpi || 'KPI red') + ').<br>' +
+      'Health metric: ' + esc(ag.metric) + ' · Linked Timmyism: <b style="color:var(--gold)">' + esc(tb ? tb.title : ag.timbit) + '</b></div>';
+
+    setAlt('street');
+    $('#catch-modal').classList.add('open');
+  }
+
+  function setAlt(alt) {
+    $$('#alt-tabs .chip').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-alt') === alt); });
+    var c = CURRENT_CATCH; if (!c) return;
+    var tb = c.tb || {};
+    var body = '';
+    if (alt === 'street') {
+      body = '<div class="ab-h">Street — the Barstool altitude</div>' +
+        '<p style="margin:0 0 6px">' + esc(tb.barstool || 'Plain talk: the square went red and nobody moved. Fix the smallest piece today and tell someone you did.') + '</p>' +
+        '<p style="margin:0"><b style="color:var(--gold)">Timbit:</b> <i>' + esc(tb.timbit || '') + '</i></p>';
+    } else if (alt === 'boardroom') {
+      body = '<div class="ab-h">Boardroom — the formal citation</div>' +
+        '<p style="margin:0 0 6px"><b>' + esc(c.ag.name) + '</b> reports a breach of best practice on <b>' + esc(c.sq.label) + '</b>. ' +
+        'Monitored signal: ' + esc(c.ag.detects) + '. Health metric impacted: ' + esc(c.ag.metric) + '.</p>' +
+        '<p style="margin:0">Governing principle (verbatim): <i>"' + esc(tb.quote || '') + '"</i> — Timmyisms canon, ' + esc(tb.jCode || '') + '.</p>';
+    } else {
+      body = '<div class="ab-h">Architect — the systems altitude</div>' +
+        '<p style="margin:0 0 6px">Detection: <b>' + esc(c.ag.name) + '</b> fired on card-state data (square <b>' + esc(c.sq.id || '—') + '</b> RYG). ' +
+        'Escalation path: Aspirin → Treatment → Fever; this event reached the Chaser, meaning earlier interventions were unavailable or ignored.</p>' +
+        '<p style="margin:0">Remediation loop: acknowledge → log to the Learning Loop (failures become systemic improvements) → Immune Memory reweights the next intervention toward your minimum effective dose. Healthy target: 90% of issues resolved before fever.</p>';
+    }
+    $('#alt-body').innerHTML = body;
+  }
+
+  $$('#alt-tabs .chip').forEach(function (c) {
+    c.addEventListener('click', function () { setAlt(c.getAttribute('data-alt')); });
+  });
+  $('#catch-close').addEventListener('click', function () { $('#catch-modal').classList.remove('open'); });
+  $('#catch-modal').addEventListener('click', function (e) { if (e.target === $('#catch-modal')) $('#catch-modal').classList.remove('open'); });
+  $('#catch-ack').addEventListener('click', function () {
+    logImmune('catch-acknowledged', CURRENT_CATCH ? CURRENT_CATCH.agentId : '');
+    $('#catch-modal').classList.remove('open');
+    toast('aspirin', 'Logged. Diagnostic closed.', 'The catch is now a Learning Loop entry — "autopsy without blame." Tomorrow the track resets.', '');
+  });
+  $('#btn-preview-catch').addEventListener('click', function () {
+    var lowest = TEAMS.slice().sort(function (a, b) { return a.score - b.score; })[0];
+    if (lowest) openCatch(lowest.file);
+  });
+
+  /* ---------------- immune memory (browser-local) ---------------- */
+  function immuneLog() { try { return JSON.parse(read('hb1000-culture-log', '[]')); } catch (e) { return []; } }
+  function logImmune(type, ref) {
+    var log = immuneLog();
+    log.push({ ts: new Date().toISOString(), type: type, ref: ref });
+    store('hb1000-culture-log', JSON.stringify(log));
+    renderImmuneLine();
+  }
+  function renderImmuneLine() {
+    var n = immuneLog().length;
+    $('#immune-memory-line').textContent = 'Immune Memory (this browser): ' + n + ' acknowledgment' + (n === 1 ? '' : 's') + ' logged.';
+  }
+
+  /* ---------------- toasts (Aspirin / Treatment / Fever) ---------------- */
+  function toast(kind, head, body, src, needsAck) {
+    var el = document.createElement('div');
+    el.className = 'toast ' + kind;
+    el.innerHTML = '<div class="t-h">' + esc(head) + '</div><div class="t-q">' + esc(body) + '</div>' +
+      (src ? '<div class="t-src">' + esc(src) + '</div>' : '') +
+      (needsAck ? '<div class="t-act"><button class="btn approve ackbtn">Acknowledge</button></div>'
+                : '<div class="t-act"><button class="btn xbtn">Dismiss</button></div>');
+    $('#toasts').appendChild(el);
+    var kill = function () { if (el.parentNode) el.parentNode.removeChild(el); };
+    if (needsAck) {
+      $('.ackbtn', el).addEventListener('click', function () { logImmune('treatment-acknowledged', head); kill(); });
+    } else {
+      $('.xbtn', el).addEventListener('click', kill);
+      setTimeout(kill, 9000);
+    }
+  }
+
+  function randomTimbit() {
+    var all = (TB && TB.core) || [];
+    return all.length ? all[Math.floor(Math.random() * all.length)] : null;
+  }
+
+  function fireAspirin(sq, teamName) {
+    var agId = sq ? agentForSquare(sq) : null;
+    var tb = agId ? timbitById(ANTIBODY[agId].timbit) : randomTimbit();
+    if (!tb) tb = randomTimbit();
+    var why = sq ? ('Yellow square: ' + sq.id + ' · ' + sq.label + (teamName ? ' — ' + teamName : '')) : 'Library pull';
+    toast('aspirin', 'Level 1 · The Aspirin', '"' + (tb ? tb.timbit : '') + '"', why + ' · Timmyism: ' + (tb ? tb.title : ''));
+  }
+  function fireTreatment(sq, teamName) {
+    var agId = sq ? agentForSquare(sq) : 'agent-velocity';
+    var ag = ANTIBODY[agId];
+    var tb = timbitById(ag.timbit);
+    var why = sq ? ('Red square: ' + sq.id + ' · ' + sq.label + (teamName ? ' — ' + teamName : '')) : '';
+    toast('treatment', 'Level 2 · The Treatment — citation requires acknowledgment',
+      ag.name + ': ' + ag.detects + '. Best practice (verbatim): "' + (tb ? tb.quote : '') + '"',
+      why + ' · Health metric: ' + ag.metric, true);
+  }
+  function fireFever() {
+    FEVER_UNTIL = Date.now() + 30000;
+    toast('fever', 'Level 3 · The Fever', 'The Chaser visibly accelerates for 30 seconds. The last resort — the system-level immune response.', 'Healthy immune systems resolve 90% of issues before this.');
+    renderRace();
+  }
+
+  $$('[data-demo]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var d = b.getAttribute('data-demo');
+      if (d === 'aspirin') {
+        var t = TEAMS.filter(function (x) { return x.yellows.length; })[0];
+        fireAspirin(t ? t.yellows[0] : null, t ? t.name : '');
+      } else if (d === 'treatment') {
+        var t2 = TEAMS.filter(function (x) { return x.reds.length; })[0];
+        fireTreatment(t2 ? t2.reds[0] : null, t2 ? t2.name : '');
+      } else fireFever();
+    });
+  });
+
+  /* ---------------- intervention queue from real card data ---------------- */
+  function renderQueue() {
+    var rows = [];
+    TEAMS.forEach(function (t) {
+      t.reds.forEach(function (sq) { rows.push({ lv: 'T', sq: sq, team: t }); });
+    });
+    TEAMS.forEach(function (t) {
+      t.yellows.forEach(function (sq) { rows.push({ lv: 'A', sq: sq, team: t }); });
+    });
+    var shown = rows.slice(0, 8);
+    $('#queue').innerHTML = shown.map(function (r, i) {
+      var ag = ANTIBODY[agentForSquare(r.sq)];
+      return '<div class="queue-row">' +
+        '<span class="q-lv ' + (r.lv === 'A' ? 'a' : 't') + '">' + (r.lv === 'A' ? 'L1 ASPIRIN' : 'L2 TREATMENT') + '</span>' +
+        '<span class="grow"><b>' + esc(r.sq.id) + ' · ' + esc(r.sq.label) + '</b> — ' + esc(r.team.name) + ' · ' + esc(ag.name) + '</span>' +
+        '<button class="btn" data-qi="' + i + '">Preview</button></div>';
+    }).join('') +
+    (rows.length > shown.length
+      ? '<p class="footnote">+' + (rows.length - shown.length) + ' more queued — rate-limited (the auto-immune guardrail).</p>' : '');
+
+    $$('#queue [data-qi]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var r = shown[Number(b.getAttribute('data-qi'))];
+        if (r.lv === 'A') fireAspirin(r.sq, r.team.name); else fireTreatment(r.sq, r.team.name);
+      });
+    });
+
+    // exactly ONE auto-nudge per page load, only when opted in, never on Friday
+    if (OPTIN && !AUTO_NUDGED && !isFriday() && shown.length) {
+      AUTO_NUDGED = true;
+      setTimeout(function () {
+        var r = shown[0];
+        if (r.lv === 'A') fireAspirin(r.sq, r.team.name); else fireTreatment(r.sq, r.team.name);
+      }, 2500);
+    }
+  }
+
+  /* ---------------- Timbits library ---------------- */
+  function renderLibrary() {
+    if (!TB) return;
+    var meta = TB.meta || {};
+    if (meta.menu_lines) {
+      $('#lib-menu-line').innerHTML = '<b style="color:var(--gold)">' + esc(meta.menu_lines.header) + '</b> — ' +
+        esc(meta.menu_lines.sub) + ' · <i>' + esc(meta.menu_lines.footer) + '</i>';
+    }
+    $$('.mode-chip').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-mode') === MODE); });
+
+    var cats = (meta.categories) || {};
+    var items = (TB.core || []).filter(function (t) {
+      if (CAT === 'featured' && !t.featured) return false;
+      if (CAT !== 'all' && CAT !== 'featured' && t.category !== CAT) return false;
+      if (SEARCH) {
+        var hay = (t.title + ' ' + t.quote + ' ' + t.timbit + ' ' + (t.barstool || '') + ' ' + (t.context || '')).toLowerCase();
+        if (hay.indexOf(SEARCH) < 0) return false;
+      }
+      return true;
+    });
+
+    $('#lib-grid').innerHTML = items.length ? items.map(function (t) {
+      var cat = cats[t.category] || {};
+      var pillKind = { rant: 'danger', ism: 'info', talk: '', timbit: 'warn' }[t.category] || '';
+      var feat = t.featured ? '<span class="pill gold">★ ' + esc(t.featuredNote || 'Featured') + '</span>' : '';
+      var body = '';
+      if (MODE === 'raw') {
+        body = '<div class="tb-voice">Raw Tim — the Barstool voice</div>' +
+               '<div class="tb-quote">"' + esc(t.quote) + '"</div>' +
+               '<div class="tb-body">' + esc(t.barstool || '') + '</div>';
+      } else if (MODE === 'agent') {
+        body = '<div class="tb-voice">Culture Agent — boardroom framing</div>' +
+               '<div class="tb-quote">"' + esc(t.quote) + '"</div>' +
+               '<div class="tb-body">' + esc(t.context || '') + '</div>';
+      } else {
+        body = '<div class="tb-voice">Swiss Protocol — structured view</div>' +
+          '<div class="swiss">' +
+            '<div class="sw-row"><div class="sw-k">ID / Code</div><div class="sw-v">' + esc(t.id) + ' · ' + esc(t.jCode) + '</div></div>' +
+            '<div class="sw-row"><div class="sw-k">Category</div><div class="sw-v">' + esc(cat.label || t.category) + '</div></div>' +
+            '<div class="sw-row"><div class="sw-k">Principle</div><div class="sw-v">"' + esc(t.quote) + '"</div></div>' +
+            '<div class="sw-row"><div class="sw-k">Context</div><div class="sw-v">' + esc(t.context || '') + '</div></div>' +
+          '</div>';
+      }
+      return '<div class="tb-card' + (t.featured ? ' featured' : '') + '" id="' + esc(t.id) + '">' +
+        '<div class="tb-top">' + Shell.pill(esc(t.jCode) + ' · ' + esc(cat.label || t.category), pillKind) + feat + '</div>' +
+        '<div class="tb-title">' + esc(t.title) + '</div>' +
+        body +
+        '<div class="bumper"><small>The Timbit</small>' + esc(t.timbit) + '</div>' +
+      '</div>';
+    }).join('') : '<p class="muted">No entries match. Clear the search or pick another category.</p>';
+  }
+
+  $$('.mode-chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      MODE = c.getAttribute('data-mode');
+      store('hb1000-culture-mode', MODE);
+      if (MODE !== 'agent') Shell.setVoice(MODE === 'swiss' ? 'swiss' : 'tim'); // raw/swiss mirror into the global voice; 'agent' stays page-local
+      renderLibrary();
+    });
+  });
+  /* reflect the global voice toggle (guard banner / other pages); 'agent' never leaks into the global key */
+  document.addEventListener('hb-voice-change', function () {
+    if (MODE !== 'agent') { MODE = (Shell.voice() === 'swiss') ? 'swiss' : 'raw'; store('hb1000-culture-mode', MODE); }
+    renderLibrary();
+  });
+  $$('.cat-chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      CAT = c.getAttribute('data-cat');
+      $$('.cat-chip').forEach(function (x) { x.classList.toggle('on', x === c); });
+      renderLibrary();
+    });
+  });
+  $('#lib-search').addEventListener('input', function () {
+    SEARCH = $('#lib-search').value.trim().toLowerCase();
+    renderLibrary();
+  });
+
+  function jumpToTimbit(id) {
+    CAT = 'all'; SEARCH = ''; $('#lib-search').value = '';
+    $$('.cat-chip').forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-cat') === 'all'); });
+    renderLibrary();
+    var el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('flash');
+      setTimeout(function () { el.classList.remove('flash'); }, 2200);
+    }
+  }
+
+  /* ---------------- glossary + collisions ---------------- */
+  function renderGlossary() {
+    var g = (TB && TB.glossary) || [];
+    $('#glossary').innerHTML =
+      '<table><thead><tr><th>Timbit</th><th>Source / context</th><th>Why it matters</th></tr></thead><tbody>' +
+      g.map(function (r) {
+        return '<tr><td style="color:var(--gold); font-weight:700">' + esc(r.timbit) + '</td>' +
+               '<td>' + esc(r.source) + '</td><td class="muted">' + esc(r.why) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  function renderCollisions() {
+    var c = (TB && TB.serendipitous_collisions) || [];
+    $('#collisions').innerHTML = c.map(function (s) {
+      return '<div class="tb-card" id="' + esc(s.id) + '">' +
+        '<div class="tb-title">' + esc(s.title) + '</div>' +
+        '<div class="tier giant"><div class="tr-h">Wisdom Giant insight</div><p>' + esc(s.wisdom_giant) + '</p></div>' +
+        '<div class="tier bar"><div class="tr-h">Barstool Understanding</div><p>' + esc(s.barstool) + '</p></div>' +
+        '<div class="bumper"><small>The Timbit</small>' + esc(s.timbit) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ---------------- Culture Audit (client-side port of POST /api/culture-audit) ---------------- */
+  var TOXIC = [
+    { re: /per my last email/gi,            label: '"per my last email" (passive-aggressive)' },
+    { re: /as i (?:already )?said/gi,       label: '"as I said" (passive-aggressive)' },
+    { re: /with all due respect/gi,         label: '"with all due respect" (contempt marker)' },
+    { re: /that'?s not my (?:job|department|problem)/gi, label: '"not my job/department" (silo)' },
+    { re: /\bobviously\b/gi,                label: '"obviously" (condescension)' },
+    { re: /you always\b/gi,                 label: '"you always" (blame absolutism)' },
+    { re: /you never\b/gi,                  label: '"you never" (blame absolutism)' },
+    { re: /your fault/gi,                   label: '"your fault" (blame)' },
+    { re: /not my call/gi,                  label: '"not my call" (accountability dodge)' },
+    { re: /no offen[cs]e/gi,                label: '"no offence" (pre-insult marker)' },
+    { re: /just saying/gi,                  label: '"just saying" (drive-by criticism)' },
+    { re: /waste of (?:my )?time/gi,        label: '"waste of time" (contempt)' },
+    { re: /\bpointless\b/gi,                label: '"pointless" (cynicism)' },
+    { re: /\buseless\b/gi,                  label: '"useless" (contempt)' },
+    { re: /who approved this/gi,            label: '"who approved this" (CYA escalation)' },
+    { re: /should have known/gi,            label: '"should have known" (hindsight blame)' },
+    { re: /\bwhatever you (?:want|say)\b/gi,label: '"whatever you say" (disengagement)' },
+    { re: /don'?t (?:really )?care/gi,      label: '"don\'t care" (disengagement)' },
+    { re: /fine, whatever/gi,               label: '"fine, whatever" (contempt)' },
+    { re: /take (?:this|it) offline\b/gi,   label: '"take it offline" (conflict avoidance — count, not crime)' }
+  ];
+
+  var DIGNITY = [
+    { re: /these people/gi,    label: '"these people"' },
+    { re: /those people/gi,    label: '"those people"' },
+    { re: /\bdeadbeats?\b/gi,  label: '"deadbeat(s)"' },
+    { re: /\blosers?\b/gi,     label: '"loser(s)"' },
+    { re: /trailer trash/gi,   label: '"trailer trash"' },
+    { re: /low[- ]?lifes?\b/gi,label: '"low-life(s)"' },
+    { re: /white trash/gi,     label: '"white trash"' },
+    { re: /stupid (?:customers?|clients?|members?|people)/gi, label: '"stupid customers/people"' }
+  ];
+
+  function countMatches(text, re) { var m = text.match(re); return m ? m.length : 0; }
+  function clamp(v) { return Math.max(0, Math.min(100, Math.round(v))); }
+
+  function runAudit(text) {
+    var hits = [];
+    TOXIC.forEach(function (t) {
+      var n = countMatches(text, t.re);
+      if (n) hits.push({ label: t.label, n: n });
+    });
+    var toxicCount = hits.reduce(function (a, h) { return a + h.n; }, 0);
+
+    var dignityHits = [];
+    DIGNITY.forEach(function (d) {
+      var n = countMatches(text, d.re);
+      if (n) dignityHits.push({ label: d.label, n: n });
+    });
+
+    // Tone 25%
+    var positive = countMatches(text, /thank(?:s| you)|appreciate|great work|well done|nice work|love (?:this|it|that)/gi);
+    var tone = clamp(85 - toxicCount * 12 + Math.min(15, positive * 3) - dignityHits.length * 15);
+
+    // Ruby Red 25%
+    var rr = countMatches(text, /ruby red|\bmember(?:s)?\b|\bcustomer(?:s)?\b|\bclient(?:s)?\b|\bmom\b|\bmother\b|\bdignity\b|\bfamily\b|\bcommunity\b|\bfor her\b|\bshe needs\b/gi);
+    var rubyRed = rr === 0 ? 25 : rr <= 2 ? 55 : rr <= 5 ? 75 : 92;
+    if (dignityHits.length) rubyRed = clamp(rubyRed - 30);
+
+    // Energy 20%
+    var burn = countMatches(text, /exhausted|burn(?:ed|t)[- ]?out|tired of|can'?t keep (?:up|doing)|overwhelmed|what'?s the point|\bi guess\b|\bsigh\b|drowning/gi);
+    var spark = countMatches(text, /excited|let'?s go|pumped|energi[sz]ed|\bjoy\b|\bfun\b|can'?t wait|fired up/gi);
+    var energy = clamp(75 - burn * 10 + Math.min(18, spark * 6));
+
+    // Agenda 15%
+    var ag = countMatches(text, /\bagenda\b|desired outcome|\bobjective\b|action items?|next steps?|\bowner\b|due (?:date|by)|by (?:mon|tues|wednes|thurs|fri|satur|sun)day|\bdeadline\b|\bdecision\b|\brecap\b/gi);
+    var drift = countMatches(text, /off[- ]topic|circling|rabbit hole|tangent/gi);
+    var agenda = clamp((ag === 0 ? 35 : ag === 1 ? 55 : ag <= 3 ? 72 : 90) - drift * 8);
+
+    // Promise 15%
+    var commits = countMatches(text, /\bi(?:'ll| will)\b|\bwe(?:'ll| will)\b|\bcommit(?:ted|ment)?\b|\bpromise\b|\bi can have\b/gi);
+    var timelines = countMatches(text, /by (?:eod|end of day|noon|tomorrow|tonight|next week|mon|tues|wednes|thurs|fri|satur|sun|\d)/gi);
+    var vague = countMatches(text, /we should\b|someday|at some point|eventually|when (?:i|we) get a chance/gi);
+    var promise = commits === 0 ? 60 : (timelines > 0 ? 85 : 45);
+    promise = clamp(promise - vague * 7 + Math.min(10, timelines * 2));
+
+    // agent overlay
+    var latency = countMatches(text, /still waiting|no decision|circle back|park (?:it|this)|table (?:this|it)|revisit (?:later|next)/gi);
+    var velocity = clamp(80 - latency * 10);
+    var frag = countMatches(text, /switching gears|jumping (?:around|topics)|unrelated,? but|quick tangent|while i have you/gi);
+    var context = clamp(82 - frag * 8);
+    var siloH = countMatches(text, /not my (?:job|department|problem)|that'?s (?:on|for) (?:them|their team)|need[- ]to[- ]know|why (?:wasn'?t|weren'?t) (?:i|we) (?:told|included)/gi);
+    var silo = clamp(84 - siloH * 10);
+
+    var dims = [
+      { key: 'tone',    label: 'Tone',               weight: 25, score: tone,    agent: 'agent-tone' },
+      { key: 'rubyred', label: 'Ruby Red Alignment', weight: 25, score: rubyRed, agent: 'agent-empathy' },
+      { key: 'energy',  label: 'Energy',             weight: 20, score: energy,  agent: 'agent-energy' },
+      { key: 'agenda',  label: 'Agenda Drift',       weight: 15, score: agenda,  agent: 'agent-agenda' },
+      { key: 'promise', label: 'Promise Tracking',   weight: 15, score: promise, agent: 'agent-promise' }
+    ];
+    var composite = clamp(dims.reduce(function (a, d) { return a + d.score * d.weight / 100; }, 0));
+
+    var agents = {
+      'agent-agenda': agenda, 'agent-tone': tone, 'agent-velocity': velocity,
+      'agent-context-switch': context, 'agent-silo': silo, 'agent-empathy': rubyRed,
+      'agent-promise': promise, 'agent-energy': energy
+    };
+
+    return { dims: dims, composite: composite, toxic: hits, dignity: dignityHits, agents: agents, commits: commits, timelines: timelines };
+  }
+
+  var REC_MAP = {
+    'agent-tone':    'Friction in the language. Re-read before sending — transparency without cruelty.',
+    'agent-empathy': 'Ruby Red is missing from the room. Name her in the next decision — she is the reason, not the user.',
+    'agent-energy':  'Energy drift detected. Joy is a leading indicator, not a luxury — find what drained the room.',
+    'agent-agenda':  'No agenda or desired outcome detected. Robust collaboration + robust communication = impact.',
+    'agent-promise': 'Commitments without who / what / when. Every promise needs an owner and a timeline — log it as a PTK.',
+    'agent-velocity':'Decisions are parked, not made. Momentum beats permission culture.',
+    'agent-silo':    '"Not my department" energy. If it is in front of you, it is yours.',
+    'agent-context-switch': 'Topic fragmentation. Navigate by what does not move — one thread at a time.'
+  };
+
+  $('#btn-audit').addEventListener('click', function () {
+    var text = $('#audit-text').value || '';
+    var out = $('#audit-out');
+    if (text.trim().split(/\s+/).length < 20) {
+      out.innerHTML = '<div class="notice-bad">Paste a real transcript (about 20 words minimum) — meeting notes, a Slack thread, an email chain. The audit runs entirely in this page; nothing leaves your browser.</div>';
+      return;
+    }
+    var r = runAudit(text);
+    var verdict = r.composite >= 80 ? ['healthy', 'good'] : r.composite >= 60 ? ['needs_attention', 'warn'] : ['critical', 'danger'];
+    var anyLow = Object.keys(r.agents).some(function (k) { return r.agents[k] < 50; });
+    var escalate = anyLow || r.composite < 65;
+    var ringCls = r.composite >= 80 ? 'green' : r.composite >= 60 ? 'yellow' : 'red';
+
+    var html = '';
+
+    if (r.dignity.length) {
+      html += '<div class="dignity-block"><b>⛔ THE DIGNITY TEST — BLOCKING GATE.</b> Dehumanizing language detected: ' +
+        r.dignity.map(function (d) { return esc(d.label) + ' ×' + d.n; }).join(' · ') +
+        '.<br><i>"Would you be comfortable if your mother went through this?"</i> Fix the language first — nothing else in this audit matters until this passes.</div>';
+    }
+
+    html += '<div class="row" style="align-items:flex-start; gap:20px">' +
+      '<div class="gauge"><div class="scoreRing ' + ringCls + '" style="--val:' + r.composite + '"><span class="val num">' + r.composite + '</span><span class="of">/100</span></div>' +
+      '<div><div class="glabel">Composite</div><div style="margin:4px 0">' + Shell.pill(verdict[0], verdict[1]) + '</div>' +
+      (escalate ? '<div class="gnote" style="color:var(--red); font-weight:700">ESCALATES — any single agent &lt;50 or composite &lt;65 goes to the Dingo Caller.</div>'
+                : '<div class="gnote">No escalation triggered.</div>') +
+      '</div></div><div style="flex:1; min-width:260px">';
+
+    r.dims.forEach(function (d) {
+      var col = d.score >= 80 ? 'var(--green)' : d.score >= 60 ? 'var(--yellow)' : 'var(--red)';
+      html += '<div class="dimbar"><div class="d-top"><span><b>' + esc(d.label) + '</b> <span class="w">· weight ' + d.weight + '%</span></span><span class="num">' + d.score + '</span></div>' +
+        '<div class="d-trk"><div class="d-fill" style="width:' + d.score + '%; background:' + col + '"></div></div></div>';
+    });
+    html += '</div></div>';
+
+    html += '<div class="ph" style="margin-top:14px">8 Antibody Agent reports</div>';
+    Object.keys(ANTIBODY).forEach(function (id) {
+      var s = r.agents[id];
+      var cls = s >= 80 ? 'ok' : s >= 60 ? 'warn' : 'bad';
+      var st = s >= 80 ? 'OK' : s >= 60 ? 'WATCH' : 'BREACH';
+      html += '<div class="status-row ' + cls + '"><span class="st">' + st + '</span><span class="grow"><b>' + esc(ANTIBODY[id].name) +
+        '</b> <span class="muted">— ' + esc(ANTIBODY[id].metric) + '</span></span><span class="num" style="font-weight:800">' + s + '</span></div>';
+    });
+
+    if (r.toxic.length) {
+      html += '<div class="ph" style="margin-top:14px">Toxic patterns detected</div><p class="muted" style="font-size:12.5px">' +
+        r.toxic.map(function (h) { return esc(h.label) + ' ×' + h.n; }).join(' · ') + '</p>';
+    } else {
+      html += '<p class="footnote" style="margin-top:12px">No toxic patterns matched the 20-pattern detector.</p>';
+    }
+
+    var recs = [];
+    Object.keys(ANTIBODY).forEach(function (id) {
+      if (r.agents[id] < 80) recs.push(id);
+    });
+    if (recs.length) {
+      html += '<div class="ph" style="margin-top:14px">Recommendations — each linked to a Timmyism</div>';
+      recs.forEach(function (id) {
+        var tb = timbitById(ANTIBODY[id].timbit);
+        html += '<div class="rec-row"><span class="grow"><b>' + esc(ANTIBODY[id].name) + ':</b> ' + esc(REC_MAP[id] || '') + '</span>' +
+          '<a href="#' + esc(ANTIBODY[id].timbit) + '" class="rec-link" data-tb="' + esc(ANTIBODY[id].timbit) + '">→ ' + esc(tb ? tb.title : 'Timmyism') + '</a></div>';
+      });
+    } else {
+      html += '<p class="footnote" style="margin-top:10px">All eight agents at or above 80 — monitor only. "Did you get your Timmy\'s today?"</p>';
+    }
+
+    html += '<p class="footnote" style="margin-top:10px">Suggest-only. Nothing here auto-applies; recommendations go to a human, always.</p>';
+    out.innerHTML = html;
+
+    $$('.rec-link', out).forEach(function (a) {
+      a.addEventListener('click', function (e) { e.preventDefault(); jumpToTimbit(a.getAttribute('data-tb')); });
+    });
+  });
+  $('#btn-audit-clear').addEventListener('click', function () {
+    $('#audit-text').value = ''; $('#audit-out').innerHTML = '';
+  });
+
+  /* ---------------- boot ---------------- */
+  renderWeek();
+  renderImmuneLine();
+
+  Promise.all([
+    loadData('data/timbits.json'),
+    loadData('data/cards/pawn-princess-pp01.json'),
+    loadData('data/cards/seba-hub-occupancy.json'),
+    loadData('data/cards/door-to-door.json')
+  ]).then(function (res) {
+    TB = res[0];
+    TEAMS = [
+      computeTeam(res[1], 'pawn-princess-pp01.json', false),
+      computeTeam(res[2], 'seba-hub-occupancy.json', false),
+      computeTeam(res[3], 'door-to-door.json', true)
+    ];
+    TEAMS.forEach(function (t) { prevCaught[t.file] = !isFriday() && t.score < chaserPos(); });
+    renderRace();
+    renderScoreboard();
+    renderQueue();
+    renderLibrary();
+    renderGlossary();
+    renderCollisions();
+    setInterval(renderRace, 1000); // the game loop ticks every 1 s
+  }).catch(function (err) {
+    var msg = '<div class="notice-bad"><b>Could not load seed data</b> (' + esc(err && err.message || err) + ').<br>' +
+      'If you opened this file directly (file://), your browser may block local fetch — serve the app folder over HTTP ' +
+      '(e.g. <code>python -m http.server</code> in <code>hb1000-os/app/</code>) and reload. The library, scoreboard and audit all read real JSON; nothing is hardcoded.</div>';
+    $('#race-lanes').innerHTML = msg;
+    $('#scoreboard').innerHTML = '';
+    $('#lib-grid').innerHTML = msg;
+    $('#glossary').innerHTML = '';
+  });
+})();
+</script>
+</body>
+</html>

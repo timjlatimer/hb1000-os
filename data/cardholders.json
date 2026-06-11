@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "what": "Issued Dingo Cards — who holds one, which card they land on, and the passcode that opens the front door (login.html).",
+    "note": "Light access-gate, not security; real auth = Phase 5 Firebase. Passcodes are plain text on purpose — this is a front door with a doorbell, not a lock. Direct URLs still work; the guard banner on every page says what is simulated.",
+    "doctrine": "People are ISSUED Dingo cards. They sign in, they land on THEIR card — the back engine stays hidden.",
+    "key": "localStorage hb1000-cardholder = { name, card, role }",
+    "roles": {
+      "caller": "Dingo Caller — lands on their card; nav reduces to My Card · My Promises · Take the walk · Sign out",
+      "admin": "ALL-ACCESS — full 14-page nav, the whole engine room",
+      "guest": "sample view — same reduced nav, on the reference card"
+    }
+  },
+  "cardholders": [
+    {
+      "name": "Lauren",
+      "passcode": "pp01",
+      "card": "pawn-princess-pp01",
+      "role": "caller",
+      "title": "Dingo Caller — Pawn Princess PP-01 (store manager, one neck to choke)"
+    },
+    {
+      "name": "Casey",
+      "passcode": "seba",
+      "card": "seba-hub-occupancy",
+      "role": "caller",
+      "title": "Dingo Caller — Seba Hub Occupancy Engine (no empty night, no empty seat)"
+    },
+    {
+      "name": "Tim",
+      "passcode": "prime",
+      "card": "pawn-princess-pp01",
+      "role": "admin",
+      "title": "ALL-ACCESS — Prime North Star holder; full nav, every room"
+    },
+    {
+      "name": "Guest",
+      "passcode": "guest",
+      "card": "pawn-princess-pp01",
+      "role": "guest",
+      "title": "Sample view — the reference Pawn Princess card, read-only by convention"
+    }
+  ]
+}

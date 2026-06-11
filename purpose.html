@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do Before I Die — Purpose DNA · The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* Cormorant Garamond — optional display font, THIS PAGE ONLY (BLUEPRINT §5.1) */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap');
+.serif{font-family:'Cormorant Garamond',Georgia,serif}
+
+.hero{display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:center;margin:8px 0 22px}
+.hero img{border-radius:var(--radius-lg);border:1px solid var(--line);width:100%}
+.hero .kicker{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
+.hero h1{font-size:42px;margin-bottom:8px}
+.hero h1 .serif{font-weight:700}
+.hero .sub{font-size:15.5px;color:var(--muted);max-width:560px}
+.hero .sig{font-size:12px;color:var(--soft);font-style:italic;margin-top:14px;line-height:1.5}
+@media (max-width:900px){.hero{grid-template-columns:1fr}.hero h1{font-size:32px}}
+
+.statement{
+  font-family:'Cormorant Garamond',Georgia,serif;font-size:31px;line-height:1.5;font-weight:600;
+  color:var(--gold-glass);padding:26px 30px;background:var(--panel);
+  border:1px solid rgba(232,181,77,.45);border-radius:var(--radius-lg);
+  box-shadow:0 0 30px rgba(232,181,77,.07), inset 0 0 40px rgba(232,181,77,.04);
+}
+@media (max-width:900px){.statement{font-size:24px;padding:20px}}
+
+.pullquote{
+  font-family:'Cormorant Garamond',Georgia,serif;font-size:25px;line-height:1.5;font-style:italic;
+  color:var(--ink);border-left:3px solid var(--gold);padding:8px 0 8px 22px;margin:16px 0;
+}
+.pullquote b{color:var(--gold);font-style:normal}
+
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;font-weight:700;margin-top:10px}
+.chain .node{background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:4px 13px}
+.chain .node.prime{border-color:var(--gold);color:var(--gold)}
+.chain .arr{color:var(--soft)}
+
+/* trilayer tabs */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tab-btn{
+  padding:7px 18px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);
+  color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
+}
+.tab-btn:hover{border-color:var(--gold);color:var(--gold)}
+.tab-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(232,181,77,.1)}
+.tab-panel{font-size:16px;line-height:1.65;color:var(--ink);min-height:84px}
+.tab-panel .serif{font-size:21px}
+
+/* degree journey timeline */
+.degrees{display:flex;align-items:stretch;flex-wrap:wrap;gap:6px 26px;margin:14px 0}
+.stage{flex:1;min-width:190px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;position:relative}
+.stage:not(:last-child)::after{content:'→';position:absolute;right:-21px;top:50%;transform:translateY(-50%);color:var(--soft);font-size:18px}
+.stage.here{border-color:var(--gold);box-shadow:0 0 16px rgba(232,181,77,.25)}
+.stage .deg{font-weight:900;font-size:17px;color:#fff}
+.stage.here .deg{color:var(--gold)}
+.stage .mean{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
+@media (max-width:900px){.stage:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-22px;transform:translateX(-50%)}.degrees{gap:26px 6px}}
+
+/* accordion */
+details.acc{border:1px solid var(--line);border-radius:var(--radius);margin:8px 0;background:var(--panel-2);overflow:hidden}
+details.acc summary{cursor:pointer;padding:11px 16px;font-weight:700;font-size:14px;color:var(--ink);list-style:none}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::before{content:'▸ ';color:var(--gold)}
+details.acc[open] summary::before{content:'▾ '}
+details.acc summary:hover{color:var(--gold)}
+details.acc .acc-body{padding:4px 18px 16px;font-size:14px;color:var(--ink);line-height:1.65}
+details.acc .acc-body blockquote{font-size:14px}
+
+ol.legacy{counter-reset:none;padding-left:22px;margin:8px 0}
+ol.legacy li{margin:9px 0;font-size:14.5px;line-height:1.55}
+ol.legacy li b{color:var(--gold)}
+
+.milestones{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px}
+.milestone{display:flex;gap:9px;align-items:flex-start;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:10px 13px;font-size:13px}
+.milestone .box{color:var(--gold);font-size:15px;line-height:1.2}
+
+.gratitude{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-style:italic;line-height:1.6;color:var(--ink)}
+.section{margin:30px 0}
+.parenthetical{font-size:12.5px;color:var(--soft);font-style:italic;line-height:1.6;margin-top:10px}
+
+/* hero banner art — from the model tour (legacy) archive */
+.hero-art{margin:4px 0 18px}
+.hero-art img{width:100%;max-height:320px;object-fit:cover;object-position:center 18%;border-radius:var(--radius-lg);border:1px solid var(--line);display:block}
+.hero-art figcaption{margin-top:6px}
+
+/* Ruby Red cash-flow ledger (the "why this matters" proof) */
+.rr-ledger{border-left:3px solid var(--ruby)}
+.rr-ledger table{margin:4px 0}
+.rr-ledger td,.rr-ledger th{font-size:13px;padding:6px 9px}
+.rr-ledger td.amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}
+.rr-ledger .neg{color:var(--red)}
+.rr-ledger .pos{color:var(--green)}
+.rr-ledger tr.sumrow td{border-top:2px solid var(--line);font-weight:900;color:#fff}
+.rr-agent label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.rr-agent input{accent-color:var(--ruby)}
+.rr-verdict{font-size:15px;font-weight:800;margin-top:10px}
+.rr-verdict b{font-size:21px}
+
+@media print{
+  #hb-sidebar,.guard-banner,#hb-nav-toggle{display:none!important}
+  body{padding-left:0;background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- ======================= HERO BANNER ART ======================= -->
+  <figure class="hero-art">
+    <!-- IMG-05 (Phase-4 harvest, Tim-approved) — painterly repaint; retires the photoreal ruby-red-hero render -->
+    <img src="assets/img/ruby-red-hero.webp"
+         alt="Ruby Red — a working mother in a deep ruby-red cardigan at her kitchen table late in the evening, calm and resolute; an open household ledger, a small stack of bills and a nearly full coin jar in warm lamplight, children's crayon drawings on the refrigerator behind her"
+         fetchpriority="high">
+    <figcaption class="footnote">Ruby Red at her kitchen table — painterly repaint (Phase-4 harvest), in the house gouache style.
+      She is the canonical <b style="color:var(--gold)">Local</b> North Star (Maven lane), not the Prime — she is who the Prime is FOR.</figcaption>
+  </figure>
+
+  <!-- ======================= HERO ======================= -->
+  <header class="hero">
+    <div>
+      <div class="kicker">Purpose DNA · the apex of the HB1000 Operating System</div>
+      <h1><span class="serif">Do <b>Before I Die</b></span></h1>
+      <p class="sub">The purpose statement Tim has been writing for ten years — his moral ambition.
+        Everything in the OS hangs below this page and must <b style="color:var(--gold)">RHYME</b> with it.</p>
+      <div class="row" style="margin-top:12px">
+        <span class="pill gold">Prime v2026.04 — rendered by default</span>
+        <span class="pill">Prime v2025.04 — master long-form, accordion below</span>
+      </div>
+      <p class="sig" id="sig"></p>
+    </div>
+    <img src="assets/img/globe-north-star.webp" alt="A globe under the North Star — the Prime at the apex of the model">
+  </header>
+
+  <!-- ======================= EXECUTIVE SUMMARY ======================= -->
+  <section class="section panel">
+    <div class="ph">Executive Summary</div>
+    <p>This is the <b style="color:var(--gold)">Prime North Star</b> of the HB1000 Operating System —
+      Tim's Do-Before-I-Die Purpose Statement, a living document refined for roughly ten years.
+      <b>ONE Prime per deployment.</b> Every Local North Star, Vivid Vision, Dingo Caller, Dingo card
+      and agent below it must rhyme with it.</p>
+    <blockquote>"Everything must rhyme. Not be identical — RHYME. Like verses in the same song.
+      The Prime sets the key; everything underneath plays in tune."</blockquote>
+    <p>It is operationalized, not decorative: <i>"Every spawned project must pass the
+      <b style="color:var(--gold)">Twin North Star Gate</b>: Prime check + Local check before any token is spent."</i></p>
+    <div class="chain" aria-label="The Rhyming Hierarchy">
+      <span class="node prime">Prime North Star</span><span class="arr">→</span>
+      <span class="node">Local North Star</span><span class="arr">→</span>
+      <span class="node">Vivid Vision</span><span class="arr">→</span>
+      <span class="node">Dingo Caller</span><span class="arr">→</span>
+      <span class="node">Dingo Cards</span>
+    </div>
+  </section>
+
+  <!-- ======================= WHY THIS MATTERS — RUBY RED'S CASH-FLOW MONTH ======================= -->
+  <section class="section panel rr-ledger" id="ruby-ledger">
+    <div class="ph">Why this matters — Ruby Red’s cash-flow month <span style="color:var(--soft);text-transform:none;letter-spacing:0">(the most persuasive 30 seconds the predecessor walkthrough ever produced)</span></div>
+    <p style="font-size:13.5px">$2,400 of income. The bills land. Then the flat tire. This is the month the whole OS exists to fix —
+      seven named agents, each clawing back a real line item, turn a <b class="neg" style="color:var(--red)">−$90 month</b> into
+      <b style="color:var(--green)">breathing room</b>. Toggle an agent off to feel the month without it.</p>
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div class="ph" style="font-size:11px">The month, before help</div>
+        <table>
+          <tbody>
+            <tr><td>Income</td><td class="amt" id="rr-income">…</td></tr>
+            <tr><td>Expenses + the flat tire <span class="footnote">(computed: income − the recorded gap)</span></td><td class="amt neg" id="rr-out">…</td></tr>
+            <tr class="sumrow"><td>The gap</td><td class="amt neg" id="rr-gap">…</td></tr>
+          </tbody>
+        </table>
+        <div class="rr-verdict" id="rr-verdict"></div>
+        <blockquote style="font-size:13px;margin-bottom:0">“That’s what 25 AI agents do.”</blockquote>
+      </div>
+      <div>
+        <div class="ph" style="font-size:11px">The 7 named agents — recovery, line by line</div>
+        <table>
+          <tbody id="rr-agents"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="footnote" style="margin-top:10px">
+      Figures transcribed verbatim from the model tour (legacy) ledger demo (“Ruby Red’s Cash Flow This Month”, archived in
+      <code>hb1000-os/hardhat-notes-live.md</code>): −$90 gap → +$351 recovery → +$261 breathing room. All totals on this panel are
+      computed at render from the seven line items — computed, never asserted. Ruby Red is a Local North Star, never the Prime (locked vocabulary).
+    </p>
+  </section>
+
+  <!-- ======================= THE NORTH STAR (VERBATIM) ======================= -->
+  <section class="section">
+    <div class="sec-h">⭐ The North Star — <b>verbatim, never paraphrased</b></div>
+    <div class="statement" id="statement"></div>
+    <p class="footnote" style="margin-top:8px">The only sanctioned restatement pattern is the trilayer
+      (Barstool / Cliché / Wisdom-Giant) below. Core value: <b style="color:var(--gold)">Attitude of Gratitude</b>.</p>
+  </section>
+
+  <!-- ======================= HOW THE OS CONSUMES THE PRIME ======================= -->
+  <section class="section grid2">
+    <div class="panel tight">
+      <div class="ph">The litmus test</div>
+      <p id="litmus" style="font-size:14px"></p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">BHAG (3–5 year, numbers in the sentence)</div>
+      <p id="bhag" style="font-size:14px"></p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">Operational values</div>
+      <p id="opvalues" style="font-size:14px"></p>
+    </div>
+    <div class="panel tight">
+      <div class="ph">Twin North Star Gate</div>
+      <p style="font-size:14px">Prime check + Local check before any token is spent. If either fails:
+        <b style="color:var(--red)">HALT → Park.</b> "No tokens burned, no agent spawned."</p>
+    </div>
+  </section>
+
+  <!-- ======================= ATTITUDE OF GRATITUDE ======================= -->
+  <section class="section panel">
+    <div class="ph">My Core Value: Attitude of Gratitude</div>
+    <p class="gratitude" id="gratitude"></p>
+  </section>
+
+  <!-- ======================= WHO GETS TO DO THIS? ======================= -->
+  <section class="section panel">
+    <div class="ph">"Who gets to do this?" — the resolving question</div>
+    <p class="pullquote" id="resolving"></p>
+    <p id="resolving-long" style="font-size:14px;color:var(--muted)"></p>
+  </section>
+
+  <!-- ======================= THE 8 LEGACY BUSINESSES ======================= -->
+  <section class="section panel">
+    <div class="ph">The 8 Legacy Businesses <span style="color:var(--soft);text-transform:none;letter-spacing:0">(v2026.04 — supersedes the six in the 2025 docx)</span></div>
+    <ol class="legacy" id="legacy"></ol>
+  </section>
+
+  <!-- ======================= THE REWARD ======================= -->
+  <section class="section panel">
+    <div class="ph">If I Succeed before I die: My Reward — <span style="color:var(--gold)">verbatim</span></div>
+    <p id="reward-lead" style="font-size:14.5px"></p>
+    <p class="pullquote" id="reward-pull"></p>
+    <p class="parenthetical" id="reward-paren"></p>
+    <p id="reward-close" class="serif" style="font-size:20px;color:var(--gold-glass);margin-top:14px"></p>
+    <hr>
+    <div class="ph">The trackable leading indicators Tim already named</div>
+    <div class="milestones" id="milestones"></div>
+  </section>
+
+  <!-- ======================= THE THATCHER CHALLENGE ======================= -->
+  <section class="section panel">
+    <div class="ph">The Thatcher challenge</div>
+    <p class="pullquote" id="thatcher"></p>
+  </section>
+
+  <!-- ======================= TRILAYER ======================= -->
+  <section class="section panel">
+    <div class="ph">Three layers of the same idea — the sanctioned restatement pattern</div>
+    <div class="tabs" role="tablist" aria-label="Three layers of the same idea">
+      <button class="tab-btn on" role="tab" aria-selected="true" data-tab="barstool" id="tab-barstool">Barstool</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="cliche" id="tab-cliche">The Cliché</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="wisdom_giant" id="tab-wisdom">Wisdom-Giant</button>
+    </div>
+    <div class="tab-panel" id="trilayer-panel" role="tabpanel" aria-live="polite"></div>
+  </section>
+
+  <!-- ======================= STAGES OF MY LIFE ======================= -->
+  <section class="section panel">
+    <div class="spread">
+      <div class="ph" style="margin-bottom:0">Stages of My Life — the School of Hard Knocks <b style="color:var(--gold)">Degree Journey</b></div>
+      <span class="pill warn" id="confirm-flag" title="">⏳ pending Tim's confirmation</span>
+    </div>
+    <p class="footnote" id="confirm-note" style="margin:8px 0 0"></p>
+    <div class="degrees" id="degrees"></div>
+    <details class="acc">
+      <summary>The narrative arc behind the degrees — <i>Confessions of a Predator Lender</i> (the stages in story form)</summary>
+      <div class="acc-body">
+        <ol style="padding-left:20px;line-height:1.7">
+          <li><b>The Island</b> — dairy farm at the end of a dirt road; the "wrong" son in a blended family of seven sisters; "a guest in my own home."</li>
+          <li><b>The Blank Slate</b> — "Because I didn't belong to their story, I was free to write my own."</li>
+          <li><b>The Best Practice Junkie</b> — hunter of wisdom; books, tapes, seminars; "searching for the secret code that would let a farm boy put a ding in the universe."</li>
+          <li><b>The Predator Years / Laboratory of Life</b> — pawn shops and high-interest lending; the world's name for him: Predator; the discovery of dignity ("The Poor Man's Bank" butterfly).</li>
+          <li><b>The Fusion</b> — finding biological father Rudie Heineke (Nature: wild ideas, optimism) + the farm (Nurture: discipline, systems).</li>
+          <li><b>The Force Multiplier <span class="pill gold">CURRENT</span></b> — "The 'Predator Lender' became a 'Force Multiplier.' We weren't just a business anymore; we were a movement." Building the net (Blue Seal, HB1000) so a whole village's brilliance gets caught.</li>
+          <li><b>The Final Gift (intended)</b> — significance, the roadmap, "I touched the hand, the mind, the heart, the soul of someone who changed the world."</li>
+        </ol>
+        <blockquote>"In my school of hard knocks. Degree journey. Then, like Churchill said, 'Never let a good crisis go to waste.'"</blockquote>
+        <blockquote>"Two hundred stores. Twice broken. Now I'm building again, inside my limits this time."</blockquote>
+        <p class="footnote">The HB1000 OS <i>is</i> the PhD thesis. Source: <code>Confessions_of_a_predator_lender.md</code>.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ======================= v2025.04 LONG-FORM ACCORDION ======================= -->
+  <section class="section panel">
+    <div class="ph">Prime v2025.04 — the master long-form <span style="color:var(--soft);text-transform:none;letter-spacing:0">(Apr 6, 2025 docx — verbatim; spelling and idiosyncrasies preserved exactly, they are part of the voice)</span></div>
+    <div id="longform"></div>
+  </section>
+
+  <!-- ======================= AI RESEARCH — THE PRIME, REVIEWED ======================= -->
+  <section class="section panel" id="ai-review">
+    <div class="ph">AI Research — the Prime, reviewed autoresearch-style <span style="color:var(--soft);text-transform:none;letter-spacing:0">(respectful; suggestions only — NEVER auto-apply)</span></div>
+    <p class="footnote" id="rev-note"></p>
+    <div class="sec-h" style="margin-top:14px">Strengths</div>
+    <div class="grid3" id="rev-strengths"></div>
+    <div class="sec-h">Tensions — flagged, not fixed</div>
+    <div class="grid3" id="rev-tensions"></div>
+    <div class="sec-h">Suggestions — Tim's yes/no</div>
+    <div id="rev-suggestions"></div>
+    <p class="pullquote" id="rev-gossip"></p>
+  </section>
+
+  <!-- ======================= CTA ======================= -->
+  <section class="section">
+    <div class="sec-h">Where the Prime goes next</div>
+    <div class="hub-grid">
+      <a class="link-card" href="north-star.html">
+        <div class="lc-t">North Star <b>Builder</b></div>
+        <div class="lc-d">Declare a Local North Star that rhymes with the Prime — Vivid Vision, Rhyme Test, Twin North Star Gate.</div>
+        <div class="lc-k">north-star.html</div>
+      </a>
+      <a class="link-card" href="life.html">
+        <div class="lc-t">Build <b>Your Own Life</b></div>
+        <div class="lc-d">The agnostic mode: the identical geometry, blank — your Prime, your Locals, your personal Dingo card.</div>
+        <div class="lc-k">life.html</div>
+      </a>
+      <a class="link-card" href="index.html">
+        <div class="lc-t">The <b>Model</b></div>
+        <div class="lc-d">See where the Prime sits — the apex of the diamond, split by the equator.</div>
+        <div class="lc-k">index.html</div>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/shell.js"></script>
+<script>
+'use strict';
+Shell.init('purpose');
+
+/* -----------------------------------------------------------------------
+   Data: data/north-stars.json (real seed). On file:// fetch is unavailable,
+   so an identical embedded copy of the prime subtree is used — same bytes
+   of content, no console errors. Computed never asserted; verbatim never
+   paraphrased.
+----------------------------------------------------------------------- */
+var FALLBACK = {
+  "prime": {
+    "default_version": "v2026.04",
+    "statement": "Help people get more out of life — not by force, but by example. Believe in abundance — of potential, of solutions, of impact. Put a Ding in the Universe through Social Impact Capitalism (S.I.C.) — Business as a Force for Good.",
+    "core_value": "Attitude of Gratitude",
+    "operational_values": ["Golden Rule", "Transparency is Kindness"],
+    "bhag": "Transform capitalism from 'profit-at-any-cost' to 'purpose-with-profit' and help build a $1 billion social impact business from a single desk.",
+    "litmus": "'Putting a Ding in the Universe' is the litmus test. If a project can't articulate its Ding, it's parked.",
+    "versions": {
+      "v2026.04": {
+        "label": "Prime v2026.04 — the Apr 13, 2026 public version (render by default)",
+        "source": "timjlatimer/tim-talks-website index.html view t9 · live at https://baaffg.netlify.app/ · 'Story · Legacy · Apr 13, 2026 · ≈ 5 min read'",
+        "resolving_question": "The resolving question is 'Who gets to do this?' The answer — I do, everybody does, so go — turns a life into significance rather than success. If not you, who? If not now, when?",
+        "resolving_question_long": "'Who gets to do this?' is a saying I often repeat to remind myself that this life is a great adventure — one I'm privileged to be on. Everybody gets to do it, and I get to do it too. It's a simple nudge to stay present, to see the wonder in the journey, and to embrace the shared opportunity of living fully.",
+        "thatcher_challenge": "Margaret Thatcher's challenge — 'If not you, who? If not now, when?' — drives me to act. To launch the pilot. To certify the first three Blue Seal businesses. To prove the model. To pass the work on. That's what's on the list. That's what I'd like to do before I die.",
+        "legacy_businesses": [
+          { "n": 1, "name": "Business As A Force For Good", "line": "the main family office, the cornerstone." },
+          { "n": 2, "name": "CashCo Financial", "line": "micro-loans for the left out, the left behind, and the working poor." },
+          { "n": 3, "name": "Seba Hub & Activity Centre", "line": "a 1-for-2 community model where the haves help cover the cost for the have-nots." },
+          { "n": 4, "name": "Freedom Cannabis", "line": "the goal is to become an ethical platform for cannabis services for Canada and overseas." },
+          { "n": 5, "name": "Pawn Princess Solutions", "line": "a modern, dignity-centred pawn model. The \"poor man's bank.\"" },
+          { "n": 6, "name": "Blue Seal", "line": "Do Good. Give Back. Starts Local. The vehicle for global impact." },
+          { "n": 7, "name": "Holding Properties", "line": "the stable, low-risk asset base." },
+          { "n": 8, "name": "Building a Vivid Vision", "line": "the Kokanee Village / Lifetime Land Use Rights initiative that grows amazing children in a summer village." }
+        ],
+        "trilayer": {
+          "barstool": "Who gets to do this? I do. Everybody does. So go. My reward isn't success — it's significance.",
+          "cliche": "If not you, who? If not now, when? A borrowed line, lived hard enough to make it true.",
+          "wisdom_giant": "A written, testable purpose statement functions as a decision-resolving invariant: it converts open-ended ambition into a constraint set against which every venture, hire, and trade-off can be adjudicated — and makes intergenerational impact, not personal accumulation, the optimisation target."
+        },
+        "reward_milestones": ["Launch the pilot", "Certify the first three Blue Seal businesses", "Prove the model", "Pass the work on"]
+      },
+      "v2025.04": {
+        "label": "Prime v2025.04 — the Apr 6, 2025 docx (master long-form; render as accordion)",
+        "source": "Do be Die Before I die Purpose statement/Do Before I Die Purpose Statement April 6 2025 PM.docx — living document Tim has refined for ~10 years. Spelling and idiosyncrasies preserved exactly — they are part of the voice.",
+        "prologue": "This document is a reflection of my life's journey, a guide to how I choose to live, lead, and leave a lasting impact. It is an evolving statement of purpose — one that captures my deepest values, my commitments, and my vision for the legacy I aim to create. This is not just a declaration of intent but a roadmap for those who will walk this path with me, now and in the future.",
+        "north_star": "I have been given the opportunity to create, to lead, and to inspire both myself personally, my wife, my family, friends, and those in my circle of influence. My mission is simple yet profound: to help people get more out of life, not by force, but by example. I believe in abundance — of potential, of solutions, and of impact.",
+        "gratitude": "Above all, I embrace and practice gratitude in all situations — both ordinary and extraordinary. Gratitude transforms perspectives, strengthens relationships, and builds a life of abundance.",
+        "roles": [
+          { "role": "First Tim Principle: Living With Intention", "lines": ["Prioritize Joy — Pursue hobbies and interests that bring fulfillment.", "Invest in Relationships — Deepen connections with lifelong friends.", "Optimize Health — Exercise meaningfully to extend both lifespan and health span.", "Achieve may PhD in S.I.C. (Social Impact Capitalism) — Evangelize the fusion of profit and purpose to drive systemic change."] },
+          { "role": "Best Husband: Love in Action", "lines": ["Embody Love as a Verb — Show love through daily action, not just words.", "Lead with Sharon — Together, set the tone for family leadership, legacy, and connection.", "Practice the 'Let Her - Let Me' — (personalized from 'Let Them - Let Me' by Mel Robbins)"] },
+          { "role": "Family: Raising Interdependent Leaders", "lines": ["Guide My Children — Move them from dependency to independence to interdependence.", "Equip Them for Impact — Provide tools for meaningful, productive lives, both personally and professionally."] }
+        ],
+        "legacy_intro": "I believe 'it takes a village to grow a child, a family, and to create intergenerational change through business as a force for good.' My goal is to leave a legacy that embodies the principles of S.I.C. (Social Impact Capitalism) — businesses that balance purpose with profit, demonstrating best practices and inspiring others to do the same.",
+        "legacy_businesses_2025": [
+          { "name": "CashCo Financial", "text": "A financial institution that serves the left-out, left-behind, and working poor by providing micro-loans, both secured and unsecured, within the regulations of provincial and federal laws in Canada. To give this business the best chance to succeed in the future the family office does not need to be the 100 percent equity owner or perhaps even any equity. This may become a Hobby business." },
+          { "name": "Seba Hub & Activity Centre", "text": "A large-scale activity and RV center, fostering community engagement through entertainment, sports, and educational programs. This includes Kokanee Village Initiatives and the Chapel in the Woods, a venue designed for events, banquets, and retreat-style accommodations." },
+          { "name": "Freedom Cannabis", "text": "A mid-level market grower in the Canadian cannabis industry. If operations succeed under the leadership of CEO John Frank Potestio, Freedom Cannabis has the potential to become a significant legacy business that exemplifies Business as a Force for Good — balancing sustainable growth, social responsibility, and industry leadership." },
+          { "name": "Pawn Princess Solutions dba as Princess Collateral Solutions", "text": "A modern take on the traditional pawn model, Pawn Princess Solutions operates under Princess Collateral Solutions, offering dignity-centered financial alternatives to underserved populations. This high-tech, centralized network of brick-and-mortar micro-loan centers aims to become the \"poor man's bank\" — providing respectful, accessible services to the left out, left behind, and working poor. The initiative plans to open 50 locations in five years, beginning with its flagship branch in Spruce Grove, Alberta." },
+          { "name": "Blue Seal", "text": "This is the vehicle to have global impact. It the 'Blue Seal — Do Good Give Back - Starts Local'. My desire is to great a movement that changes the way capitalism is practiced around the globe. Before community and civil unrest and prosperity is ruined for all in the village by the greed embedded in the current rules of capitalism in todays sociality. Blue Seal is a rebalancing of the global 'classes' haves and have nots in society." },
+          { "name": "Holding Properties", "text": "A portfolio of investment properties strategically managed to balance financial risk while operating various businesses. These are designed to be low-risk, low-maintenance, and require minimal direct management, ensuring stability while maintaining social impact goals." }
+        ],
+        "degrees": {
+          "heading": "My degrees in the School of Hard Knocks",
+          "current": ["F.F.B. (2 Fires and a Bankruptcy)", "C.A3. (3 Class Actions)"],
+          "next": "PhD in S.I.C. — Tuition Fee $10m US, prepaid with Smart Financial investment"
+        },
+        "sic": ["Transform Capitalism — Being a champion of shifting business from \"capitalism, capitalism\" (profit-driven at any cost) to Social Impact Capitalism (profit and purpose intertwined).", "Global Reach — Leave a worldwide impact by helping others scale social impact businesses.", "Mentorship at Scale — Help build a $1 billion social impact business from a single desk."],
+        "reward": "If I am able to live by these values and fulfill these roles, my reward will not be measured in money or accolades, but in impact: I will have built something that outlives me — a thriving community of businesses, relationships, and ideas that continue to make a difference long after I am gone. I will have inspired others — to embrace gratitude, service, and meaningful capitalism. I will leave a roadmap — for future generations to build upon. My reward is not success, but significance — knowing that my life mattered, and that my work will continue to change lives long after I take my last breath.",
+        "reward_parenthetical": "(this is known to me to be only my illusion and has no real bearing on the meaning of my life or the that I need any recognition to validate my a legacy. Its rather a simple illusionary hashmark, a KPI, a way for me to play the game of life as an adventure, the journey is the adventure and these are only road signs on that adventure and not monuments to me having existed)",
+        "reward_close": "My greatest reward will be to say: I touched the hand, the mind, and the heart, I touch the soul of someone who changed the world. To know that I made a difference — that I had a part to play.",
+        "hobby_businesses": [
+          "Mitsho & Groundswell — Indigenous-led food/product company (Ian Gladue) + dried-meat snack producer.",
+          "Game Changer Consultants — best practices, leadership, daily strategy meetings.",
+          "1-800-FRE²-RENT — basement reno + rental management, 50/50 income split after $250 admin fee.",
+          "Tip the Maker / Tip the Grower — scan a code, tip the artisan/farmer behind the product directly.",
+          "Hawaii by the Inch — buy an inch of resort property, monthly selection pool, butler/chef/concierge, first-class flights covered.",
+          "Seba Hub Petting Zoo — goats on the roof, bridge over the highway, cantilevered structures."
+        ],
+        "final_gift": "1. A Mind that seeks truth — Never stops learning questioning and growing. 2. A heart that loves deeply — Cherishes relationships and cultivates compassion. 3. A legacy that matters — Build something that outlives you. — If this document is being read after I am gone, know this: My life was imperfect but beautiful. I lived fully, loved deeply, and failed often — but I got back up every single time. I leave behind lessons, laughter, and a legacy of belief in people. Please use this document to guide your own journey. Let it serve as a compass for courage, clarity, and compassion. This is my final gift. With love, — Tim"
+      }
+    },
+    "signature_line": "Tim J Latimer, FFB, CA3, SIC — \"(I have written my - 'Do Before I Die Purpose Statement'. Its my moral ambition. Happy to share upon request)\"",
+    "degree_journey": {
+      "label": "Stages of My Life — the School of Hard Knocks Degree Journey",
+      "confirm_flag": "PENDING TIM'S CONFIRMATION — is the Degree Journey the canonical 'Stages of My Life', or is there a separate document not yet in the estate? Do not silently invent stages.",
+      "stages": [
+        { "degree": "F.F.B.", "meaning": "2 Fires and a Bankruptcy", "status": "earned" },
+        { "degree": "C.A3.", "meaning": "3 Class Actions", "status": "earned" },
+        { "degree": "PhD in S.I.C.", "meaning": "Social Impact Capitalism — champion & spokesperson. 'Tuition Fee $10m US, prepaid with Smart Financial investment.'", "status": "YOU ARE HERE — in progress. The HB1000 OS is the PhD thesis." }
+      ]
+    },
+    "review": {
+      "label": "AI Research — the Prime, reviewed autoresearch-style",
+      "guard": "(respectful; suggestions only — NEVER auto-apply)",
+      "protocol_note": "Run per the portable autoresearch protocol: every output is a baseline; adversarial scrutiny; actionable synthesis.",
+      "source": "hb1000-os/blueprint/purpose-dna.md §8",
+      "strengths": [
+        { "title": "It is a decision-resolving invariant, not a vibe.", "text": "The Wisdom-Giant layer on the live site says it precisely: the statement converts open-ended ambition into a constraint set. The Twin North Star Gate already operationalizes it — rare for a personal purpose statement to be machine-checkable." },
+        { "title": "The reward clause is psychologically sophisticated.", "text": "The parenthetical (\"this is known to me to be only my illusion… a way for me to play the game of life as an adventure\") inoculates the whole document against ego-capture. Few purpose statements audit themselves." },
+        { "title": "It rhymes top to bottom.", "text": "Prime → 8 legacy businesses → Ruby Red → DINGO cards is a coherent single song. The 2026 site version visibly evolved (resolving question, Thatcher, 8 businesses) — the \"living document\" claim is true in practice." }
+      ],
+      "tensions": [
+        { "title": "Version drift between canon copies.", "text": "Docx (Apr 2025): 6 legacy businesses, CashCo \"may become a Hobby business.\" Site (Apr 2026): 8 businesses, CashCo unambiguous, Freedom Cannabis reframed as \"ethical platform,\" adds BAFFG-cornerstone + Kokanee Vivid Vision. PRIME_NORTH_STAR.md (May 2026) is a third, mostly-docx-shaped list. The app needs ONE rendered canon with a version history, or agents will gate against different Primes." },
+        { "title": "The \"Stages of My Life\" surface is implied, never written.", "text": "Tim signs every email FFB, CA3 — the degree journey is clearly how he narrates his life — but no document declares it as the stages framework, and the only formal five-stage spec in the estate belongs to Ruby, not Tim." },
+        { "title": "The reward KPI is unmeasurable as written.", "text": "\"Touched the soul of someone who changed the world\" cannot be tracked; meanwhile the OS doctrine says \"no metric = no optimization = no ship.\" The Prime is currently exempt from its own rule (this may be intentional — a Prime perhaps should outrun its metrics — but it is a tension)." }
+      ],
+      "suggestions": [
+        { "title": "SUGGESTION 1 — Declare a single canonical version with a changelog.", "text": "Adopt the Apr 13, 2026 site version (8 businesses + resolving question) as \"Prime v2026.04,\" keep the Apr 6, 2025 docx as \"Prime v2025.04 (master long-form),\" and have the app render v2026.04 by default with one-click access to the long-form. Agents gate against the declared version only." },
+        { "title": "SUGGESTION 2 — Formalize \"Stages of My Life\" as the School of Hard Knocks Degree Journey.", "text": "One page: FFB → CA3 → PhD in S.I.C. (current, in progress), with the Confessions narrative arc as the story layer and a \"thesis progress\" tie-in to live HB1000 OS milestones (e.g., Blue Seal first-three certifications = PhD defense milestones). 15-minute voice session with Tim to confirm names and add any missing early stages." },
+        { "title": "SUGGESTION 3 — Give the Reward a proxy metric without deflating it.", "text": "Keep \"significance, not success\" as unmeasured poetry, but add the trackable leading indicator Tim already named in the site version: launch the pilot, certify the first three Blue Seal businesses, prove the model, pass the work on — four checkboxes the dashboard can actually show." }
+      ],
+      "gossip_protocol": "The purpose statement already contains its own enforcement mechanism — the \"Who gets to do this?\" question + Twin North Star Gate. The app shouldn't display the Prime; it should ask the Prime's question at every project spawn."
+    }
+  }
+};
+
+var esc = Shell.esc;
+function el(id){ return document.getElementById(id); }
+
+function render(data){
+  var p   = (data && data.prime) || {};
+  var vs  = p.versions || {};
+  var v26 = vs['v2026.04'] || {};
+  var v25 = vs['v2025.04'] || {};
+
+  /* hero signature */
+  el('sig').textContent = p.signature_line || '';
+
+  /* the North Star statement — verbatim */
+  el('statement').textContent = '“' + (p.statement || '') + '”';
+
+  /* how the OS consumes the Prime */
+  el('litmus').textContent = p.litmus || '';
+  el('bhag').textContent = '“' + (p.bhag || '') + '”';
+  el('opvalues').innerHTML =
+    Shell.pill(p.core_value || 'Attitude of Gratitude', 'gold') + ' ' +
+    (p.operational_values || []).map(function(v){ return Shell.pill(v, 'info'); }).join(' ') +
+    '<br><span class="footnote">Attitude of Gratitude is THE core value; the Golden Rule + “Transparency is Kindness” are the operational pair.</span>';
+
+  /* gratitude (verbatim, v2025.04) */
+  el('gratitude').textContent = '“' + (v25.gratitude || '') + '”';
+
+  /* who gets to do this? */
+  el('resolving').textContent = v26.resolving_question || '';
+  el('resolving-long').textContent = v26.resolving_question_long || '';
+
+  /* 8 legacy businesses */
+  el('legacy').innerHTML = (v26.legacy_businesses || []).map(function(b){
+    return '<li><b>' + esc(b.name) + '</b> — ' + esc(b.line) + '</li>';
+  }).join('');
+
+  /* the Reward — verbatim, with the Reward sentence as a pull-quote */
+  var R = v25.reward || '';
+  var ix = R.indexOf('My reward is not success');
+  if (ix > 0){
+    el('reward-lead').textContent = R.slice(0, ix).trim();
+    el('reward-pull').textContent = '“' + R.slice(ix).trim() + '”';
+  } else {
+    el('reward-lead').textContent = R;
+    el('reward-pull').textContent = '';
+  }
+  el('reward-paren').textContent = v25.reward_parenthetical || '';
+  el('reward-close').textContent = '“' + (v25.reward_close || '') + '”';
+  el('milestones').innerHTML = ((v26.reward_milestones) || []).map(function(m){
+    return '<div class="milestone"><span class="box">☐</span><span>' + esc(m) + '</span></div>';
+  }).join('');
+
+  /* Thatcher challenge */
+  el('thatcher').textContent = '“' + (v26.thatcher_challenge || '') + '”';
+
+  /* trilayer tabs */
+  var tri = v26.trilayer || {};
+  function showTab(key){
+    var labels = { barstool: 'Barstool', cliche: 'The Cliché', wisdom_giant: 'Wisdom-Giant' };
+    el('trilayer-panel').innerHTML =
+      '<span class="serif" style="color:var(--gold-glass)">“' + esc(tri[key] || '') + '”</span>' +
+      '<div class="footnote" style="margin-top:8px">' + esc(labels[key]) + ' layer — same idea, different altitude.</div>';
+    Array.prototype.forEach.call(document.querySelectorAll('.tab-btn'), function(b){
+      var on = b.getAttribute('data-tab') === key;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.tab-btn'), function(b){
+    b.addEventListener('click', function(){ showTab(b.getAttribute('data-tab')); });
+  });
+  showTab('barstool');
+
+  /* Stages of My Life — Degree Journey widget (flagged, never silently invented) */
+  var dj = p.degree_journey || {};
+  el('confirm-note').textContent = dj.confirm_flag || '';
+  el('confirm-flag').title = dj.confirm_flag || '';
+  el('degrees').innerHTML = (dj.stages || []).map(function(s){
+    var here = /YOU ARE HERE/i.test(s.status || '');
+    return '<div class="stage' + (here ? ' here' : '') + '">' +
+      '<div class="deg">' + esc(s.degree) + (here ? ' <span class="pill gold">YOU ARE HERE</span>' : '') + '</div>' +
+      '<div class="mean">' + esc(s.meaning) + '</div>' +
+      '<div style="margin-top:7px">' + (here ? Shell.pill('in progress', 'warn') : Shell.pill('earned', 'good')) + '</div>' +
+    '</div>';
+  }).join('');
+
+  /* v2025.04 long-form accordion — full verbatim text */
+  function acc(title, bodyHTML, open){
+    return '<details class="acc"' + (open ? ' open' : '') + '><summary>' + esc(title) + '</summary>' +
+           '<div class="acc-body">' + bodyHTML + '</div></details>';
+  }
+  var lf = '';
+  lf += acc('Prologue', '<blockquote>' + esc(v25.prologue || '') + '</blockquote>', true);
+  lf += acc('Do-Before-I-Die Purpose Statement — North Star', '<blockquote>' + esc(v25.north_star || '') + '</blockquote>');
+  lf += acc('My Core Value: Attitude of Gratitude', '<blockquote>' + esc(v25.gratitude || '') + '</blockquote>');
+  lf += acc('My Prioritized Roles', (v25.roles || []).map(function(r){
+    return '<p><b style="color:var(--gold)">' + esc(r.role) + '</b></p><ul>' +
+      (r.lines || []).map(function(l){ return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>';
+  }).join(''));
+  lf += acc('Leaving a Legacy — the Legacy Businesses (2025 docx: six listed)',
+    '<blockquote>' + esc(v25.legacy_intro || '') + '</blockquote>' +
+    (v25.legacy_businesses_2025 || []).map(function(b){
+      return '<p><b style="color:var(--gold)">' + esc(b.name) + '</b> — ' + esc(b.text) + '</p>';
+    }).join('') +
+    '<p class="footnote">Superseded by the eight-business list in v2026.04 above; kept verbatim as the master long-form.</p>');
+  lf += acc((v25.degrees && v25.degrees.heading) || 'My degrees in the School of Hard Knocks',
+    '<p><b>Current designations:</b></p><ul>' +
+    (((v25.degrees || {}).current) || []).map(function(d){ return '<li>' + esc(d) + '</li>'; }).join('') +
+    '</ul><p><b>My next degree:</b> ' + esc((v25.degrees || {}).next || '') + '</p>');
+  lf += acc('Social Impact Capitalist — (S.I.C.)', '<ul>' +
+    (v25.sic || []).map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>');
+  lf += acc('If I Succeed before I die: My Reward',
+    '<blockquote>' + esc(v25.reward || '') + '</blockquote>' +
+    '<p class="parenthetical">' + esc(v25.reward_parenthetical || '') + '</p>' +
+    '<blockquote>' + esc(v25.reward_close || '') + '</blockquote>');
+  lf += acc('Appendix — My Hobby Businesses', '<ol>' +
+    (v25.hobby_businesses || []).map(function(h){ return '<li>' + esc(h) + '</li>'; }).join('') +
+    '</ol><p class="footnote">"This needs further build out by reviewing my Innovation file collected over the years."</p>');
+  lf += acc('My Final Gift', '<blockquote>' + esc(v25.final_gift || '') + '</blockquote>');
+  el('longform').innerHTML = lf;
+
+  /* AI Research review — purpose-dna.md §8 (suggestions only — NEVER auto-apply) */
+  var rev = p.review || {};
+  el('rev-note').textContent = rev.protocol_note || '';
+  el('rev-strengths').innerHTML = (rev.strengths || []).map(function(s){
+    return '<div class="panel tight"><div class="ph">Strength</div>' +
+      '<p style="font-size:13px"><b style="color:var(--gold)">' + esc(s.title) + '</b> ' + esc(s.text) + '</p></div>';
+  }).join('');
+  el('rev-tensions').innerHTML = (rev.tensions || []).map(function(t){
+    return '<div class="panel tight"><div style="margin-bottom:8px">' + Shell.pill('TENSION — flagged, not fixed', 'warn') + '</div>' +
+      '<p style="font-size:13px"><b>' + esc(t.title) + '</b> ' + esc(t.text) + '</p></div>';
+  }).join('');
+  el('rev-suggestions').innerHTML = (rev.suggestions || []).map(function(sg){
+    return '<details class="acc"><summary>' + esc(sg.title) + ' <span class="pill gold">ADOPTED IN THIS BUILD (Tim-gated)</span></summary>' +
+      '<div class="acc-body">' + esc(sg.text) + '</div></details>';
+  }).join('');
+  el('rev-gossip').innerHTML = rev.gossip_protocol
+    ? '<b>Gossip Protocol</b> — “' + esc(rev.gossip_protocol) + '”'
+    : '';
+}
+
+/* boot — fetch on http(s), embedded identical copy on file:// (avoids console noise) */
+if (location.protocol === 'file:') {
+  render(FALLBACK);
+} else {
+  Shell.loadJSON('data/north-stars.json')
+    .then(render)
+    .catch(function(){ render(FALLBACK); });
+}
+
+/* -----------------------------------------------------------------------
+   Ruby Red's cash-flow month — transcribed verbatim from the model tour
+   (legacy) ledger demo, archived in hb1000-os/hardhat-notes-live.md.
+   Recorded figures: $2,400 income, −$90 gap, 7 agents totalling +$351,
+   +$261 breathing room. Totals below are COMPUTED from the line items at
+   render — computed, never asserted.
+----------------------------------------------------------------------- */
+(function rubyLedger(){
+  var INCOME = 2400;
+  var GAP = -90; // the recorded month, before help
+  var AGENTS = [
+    { name: 'Budget Guardian',    amt: 45  },
+    { name: 'Bill Negotiator',    amt: 30  },
+    { name: 'Benefits Navigator', amt: 125 },
+    { name: 'Deal Hunter',        amt: 65  },
+    { name: 'Utility Optimizer',  amt: 28  },
+    { name: 'Emergency Fund',     amt: 18  },
+    { name: 'Transportation',     amt: 40  }
+  ];
+  var on = AGENTS.map(function(){ return true; });
+
+  var tbody = el('rr-agents');
+  if (!tbody) return;
+
+  function money(n){ return (n < 0 ? '−$' : '+$') + Math.abs(n); }
+
+  el('rr-income').textContent = '$' + INCOME.toLocaleString('en-CA');
+  el('rr-out').textContent = '−$' + (INCOME - GAP).toLocaleString('en-CA'); // computed: 2400 − (−90) = 2490
+  el('rr-gap').textContent = '−$' + Math.abs(GAP) + ' SHORT';
+
+  function recompute(){
+    var recovery = AGENTS.reduce(function(a, ag, i){ return a + (on[i] ? ag.amt : 0); }, 0);
+    var month = GAP + recovery;
+    var offCount = on.filter(function(x){ return !x; }).length;
+    var sumRow = el('rr-sum');
+    if (sumRow) sumRow.innerHTML = '<td>Agents’ recovery (computed' + (offCount ? ', ' + offCount + ' toggled off' : '') + ')</td>' +
+      '<td class="amt pos">' + money(recovery) + '</td>';
+    el('rr-verdict').innerHTML = 'The month, after help: ' +
+      '<b class="' + (month >= 0 ? 'pos' : 'neg') + '" style="color:var(--' + (month >= 0 ? 'green' : 'red') + ')">' +
+      money(month) + '</b> ' + (month >= 0 ? 'breathing room' : 'still short') +
+      ' <span class="footnote">(−$' + Math.abs(GAP) + ' gap ' + money(recovery) + ' recovery — computed)</span>';
+  }
+
+  tbody.innerHTML = AGENTS.map(function(ag, i){
+    return '<tr class="rr-agent"><td><label><input type="checkbox" checked data-i="' + i + '"> ' +
+      Shell.esc(ag.name) + '</label></td><td class="amt pos">+$' + ag.amt + '</td></tr>';
+  }).join('') + '<tr class="sumrow" id="rr-sum"></tr>';
+
+  Array.prototype.forEach.call(tbody.querySelectorAll('input[type="checkbox"]'), function(cb){
+    cb.addEventListener('change', function(){
+      on[Number(cb.getAttribute('data-i'))] = cb.checked;
+      recompute();
+    });
+  });
+
+  recompute();
+})();
+</script>
+</body>
+</html>

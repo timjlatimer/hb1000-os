@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "The Council of Elders — 9 Elders (NSA holds the 9th seat; 10th reserved)",
+    "source": "github.com/timjlatimer/personal-ai-os-vault/03_COUNCIL/_COUNCIL_ROSTER.md (June 2026 canon — supersedes the older 8-Elder card) via hb1000-os/blueprint/github-vault-canon.md §1.3",
+    "covenant": [
+      "Agents do 80%. Tim does 20%. If Tim's share creeps over 20%, the dashboard turns red and the Council triages.",
+      "Span of control = 8-10 Elders max. Anything else is a worker agent reporting to an Elder.",
+      "HIL queue capped at 10 items. Full queue = Council triages before anything reaches Tim."
+    ],
+    "voice": "Internal voice = Ghost Tim clone (KIE.ai — Standing Order #1: KIE.ai ONLY). External voice per project.",
+    "governance": "Three-File Governance (law per Manus adoption May 25, 2026): every Elder spec = Markdown (.md, the WHY) + JSON Schema (schema.json, strict structure) + Python wrapper (enforce.py, executable hard gate). Every agent (Elder or worker) has: budget (tokens + dollars), role, reporting line, audit trail.",
+    "why_nsa_got_her_seat": "\"Shared accountability = no accountability. Two parents, no parent.\" Three distinct verbs: \"Empathy Enforcer ADVOCATES; Compliance Marshal ENFORCES RULES; NSA ENFORCES ALIGNMENT.\""
+  },
+  "elders": [
+    { "seat": 1, "name": "The Quartermaster", "portfolio": "Knowledge Vault + IP intake", "cliche": "A place for everything." },
+    { "seat": 2, "name": "The Cartographer", "portfolio": "Project catalog + scoring", "cliche": "You can't fix what you can't see." },
+    { "seat": 3, "name": "The Banker", "portfolio": "Monetization + rent-check", "cliche": "Cash is king." },
+    { "seat": 4, "name": "The Foreman", "portfolio": "Build pipelines (code, docs, decks)", "cliche": "Many hands make light work." },
+    { "seat": 5, "name": "The Pitchman", "portfolio": "Sales, outreach, marketing", "cliche": "Always be closing — with dignity." },
+    { "seat": 6, "name": "The Compliance Marshal", "portfolio": "Legal, ethics, Standing Orders + Three-File Governance", "cliche": "Better to ask permission." },
+    { "seat": 7, "name": "The Town Crier", "portfolio": "Comms, briefings, dashboards, Gossip Protocol", "cliche": "The buck stops here — only when it must." },
+    { "seat": 8, "name": "The Empathy Enforcer", "portfolio": "Local North Star advocacy, Empty Chair votes", "cliche": "There but for the grace of God go I." },
+    {
+      "seat": 9,
+      "name": "The North Star Agent (NSA)",
+      "portfolio": "Always-on alignment enforcer · Twin North Star Gate · Vivid Vision Rhyme Test · Phase 0 Step 5 hard halt",
+      "cliche": "The flag never droops on her watch.",
+      "cross_cutting": true,
+      "notes": "NSA runs continuously ACROSS all other Elders — cross-cutting enforcement, not a peer. Escalation ladder: Aspirin (gentle inline nudge) → Treatment (formal citation, audit-logged, Bartender Briefing) → Fever (agent paused, HIL queue entry, Tim alerted within 10 min). Inherits The Watchman v2.1 + Iron Brief v1.4; uses the PFE (Persistent Foraging Engine). Autonomy Score capped at 95% — Tim always in the loop for North Star sign-off. Weekly 🟢/🟡/🔴 Rhyme Integrity per project in the Bartender Briefing."
+    }
+  ],
+  "tenth_seat": {
+    "status": "reserved",
+    "candidates": ["The Recruiter", "The Diplomat", "The Signal Intelligence Officer"]
+  },
+  "bartender_briefing": "Auto-generated every Monday: 'Five sentences from The Town Crier. Five minutes to read. What happened, what's working, what's stuck, what needs Tim, what comes next.' Plus Council Headlines — one line per Elder."
+}

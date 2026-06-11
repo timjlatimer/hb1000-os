@@ -1,0 +1,44 @@
+{
+  "store": "Pawn Princess — Store PP-01",
+  "caller": "Lauren (store manager)",
+  "vivid_vision": {
+    "purpose": "Dignified cash when life happens",
+    "bhag": "50 dignified stores in 5 years",
+    "values": ["Dignity", "Speed", "Transparency"]
+  },
+  "wiifm": "Run a balanced, trusted store — and get home on time.",
+  "ticker": [
+    {"k": "Cash", "v": "positive", "ryg": "green"},
+    {"k": "Noon SLA", "v": "✓", "ryg": "green"},
+    {"k": "Loans vs target", "v": "▼", "ryg": "yellow"},
+    {"k": "Lapsed loans", "v": "▲", "ryg": "red"},
+    {"k": "Reviews", "v": "4.8★", "ryg": "green"}
+  ],
+  "squares": [
+    {"id": "D1", "label": "Daily cash-out", "kpi": "balanced by close", "ryg": "green", "human": 20},
+    {"id": "D2", "label": "Noon reconciliation", "kpi": "by 12:00", "ryg": "green", "human": 20},
+    {"id": "D3", "label": "Pawn loans written", "kpi": "vs target", "ryg": "yellow", "human": 30},
+    {"id": "D4", "label": "Redemptions", "kpi": "rate", "ryg": "green", "human": 20},
+    {"id": "D5", "label": "Layaways", "kpi": "active", "ryg": "green", "human": 20},
+    {"id": "D6", "label": "Inventory aging", "kpi": "<90 days", "ryg": "yellow", "human": 40},
+    {"id": "D7", "label": "Lapsed loans", "kpi": "to forfeit", "ryg": "red", "human": 30},
+    {"id": "D8", "label": "Store presentation", "kpi": "clean & set", "ryg": "green", "human": 80},
+    {"id": "D9", "label": "Customer follow-up", "kpi": "calls done", "ryg": "yellow", "human": 20},
+    {"id": "D10", "label": "Staff schedule", "kpi": "covered", "ryg": "green", "human": 50},
+    {"id": "D11", "label": "Compliance log", "kpi": "police upload 24h", "ryg": "green", "human": 20},
+    {"id": "D12", "label": "Bank deposit", "kpi": "made & logged", "ryg": "green", "human": 60},
+    {"id": "PTK", "ptk": true},
+    {"id": "D14", "label": "Blue Seal give-back", "kpi": "hooked up", "ryg": "yellow", "human": 20},
+    {"id": "D15", "label": "Reviews", "kpi": "rating", "ryg": "green", "human": 20},
+    {"id": "D16", "label": "Safety checks", "kpi": "done", "ryg": "green", "human": 60},
+    {"id": "D17", "label": "Training", "kpi": "module", "ryg": "yellow", "human": 30},
+    {"id": "D18", "label": "Upsell / attach", "kpi": "rate", "ryg": "yellow", "human": 20},
+    {"id": "D19", "label": "Returns", "kpi": "handled", "ryg": "green", "human": 20},
+    {"id": "D20", "label": "Loss prevention", "kpi": "shrink", "ryg": "green", "human": 30},
+    {"id": "D21", "label": "Utilities", "kpi": "in budget", "ryg": "green", "human": 20},
+    {"id": "D22", "label": "Local outreach", "kpi": "events", "ryg": "yellow", "human": 40},
+    {"id": "D23", "label": "Supplies", "kpi": "stocked", "ryg": "green", "human": 50},
+    {"id": "D24", "label": "KPI review", "kpi": "weekly", "ryg": "green", "human": 20},
+    {"id": "D25", "label": "Month-end email", "kpi": "sent", "ryg": "yellow", "human": 20}
+  ]
+}

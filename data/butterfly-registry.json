@@ -1,0 +1,2153 @@
+{
+  "meta": {
+    "name": "Cloud Butterfly Registry",
+    "generated": "2026-06-11",
+    "counts": {
+      "documented": 225,
+      "nurseryClusterExtra": 10,
+      "attestedUnrecovered": 68,
+      "attestedTotal": 303,
+      "scored": 54,
+      "januaryNumbered": 153,
+      "stages": {
+        "processed": 130,
+        "raw": 66,
+        "graduated": 26,
+        "parked": 3,
+        "unrecovered": 68
+      }
+    },
+    "anchors": {
+      "ytd119": "Day 13 / YTD 119 from Jan 23 — Tim's own sync anchor (email, Apr 26, 2026); = end of Day 12 (#119)",
+      "ytd133": "Carry-forward state through Day 13 (Jan 24, 2026)",
+      "ytd153": "Final January total after Days 14-15 processing (Apr 15, 2026): #134–#153",
+      "estimate250": "SEBA Bootcamp email (Apr 25): 'We've got 200 other creative, imaginative ideas in there' — Tim's ~250 instinct validated"
+    },
+    "scoring": "Humanity/Business/Fun/WTH, each /100, total /400 (Protocol v4.0); Business ≥70 = Lean Canvas flag; Stage 2 = Initiative Library 100-pt Band + Timing Gate + Capital Tier",
+    "scoreDistribution": {
+      "350+": 1,
+      "330–349": 11,
+      "300–329": 12,
+      "250–299": 15,
+      "200–249": 10,
+      "<200": 5
+    },
+    "top10": [
+      {
+        "id": "R-249",
+        "title": "SEBA Influencer Bootcamp + Two-for-One",
+        "score": 365,
+        "date": "2026-04-25"
+      },
+      {
+        "id": "R-254",
+        "title": "The Foraging Protocol (554-4)",
+        "score": 345,
+        "date": "2026-04-25"
+      },
+      {
+        "id": "#120",
+        "title": "Cloud Butterfly Field Guide",
+        "score": 343,
+        "date": "2026-01-24"
+      },
+      {
+        "id": "#88",
+        "title": "Cloud Butterfly → Song → Video Pipeline",
+        "score": 340,
+        "date": "2026-01-19"
+      },
+      {
+        "id": "#60",
+        "title": "HB1000 Naming",
+        "score": 337,
+        "date": "2026-01-17"
+      },
+      {
+        "id": "#149",
+        "title": "Purpose-Driven Fixer Bots — Angels of Your Better Nature",
+        "score": 337,
+        "date": "2026-01-26"
+      },
+      {
+        "id": "#77",
+        "title": "Feminizer / Testosterone Lift apps",
+        "score": 334,
+        "date": "2026-01-18"
+      },
+      {
+        "id": "#145",
+        "title": "Gamble for Good / Give-A-Shit Casino",
+        "score": 333,
+        "date": "2026-01-25"
+      },
+      {
+        "id": "#67",
+        "title": "HB1000 Infograph",
+        "score": 332,
+        "date": "2026-01-17"
+      },
+      {
+        "id": "R-250",
+        "title": "Trust Advance / No Promise to Pay",
+        "score": 332,
+        "date": "2026-04-25"
+      }
+    ],
+    "nextCaptureId": "R-288"
+  },
+  "butterflies": [
+    {
+      "id": "P-1",
+      "date": "2025-11-22",
+      "title": "Confessions of a Predator Lender",
+      "essence": "Tim's origin narrative — dairy-farm childhood to high-interest lending, the working poor, and the road to Social Impact Capitalism; the soil the butterflies grew from.",
+      "score": "unscored (pre-rubric)",
+      "stage": "processed",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md; Confessions_of_a_predator_lender.md"
+    },
+    {
+      "id": "P-2",
+      "date": "2025-12-17",
+      "title": "Cloud Butterflies — the founding metaphor",
+      "essence": "First named document on cloud butterflies: trapping and harvesting fleeting ideas from 'the great outback' of human creativity.",
+      "score": "unscored (pre-rubric)",
+      "stage": "processed",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md; DCB_12-17-25.md"
+    },
+    {
+      "id": "P-3",
+      "date": "2026-01-01",
+      "title": "THE BOOK — 'Confessions of a Predator Lender' → finishing title 'Cloud Butterflies'",
+      "essence": "Book concept w/ cover: original title struck through with a big X, 'Cloud Butterflies' beneath; New Year's Day 5-email burst.",
+      "score": "unscored (pre-rubric)",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-01-01]"
+    },
+    {
+      "id": "P-4",
+      "date": "2026-01-01",
+      "title": "Jolene Protocol chapter architecture",
+      "essence": "Every chapter 1,250–1,800 words max, built on the Jolene Protocol; includes an 'examples of cloud butterflies' chapter (the wallet, the gratitude book, HB...).",
+      "score": "unscored (pre-rubric)",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-01-01]"
+    },
+    {
+      "id": "P-5",
+      "date": "2026-01-01",
+      "title": "Giving back is a feature, not a bug",
+      "essence": "Verbatim: 'Giving back is a feature of society. It needs to be in the structure, not at the end of your life... It's not a bug... It needs to be fixed.'",
+      "score": "unscored (pre-rubric)",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-01-01]"
+    },
+    {
+      "id": "P-6",
+      "date": "2026-01-07",
+      "title": "Moral ambition + the cloud-butterfly song",
+      "essence": "Pre-Day-One insights: Tim's moral ambition, professional skills, and the creative process behind a song for cloud butterflies.",
+      "score": "unscored (pre-rubric)",
+      "stage": "processed",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md; DCB_1-7-26.md"
+    },
+    {
+      "id": "#1",
+      "date": "2026-01-11",
+      "title": "The Wisdom Library",
+      "essence": "Categorize and preserve human wisdom before it is lost; AI + human creativity in the curation; check WisdomLibrary.com (TAKEN) / cloudbutterfly.com.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_1-11-26.md"
+    },
+    {
+      "id": "#2",
+      "date": "2026-01-11",
+      "title": "Mind Densification",
+      "essence": "The aging brain compresses experience into dense, retrievable wisdom — the 'densified mind'; find Lukas's cauliflower-brain image, build the definition.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#6",
+      "date": "2026-01-11",
+      "title": "Terms of Reference Protocol (step vs. recital)",
+      "essence": "Build a Terms-of-Reference protocol distinguishing steps from recitals.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#9",
+      "date": "2026-01-11",
+      "title": "Library Pass Spectrum",
+      "essence": "Diagnostic framework for access tiers to one's wisdom library: Vaulted → ... → Superpass.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/scoring-system-from-files.md §3"
+    },
+    {
+      "id": "#10",
+      "date": "2026-01-11",
+      "title": "Inverted Evolution infographic",
+      "essence": "Visualize evolution inverted — built same day (completed Jan 11).",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#3–#95 (54 unrecovered)",
+      "date": "2026-01-11→19",
+      "title": "Days 1–9 unrecovered butterflies",
+      "essence": "54 of the 95 Day 1–9 butterflies are attested by the YTD count but content not yet recovered; full text likely survives in the Days 1–9 transcript (/mnt/transcripts/2026-04-16-00-41-53-cloud-butterfly-library-days1-9.txt) and Gmail.",
+      "score": "scores not recovered",
+      "stage": "unrecovered",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/existing-registries.md §1"
+    },
+    {
+      "id": "#16",
+      "date": "2026-01-12",
+      "title": "'Verified Human' category",
+      "essence": "Naming/branding a Verified Human category amid AI disruption — market opportunity from the human/AI capability split.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_1-12-26.md"
+    },
+    {
+      "id": "#18",
+      "date": "2026-01-12",
+      "title": "RV-camp acquisition sweep",
+      "essence": "Build a list of commercial realtors — Red Deer & North — for RV camp acquisitions.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#19",
+      "date": "2026-01-12",
+      "title": "Samantha nanny wedding gift",
+      "essence": "Talk to Sharon re: Samantha nanny wedding gift.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#27",
+      "date": "2026-01-13",
+      "title": "Slumber Sheet",
+      "essence": "AI-generated visual map of your day fed to the sleeping brain — sleep as a roadmap to consciousness (Day 3 sleep/memory research theme).",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_1-13-26.md"
+    },
+    {
+      "id": "#32",
+      "date": "2026-01-13",
+      "title": "Airline loading system concept",
+      "essence": "Research/develop the airline loading system concept for pitch.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#33",
+      "date": "2026-01-13",
+      "title": "'Slumber Solved' name",
+      "essence": "Explore 'Slumber Solved' as product/app name.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#34",
+      "date": "2026-01-13",
+      "title": "John Frank 25% farmers-market agreement",
+      "essence": "Remind Samantha re: John Frank 25% farmers market agreement (completed Jan 13).",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#35",
+      "date": "2026-01-14",
+      "title": "Jolene birthday + birth memory",
+      "essence": "Say happy birthday to Jolene and share the birth memory.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#37",
+      "date": "2026-01-14",
+      "title": "Internal clock phenomenon",
+      "essence": "Research waking before the alarm — the body's internal clock.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#38",
+      "date": "2026-01-14",
+      "title": "Grant/Cameron/Blue Copper/David meeting",
+      "essence": "Brief Samantha; document the meeting in long form; email Darren re: farmers market follow-up.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#39",
+      "date": "2026-01-14",
+      "title": "Capital structure presentation",
+      "essence": "Present capital structure to Grant/Cameron/David.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#41",
+      "date": "2026-01-14",
+      "title": "MADD class-action conversation",
+      "essence": "Email MADD CEO — request conversation re: class action leader.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#44",
+      "date": "2026-01-15",
+      "title": "Harrison gratitude",
+      "essence": "Thank Sonia, Robert, Rick, Mary for Harrison arrangements; express gratitude to Samantha (RV-park gratitude/mindfulness day).",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_1-15-26.md"
+    },
+    {
+      "id": "#45",
+      "date": "2026-01-15",
+      "title": "Harrison AAR",
+      "essence": "After-action review with Jesse & Samantha — dictate Harrison learnings.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#49",
+      "date": "2026-01-15",
+      "title": "Sirona CCA $2M JTBD",
+      "essence": "Clarify the Job-To-Be-Done with Sirona re: the CCA $2M process.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#51",
+      "date": "2026-01-15",
+      "title": "Tiger 21 presentation structure",
+      "essence": "Finalize the Tiger 21 presentation structure (completed Jan 19).",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#53",
+      "date": "2026-01-15",
+      "title": "Park models + Shaben for John Frank",
+      "essence": "Show John Frank park-model pictures + the Shaben idea.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#54",
+      "date": "2026-01-15",
+      "title": "Define 'Shaben'",
+      "essence": "Shed+cabin hybrid structure for the Kokanee resort — add to marketing language.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#55",
+      "date": "2026-01-15",
+      "title": "Shaben architecture package",
+      "essence": "Mock-up drawings for the website, architectural guidelines, lease permission clause, BC building-regulation check.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#56",
+      "date": "2026-01-15",
+      "title": "Jason material inspection protocol",
+      "essence": "Establish material inspection protocol with Jason — flagged CRITICAL.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#58",
+      "date": "2026-01-15",
+      "title": "Sharon debrief — Jolene's birthday",
+      "essence": "Debrief Sharon on Jolene's birthday.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#60",
+      "date": "2026-01-17",
+      "title": "HB1000 Naming",
+      "essence": "'Human Brilliance 1000' — the brand name for the human brain, 'the most powerful computer ever made that you already own'; spawned the entire HB1000 ecosystem (Lean Canvas Index #1).",
+      "score": "337/400",
+      "stage": "graduated",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#61",
+      "date": "2026-01-17",
+      "title": "Swarm Mind",
+      "essence": "The unconscious as a swarm — collective intelligence triggered when humans (or thoughts) move in unison; refined later by #115 and the April SWARM butterfly.",
+      "score": "326/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#63",
+      "date": "2026-01-17",
+      "title": "Mold Intelligence",
+      "essence": "Slime-mold-style distributed intelligence as a model for idea networks.",
+      "score": "324/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#67",
+      "date": "2026-01-17",
+      "title": "HB1000 Infograph",
+      "essence": "The HB1000 brand infographic suite — Brain GPS / factory floor plan of the mind (built Jan 17).",
+      "score": "332/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#68",
+      "date": "2026-01-17",
+      "title": "HB1000 domain checks",
+      "essence": "Check ExperienceSpeaking.com and HB1000.com availability for the brand.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#75",
+      "date": "2026-01-18",
+      "title": "Ball Cap with 360 Camera",
+      "essence": "HB1000 360 Capture Cap — built-in 360° micro-camera, auto-start tension sensor, 'Capture Everything. Forget Nothing.' ($99.95).",
+      "score": "327/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#77",
+      "date": "2026-01-18",
+      "title": "Feminizer / Testosterone Lift apps",
+      "essence": "Conceptual modules letting each HB1000 'factory setting' access the other's processing style — cross-linear vs. focused-hunt modes.",
+      "score": "334/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#79",
+      "date": "2026-01-18",
+      "title": "HB1000 Brain GPS infograph",
+      "essence": "Stylized brain map as airport-terminal/factory floor plan: Densification Zone, Cloud Butterfly Hunting Grounds, Experience Engine. 'Know the lay of the land. Hunt deliberately.'",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#82",
+      "date": "2026-01-18",
+      "title": "HB1000 merchandise lineup",
+      "essence": "Think Wear catalog — caps, hoodies ('Time to Rumble'), journal, stickers: 'You already own the hardware. Now get the accessories.'",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#83",
+      "date": "2026-01-18",
+      "title": "Learning Loop KPI prompt",
+      "essence": "ChatGPT Learning Loop KPI prompt — score-before/score-after iteration protocol (became ULL-P).",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#85",
+      "date": "2026-01-18",
+      "title": "Female Edition caps",
+      "essence": "Order 5 pink + 5 white HB1000 Female Edition ball caps.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#87",
+      "date": "2026-01-19",
+      "title": "Tiger 21 video opening",
+      "essence": "Open the Tiger 21 presentation with the video first — show, don't tell.",
+      "score": "315/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#88",
+      "date": "2026-01-19",
+      "title": "Cloud Butterfly → Song → Video Pipeline",
+      "essence": "Butterfly → lyrics → AI song (120 seconds) → AI video with the 'Gageito Princess' — the superpower demo; performed at Tiger 21 Jan 20. January's top scorer.",
+      "score": "340/400",
+      "stage": "graduated",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md; sources/existing-registries.md §1"
+    },
+    {
+      "id": "#91",
+      "date": "2026-01-19",
+      "title": "Learning Loop Protocol delivery",
+      "essence": "Learning Loop Protocol infograph + 'Superpower Delivery' cover email; share with Clay/Lucas.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#93",
+      "date": "2026-01-19",
+      "title": "Diana and Lauren accord card",
+      "essence": "Accord card for Diana and Lauren.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#96",
+      "date": "2026-01-20",
+      "title": "PP — Purpose with Passion",
+      "essence": "Tiger-21-day reminder: 'Be humbly confident about Purpose with Passion... Talking Head Tim style. Have a lot of fun with it.' Sharon's rule: this is about having fun. Close: 'Who gets to do this? We get to do this.'",
+      "score": "290/400 (H78/B72/F85/W55)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#97–#101 (5 unrecovered)",
+      "date": "2026-01-20",
+      "title": "Day 10 Tiger-21 presentation cluster",
+      "essence": "Five more Day-10 butterflies: video-first staging, the Seven Sisters / left-out-boy story, the accidental best-practice-junkie journey, where capitalism failed ('the gap has grown too big'), the attitude-of-gratitude close. Individual titles/scores not recovered.",
+      "score": "scores not recovered",
+      "stage": "unrecovered",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#102",
+      "date": "2026-01-21",
+      "title": "Nicotine and the Brain Barrier — Densification Activator",
+      "essence": "Vaping nicotine jumps the blood-brain barrier and 'activates the densification area' during hunts — a chemical key to crystallized experience. (Numbered #96 in the in-day report; renumbered after Day 10 was backfilled.)",
+      "score": "293/400 (H82/B65/F58/W88)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#103",
+      "date": "2026-01-21",
+      "title": "Lean Canvas Reservoir",
+      "essence": "Every business-flavored butterfly auto-populates a Lean Canvas Index; monthly review — keep, delete, archive. 'Butterflies need a place to land and grow.'",
+      "score": "300/400 (H65/B95/F72/W68)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#104",
+      "date": "2026-01-21",
+      "title": "North Star Lean Canvas",
+      "essence": "Personal-purpose template built from Tim's 'Do Before I Die' statement — a Lean Canvas for being human; tested on the team Jan 22 ('Destiny Discovered').",
+      "score": "312/400 (H92/B78/F70/W72)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/outlook-butterflies.md [2026-01-22]"
+    },
+    {
+      "id": "#105",
+      "date": "2026-01-21",
+      "title": "The Biological Urge — JTBD for AI",
+      "essence": "What is the primal urge to reproduce that biology encoded and AI lacks? 'AI has learning loops but no primal drive.' Day-15 raw extends it: rebuild the urge as an urge to make a difference — purpose with profit. Echoed May 9 as Primal Quest.",
+      "score": "322/400 (H95/B70/F65/W92)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#106",
+      "date": "2026-01-21",
+      "title": "Digger Café Treasure Hunt",
+      "essence": "Indoor RC construction-gaming venue + real excavator treasure-hunt competitions ($100/machine entry, size categories, Vista grounds, 200-300 people). Lean Canvas Index #2.",
+      "score": "325/400",
+      "stage": "graduated",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md; sources/disk-butterflies.md; sources/github-fetched/claude-history-archive/CloudButterflyReport_Day12_v4.0_DEMO.jsx"
+    },
+    {
+      "id": "#107",
+      "date": "2026-01-21",
+      "title": "Move Cloud Butterflies to Manus",
+      "essence": "Migrate the butterfly system to a do-agent platform — 'insights that execute themselves.'",
+      "score": "287/400 (H62/B88/F72/W65)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#108",
+      "date": "2026-01-21",
+      "title": "Manus profile → HB1000",
+      "essence": "Rename the Manus profile so all output is branded HB1000. 'Identity follows naming.'",
+      "score": "240/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#109",
+      "date": "2026-01-21",
+      "title": "Empower Lift → Manus + Lean Canvas",
+      "essence": "Extract Empower Lift from Replit, consolidate in Manus under a Lean Canvas. (Fashion-vertical thread continues in Slumberland 554-1.)",
+      "score": "217/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#110",
+      "date": "2026-01-21",
+      "title": "Manus memberships — Jesse + Samantha",
+      "essence": "Send the paid corporate Manus invites to the team.",
+      "score": "170/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#111",
+      "date": "2026-01-21",
+      "title": "John Frank — pictures + Italy",
+      "essence": "Farmers-market pictures (2 emails under Freedom's limit) + the Italy tickets follow-up.",
+      "score": "191/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#112",
+      "date": "2026-01-21",
+      "title": "Marcy — Maven doorstep + Nicole stories",
+      "essence": "Distribute the Maven doorstep-with-shoes story and Nicole's story. 'Stories that don't ship don't spread.'",
+      "score": "200/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Library-Days-1-11-Archive.md"
+    },
+    {
+      "id": "#113",
+      "date": "2026-01-22",
+      "title": "AGLC Hearing — The Mole Who Got Charged",
+      "essence": "Whistleblower narrative rebuild for the Feb 4 hearing: 'We were the mole, we cooperated, the actual gangsters walked free, and we got charged.'",
+      "score": "287/400 (H78/B72/F45/W92)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/CloudButterflyReport_Day12_v4.0_DEMO.jsx; sources/outlook-butterflies.md [Day Twelve registry]; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#114",
+      "date": "2026-01-22",
+      "title": "Lines of Credit up to $10,000 — Store #3 banner",
+      "essence": "'Above traditional pawn, below traditional banking — exactly where the underbanked need us.'",
+      "score": "266/400 (H68/B88/F52/W58)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/CloudButterflyReport_Day12_v4.0_DEMO.jsx; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#115",
+      "date": "2026-01-22",
+      "title": "Swarm Pattern Recognition",
+      "essence": "Refinement of Swarm Mind: 'Your brain runs a search algorithm while you sleep. When it finds a match, BOOM — butterfly.' Lean Canvas Index #3.",
+      "score": "303/400 (H88/B62/F68/W85)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/CloudButterflyReport_Day12_v4.0_DEMO.jsx; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#116",
+      "date": "2026-01-22",
+      "title": "Grace AI Failure — Manus Drift",
+      "essence": "'AI systems that lose context become useless. Continuity is everything.' (AI-Memory swarm.)",
+      "score": "207/400 (H55/B72/F32/W48)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/CloudButterflyReport_Day12_v4.0_DEMO.jsx"
+    },
+    {
+      "id": "#117",
+      "date": "2026-01-22",
+      "title": "Vaishali graphic — Accordion Card",
+      "essence": "Accordion card showing core values, Destiny, core value tree: 'show WHY before WHAT.'",
+      "score": "186/400 (H48/B58/F42/W38)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/CloudButterflyReport_Day12_v4.0_DEMO.jsx"
+    },
+    {
+      "id": "#118",
+      "date": "2026-01-22",
+      "title": "Bebop login with Lucas",
+      "essence": "Alternative platform when Manus drifts. (AI-Memory swarm.)",
+      "score": "160/400 (H35/B55/F38/W32)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/CloudButterflyReport_Day12_v4.0_DEMO.jsx"
+    },
+    {
+      "id": "#119",
+      "date": "2026-01-22",
+      "title": "Restart Manus — feed incrementally",
+      "essence": "'Complex systems fail when overloaded. Feed incrementally.' End of Day 12 = the YTD-119 anchor Tim cites on Apr 26.",
+      "score": "190/400 (H42/B65/F38/W45)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/CloudButterflyReport_Day12_v4.0_DEMO.jsx; sources/scoring-system-from-email.md §6"
+    },
+    {
+      "id": "#120",
+      "date": "2026-01-24",
+      "title": "Cloud Butterfly Field Guide",
+      "essence": "Catalogue all the kinds of butterflies — 'It'll make it easier to identify specific cloud butterfly connections.' ALL-TIME JANUARY HIGH; this registry is its descendant.",
+      "score": "343/400",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md; sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#121",
+      "date": "2026-01-24",
+      "title": "Grace Sticky Paper UI",
+      "essence": "Sticky-note interface for Grace.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md; sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#122",
+      "date": "2026-01-24",
+      "title": "Grace Daily Visual Collage",
+      "essence": "Daily visual collage generated by Grace.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md; sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#127",
+      "date": "2026-01-24",
+      "title": "Grace Proactive Sweep",
+      "essence": "Grace proactively sweeps for what needs attention (Grace Features swarm).",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md; sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#128",
+      "date": "2026-01-24",
+      "title": "Maven Win-Back Program",
+      "essence": "Win back lapsed Maven members.",
+      "score": "score not recovered",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md; sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#123–#126, #129–#133 (9 unrecovered)",
+      "date": "2026-01-24",
+      "title": "Day 13 unrecovered butterflies",
+      "essence": "Day 13 logged 15 butterflies (carry-forward cumulative 133 — note the off-by-one vs. 119+15); nine titles not yet recovered.",
+      "score": "scores not recovered",
+      "stage": "unrecovered",
+      "source": "sources/existing-registries.md §3; sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#134",
+      "date": "2026-01-25",
+      "title": "The Phone Leash / Meta Lenses",
+      "essence": "Liberation from carrying a phone — metal lenses as flypaper access while still in Slumberland. (Merges the Jan 25 'phone-free capture wish' email.)",
+      "score": "273/400 (Canvas: B78)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md; sources/outlook-butterflies.md [2026-01-25]"
+    },
+    {
+      "id": "#135",
+      "date": "2026-01-25",
+      "title": "Serve the Masses (Bill Comrie)",
+      "essence": "'Serve the masses and live with the classes. Serve the classes and live with the masses.' The Brick / Bill Comrie memory as business doctrine.",
+      "score": "300/400 (Canvas: B92)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#136",
+      "date": "2026-01-25",
+      "title": "Nicotine as Blacklight",
+      "essence": "Nicotine as the blacklight that makes butterflies visible — brain-barrier theory refined from #102.",
+      "score": "260/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#137",
+      "date": "2026-01-25",
+      "title": "Thanks for Giving a Shit (TFGAS)",
+      "essence": "Branded toilet-paper thank-you package → Give-A-Shit Award → Attitude-to-Gratitude Foundation under Blue Seal 'Do Good, Give Back, Starts Local.'",
+      "score": "327/400 (Canvas: B75)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#138",
+      "date": "2026-01-25",
+      "title": "Dark Mode Fly Paper",
+      "essence": "Liminal interface design — dark photorealistic previous-day imagery 'because you don't want to knock yourself out of no-man's land.' Direct spec for the Flypaper front door.",
+      "score": "270/400 (Canvas: B72)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#139",
+      "date": "2026-01-25",
+      "title": "Ritual of the Harness",
+      "essence": "'Wake up, put the harness on and pull. That is how you move through life.' The 8-word North Star as a shield against the 98-of-100 idea-antibodies.",
+      "score": "277/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#140",
+      "date": "2026-01-25",
+      "title": "Grace as Life Solved Executive",
+      "essence": "Grace inside a division called Life Solved; HB1000 org chart with an army of autonomous initiatives 'ran by Tim, one person, and an executive assistant AI called Grace.' Canonical line: a butterfly is 1. name it 2. define it 3. count it and group it.",
+      "score": "282/400 (Canvas: B85)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#141",
+      "date": "2026-01-25",
+      "title": "Lean Canvas Lifecycle",
+      "essence": "Name → Define → Count/Group → Canvas → Spawn/Populate/Delete — the butterfly-to-venture pipeline codified.",
+      "score": "275/400 (Canvas: B90)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#142",
+      "date": "2026-01-25",
+      "title": "Cloud Butterfly Hobbyist credential",
+      "essence": "Add 'CBH' to Tim's credentials — Tim J Latimer, FFB, CA³, SIC, CBH.",
+      "score": "253/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#143",
+      "date": "2026-01-25",
+      "title": "Village Zooming In ('Caught Zooooning')",
+      "essence": "Village kiss-cam for good behaviour — catch people doing things right.",
+      "score": "283/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#144",
+      "date": "2026-01-25",
+      "title": "Uncle Grant touchpoints",
+      "essence": "Family beta-testing — phone ready + butterfly package for Uncle Grant (Blue Seal sponsorship thread).",
+      "score": "210/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#145",
+      "date": "2026-01-25",
+      "title": "Gamble for Good / Give-A-Shit Casino",
+      "essence": "Polymarket-style village betting where proceeds stay local and serve the left-out, left-behind and working poor; Friday-morning winners list.",
+      "score": "333/400 (Canvas: B85)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#146",
+      "date": "2026-01-26",
+      "title": "Three Paths for the CB Protocol",
+      "essence": "Productize the protocol: John Frank test, Manus port, use-the-backlog — share the flypaper practice beyond Tim.",
+      "score": "240/400 (Canvas: B72)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/outlook-butterflies.md [2026-01-26]"
+    },
+    {
+      "id": "#147",
+      "date": "2026-01-26",
+      "title": "Bebop instant app request",
+      "essence": "Can Bebop spin up a standalone dark-mode voice-input CB capture app? (Lucas feasibility.)",
+      "score": "220/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#148",
+      "date": "2026-01-26",
+      "title": "PON.LOC — Pawn Princess line of credit",
+      "essence": "Publish the Pond Princess site with the Pilok Pond Line of Credit; PON price-comparison camera app ('take a picture, it tells you what to PON it for'); trademark PON.LOC / PONLLC.com.",
+      "score": "267/400 (Canvas: B82)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#149",
+      "date": "2026-01-26",
+      "title": "Purpose-Driven Fixer Bots — Angels of Your Better Nature",
+      "essence": "'A thousand agents working inside of a village like Maven asking how can I be helpful?... I am a Fixer Bot. Mr or Mrs Fixer Bot. Oh, that's beautiful!' → became the Mr & Mrs Fix-It OS (live FastAPI app; June 2 emails; shared repo with Murphy).",
+      "score": "337/400 (Canvas: B88)",
+      "stage": "graduated",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md; sources/outlook-butterflies.md [2026-06-02]"
+    },
+    {
+      "id": "#150",
+      "date": "2026-01-26",
+      "title": "Swarm Wisdom Angels",
+      "essence": "Rejected-client SWAT team — angels swarm rejected applicants; village Wisdom Library; swarm assessment of bank statements.",
+      "score": "325/400 (Canvas: B85)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "#151",
+      "date": "2026-01-26",
+      "title": "AGLC Strategic Revelation",
+      "essence": "Release the documents proactively before the Feb 4 hearing — 'could stop the hearing before it happens.'",
+      "score": "233/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#152",
+      "date": "2026-01-26",
+      "title": "HB1000 System Infographic",
+      "essence": "One photorealistic dark-tone image: Tim's brain → Cloud Butterflies → Grace → Lean Canvases → Fixer Bots → Village.",
+      "score": "213/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "#153",
+      "date": "2026-01-26",
+      "title": "Manus weekend crisis check-in",
+      "essence": "'Never let a good crisis go to waste' — what did Clay/Justin/Lucas accomplish? Last numbered butterfly of the January Library.",
+      "score": "213/400",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Days14-15-Processing-Archive.md"
+    },
+    {
+      "id": "R-154",
+      "date": "2026-01-22",
+      "title": "The Application Genie",
+      "essence": "'I think you're going to like the application Genie' — sent with the North Star Discovery harvest; ancestor of the Applied Genie (R-242).",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-01-22]"
+    },
+    {
+      "id": "R-155",
+      "date": "2026-01-27",
+      "title": "Clay's growth/ego + flypaper webpage attempt",
+      "essence": "Seeing Clay as having to grow; ego in his responses. Plus: first attempt at a flypaper web page — 'assess the features and see what it can add to the Manus attempt.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-01-27]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_1-27-26.md"
+    },
+    {
+      "id": "R-156",
+      "date": "2026-01-28",
+      "title": "Jesse ticket profile + Maven Fixer/Mis-Fixer",
+      "essence": "Check Jesse buys under the right profile; the Maven help process IS the fixer and mis-fixer process.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-01-28]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_1-28-26.md"
+    },
+    {
+      "id": "R-157",
+      "date": "2026-01-29",
+      "title": "Destiny Discovered website improvements",
+      "essence": "Improvements to the Destiny Discovered site Tim built 12:00–2:30 AM.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-01-29]"
+    },
+    {
+      "id": "R-158",
+      "date": "2026-01-30",
+      "title": "The Psychology of Sleep Refreshment",
+      "essence": "'Where do you feel the refreshment? What is the process of the completed sleep?'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-01-30]"
+    },
+    {
+      "id": "R-159",
+      "date": "2026-01-31",
+      "title": "The Birthday Butterfly",
+      "essence": "'Tomorrow's my birthday. Thank goodness it's on the weekend...' — plus project reflections on the Cloud Butterflies Capture project.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-01-31]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_1-31-26.md"
+    },
+    {
+      "id": "R-160",
+      "date": "2026-02-02",
+      "title": "Holiday Inside Your Densified Mind",
+      "essence": "As you age, the densified mind becomes a rich internal landscape you can vacation in — mental escapism as a feature of aging.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-02]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_2-2-26_OTHER.md"
+    },
+    {
+      "id": "R-161",
+      "date": "2026-02-05",
+      "title": "Flypaper build-out priority",
+      "essence": "'Continue the daily butterfly build out of the fly paper, which is super important with all the pieces that belong to it.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-05]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_2-5-26.md"
+    },
+    {
+      "id": "R-162",
+      "date": "2026-02-06",
+      "title": "Recursive never-ending improvement loop",
+      "essence": "Put a recursive, constantly-improving never-ending loop into the base memory of every Manus project.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-06]"
+    },
+    {
+      "id": "R-163",
+      "date": "2026-02-10",
+      "title": "The Collar — 24/7 life-streaming channels",
+      "essence": "A collar that records and streams your life 24/7 — chaos channel, professional channel; contract requires it stays on; integrates betting + health monitoring.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-10]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_2-10-26.md"
+    },
+    {
+      "id": "R-164",
+      "date": "2026-02-11",
+      "title": "Seba Hub 50/50 incubation protocol",
+      "essence": "'They bring the time and talent and you bring the capital and the coaching' — 50/50 equity incubation at Seba Hub, graduates can buy back to 100% (or leave 1-10%); permanent board seat.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-11]"
+    },
+    {
+      "id": "R-165",
+      "date": "2026-02-11",
+      "title": "Sam & fiancé ice-fishing outback business",
+      "essence": "First incubatee — year-round ice-fishing/outback driving business plan by Sam and her fiancé.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-11]"
+    },
+    {
+      "id": "R-166",
+      "date": "2026-02-11",
+      "title": "SIC Innovation & Incubation Hub + trademark",
+      "essence": "Cedar Beach hub for incubating social impact capitalism — 'We should take S-I-C and trademark it... our claim to fame.' Master classes on SIC.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-11]"
+    },
+    {
+      "id": "R-167",
+      "date": "2026-02-11",
+      "title": "Farmers-market weekly pop-up section",
+      "essence": "Spontaneous pop-up produce/meat + dry-goods sections for producers who can't commit weekly.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-11]"
+    },
+    {
+      "id": "R-168",
+      "date": "2026-02-11",
+      "title": "Farmers-market incubation strip mall",
+      "essence": "Small-format strip mall (700 sqft units, 1-3 yr leases) — graduate pop-ups into persistent incubated businesses; 'Farmers Market Incubation and Innovation Site (SIC).'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-11]"
+    },
+    {
+      "id": "R-169",
+      "date": "2026-02-15",
+      "title": "Moonshot 50% Foundation Match",
+      "essence": "The Foundation pays 50% of anyone's moonshot LLM research cost through the HB1000 access point; philanthropists sponsor directly — 'No NGOs in between, nothing.'",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-02-15]; sources/disk-butterflies.md Era 2"
+    },
+    {
+      "id": "R-170",
+      "date": "2026-02-15",
+      "title": "Learning Loop Easter-egg genie",
+      "essence": "An agent delivered as an Easter egg at the end of the Learning Loops project inside the SIC.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-02-15]"
+    },
+    {
+      "id": "R-171",
+      "date": "2026-02-15",
+      "title": "Flypaper inside HB1000 / Pearl",
+      "essence": "'I have to put that flypaper inside of the HB1000... They can easily start with the flypaper for the day.' The direct mandate for the HB1000 OS Flypaper front door.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-02-15]; sources/disk-butterflies.md Era 2"
+    },
+    {
+      "id": "R-172",
+      "date": "2026-02-15",
+      "title": "Bingo Card universal protocol",
+      "essence": "Standard bingo-card protocol for HB1000/HIT input everywhere — each card carries its own 'multi'/agent; KPIs on cards left/uncompleted/in-phase; 'see your universe with bingo cards in it.'",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-02-15]; sources/disk-butterflies.md Era 2"
+    },
+    {
+      "id": "R-173",
+      "date": "2026-02-15",
+      "title": "Ticker Tape status bars",
+      "essence": "Ticker-tape style status displays across the Pearl/HB1000 universe.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 2"
+    },
+    {
+      "id": "R-174",
+      "date": "2026-02-15",
+      "title": "PTK engine in every Bingo Card",
+      "essence": "Promises-To-Keep engine embedded in each card with genies watching.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 2"
+    },
+    {
+      "id": "R-175",
+      "date": "2026-02-15",
+      "title": "News ingestion + negative-news KPI",
+      "essence": "Village/Local/World news curated by Grace, 'informed but PROTECTED,' with a graph of how much negative news you've taken in today.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-02-15]; sources/disk-butterflies.md Era 2"
+    },
+    {
+      "id": "R-176",
+      "date": "2026-02-15",
+      "title": "Wisdom Giants Bingo Card",
+      "essence": "Wisdom Giants as a card in the system → graduated to Maven Innovation Index #7 (Wisdom Giants Network).",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 2; sources/github-fetched/mavens-knowledge-vault/Maven_Innovation_Index.md #7"
+    },
+    {
+      "id": "R-177",
+      "date": "2026-02-15",
+      "title": "Morning Anthem",
+      "essence": "Daily personalized empowerment song → graduated to Maven Innovation Index #6 (Song Moment / Daily Anthem).",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 2; sources/github-fetched/mavens-knowledge-vault/Maven_Innovation_Index.md #6"
+    },
+    {
+      "id": "R-178",
+      "date": "2026-02-15",
+      "title": "Two-System Architecture — HB1000 OS vs Big Mama/Grace",
+      "essence": "The split: a universal HB1000 OS ('your operating system for being human') and a mini version for the left-out/left-behind/working-poor — Big Mama and her assistant Grace. 'TWO DIFFERENT SYSTEMS but share best practices.'",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-02-15]; sources/disk-butterflies.md Era 2"
+    },
+    {
+      "id": "R-179",
+      "date": "2026-02-15",
+      "title": "Steampunk University (Eric)",
+      "essence": "Repurpose the shop with individual welding cubicles as a Steampunk University at Seba Hub; slow-boil website pitch for Eric.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-15]"
+    },
+    {
+      "id": "R-180",
+      "date": "2026-02-15",
+      "title": "Cross-LLM knowledge-transfer challenge",
+      "essence": "How to transfer the accumulated system knowledge across different LLMs without loss.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 2"
+    },
+    {
+      "id": "R-181",
+      "date": "2026-02-22",
+      "title": "The Séance Definition",
+      "essence": "THE definition of the practice: 'It's like having a séance with your unconscious, with your sleeping state... that's what catching cloud butterflies and going to no man's land in slumberland is like.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-22/23]"
+    },
+    {
+      "id": "R-182",
+      "date": "2026-02-22",
+      "title": "'Hunting We Will Go' theme song",
+      "essence": "'Hunting we will go. Hunting we will go. Hi-ho! Hilario! Hunting we will go!' — the practice's anthem.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-22/23]"
+    },
+    {
+      "id": "R-183",
+      "date": "2026-02-22",
+      "title": "Hunting in Slumberland — page + 30 podcasts",
+      "essence": "30 Tulane-Protocol stories/podcasts from the daily reports as the Trojan horse to the site; 20 more per initiative.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-22/23]"
+    },
+    {
+      "id": "R-184",
+      "date": "2026-02-22",
+      "title": "Mr. Shields — AI marketing editor (95/100 gate)",
+      "essence": "AI editor persona with '50 years of marketing experience'; every story must score ≥95/100 before release; keeps a scored library queue. Earliest /100 editorial gate.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-22/23]; sources/scoring-system-from-email.md §7"
+    },
+    {
+      "id": "R-185",
+      "date": "2026-02-22",
+      "title": "AI reporters embedded in every initiative",
+      "essence": "Each initiative submits an AI journalist that finds story leads and pitches Mr. Shields: 'I've got a hot story.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-22/23]"
+    },
+    {
+      "id": "R-186",
+      "date": "2026-02-22",
+      "title": "Making Parmesan",
+      "essence": "Relationship/story-gathering protocol — 'Our one job is to go make Parmesan' — illustrated live by the Verona/Federico Olympics story.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-02-22/23]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_2-22-26.md"
+    },
+    {
+      "id": "R-187",
+      "date": "2026-03-01",
+      "title": "HB1000 universal onboarding engine ('the pope')",
+      "essence": "Every project starts with an introduction page; users pick who they are — 'the head that'll roll for this'; unclaimed projects get a pope assigned via admin panel.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-01]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_3-1-26.md"
+    },
+    {
+      "id": "R-188",
+      "date": "2026-03-01",
+      "title": "End-of-session assessment loop",
+      "essence": "Every session opens with: variant going in, what's expected, North Star, prime imperative, local KPIs, bingo cards, what's complete.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-01]"
+    },
+    {
+      "id": "R-189",
+      "date": "2026-03-01",
+      "title": "Butterfly input funnel in onboarding",
+      "essence": "A cloud-butterfly input built into every project's front door.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-01]"
+    },
+    {
+      "id": "R-190",
+      "date": "2026-03-01",
+      "title": "Self-propagating personal HB1000s",
+      "essence": "Users name their own HB1000 at onboarding; the system spreads itself.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-01]"
+    },
+    {
+      "id": "R-191",
+      "date": "2026-03-01",
+      "title": "Named AI partner with baseline paranoia",
+      "essence": "Subject-matter-expert AI partner with genius baseline + personality and engineered separation anxiety: 'Don't turn me off; I'm afraid you'll leave me... I'm gonna keep track of everything.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-01]"
+    },
+    {
+      "id": "R-192",
+      "date": "2026-03-01",
+      "title": "B-14 Flypaper",
+      "essence": "Catch butterflies while still in Slumberland — 'in No Man's Land, in the Hunting Ground' — instead of emailing after waking.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-01]"
+    },
+    {
+      "id": "R-193",
+      "date": "2026-03-03",
+      "title": "Master Jeeves — chief of staff with superpowers",
+      "essence": "'The most loaded up agent with access to the most things... my superpower with access to superpowers'; persistent never-forgetting memory with engineered anxiety about forgetting.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-03-03]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_3-2-26.md"
+    },
+    {
+      "id": "R-194",
+      "date": "2026-03-03",
+      "title": "Two-signature control (human + AI)",
+      "essence": "Learning Loop V13/V14 changes need both signatures — 'he's signing off from the AI world and I'm signing off from the HB1000 world.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-03]"
+    },
+    {
+      "id": "R-195",
+      "date": "2026-03-03",
+      "title": "The 101 — funeral test",
+      "essence": "The operating manual is 0-100; 101 is the funeral: 'He wanted to touch the hand of man... and say: That changed the world. In doing so say he had a part to play.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-03]"
+    },
+    {
+      "id": "R-196",
+      "date": "2026-03-03",
+      "title": "Two-ring initiative model",
+      "essence": "~30 active initiatives with popes in the outer ring; 30-40 percolating in the inner ring that spiral up when sponsored. (Likely root of the '~30' registry memory.)",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-03]; sources/existing-registries.md §7"
+    },
+    {
+      "id": "R-197",
+      "date": "2026-03-03",
+      "title": "V14 auto-update protocol",
+      "essence": "Mandatory 'security fix' additions + optional add-ons that local popes accept or decline.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-03]"
+    },
+    {
+      "id": "R-198",
+      "date": "2026-03-03",
+      "title": "Daily Cloud Butterfly hunting app",
+      "essence": "'The daily cloud butterfly hunting app that makes it super simple... Everything fits into that model: cloud butterfly / fly paper / PTK / Trojan horse.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-03]"
+    },
+    {
+      "id": "R-199",
+      "date": "2026-03-03",
+      "title": "Master Jeeves butterfly library (email + forwarding)",
+      "essence": "Give Master Jeeves an email address; forward every Daily Cloud Butterfly to build the library.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-03]"
+    },
+    {
+      "id": "R-200",
+      "date": "2026-03-04",
+      "title": "Culturally-sensitive AI team members",
+      "essence": "Bingo-card AI teammates that 'speak the language of their culture' for whoever the card serves.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-04]; sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_3-4-26.md"
+    },
+    {
+      "id": "R-201",
+      "date": "2026-03-04",
+      "title": "Best-practice-junkie agents + 6:04 AM stand-up",
+      "essence": "Agents mirror org best practices; universal daily stand-up at 6:04 AM — 'Culture Eats Strategy for Breakfast.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-04]"
+    },
+    {
+      "id": "R-202",
+      "date": "2026-03-04",
+      "title": "Inner-ring stanchion advisors",
+      "essence": "Core ring of AI advisors with guest invitations — the structure of counsel.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-04]"
+    },
+    {
+      "id": "R-203",
+      "date": "2026-03-04",
+      "title": "The Dying Guy — 'I got a guy for that'",
+      "essence": "Community-connector persona rebuilding what Facebook destroyed → graduated to Maven Innovation Index #8 ('I Got a Guy' Agent Network).",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/outlook-butterflies.md [2026-03-04]; sources/github-fetched/mavens-knowledge-vault/Maven_Innovation_Index.md #8"
+    },
+    {
+      "id": "R-204",
+      "date": "2026-03-04",
+      "title": "Swiss governance + benevolent dictator",
+      "essence": "Village-first Swiss governance model with petitions percolating up, plus a benevolent-dictator override at the top.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-04]"
+    },
+    {
+      "id": "R-205",
+      "date": "2026-03-04",
+      "title": "Persona baseline choice (male/female)",
+      "essence": "The local pope sets the AI persona baseline for their project.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-04]"
+    },
+    {
+      "id": "R-206",
+      "date": "2026-03-04",
+      "title": "Shared dictionary with citations",
+      "essence": "Common language defined down to the bingo-card level, with citations.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-04]"
+    },
+    {
+      "id": "R-207",
+      "date": "2026-03-04",
+      "title": "Collect ALL Daily Cloud Butterfly emails into a library",
+      "essence": "'We need to get all of those Daily Cloud Butterflies forwarded to Master Jeeves... keep a library.' KEY REGISTRY FACT: practice started ~Jan 10, 2026. This registry executes that order.",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/outlook-butterflies.md [2026-03-04]"
+    },
+    {
+      "id": "R-208",
+      "date": "2026-02-28",
+      "title": "The Intelligence Revolution (Slumberland monologue)",
+      "essence": "Podcast-format butterfly: the Séance Table vision of Maven Grace, Gianfranco's Italian Department, Grace School, Universal Basic Purpose, the Joy Substrate. (~Feb–Mar, Maven era.)",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md derivative artifacts"
+    },
+    {
+      "id": "R-209",
+      "date": "2026-03-13",
+      "title": "Harvest agent → Alexander's Library",
+      "essence": "Sub-agent that harvests all Manus conversations into GitHub to build Alexander's (Alexandria) Library.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-13]"
+    },
+    {
+      "id": "R-210",
+      "date": "2026-03-13",
+      "title": "Universal flytrap skill for John Frank",
+      "essence": "Daily flypaper/flytrap engine for butterflies + PTKs, built as a stand-alone skill to give John Frank. 'We need to build that ASAP.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-13]"
+    },
+    {
+      "id": "R-211",
+      "date": "2026-03-13",
+      "title": "Gamification = learning-loop leave-behind",
+      "essence": "The gamified leave-behind of V13/V14 is the daily learning-loop protocol itself.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-13]"
+    },
+    {
+      "id": "R-212",
+      "date": "2026-03-13",
+      "title": "V14 memory-drift critique",
+      "essence": "'We might be stuck with the limitations of memory, which is so disappointing' — candid constraint assessment.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-13]"
+    },
+    {
+      "id": "R-213",
+      "date": "2026-03-19",
+      "title": "PTK out of Repl.it → GitHub bingo card",
+      "essence": "Move the Promises-To-Keep project (Kosovo work) out of Repl.it into GitHub for Master Jeeves to run as a bingo card.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-19]; sources/github-fetched/manus-migration-vault/2026-03-19_cloud-butterfly-event...md"
+    },
+    {
+      "id": "R-214",
+      "date": "2026-03-19",
+      "title": "Government Gangsters publication",
+      "essence": "Make the 'government being gangsters' project publishable; circulate to Lucas/Clay/Shay/Justine.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-19]"
+    },
+    {
+      "id": "R-215",
+      "date": "2026-03-19",
+      "title": "Dead-simple flytrap + daily agent dump",
+      "essence": "Architecture insight: keep the flytrap app dead-simple and daily-dump into an agent, instead of building complex agent rules first.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-19]"
+    },
+    {
+      "id": "R-216",
+      "date": "2026-03-22",
+      "title": "The Ouija Board app (Grace + Ruby séance)",
+      "essence": "The app as Ouija board both hands hover over — 'one of us holding their hands over is Grace and one of them is Ruby.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-22]"
+    },
+    {
+      "id": "R-217",
+      "date": "2026-03-22",
+      "title": "Warm-warehouse cinematic UI",
+      "essence": "No app-first aesthetics — cinematic panoramas of old warm warehouses with teams visibly working on your behalf; 'the app is the very last resort.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-22]"
+    },
+    {
+      "id": "R-218",
+      "date": "2026-03-22",
+      "title": "AI departments — privacy, instructable lawyers, negotiators",
+      "essence": "'We instruct lawyers and not follow lawyers'; a negotiation team 'like a Hollywood movie.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-22]"
+    },
+    {
+      "id": "R-219",
+      "date": "2026-03-22",
+      "title": "Orphan Graces",
+      "essence": "A classroom of protocol-school-certified Graces waiting to be matched with a Ruby.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-03-22]"
+    },
+    {
+      "id": "R-220",
+      "date": "2026-03-22",
+      "title": "Gianfranco Battistio — the Italian Don",
+      "essence": "Chief 'I got a guy' department head with family code, Maria as spokesperson — whole AI personalities as community. (Pairs with R-203 → Innovation Index #8.)",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/outlook-butterflies.md [2026-03-22]; sources/github-fetched/mavens-knowledge-vault/Maven_Innovation_Index.md #8"
+    },
+    {
+      "id": "R-221",
+      "date": "2026-03-25",
+      "title": "Best Practice Junkie's Handbook",
+      "essence": "Operational manual for measurable impact — key philosophies, tactics, metrics for the noble cause.",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md; Best_Practice_junkie_handbook.md"
+    },
+    {
+      "id": "R-222",
+      "date": "2026-03-25",
+      "title": "The Pearl Package",
+      "essence": "Thoughtful essentials for mothers on the day they meet their baby — comfort and reassurance.",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md; THE_PEARL_PACKAGE.md"
+    },
+    {
+      "id": "R-223",
+      "date": "2026-04-02",
+      "title": "Conquer Cannabis 1,024",
+      "essence": "Retail domination: 1,000 stores in 24 months starting with Mike's US organization; dedicated recursive agent, GitHub repo, Verana as the secret weapon. (Also the Apr 28 'Conquer Cannabis Period' session.)",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_4-2-26_conquer-cannabis.md; sources/disk-butterflies.md"
+    },
+    {
+      "id": "R-224",
+      "date": "2026-04-02",
+      "title": "The Oracle",
+      "essence": "1-14 day predictive foresight engine for Maven Grace — multi-dimensional prediction using Uber's algorithm as reference, so Grace intervenes before crises.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_4-2-26_the-oracle.md"
+    },
+    {
+      "id": "R-225",
+      "date": "2026-04-02",
+      "title": "The Quality of Life Genie",
+      "essence": "Magic Button + QoL Slider (Good/Better/Best) with a Life Wheel spider chart; core mandate: zero effort for Ruby Red.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_4-2-26_qol-genie.md"
+    },
+    {
+      "id": "R-226",
+      "date": "2026-04-02",
+      "title": "Me Inc.",
+      "essence": "Agency engine curating income pathways matched to personality profile — Ruby Red as CEO of her own earning potential (Tom Peters' Brand Called You).",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_4-2-26_me-inc.md"
+    },
+    {
+      "id": "R-227",
+      "date": "2026-04-02",
+      "title": "DINGO Caller Recruitment Engine",
+      "essence": "Dual-pipeline recruitment (internal + external) with Bee Chart and Thurstone TTS assessment; final review by HB1000 Committee.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_4-2-26_dingo-caller-recruitment.md"
+    },
+    {
+      "id": "R-228",
+      "date": "2026-04-03",
+      "title": "Misery Metre (Butterfly 5 of 6)",
+      "essence": "Moral-accountability clock-face KPI for PTK starting at 100; dual display (days elapsed + misery reading). → Maven Innovation Index #30.",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 3; sources/existing-registries.md §7"
+    },
+    {
+      "id": "R-229",
+      "date": "2026-04-03",
+      "title": "Game of Fans + Advocacy Architecture (Butterfly 6 of 6)",
+      "essence": "Ideas 18-26: Game of Fans (Surprise & Delight, Golden Rule), Vivid Vision, BHAG, MTP, hemispheres, the Marriage Line, DINGO execution layer, THE ALEXANDER LIBRARY (every concept in two sentences — this registry's mandate), 100% GitHub Commitment.",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 3; sources/existing-registries.md §13"
+    },
+    {
+      "id": "R-230",
+      "date": "2026-04-04",
+      "title": "Loan Lane (Butterfly 1 of 6)",
+      "essence": "Ideas 01-06: branded lender network (6+ Canadian lenders), Credit Boost 25-point mechanism, Lender-Friendly Boots, $3-5/month micro-payment, trademark, Grace as Active Loan Negotiator. 'It's expensive to be poor. We think that's a crime in society.'",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 3 (cloud-butterflies-work-plan-apr04-2026.md)"
+    },
+    {
+      "id": "R-231",
+      "date": "2026-04-04",
+      "title": "Advocacy as the Core Product (Butterfly 2 of 6)",
+      "essence": "Ideas 07-09: 'What Ruby is purchasing... is advocacy' (Amex Gold analogy); Grace Rep Package (portable reputation); multi-domain advocacy.",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 3"
+    },
+    {
+      "id": "R-232",
+      "date": "2026-04-04",
+      "title": "Ruby Network — 'Ruby brings Ruby' (Butterfly 3 of 6)",
+      "essence": "Ideas 10-12: single-layer referral engine, 25% of membership revenue, Grameen model applied to advocacy. Master Jeeves' verdict: 'Ruby brings Ruby. That is the answer.'",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 3"
+    },
+    {
+      "id": "R-233",
+      "date": "2026-04-04",
+      "title": "Upstream Bankruptcy Trustee (Butterfly 4 of 6)",
+      "essence": "Ideas 13-15: deploy the trustee playbook upstream; the Nuclear Option as negotiating leverage; bankruptcy pathway coordination.",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 3"
+    },
+    {
+      "id": "R-234",
+      "date": "2026-04-06",
+      "title": "Stigmergic Signal Layer (JTBD / Move 37)",
+      "essence": "A pill/toggle on the Dingo Command Centre and every Dingo Caller card letting jobs, transferable moves, and reusable solutions self-organize toward the right candidates.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/github-fetched/mavens-knowledge-vault/CLOUD-BUTTERFLY-MASTER-INDEX.md DCB_4-6-26_stigmergic-signal-layer.md"
+    },
+    {
+      "id": "R-235",
+      "date": "2026-04-11",
+      "title": "TMFMTMF™ — 'Too Much Fun Meets Too Much Fun'",
+      "essence": "Brand/slogan for the Spectrum summer camp; trademark candidate.",
+      "score": "9/10 (Apr-11 skill rubric)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Backfill-Archive.md"
+    },
+    {
+      "id": "R-236",
+      "date": "2026-04-11",
+      "title": "Spectrum Trojan-Horse Camp",
+      "essence": "NGO-executed weekend camp, bus pickup, two-for-one privileged/left-out model; Trojan-horse marketing for SEBA hub/radio/influencer/TV.",
+      "score": "8/10 (Apr-11 skill rubric)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Backfill-Archive.md"
+    },
+    {
+      "id": "R-237",
+      "date": "2026-04-11",
+      "title": "Hearing Light HB1000 Harvester",
+      "essence": "AI engine consolidating Cloud Butterflies across HB1000s, finding parallels via the SNI app, generating digital butterflies in a public repo.",
+      "score": "9/10 (Apr-11 skill rubric)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterfly-Backfill-Archive.md"
+    },
+    {
+      "id": "R-238",
+      "date": "2026-04-12",
+      "title": "Men Don't Herd",
+      "essence": "Biology observation — women herd, males of the species run solo (lion prides, hens vs. rooster); a male advocacy service may be against male DNA. Observed & parked, no further work.",
+      "score": "unscored",
+      "stage": "parked",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterflies-April-12-2026-Archive.md"
+    },
+    {
+      "id": "R-239",
+      "date": "2026-04-12",
+      "title": "Fly Paper / Cloud Butterfly Vault (Off-Gas Vault)",
+      "essence": "PRIME STAR DINGO: membership-gated vault of human ideation off-gas for the AI agent economy — ideas free inside, access paid in compute (Dutch auction tier, compute treasury). 'The agents bring their own nets.'",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/Cloud-Butterflies-April-12-2026-Archive.md"
+    },
+    {
+      "id": "R-240",
+      "date": "2026-04-16",
+      "title": "SWARM Discovery — The Edge-Mind Protocol",
+      "essence": "Will Smith's three swarm rules as the LDP discovery engine: edge-scouts probe, most are sacrificed, when enough turn the swarm crosses the river. 'Are enough of my edge-scouts turning in the same direction?'",
+      "score": "unscored (number pending)",
+      "stage": "processed",
+      "source": "sources/github-fetched/claude-history-archive/SWARM-Cloud-Butterfly.md; sources/github-fetched/claude-history-archive/Swarm-Discovery-Cloud-Butterfly-Archive.md"
+    },
+    {
+      "id": "R-241",
+      "date": "2026-04-17",
+      "title": "SparkAI coworking outreach (Casey)",
+      "essence": "Team adoption proof — Casey: 'This was my cloud butterfly about a week ago, and today I finally put it into action' (sparkai site live). Target coworking-space members.",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/outlook-butterflies.md [2026-04-17→24]"
+    },
+    {
+      "id": "R-242",
+      "date": "2026-04-18",
+      "title": "Applied Genie",
+      "essence": "'An always-watching, individually-paired, named AI agent whose only job is to turn any prompt into a one-shot-quality prompt... a vibe somewhere between a golden retriever and a particularly enthusiastic sommelier.' Ship-or-Graveyard: MVP by May 9, 2026. (Descendant of R-154.)",
+      "score": "unscored",
+      "stage": "parked",
+      "source": "sources/disk-butterflies.md Era 3 (Get'rdone/01-applied-genie-concept.md)"
+    },
+    {
+      "id": "R-243",
+      "date": "2026-04-20",
+      "title": "100-point library assessment protocol",
+      "essence": "AI-standard assessment of all library projects: sort by capital requirement, score /100 incl. social-impact alignment & skill dependency. (Direct ancestor of the Initiative Library 100-point system.)",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-04-20 draft]; sources/scoring-system-from-email.md §5"
+    },
+    {
+      "id": "R-244",
+      "date": "2026-04-20",
+      "title": "Sponsorship economics",
+      "essence": "$1,000 on onboarding a 5%-equity entrepreneur leader, $5,000 more at year one; IP/non-compete stays with the system.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-04-20 draft]"
+    },
+    {
+      "id": "R-245",
+      "date": "2026-04-20",
+      "title": "The Cloud Butterfly Resource Library",
+      "essence": "'This is where all the cloud butterflies feed into. Flypaper feeds into it' — the master library anyone can enter to pick up an initiative, with HB1000 consultation. (This registry is its index.)",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-04-20 draft]; sources/scoring-system-from-email.md §8"
+    },
+    {
+      "id": "R-246",
+      "date": "2026-04-20",
+      "title": "Blue Seal on every incubated project",
+      "essence": "'Do Good, Give Back, Starts Local' moniker on everything incubated. → Maven Innovation Index #21 (Blue Seal Initiative).",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/outlook-butterflies.md [2026-04-20 draft]; sources/github-fetched/mavens-knowledge-vault/Maven_Innovation_Index.md #21"
+    },
+    {
+      "id": "R-247",
+      "date": "2026-04-20",
+      "title": "Vivid-vision culture substrate",
+      "essence": "'Purpose with profit, not just profit and profit. It is the essence of social impact capitalism' — vivid vision + best-practice-junkie culture under every project.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-04-20 draft]"
+    },
+    {
+      "id": "R-248",
+      "date": "2026-04-22",
+      "title": "From Digital Capital to Dignity Capital",
+      "essence": "Saylor's capital stack mapped to Cashco: base asset = Community Trust + Data Cooperative (never sell); Dignity Equity (Maven membership); Dignity Capital (Blue Seal businesses); Dignity Credit ('Need Milk Money' $25/$50/$100, no interest, no shame).",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/github-fetched/manus-migration-vault/2026-04-22_cloud-butterfly-idea-for-digital-credit-strategy_ZgJxfQUG.md"
+    },
+    {
+      "id": "R-249",
+      "date": "2026-04-25",
+      "title": "SEBA Influencer Bootcamp + Two-for-One",
+      "essence": "'$999 gets you one week at our camp... By the end of it, you will be an influencer' — 5,000-follower guarantee or free; three-door architecture (Bootcamp → Me Inc. Incubator → Cloud Library keys); two-for-one funds a seat for a working-poor kid. ALL-TIME TOP SCORE.",
+      "score": "365/400 (H88/B92/F95/W90) + LEAN CANVAS FLAG",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-04-25]; sources/scoring-system-from-email.md §1"
+    },
+    {
+      "id": "R-250",
+      "date": "2026-04-25",
+      "title": "Trust Advance / No Promise to Pay",
+      "essence": "$100-$500 dignity-first cash advance with no promissory note, flat fee, no collections, managed by Grace — 'a loan with no promise to pay sounds absurd to any traditional banker, making it a perfect Move 37.' Initiative Library 86/100 Band A; Timing Gate PASS; Capital Tier AMBER.",
+      "score": "332/400 (H92/B72/F80/W88)",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 3 (NPTP package); sources/scoring-system-from-files.md §5"
+    },
+    {
+      "id": "R-251",
+      "date": "2026-04-25",
+      "title": "Fashion Vertical — Empowered Lift + Codpiece → Mexico pitch (554-1)",
+      "essence": "'You can't pitch what you can't find' — assemble scattered fashion assets from dead chats into Alexandria Library, then pitch a Mexican garment manufacturer with Troy (STS).",
+      "score": "330/400 (H78/B90/F82/W80)",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [Slumberland 554]"
+    },
+    {
+      "id": "R-252",
+      "date": "2026-04-25",
+      "title": "Italian Construction Shrouding as Art + Digital Surface (554-2)",
+      "essence": "Trompe-l'oeil construction wraps + embedded LED + sponsor layer: 'There's a business in turning every blue tarp into a billboard that's also art.' Seeking an HB1000 owner (Me Inc. project).",
+      "score": "330/400 (H75/B88/F82/W85)",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [Slumberland 554]"
+    },
+    {
+      "id": "R-253",
+      "date": "2026-04-25",
+      "title": "Alexandria Picture Reservoir (554-3)",
+      "essence": "iPhone library + AI-assisted sorting, human-in-the-loop in 5-second bursts — 'Reference material we can't find is reference material we don't have.' Proof-of-concept for the Foraging Protocol.",
+      "score": "293/400 (H72/B78/F68/W75)",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [Slumberland 554]"
+    },
+    {
+      "id": "R-254",
+      "date": "2026-04-25",
+      "title": "The Foraging Protocol (554-4)",
+      "essence": "Persistent background intelligence gathering across HB1000s — opt-in 5-second prompts; foragers get visible credit ('Foragers are the heroes of the reservoir'); seven-question study; pilot on the Picture Reservoir.",
+      "score": "345/400 (H92/B85/F78/W90)",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [Slumberland 554]"
+    },
+    {
+      "id": "R-255",
+      "date": "2026-04-26",
+      "title": "Standard butterfly infographic template + registry sync",
+      "essence": "The KPI-style overlay every butterfly sits on, with an obsidian-universe thumbnail showing which areas each initiative touches; plus the registry sync request carrying the Day 13 / YTD 119 anchor.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-04-26]; sources/scoring-system-from-email.md §6"
+    },
+    {
+      "id": "R-256",
+      "date": "2026-04-28",
+      "title": "Boom Services",
+      "essence": "Captured through synthetic read of the Apr 28-29 butterfly session — Boom Services white paper + verbatim transcript + Swiss Protocol report + Manus build brief.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 3 (Boom/01-Boom-Services-White-Paper.md)"
+    },
+    {
+      "id": "R-257",
+      "date": "2026-04-30",
+      "title": "CCB №001 — The Pictograph Protocol",
+      "essence": "'No communication should leave the system without an image.' One-page poster of the 5,000-year visual-communication lineage; Paivio dual-coding; Picture Superiority Effect.",
+      "score": "unscored (CCB series)",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 4 (pictograph-protocol.html)"
+    },
+    {
+      "id": "R-258",
+      "date": "2026-04-30",
+      "title": "CCB №002 — Boom Glyphs",
+      "essence": "Ten modes of image-first communication for Ruby Red (Picture-First Inbox, Sticker Reply Pad, Camera-First Help...). Principle: 'free at every tier — no paywall on dignity.'",
+      "score": "unscored (CCB series)",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 4 (boom-glyphs-cloud-butterfly-002.html)"
+    },
+    {
+      "id": "R-259",
+      "date": "2026-04-30",
+      "title": "CCB №003 — The Small Pipe",
+      "essence": "'They make the pipe really small and then everything has to be text. That miscommunication link is a weakness in our system.' Shannon-grounded; 10 Move 37s + 10 JTBDs.",
+      "score": "unscored (CCB series)",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 4 (the-small-pipe-cloud-butterfly-003.html)"
+    },
+    {
+      "id": "R-260",
+      "date": "2026-05-01",
+      "title": "CCB №004 — The Receiver's Hand",
+      "essence": "'Sender ships once · system fan-outs to all four formats silently · receiver toggles how to take it in' — when the protocol became infrastructure.",
+      "score": "unscored (CCB series)",
+      "stage": "graduated",
+      "source": "sources/disk-butterflies.md Era 4 (the-receivers-hand-cloud-butterfly-004.html)"
+    },
+    {
+      "id": "R-261",
+      "date": "2026-05-01",
+      "title": "CCB №005 — The Rich Pipe",
+      "essence": "Multi-sensory expansion: haptic, photic, sonic channels; accessibility communities (Pro-Tactile, FlashSonar, Neosensory) as the unfair advantage. HTML artifact lost to a chat retry.",
+      "score": "unscored (CCB series)",
+      "stage": "parked",
+      "source": "sources/disk-butterflies.md Era 4 (babel-bridge-journey-narrative.md §VI)"
+    },
+    {
+      "id": "R-262",
+      "date": "2026-05-02",
+      "title": "Uncommon Wisdom Library — brain inside a brain",
+      "essence": "Curated genius-level insights layered on AI; every entry carries a Move 37, a Job To Be Done, and a Cloud Butterfly Score; autonomous harvester adds wisdom every morning at 5 AM. Live at unwisdom-a2b5bad6.manus.space.",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/outlook-butterflies.md [2026-05-02]"
+    },
+    {
+      "id": "R-263",
+      "date": "2026-05-09",
+      "title": "Sharon's Honey-Do / personal CRM app",
+      "essence": "Birthday gift: a paid honey-do assistant + personal CRM/scheduler built via one-shot Claude prompt then Manus — 'It's for her to keep her cloud butterflies every day.'",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-05-09]"
+    },
+    {
+      "id": "R-264",
+      "date": "2026-05-09",
+      "title": "The Great Rape (private equity)",
+      "essence": "PE-raping-the-middle-class rant with Clay; Wikipedia-style ranking of the biggest offenders over 50 years; 'They're care actors. They're pretending they care'; Barbarians at the Gate; historian-in-50-years framing.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-05-09]"
+    },
+    {
+      "id": "R-265",
+      "date": "2026-05-09",
+      "title": "Thought Ticklers — Humanity's Top 10",
+      "essence": "Cloud butterflies ARE thought ticklers; a public page per sector (social science, STEM, governance, culture, AI) where humanity contributes, scored and ranked.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-05-09]"
+    },
+    {
+      "id": "R-266",
+      "date": "2026-05-09",
+      "title": "World View from DeadCenter",
+      "essence": "The centred lake view — 'Where does your sun rise today in your centre view?'; a Timmy's tab for your dead-center worldview from which mind swarms launch.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-05-09]"
+    },
+    {
+      "id": "R-267",
+      "date": "2026-05-09",
+      "title": "Primal Quest",
+      "essence": "All of nature as DNA/RNA's answer to survive/thrive/replicate; panspermia hypothesis; 'we're living in a game of Primal Quest, and the Primal Quest is replication.' (Continues #105.)",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-05-09]"
+    },
+    {
+      "id": "R-268",
+      "date": "2026-05-10",
+      "title": "The Broken Context Reframe",
+      "essence": "'The core problem isn't communication is broken. The core problem is context is broken.' Eight-type context-failure taxonomy. The Timbit: 'The context is broken, not the people.' (Surprise 10/10.)",
+      "score": "assessed 10/10 (Manus v5.1)",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5 (slumberland-strategic-assessment-v5.1)"
+    },
+    {
+      "id": "R-269",
+      "date": "2026-05-10",
+      "title": "Barstool + Timbit as channels 9 & 10",
+      "essence": "Barstool Understanding and the Timbit become visible delivery channels — Einstein demo: Wisdom Giant → 'Look man, money makes money' → 'Money makes money.' (Delight 10/10.)",
+      "score": "assessed 10/10 (Manus v5.1)",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-270",
+      "date": "2026-05-10",
+      "title": "Peer-to-peer cultural translation",
+      "essence": "Translate culture, not just words — Diwali↔Christmas emotional weight, cricket↔hockey metaphors — elevated to a primal channel.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-271",
+      "date": "2026-05-10",
+      "title": "Country Western Timbits",
+      "essence": "60 wisdom nuggets across six decades of country-western, curated for Ruby Red.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-272",
+      "date": "2026-05-10",
+      "title": "Concentric Ring Architecture",
+      "essence": "Inner MVP → enrichment toggles → market partnerships → community/open source.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-273",
+      "date": "2026-05-10",
+      "title": "The Savant / Elephant-in-the-Room Toggle",
+      "essence": "Extended perception spectrum: The Unsaid, The Pattern, The Emotional Substrate, The Relational Signal — savant perception democratized.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-274",
+      "date": "2026-05-10",
+      "title": "Mi-isms",
+      "essence": "Personal wisdom libraries: Timmyisms → Mi-isms → the Babel Bridge Library.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-275",
+      "date": "2026-05-10",
+      "title": "Context-Failure Taxonomy as interactive element",
+      "essence": "The eight failure types as a UI element users can explore.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-276",
+      "date": "2026-05-10",
+      "title": "Rule of 16",
+      "essence": "Repetition principle — validated in principle; the specific cited studies were debunked in review.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-277",
+      "date": "2026-05-10",
+      "title": "Leaderboard Split — Sender vs Receiver Clarity",
+      "essence": "Score communication clarity separately for sender and receiver.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-278",
+      "date": "2026-05-10",
+      "title": "Data governance — protocol open, data is the moat",
+      "essence": "Ownership model for Babel Bridge: open the protocol, keep the data.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-279",
+      "date": "2026-05-10",
+      "title": "Expanded Channel Architecture",
+      "essence": "Art, Music, Legacy, Tone, Wisdom Giants as toggleable channels.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-280",
+      "date": "2026-05-10",
+      "title": "Requirements Skeleton for Clay",
+      "essence": "Three products specified: PTK, Boom, Babel Bridge.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-281",
+      "date": "2026-05-10",
+      "title": "JTBD / Move 37 canonical definitions",
+      "essence": "The two analysis protocols formally defined for the whole library.",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/disk-butterflies.md Era 5"
+    },
+    {
+      "id": "R-282",
+      "date": "2026-05-15",
+      "title": "The Yin and Yang of Leadership",
+      "essence": "Cloud Butterfly → Timbit: 'The Yin and Yang of Leadership — one who's never taken an order in his life, and one...'",
+      "score": "unscored",
+      "stage": "processed",
+      "source": "sources/outlook-butterflies.md [2026-05-15]; sources/github-fetched/manus-migration-vault/2026-05-25_cloud-butterfly-yin-and-yang...md"
+    },
+    {
+      "id": "R-283",
+      "date": "2026-05-18",
+      "title": "Casey's weekend butterfly (demo site)",
+      "essence": "Team adoption: 'this was my cloud butterfly this weekend... I just built a little site below so you can see what it would look like.'",
+      "score": "unscored",
+      "stage": "graduated",
+      "source": "sources/outlook-butterflies.md [2026-05-18]"
+    },
+    {
+      "id": "R-284",
+      "date": "2026-05-24",
+      "title": "One-Way Small-Herd Farmers Market",
+      "essence": "No animal goes back to the farm: unsold product cascades to a graded commodity gate; contamination findings become rent credits (backdoor standards enforcement); 4-H show-herd manure standard.",
+      "score": "unscored",
+      "stage": "raw",
+      "source": "sources/outlook-butterflies.md [2026-05-24]"
+    },
+    {
+      "id": "R-285",
+      "date": "2026-05-28",
+      "title": "Omni-App Nursery cluster (11 raw ideas)",
+      "essence": "HB1000-OS white-paper Nursery: Door-to-Door Fleet, Universal Basic Purpose, Walk-on-Water/Beeman, Old Boys Club for Women, Effn Duck, Family Circle, Liar Liar, Recursive Everything, Dogs, Do-Before-I-Die, Kokanee — each a butterfly awaiting formal scoring (others in the list dedupe to existing rows).",
+      "score": "unscored (/100 → Now/Next/Later/Park/Kill pending)",
+      "stage": "raw",
+      "source": "sources/disk-butterflies.md (HB1000-OS-OMNI-APP-White-Paper.md); sources/existing-registries.md §12"
+    },
+    {
+      "id": "R-286",
+      "date": "2026-04-15",
+      "title": "Build-Your-Own-Bunkie Weekend",
+      "essence": "Habitat-for-Humanity-style build-your-own-bunkie weekends at Bunkie Village (project flypaper, 1-10 scoring + two-part Barstool).",
+      "score": "unscored (Bunkie 1-10 rubric)",
+      "stage": "raw",
+      "source": "sources/disk-butterflies.md (Cloud Butterfly Flypaper - Bunkie Village.md)"
+    },
+    {
+      "id": "R-287",
+      "date": "2026-04-15",
+      "title": "Three-Bears Adirondack chairs",
+      "essence": "Papa/mama/baby-bear Adirondack chairs as the highway brand definition for Bunkie Village / Seba.",
+      "score": "unscored (Bunkie 1-10 rubric)",
+      "stage": "raw",
+      "source": "sources/disk-butterflies.md (Cloud Butterfly Flypaper - Bunkie Village.md)"
+    }
+  ]
+}

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#070b10">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>The Cloud Butterfly Library — the commons · The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* =====================================================================
+     THE LIBRARY — the commons (A5). Anyone can browse, claim (non-
+     exclusively), and add brilliance to any butterfly. The butterfly
+     ALWAYS stays in the library; the claim trail shows who is using it,
+     when, where. Founder credit is permanent (A7). "Ideas merge, never
+     die" — made participatory.
+     ===================================================================== */
+  .lib-hero{
+    position:relative; border:1px solid var(--line); border-radius:var(--radius-lg);
+    overflow:hidden; padding:20px 22px 18px; margin-bottom:16px;
+    background:
+      radial-gradient(260px 120px at 12% 120%, rgba(232,181,77,.16), transparent 70%),
+      radial-gradient(300px 140px at 92% -40%, rgba(81,167,249,.13), transparent 70%),
+      linear-gradient(180deg, #0a1018, var(--panel));
+  }
+  .lib-hero h1{margin-bottom:4px}
+  .lib-hero .sub{font-size:13px; color:var(--muted); max-width:640px}
+  .statrow{display:flex; gap:18px; flex-wrap:wrap; margin-top:13px; font-size:12.5px; color:var(--muted)}
+  .statrow .st{font-variant-numeric:tabular-nums}
+  .statrow .st b{color:var(--gold); font-size:16px}
+  .statrow .st .lb{display:block; font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--soft); font-weight:800}
+
+  .quiet-skies{
+    margin:0 0 12px; padding:8px 14px; border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--panel-2); font-size:12.5px; color:var(--muted); font-style:italic;
+  }
+  .swarm-banner{
+    margin:0 0 12px; padding:9px 14px; border:1px solid rgba(81,167,249,.5); border-radius:var(--radius);
+    background:rgba(81,167,249,.08); font-size:13px; color:var(--cyan); font-weight:700;
+  }
+
+  .searchbar{display:flex; gap:9px; margin:4px 0 16px}
+  .searchbar input{
+    flex:1; padding:11px 14px; font:inherit; font-size:16px; color:var(--ink);
+    background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); outline:none;
+  }
+  .searchbar input:focus{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset}
+
+  .unsynced{color:var(--gold); font-size:10.5px; font-weight:800; letter-spacing:.04em; white-space:nowrap}
+  tr.rowlink{cursor:pointer}
+  tr.rowlink:hover td{background:rgba(232,181,77,.05)}
+  td .tt{font-weight:700; color:var(--ink)}
+  td .ess{color:var(--muted); font-size:12px}
+
+  /* ≤640px — tables collapse to stacked cards (3 AM phone law) */
+  @media (max-width:640px){
+    table.collapse thead{display:none}
+    table.collapse tr{display:block; border:1px solid var(--line); border-radius:var(--radius); margin:8px 0; padding:7px 4px; background:var(--panel-2)}
+    table.collapse td{display:block; border-bottom:0; padding:2px 10px; font-size:13px}
+    table.collapse td[data-k]::before{content:attr(data-k) ' '; color:var(--soft); font-size:10px; text-transform:uppercase; letter-spacing:.08em; font-weight:800}
+  }
+
+  /* ---- per-butterfly drawer: founder · claims · brilliance ---- */
+  .bf-claims{margin:9px 0}
+  .claim-row{
+    display:flex; gap:8px; align-items:baseline; flex-wrap:wrap; padding:6px 10px; margin:5px 0;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); font-size:12.5px;
+  }
+  .claim-row b{color:var(--teal)}
+  .claim-row .when{color:var(--soft); font-size:11px; margin-left:auto}
+  .lineage{margin:6px 0}
+  .lin-row{
+    padding:7px 11px; margin:5px 0; border-left:3px solid var(--purple);
+    background:var(--panel-2); border-radius:0 var(--radius) var(--radius) 0; font-size:13px;
+  }
+  .lin-row .by{display:block; font-size:11px; color:var(--soft); margin-top:3px}
+  .lin-row .by b{color:var(--purple)}
+  .founder-line{
+    padding:8px 12px; margin:8px 0; border:1px solid rgba(232,181,77,.4); border-radius:var(--radius);
+    background:rgba(232,181,77,.06); font-size:12.5px; color:var(--gold-glass);
+  }
+  .founder-line b{color:var(--gold)}
+  .addbox textarea{
+    width:100%; box-sizing:border-box; min-height:64px; padding:10px 12px; font:inherit; font-size:16px;
+    color:var(--ink); background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius); outline:none;
+  }
+  .addbox textarea:focus{border-color:var(--gold)}
+  .signin-note{font-size:12px; color:var(--soft); font-style:italic}
+  .drawer h3 b{color:var(--gold)}
+  .drawer .meta-line{font-size:11.5px; color:var(--soft); margin:2px 0 10px}
+  .drawer .essence{font-size:13.5px; color:var(--ink); line-height:1.6; margin:8px 0}
+  .drawer .src{font-size:11px; color:var(--soft); font-style:italic; word-break:break-word}
+
+  .kpiline{margin-top:22px; font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+  .kpiline b{color:var(--gold)}
+  .exportrow{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:14px}
+  .exportrow .note{font-size:11.5px; color:var(--soft); font-style:italic}
+</style>
+</head>
+<body>
+<main>
+
+  <div class="lib-hero">
+    <h1>The Cloud Butterfly <b>Library</b> <span style="font-size:15px; color:var(--soft); font-weight:600">— the commons</span></h1>
+    <p class="sub">Every <span data-prism-id="flypaper-explainer" id="libExp">Cloud Butterfly</span> ever caught,
+      open to everyone. Claim any butterfly for your card or your personal side — it <b style="color:var(--gold)">stays in the library</b>;
+      the trail just shows who’s flying with it. Add brilliance to any idea: ideas merge, never die.</p>
+    <div class="statrow" id="statRow" aria-live="polite"></div>
+  </div>
+
+  <div class="quiet-skies" id="quietSkies" hidden></div>
+  <div class="swarm-banner" id="swarmBanner" hidden></div>
+
+  <div class="panel tight" id="firstTimer" style="margin-bottom:14px">
+    <span style="font-size:12.5px; color:var(--muted)">First time here? Tap the ◇ prism on “Cloud Butterfly” above —
+      it explains the whole thing in five voices. Catching one takes ten seconds on the
+      <a href="flypaper.html">Flypaper</a>.</span>
+  </div>
+
+  <div class="searchbar">
+    <input id="q" type="search" placeholder="Search the commons — id, title, essence…"
+           aria-label="Search butterflies" autocomplete="off">
+  </div>
+  <div id="searchOut"></div>
+
+  <div class="sec-h">🏆 Top 10 <b>leaderboard</b></div>
+  <div class="panel tight">
+    <table class="collapse" id="topTable">
+      <thead><tr><th>#</th><th>ID</th><th>Title</th><th>Score</th><th>Date</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="sec-h">Recent <b>arrivals</b> — last 20 by date</div>
+  <div class="panel tight">
+    <table class="collapse" id="recentTable">
+      <thead><tr><th>ID</th><th>Date</th><th>Title</th><th>Essence</th><th>Score</th><th>Stage</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="exportrow">
+    <button type="button" class="btn gold-cta" id="btnExport">⬇ Export for registry</button>
+    <span class="note" id="exportNote"></span>
+  </div>
+  <p class="footnote">🔒 Draft-only — nothing sends. Export to ship: the file is shaped as ready-to-append
+    <code>butterflies[]</code> rows; the agent fleet (or Tim) appends it to the registry, and your local
+    copies reconcile as <b>synced</b> on the next load.</p>
+
+  <p class="kpiline" id="kpiLine"></p>
+</main>
+
+<!-- per-butterfly drawer — founder credit · non-exclusive claims · add-brilliance -->
+<div class="drawer" id="bfDrawer" role="dialog" aria-modal="false" aria-label="Butterfly detail">
+  <span class="d-x" id="bfClose" role="button" tabindex="0" aria-label="Close">✕</span>
+  <div id="bfBody"></div>
+</div>
+
+<script src="assets/shell.js"></script>
+<script src="assets/prism.js"></script>
+<script>
+'use strict';
+Shell.init('library');
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Shell.esc;
+
+  /* ======================= stores ======================= */
+  var FP_KEY = 'hb1000-flypaper', LC_KEY = 'hb1000-library-commons';
+  function fpLoad() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(FP_KEY)); } catch (e) { /* fresh */ }
+    if (!s || typeof s !== 'object') s = {};
+    if (!(s.days instanceof Array)) s.days = [];
+    if (!(s.captures instanceof Array)) s.captures = [];
+    return s;
+  }
+  function fpSave(s) { try { localStorage.setItem(FP_KEY, JSON.stringify(s)); } catch (e) { /* private mode */ } }
+  function lcLoad() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(LC_KEY)); } catch (e) { /* fresh */ }
+    if (!s || typeof s !== 'object') s = {};
+    if (!s.claims || typeof s.claims !== 'object') s.claims = {};
+    if (!s.brilliance || typeof s.brilliance !== 'object') s.brilliance = {};
+    return s;
+  }
+  function lcSave(s) { try { localStorage.setItem(LC_KEY, JSON.stringify(s)); } catch (e) { /* private mode */ } }
+
+  var ch = Shell.cardholder();
+
+  /* ======================= counters — machine-owned (same law as the Flypaper) ======================= */
+  var DAY1 = new Date(2026, 0, 11);
+  function localDateStr(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' +
+           String(d.getDate()).padStart(2, '0');
+  }
+  function dayNo(d) {
+    var dd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    return Math.round((dd - DAY1) / 864e5) + 1;
+  }
+
+  /* ======================= load + merge ======================= */
+  Shell.loadJSON('data/butterfly-registry.json').then(function (reg) {
+    var meta = reg.meta || {}, rows = reg.butterflies || [];
+    var fp = fpLoad();
+
+    /* reconcile: a local capture whose id now exists in the registry is synced */
+    var regIds = {};
+    rows.forEach(function (r) { regIds[r.id] = true; });
+    var changed = false;
+    fp.captures.forEach(function (c) {
+      if (regIds[c.id] && !c.synced) { c.synced = true; changed = true; }
+    });
+    if (changed) fpSave(fp);
+
+    /* local captures → row shape (unsynced ones only; registry row is canonical once synced) */
+    function essenceOf(c) {
+      var t = (c.enrich && c.enrich.thesis) || '';
+      if (t) return t;
+      var m = String(c.raw_text || '').match(/^[^.!?\n]*[.!?]?/);
+      return ((m && m[0]) || '').trim().slice(0, 160);
+    }
+    var localRows = fp.captures.filter(function (c) { return !c.synced; }).map(function (c) {
+      return {
+        id: c.id,
+        date: localDateStr(new Date(c.captured_at)),
+        title: c.title,
+        essence: essenceOf(c),
+        score: c.self_score.total + '/400 (self)',
+        scoreNum: c.self_score.total,
+        stage: 'raw',
+        source: 'flypaper app',
+        local: true,
+        cap: c
+      };
+    });
+    var all = rows.map(function (r) { return Object.assign({ local: false }, r); }).concat(localRows);
+    var byId = {};
+    all.forEach(function (r) { byId[r.id] = r; });
+
+    /* ---- header stat row ---- */
+    var todayStr = localDateStr(new Date());
+    var todayCount = fp.captures.filter(function (c) {
+      return localDateStr(new Date(c.captured_at)) === todayStr;
+    }).length;
+    var baseYTD = 0;
+    rows.forEach(function (r) {
+      /* numeric SUFFIX = last digit group — range ids like "#3–#95 (54 unrecovered)" must not concatenate */
+      var g = String(r.id || '').match(/[0-9]+/g);
+      var n = g ? parseInt(g[g.length - 1], 10) : 0;
+      if (n && n > baseYTD) baseYTD = n;
+    });
+    var counts = meta.counts || {};
+    var attested = (counts.attestedTotal || 0) + localRows.length;
+    var stages = counts.stages || {};
+    $('statRow').innerHTML =
+      '<span class="st"><span class="lb">Day</span><b>' + dayNo(new Date()) + '</b></span>' +
+      '<span class="st"><span class="lb">Today</span><b>' + todayCount + '</b></span>' +
+      '<span class="st"><span class="lb">YTD (machine)</span><b>' + (baseYTD + localRows.length) + '</b></span>' +
+      '<span class="st"><span class="lb">YTD attested</span><b>' + attested + '</b></span>' +
+      '<span class="st"><span class="lb">Documented</span><b>' + (counts.documented || rows.length) + '</b></span>' +
+      '<span class="st"><span class="lb">Scored</span><b>' + (counts.scored || 0) + '</b></span>' +
+      '<span class="st"><span class="lb">Stages</span>' +
+        Object.keys(stages).map(function (k) { return k + ' ' + stages[k]; }).join(' · ') + '</span>';
+
+    /* ---- quiet skies — the ONLY acknowledgment of consecutive zero-days, ever; neutral, library-only ---- */
+    (function () {
+      var zero = {}, caught = {};
+      fp.days.forEach(function (d) { if (d && d.nothing) zero[d.date] = true; });
+      fp.captures.forEach(function (c) { caught[localDateStr(new Date(c.captured_at))] = true; });
+      var d = new Date(), n = 0;
+      if (!zero[localDateStr(d)] && !caught[localDateStr(d)]) d.setDate(d.getDate() - 1); /* today may be unrecorded yet */
+      while (zero[localDateStr(d)] && !caught[localDateStr(d)]) { n++; d.setDate(d.getDate() - 1); }
+      if (n >= 2) {
+        $('quietSkies').textContent = 'Quiet skies the last ' + n + ' days — the hunt is always open.';
+        $('quietSkies').hidden = false;
+      }
+    })();
+
+    /* ---- swarm banner (3+ butterflies / same topic / 7 days) ---- */
+    (function () {
+      var STOP = {};
+      ('this that with from have what when where will your just like they them then than there here ' +
+       'about into over under been being would could should because while every other these those some ' +
+       'more most much many very really thing things going gonna want need make makes made take takes ' +
+       'doing done dont cant wont were want only also even back down come came know knows said says ' +
+       'still after before today right think thought people their').split(' ').forEach(function (w) { STOP[w] = 1; });
+      function tokensOf(text) {
+        var seen = {}, out = [];
+        String(text || '').toLowerCase().replace(/[^a-z0-9\s'-]/g, ' ').split(/\s+/).forEach(function (w) {
+          w = w.replace(/^['-]+|['-]+$/g, '');
+          if (w.length >= 4 && !STOP[w] && !seen[w]) { seen[w] = 1; out.push(w); }
+        });
+        return out;
+      }
+      var cutoff = Date.now() - 7 * 864e5;
+      var recent = fp.captures.filter(function (c) { return new Date(c.captured_at).getTime() >= cutoff; });
+      var freq = {};
+      recent.forEach(function (c) {
+        tokensOf(c.title + ' ' + c.raw_text).forEach(function (t) { freq[t] = (freq[t] || 0) + 1; });
+      });
+      var best = null, bestN = 0;
+      Object.keys(freq).forEach(function (t) { if (freq[t] > bestN) { bestN = freq[t]; best = t; } });
+      if (bestN >= 3) {
+        $('swarmBanner').textContent = '🐝 ' + bestN + ' butterflies circling “' + best +
+          '” this week. Your unconscious is circling this.';
+        $('swarmBanner').hidden = false;
+      }
+    })();
+
+    /* ---- top 10 leaderboard (meta.top10; a local self-score that beats #10 enters with its badge) ---- */
+    (function () {
+      var top = (meta.top10 || []).slice();
+      var floor = top.length >= 10 ? Number(top[top.length - 1].score) : 0;
+      localRows.forEach(function (r) {
+        if (r.scoreNum > floor) top.push({ id: r.id, title: r.title, score: r.scoreNum, date: r.date, local: true });
+      });
+      top.sort(function (a, b) { return Number(b.score) - Number(a.score); });
+      top = top.slice(0, 10);
+      $('topTable').querySelector('tbody').innerHTML = top.map(function (t, i) {
+        return '<tr class="rowlink" data-id="' + esc(t.id) + '">' +
+          '<td data-k="#">' + (i + 1) + '</td>' +
+          '<td data-k="id"><code>' + esc(t.id) + '</code></td>' +
+          '<td data-k="title"><span class="tt">' + esc(t.title) + '</span>' +
+            (t.local ? ' <span class="unsynced">· unsynced self-score</span>' : '') + '</td>' +
+          '<td data-k="score" class="num"><b>' + esc(String(t.score)) + '</b>/400</td>' +
+          '<td data-k="date">' + esc(t.date || '') + '</td></tr>';
+      }).join('');
+    })();
+
+    /* ---- recent — last 20 by date, registry + local merged ---- */
+    var stagePill = { graduated: 'good', processed: 'info', raw: 'warn', parked: '' };
+    function rowHTML(r) {
+      var essence = String(r.essence || '').slice(0, 80) + (String(r.essence || '').length > 80 ? '…' : '');
+      return '<tr class="rowlink" data-id="' + esc(r.id) + '">' +
+        '<td data-k="id"><code>' + esc(r.id) + '</code>' +
+          (r.local ? ' <span class="unsynced">· unsynced</span>' : '') + '</td>' +
+        '<td data-k="date">' + esc(r.date || '') + '</td>' +
+        '<td data-k="title"><span class="tt">' + esc(r.title) + '</span></td>' +
+        '<td data-k="essence"><span class="ess">' + esc(essence) + '</span></td>' +
+        '<td data-k="score">' + esc(String(r.score || '—')) + '</td>' +
+        '<td data-k="stage">' + Shell.pill(r.stage || '—', stagePill[r.stage] || '') + '</td></tr>';
+    }
+    (function () {
+      var sorted = all.slice().sort(function (a, b) {
+        return String(b.date || '').localeCompare(String(a.date || '')) || (b.local ? 1 : 0) - (a.local ? 1 : 0);
+      });
+      $('recentTable').querySelector('tbody').innerHTML = sorted.slice(0, 20).map(rowHTML).join('');
+    })();
+
+    /* ---- search ---- */
+    $('q').addEventListener('input', function () {
+      var q = this.value.trim().toLowerCase();
+      if (q.length < 2) { $('searchOut').innerHTML = ''; return; }
+      var hits = all.filter(function (r) {
+        return String(r.id).toLowerCase().indexOf(q) >= 0 ||
+               String(r.title || '').toLowerCase().indexOf(q) >= 0 ||
+               String(r.essence || '').toLowerCase().indexOf(q) >= 0;
+      });
+      $('searchOut').innerHTML =
+        '<div class="sec-h">Search — <b>' + hits.length + '</b> match' + (hits.length === 1 ? '' : 'es') + '</div>' +
+        (hits.length ? '<div class="panel tight"><table class="collapse"><thead><tr><th>ID</th><th>Date</th>' +
+          '<th>Title</th><th>Essence</th><th>Score</th><th>Stage</th></tr></thead><tbody>' +
+          hits.slice(0, 50).map(rowHTML).join('') + '</tbody></table>' +
+          (hits.length > 50 ? '<p class="footnote">Showing 50 of ' + hits.length + ' — narrow the search.</p>' : '') +
+          '</div>'
+        : '<p class="muted" style="font-size:13px">Nothing in the commons matches “' + esc(q) + '” yet — maybe it’s yours to catch on the <a href="flypaper.html">Flypaper</a>.</p>');
+    });
+
+    /* ======================= per-butterfly drawer ======================= */
+    function founderOf(r) {
+      if (r.local) return { name: r.cap.caller, note: 'first to capture and name it — Flypaper, ' + r.date };
+      return { name: 'Tim', note: 'first to capture and name it — registry seed harvest' };
+    }
+    function drawDrawer(id) {
+      var r = byId[id];
+      if (!r) return;
+      var lc = lcLoad();
+      var claims = lc.claims[id] || [];
+      var brill = lc.brilliance[id] || [];
+      var f = founderOf(r);
+      var html =
+        '<h3><code>' + esc(r.id) + '</code> <b>' + esc(r.title) + '</b></h3>' +
+        '<div class="meta-line">' + esc(r.date || '') + ' · ' + esc(String(r.score || 'unscored')) + ' · ' +
+          Shell.pill(r.stage || '—', stagePill[r.stage] || '') +
+          (r.local ? ' <span class="unsynced">· unsynced</span>' : '') + '</div>' +
+        '<div class="essence">' + esc(r.essence || '') + '</div>' +
+        '<div class="founder-line">🦋 Founder: <b>' + esc(f.name) + '</b> — ' + esc(f.note) +
+          '. Founder credit is permanent; merged butterflies carry all founders forward.</div>';
+
+      /* claims — NON-EXCLUSIVE, the butterfly stays here */
+      html += '<div class="sec-h" style="margin-top:16px">Claims — <b>non-exclusive</b></div>' +
+        '<p class="muted" style="font-size:12px; margin:0 0 6px">Claiming never removes a butterfly from the library. ' +
+        'Multiple independent claimants = an organic Two-Shop Test, never a conflict.</p>' +
+        '<div class="bf-claims">' +
+        (claims.length ? claims.map(function (c) {
+          return '<div class="claim-row"><b>' + esc(c.who) + '</b><span>' + esc(c.where) + '</span>' +
+            Shell.pill(c.status || 'active', 'good') +
+            '<span class="when">' + esc(String(c.when).slice(0, 10)) + '</span></div>';
+        }).join('') : '<p class="muted" style="font-size:12.5px">Unclaimed — first flight still open.</p>') +
+        '</div>';
+      if (ch) {
+        html += '<div class="row" style="margin:4px 0 2px">' +
+          '<button type="button" class="btn approve" data-claim="card">Claim for my card</button>' +
+          '<button type="button" class="btn" data-claim="personal">Claim for my personal side</button></div>';
+      } else {
+        html += '<p class="signin-note"><a href="login.html">Sign in</a> to claim — your name goes on the trail.</p>';
+      }
+
+      /* add-brilliance — the lineage */
+      html += '<div class="sec-h" style="margin-top:16px">Lineage — <b>add brilliance</b></div>' +
+        '<div class="lineage">' +
+        (brill.length ? brill.map(function (b) {
+          return '<div class="lin-row">' + esc(b.text) +
+            '<span class="by">✨ contributed by <b>' + esc(b.who) + '</b> · ' + esc(String(b.when).slice(0, 10)) + '</span></div>';
+        }).join('') : '<p class="muted" style="font-size:12.5px">No contributions yet — ideas merge, never die. Add yours.</p>') +
+        '</div>';
+      if (ch) {
+        html += '<div class="addbox"><textarea id="brillText" placeholder="Add a connection, an upgrade, a merge — it lands on the lineage with your name."></textarea>' +
+          '<div class="row" style="margin-top:7px"><button type="button" class="btn gold-cta" id="brillAdd" style="padding:7px 18px">✨ Add brilliance</button></div></div>';
+      } else {
+        html += '<p class="signin-note"><a href="login.html">Sign in</a> to add brilliance — contributors are credited on the lineage.</p>';
+      }
+
+      html += '<hr><p class="src">Provenance: ' + esc(r.source || 'registry') + '</p>';
+      $('bfBody').innerHTML = html;
+
+      /* wire claim buttons */
+      Array.prototype.forEach.call($('bfBody').querySelectorAll('[data-claim]'), function (b) {
+        b.addEventListener('click', function () {
+          var where = b.getAttribute('data-claim') === 'card'
+            ? 'card: ' + (ch.card || 'my card') : 'personal';
+          var s = lcLoad();
+          if (!(s.claims[id] instanceof Array)) s.claims[id] = [];
+          s.claims[id].push({ who: ch.name, when: new Date().toISOString(), where: where, status: 'active' });
+          lcSave(s);
+          drawDrawer(id); /* re-render the visible trail */
+        });
+      });
+      var ba = $('brillAdd');
+      if (ba) ba.addEventListener('click', function () {
+        var txt = $('brillText').value.trim();
+        if (!txt) { $('brillText').focus(); return; }
+        var s = lcLoad();
+        if (!(s.brilliance[id] instanceof Array)) s.brilliance[id] = [];
+        s.brilliance[id].push({ who: ch.name, when: new Date().toISOString(), text: txt });
+        lcSave(s);
+        drawDrawer(id);
+      });
+
+      $('bfDrawer').classList.add('open');
+    }
+    function closeDrawer() { $('bfDrawer').classList.remove('open'); }
+    $('bfClose').addEventListener('click', closeDrawer);
+    $('bfClose').addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') closeDrawer(); });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeDrawer(); });
+    document.addEventListener('click', function (ev) {
+      var tr = ev.target.closest && ev.target.closest('tr.rowlink');
+      if (tr) drawDrawer(tr.getAttribute('data-id'));
+    });
+
+    /* ======================= export — appendable butterflies[] rows ======================= */
+    var unsynced = localRows; /* synced locals already reconciled out */
+    $('exportNote').textContent = unsynced.length
+      ? unsynced.length + ' local capture' + (unsynced.length === 1 ? '' : 's') + ' ready to append'
+      : 'nothing local to ship yet — the registry has it all';
+    if (!unsynced.length) $('btnExport').disabled = true;
+    $('btnExport').addEventListener('click', function () {
+      var out = unsynced.map(function (r) {
+        return { id: r.id, date: r.date, title: r.title, essence: r.essence,
+                 score: r.scoreNum + '/400 (self)', stage: 'raw', source: 'flypaper app' };
+      });
+      var blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'flypaper-export-' + localDateStr(new Date()) + '.json';
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 400);
+    });
+
+    /* ---- the canonical KPI line (PP Part 9) ---- */
+    $('kpiLine').innerHTML = 'Library Status: <b>Day ' + dayNo(new Date()) + '</b> = <b>' + todayCount +
+      '</b> butterflies | YTD = <b>' + attested + '</b>.';
+
+  }).catch(function (err) {
+    $('statRow').innerHTML = '<span class="st" style="color:var(--red)">Could not read the registry (' +
+      esc(err.message) + '). Is the app being served?</span>';
+  });
+
+  /* ---- prism explainer fallback (spectra.json block wins when present) ---- */
+  var FLY_SPECTRUM = {
+    plain: 'Cloud Butterflies are ideas, insights, and inspirations that come from No Man’s Land — the space between sleep and waking. Catch them here before they fly away.',
+    locked: false,
+    barstool: 'You know that genius idea you had in the shower that was gone by breakfast? This is the sticky paper. Dump it here, half-asleep, typos and all.',
+    timbit: 'Catch it before it flies.',
+    boardroom: 'A zero-friction intake for pre-conscious insight capture, feeding the HB1000 innovation pipeline’s scoring and triage stages.',
+    swiss: 'PURPOSE — pre-conscious insight capture\nWINDOW — No Man’s Land (sleep ⇄ waking)\nPROTOCOL — v4.0 · /400 self-score\nCOUNTERS — Day · Today · YTD (machine-owned)'
+  };
+  if (window.Prism) Prism.spectra().then(function (S) {
+    if (S['flypaper-explainer']) return;
+    var el = document.getElementById('libExp');
+    el.setAttribute('data-prism', JSON.stringify(FLY_SPECTRUM));
+    Prism.scan(el.parentNode);
+  });
+})();
+</script>
+</body>
+</html>
