@@ -203,7 +203,8 @@
   }
 
   /* ---- the gate: your work email, checked against data/cardholders.json
-          (the family roster; light access-gate, not security — real auth =
+          (the family roster — stored as SHA-256 fingerprints, no addresses
+          in the public file; light access-gate, not security — real auth =
           Phase 5 Firebase) ---- */
   var holdersP = null;
   function loadHolders() {
@@ -213,9 +214,28 @@
           if (!r.ok) throw new Error('cardholders.json → HTTP ' + r.status);
           return r.json();
         })
-        .then(function (j) { return (j && j.cardholders) || []; });
+        .then(function (j) { return (j && j.roster) || []; });
     }
     return holdersP;
+  }
+
+  /* SHA-256 of the lowercased, trimmed email → lowercase hex string.
+     crypto.subtle needs a secure context (https or localhost). */
+  function sha256Hex(text) {
+    if (!(window.crypto && window.crypto.subtle && window.crypto.subtle.digest)) {
+      return Promise.reject(new Error(
+        'This door needs a secure connection (https or localhost) to check the roster — ' +
+        'please open the site over https.'));
+    }
+    return window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+      .then(function (buf) {
+        var bytes = new Uint8Array(buf);
+        var hex = '';
+        for (var i = 0; i < bytes.length; i++) {
+          hex += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16);
+        }
+        return hex;
+      });
   }
 
   function fail(msg) {
@@ -237,20 +257,22 @@
     if (!name || !email) { fail('Both fields, please — your name and your work email.'); return; }
     $('enterBtn').disabled = true;
 
-    loadHolders().then(function (holders) {
+    Promise.all([loadHolders(), sha256Hex(email)]).then(function (pair) {
+      var holders = pair[0];
+      var fingerprint = pair[1];
       var hit = null;
       for (var i = 0; i < holders.length; i++) {
-        if (String(holders[i].email || '').toLowerCase() === email) { hit = holders[i]; break; }
+        if (String(holders[i].h || '').toLowerCase() === fingerprint) { hit = holders[i]; break; }
       }
       if (!hit) {
         fail('This door knows the family by name — if you should be on the list, ' +
              'reply to Maria’s newsletter.');
         return;
       }
-      var session = { name: name, email: hit.email, card: hit.card, role: hit.role };
+      var session = { name: name, email: email, card: hit.card, role: hit.role };
       try { localStorage.setItem(KEY, JSON.stringify(session)); }
       catch (e) { /* private mode — the redirect still lands */ }
-      location.href = successURL({ name: name, email: hit.email, card: hit.card, role: hit.role });
+      location.href = successURL({ name: name, email: email, card: hit.card, role: hit.role });
     }).catch(function (err) {
       fail('Could not read the family roster (' + err.message + '). Is the app being served?');
     });

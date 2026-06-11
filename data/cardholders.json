@@ -1,373 +1,305 @@
 {
   "meta": {
-    "what": "The HB1000 family roster — who the front door (login.html) knows by email, and which Dingo Card (if any) is already issued to them.",
-    "note": "Light access-gate, not security; real auth = Phase 5 Firebase. The door checks your work email against this list — personalization, not a lock. Direct URLs still work; the guard banner on every page says what is simulated.",
-    "doctrine": "People are ISSUED Dingo cards. They sign in with their work email, they land on THEIR card — the back engine stays hidden.",
-    "key": "localStorage hb1000-cardholder = { name, email, card, role }",
-    "roles": {
-      "caller": "Dingo Caller — has an issued card; lands on it; nav reduces to My Card · My Promises · Take the walk · Sign out",
-      "admin": "ALL-ACCESS — full 14-page nav, the whole engine room",
-      "member": "Family on the roster, card being prepared — lands in the Library; reply DEAL ME IN to Maria's newsletter to raise your hand"
-    }
+    "note": "Roster emails stored as SHA-256 fingerprints — no addresses in this file. Light access-gate, not security; real auth = Phase 5 Firebase."
   },
-  "cardholders": [
+  "roster": [
     {
-      "email": "samantha@businessasaforceforgood.ca",
-      "name": "Samantha",
+      "h": "913fbfdc48c955082cd61bc6002c666a73682d25c7f28e330a820002288b1f75",
       "card": null,
       "role": "member"
     },
     {
-      "email": "jesse@businessasaforceforgood.ca",
-      "name": "Jesse",
+      "h": "79dee198bbaaa581fdb7dc12abc90704f22556b3c368e493b62ad999e93aa790",
       "card": null,
       "role": "member"
     },
     {
-      "email": "fidel@businessasaforceforgood.ca",
-      "name": "Fidel",
+      "h": "96c6d68508d026fd8b352f4ca32796019be7e0fde1fe9022e1b28856b8836e86",
       "card": null,
       "role": "member"
     },
     {
-      "email": "diana@businessasaforceforgood.ca",
-      "name": "Diana",
+      "h": "987d428fba4ad03117c7595af96ee559214474e76809e756c55ab3703d399977",
       "card": null,
       "role": "member"
     },
     {
-      "email": "esmeralda@businessasaforceforgood.ca",
-      "name": "Esmeralda",
+      "h": "38934f02890a1feb7618bc402974ea4d74b38a1c4a7848264c9a3318250c1ed0",
       "card": null,
       "role": "member"
     },
     {
-      "email": "abigail@businessasaforceforgood.ca",
-      "name": "Abigail",
+      "h": "853a18f67299e1dc07121e0fada1819e4892771f4db56b93586de58307050cda",
       "card": null,
       "role": "member"
     },
     {
-      "email": "almira@businessasaforceforgood.ca",
-      "name": "Almira",
+      "h": "c03fb705f37c0305a11b90c5358a10f6214e8ac5886bdd3e3c91a55bb4fb6d9c",
       "card": null,
       "role": "member"
     },
     {
-      "email": "efrenalyn@businessasaforceforgood.ca",
-      "name": "Efrenalyn",
+      "h": "2fd915fc945da3d609b19cef56d9616ddde502b040374ebf203ec6386416d8f3",
       "card": null,
       "role": "member"
     },
     {
-      "email": "iara@businessasaforceforgood.ca",
-      "name": "Iara",
+      "h": "429afa5935495cdba24429fdb4dae166c6f6238d76d0504223b9a62793b827be",
       "card": null,
       "role": "member"
     },
     {
-      "email": "johaillah@businessasaforceforgood.ca",
-      "name": "Johaillah",
+      "h": "8425b9667068acd4b061d6bca8c4b6a17b62e696ecb65c3cd3e3affddbef81cf",
       "card": null,
       "role": "member"
     },
     {
-      "email": "josephine@businessasaforceforgood.ca",
-      "name": "Josephine",
+      "h": "6d69dd335b3fd2e391cbea1132d02875b61531edc9b65045b7334660e2d49a04",
       "card": null,
       "role": "member"
     },
     {
-      "email": "kimberly@businessasaforceforgood.ca",
-      "name": "Kimberly",
+      "h": "a5559dd2a8cca98cb6bc6255abb7cd61b7f24cd71d41771d0c71f0d31004f410",
       "card": null,
       "role": "member"
     },
     {
-      "email": "marilou@businessasaforceforgood.ca",
-      "name": "Marilou",
+      "h": "360113ceec52eed11e53ed6c3cf53f0c444a3736c444dbf93d97b7c3c879ab91",
       "card": null,
       "role": "member"
     },
     {
-      "email": "katayoun@businessasaforceforgood.ca",
-      "name": "Katayoun",
+      "h": "13f26566346cdd3ae4d1889eedfdadbe17fa5d0e8ef59a814591bd9ea9f16cd4",
       "card": null,
       "role": "member"
     },
     {
-      "email": "maellen@businessasaforceforgood.ca",
-      "name": "Maellen",
+      "h": "1381d706426d34c3db3b9ebc50aad13ceef8e7bcadb14bf41e8b3a1f1eecf9c4",
       "card": null,
       "role": "member"
     },
     {
-      "email": "jonnah@businessasaforceforgood.ca",
-      "name": "Jonnah",
+      "h": "6ee6566d1f94c4e42a294875f0da867a263a1cb7421c2bd98751b2201b73ea1a",
       "card": null,
       "role": "member"
     },
     {
-      "email": "mcraig@cashcofinancial.com",
-      "name": "Mcraig",
+      "h": "62d42dc62eab65520ce6119fda14669c561505aa91ee6d69785a7db6a9e0fda6",
       "card": null,
       "role": "member"
     },
     {
-      "email": "smeunier@cashcofinancial.com",
-      "name": "Smeunier",
+      "h": "da41ae9951d6d9e954abbd07b73b475a57552b674b7cdf46bb1aa566e1c20aa0",
       "card": null,
       "role": "member"
     },
     {
-      "email": "bhong@cashcofinancial.com",
-      "name": "Bhong",
+      "h": "fecc4b02db81de178592d3ab6dfea4b70171e7d0a40b7fbad24875bd7532dc9b",
       "card": null,
       "role": "member"
     },
     {
-      "email": "jmoores@cashcofinancial.com",
-      "name": "Jmoores",
+      "h": "5c0dec475d67a983db5c96aeb92456f79c6c8c72e6ef65110e9d9a042b59b42d",
       "card": null,
       "role": "member"
     },
     {
-      "email": "akumar@cashcofinancial.com",
-      "name": "Akumar",
+      "h": "b618934ba10a3ee8565578698ebaa58acebe65e4a570177d586e82cb58bf333d",
       "card": null,
       "role": "member"
     },
     {
-      "email": "cgraham@cashcofinancial.com",
-      "name": "Cgraham",
+      "h": "360437851f3238103e0f67d663805d0c63c750168232f049bb2c4c3b8f652ff0",
       "card": null,
       "role": "member"
     },
     {
-      "email": "roisinb@cashcofinancial.com",
-      "name": "Roisinb",
+      "h": "3d6d2b5b4c40a715de1079e4b99a6e27897c7388003cbeabde31e597c19fde3a",
       "card": null,
       "role": "member"
     },
     {
-      "email": "tburns@cashcofinancial.com",
-      "name": "Tburns",
+      "h": "f744b3bcc5ac2aba51bc4316c11244bb29ded5a1af7e24042c7284d83d95963a",
       "card": null,
       "role": "member"
     },
     {
-      "email": "abeckett@cashcofinancial.com",
-      "name": "Abeckett",
+      "h": "4ec767ddd3e75e616cdf378f7929e1a186121dc05002ddc1c6d59693d9f0a422",
       "card": null,
       "role": "member"
     },
     {
-      "email": "vbhatti@cashcofinancial.com",
-      "name": "Vbhatti",
+      "h": "38b0aff98042927db293009dcd4f347e60358f108817f4b5c9b32e7017028988",
       "card": null,
       "role": "member"
     },
     {
-      "email": "msidhu@cashcofinancial.com",
-      "name": "Msidhu",
+      "h": "1c24a0e3516fc766fea917815f68cbe24abd4630c8e1c212c5dd0d72cd0875c2",
       "card": null,
       "role": "member"
     },
     {
-      "email": "tim.latimer@cashcofinancial.com",
-      "name": "Tim",
+      "h": "db2e21381a78613814e903de88516368cd54344b31d7d71f68317261a7270612",
       "card": null,
       "role": "admin"
     },
     {
-      "email": "nathanielgarneau@freedomcannabis.ca",
-      "name": "Nathanielgarneau",
+      "h": "80e019aaa6c6cc6f682d5cd5062eeb7e3f8a2e0915208cdafc2f647f8080a1a9",
       "card": null,
       "role": "member"
     },
     {
-      "email": "johnfrankpotestio@freedomcannabis.ca",
-      "name": "Johnfrankpotestio",
+      "h": "21c7ce0b6cdede015611c169e96d20dcc161f8de8db11c0b0e2f9207ade2fd37",
       "card": null,
       "role": "member"
     },
     {
-      "email": "juliepotestio@freedomcannabis.ca",
-      "name": "Juliepotestio",
+      "h": "0bf3781f1cdbf04ed868f9f5f02ef7291834788c59019c5c3bcc295cce072b59",
       "card": null,
       "role": "member"
     },
     {
-      "email": "ricopotestio@freedomcannabis.ca",
-      "name": "Ricopotestio",
+      "h": "7f9d6a968d3df3388b45e5a7bc900a66bad69d0c2d96f9bc4f9219ab9b7f0bc5",
       "card": null,
       "role": "member"
     },
     {
-      "email": "bryangibb@freedomcannabis.ca",
-      "name": "Bryangibb",
+      "h": "6ebadf6f4330fc12571b5326d3cc83f0344526b3b9892affe6089507f13b6d44",
       "card": null,
       "role": "member"
     },
     {
-      "email": "chrisscott@freedomcannabis.ca",
-      "name": "Chrisscott",
+      "h": "10690385c1a7f807a5df5450497a09721b1a977e9bc45ffc88d11a426bbf9c0e",
       "card": null,
       "role": "member"
     },
     {
-      "email": "gagegorda@freedomcannabis.ca",
-      "name": "Gagegorda",
+      "h": "fe9095e1764107dd24a2174778856cfecc178e5ba626fb2ec5c1954e8d586dc0",
       "card": null,
       "role": "member"
     },
     {
-      "email": "ninaackah@freedomcannabis.ca",
-      "name": "Ninaackah",
+      "h": "c37b2805ac7825e74e16b6caabc21c14a3abec73a2ba6f5d2e046ec838a02fc7",
       "card": null,
       "role": "member"
     },
     {
-      "email": "scottsinclair@freedomcannabis.ca",
-      "name": "Scottsinclair",
+      "h": "b70b34f22cacb62657102addd9ce6a0791a3b689b1d34fd5d0cc1588962aebbe",
       "card": null,
       "role": "member"
     },
     {
-      "email": "justinambar@freedomcannabis.ca",
-      "name": "Justinambar",
+      "h": "c85d95149d750aaa5601af9d3e896ef3cd225beca2098f717d9ef79b87dc6ba2",
       "card": null,
       "role": "member"
     },
     {
-      "email": "marissagarneau@freedomcannabis.ca",
-      "name": "Marissagarneau",
+      "h": "edf527961fc5ee1a610ffaa4c94daa4bea36df3399ff7d14e27952fc302ec24e",
       "card": null,
       "role": "member"
     },
     {
-      "email": "davidgamage@freedomcannabis.ca",
-      "name": "Davidgamage",
+      "h": "2ac45c88fbc931753072ca7a282781cc9561cb1c8049e445894819d4f9bc9001",
       "card": null,
       "role": "member"
     },
     {
-      "email": "gianfranco@freedomcannabis.ca",
-      "name": "Gianfranco",
+      "h": "aee2a9efd4ddeb8fa52576b3fb7bac655d1fc3508b8410e54fa4026a8116c492",
       "card": null,
       "role": "member"
     },
     {
-      "email": "lodenlheureux@freedomcannabis.ca",
-      "name": "Lodenlheureux",
+      "h": "9bdf5f74b0e3313438ffd6e15a1f06d90359d386fd5d5d007ae67b04095d3f99",
       "card": null,
       "role": "member"
     },
     {
-      "email": "lorainelapada@freedomcannabis.ca",
-      "name": "Lorainelapada",
+      "h": "42c5b9645b6e238ddf52985ba0884cc5d879dadf932f7c1b0411c4c58a24ed69",
       "card": null,
       "role": "member"
     },
     {
-      "email": "lauren@pawnprincess.com",
-      "name": "Lauren",
+      "h": "af9d77a59b85d5bb81329909b0b3472f51fde27e2a635ef2beaa1a69ca8ff26c",
       "card": "pawn-princess-pp01",
       "role": "caller"
     },
     {
-      "email": "jgordon@pawnprincess.com",
-      "name": "Jgordon",
+      "h": "4414b10952ee690dac2cac5be821d74700dfe3ecc9f75ac7e04e83f337a59d06",
       "card": null,
       "role": "member"
     },
     {
-      "email": "casey@sebahub.com",
-      "name": "Casey",
+      "h": "d44b009a4f43f33b20bf0005de32c6cfc59813e4324a42bd934660008ce3d3a3",
       "card": "seba-hub-occupancy",
       "role": "caller"
     },
     {
-      "email": "thomas@sebahub.com",
-      "name": "Thomas",
+      "h": "4e7d5206f6709233c58ac76e9c45c9c25ec42edd1af8e664a4e3f6d3c9997201",
       "card": null,
       "role": "member"
     },
     {
-      "email": "murphy@sebahub.com",
-      "name": "Murphy",
+      "h": "e5730470e3cb84a992897ad15ef9ef961d240cbd246b180ca319cee4b62bef7d",
       "card": null,
       "role": "member"
     },
     {
-      "email": "shelby@sebahub.ca",
-      "name": "Shelby",
+      "h": "1bda7abc71eee0a319394cd5e0f5739435e6a558f5f752ec5a917f1b9878929a",
       "card": null,
       "role": "member"
     },
     {
-      "email": "jason@sebahub.ca",
-      "name": "Jason",
+      "h": "244548274dd2e871c27c962f4cad994c25eabbe8e3f25eb312bc6618e8900ffb",
       "card": null,
       "role": "member"
     },
     {
-      "email": "karen@sebahub.ca",
-      "name": "Karen",
+      "h": "cf979e88fc98431746a72b7b01c9a1f139219f50a4f229f4b21ac3764c798727",
       "card": null,
       "role": "member"
     },
     {
-      "email": "info@kokaneespringsrv.com",
-      "name": "Info",
+      "h": "46427911d0874b8e7c7d5b81274375e070cc7bca2681dde954a5f6bde7169a47",
       "card": null,
       "role": "member"
     },
     {
-      "email": "forestweddings@villagevows.com",
-      "name": "Forestweddings",
+      "h": "613e670852fb42e765510a9dbde623a8570c1a73b1b4468ae249f65a82ecf91d",
       "card": null,
       "role": "member"
     },
     {
-      "email": "timjlatimer@gmail.com",
-      "name": "Tim",
+      "h": "9e9df8970381a85ed06352c01405efddfacb545af2faca1eb616bcd3ab6bcf46",
       "card": null,
       "role": "admin"
     },
     {
-      "email": "robert.reyerse@gmail.com",
-      "name": "Robert Reyerse",
+      "h": "22f27ddc68d516044c63604466757649f71568af109be6ec578c815937fe4b69",
       "card": null,
       "role": "member"
     },
     {
-      "email": "claydouglass@gmail.com",
-      "name": "Claydouglass",
+      "h": "f1147d47d538931a1a112a854798753cbfaef6747e6b4cca51cfea49dcca6d03",
       "card": null,
       "role": "member"
     },
     {
-      "email": "pilipcasey@gmail.com",
-      "name": "Pilipcasey",
+      "h": "39da881bcf43b19006a0d32f5246b254908e39dfe047192d46801328268f0174",
       "card": null,
       "role": "member"
     },
     {
-      "email": "andre@timberbuilthomes.ca",
-      "name": "Andre",
+      "h": "9d4e43be39190bd406c844f7ee85abf325c93fce5ca0594e72be8475bc420fe2",
       "card": null,
       "role": "member"
     },
     {
-      "email": "davec@bluecoppercapital.com",
-      "name": "Davec",
+      "h": "5d30d065d00ad16cf4b1c51b46abfd7642f215cf3c9e1774047783c1b5889c04",
       "card": null,
       "role": "member"
     },
     {
-      "email": "tim@businessasaforceforgood.ca",
-      "name": "Tim",
+      "h": "b7f7f40f465a87f4e23388f9a74b0cc04c6ced1c0f5c1b48e350b0e8b2949860",
       "card": null,
       "role": "admin"
     }
