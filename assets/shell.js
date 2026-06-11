@@ -40,7 +40,8 @@
 
   /* ========================================================================
      CARDHOLDER MODE — the front door session (login.html writes it).
-     localStorage 'hb1000-cardholder' = { name, card, role }.
+     localStorage 'hb1000-cardholder' = { name, email, card, role } —
+     card is null for admin (all-access) and member (card being prepared).
      Tim's MVP doctrine: people are ISSUED Dingo cards; they sign in and
      land on THEIR card — the back engine stays hidden. So when a holder
      with role !== 'admin' is signed in, the nav reduces to: My Card ·
@@ -55,7 +56,8 @@
   function cardholderGet() {
     try {
       var c = JSON.parse(localStorage.getItem(CH_KEY));
-      if (c && typeof c === 'object' && c.name && c.card) return c;
+      /* card may be null (admin / member awaiting their card) — name+role is a session */
+      if (c && typeof c === 'object' && c.name && (c.card || c.role)) return c;
     } catch (e) { /* absent or corrupt → not signed in */ }
     return null;
   }
@@ -704,9 +706,6 @@
       var acc = acceptanceGet(ch.card);
       var cerPending = !!(acc && /^(offered|briefed|negotiated)$/.test(acc.state));
       var MY_PAGES = [
-        { id: 'card', file: 'card.html?card=' + encodeURIComponent(ch.card),
-          label: 'My Card',     sub: '2D ⇄ 3D · ' + ch.card,
-          dot: cerPending ? 'Ceremony pending — your assignment awaits' : null },
         { id: 'ptk',  file: 'ptk.html',
           label: 'My Promises', sub: 'PTK — Promises to Keep' },
         { id: 'flypaper', file: 'flypaper.html',
@@ -714,6 +713,14 @@
         { id: 'library', file: 'library.html',
           label: 'Library',     sub: 'the Cloud Butterfly Library' }
       ];
+      /* members have card:null (their card is being prepared) — no My Card link yet */
+      if (ch.card) {
+        MY_PAGES.unshift({
+          id: 'card', file: 'card.html?card=' + encodeURIComponent(ch.card),
+          label: 'My Card',     sub: '2D ⇄ 3D · ' + ch.card,
+          dot: cerPending ? 'Ceremony pending — your assignment awaits' : null
+        });
+      }
       links = MY_PAGES.map(function (p) {
         var cur = (p.id === pageId) ? ' class="current" aria-current="page"' : '';
         var dot = p.dot ? ' <span class="nav-cer-dot" title="' + esc(p.dot) +
@@ -780,7 +787,7 @@
         persists to localStorage 'hb1000-voice' and dispatches 'hb-voice-change'. */
     setVoice: voiceSet,
 
-    /** Signed-in cardholder { name, card, role } from localStorage 'hb1000-cardholder', or null. */
+    /** Signed-in cardholder { name, email, card, role } from localStorage 'hb1000-cardholder', or null (card is null for admin / member). */
     cardholder: cardholderGet,
 
     /** Clear the cardholder session and return to the front door (login.html). */

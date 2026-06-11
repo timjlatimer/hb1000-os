@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sign in — The HB1000 Operating System</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
@@ -110,19 +111,19 @@
 
     <form id="doorForm" novalidate>
       <label for="fName">Your name</label>
-      <input id="fName" name="name" type="text" autocomplete="username" autocapitalize="words"
-             spellcheck="false" required placeholder="As it appears on your card">
+      <input id="fName" name="name" type="text" autocomplete="name" autocapitalize="words"
+             spellcheck="false" required placeholder="What should we call you?">
 
-      <label for="fPass">Passcode</label>
-      <input id="fPass" name="passcode" type="password" autocomplete="current-password"
-             required placeholder="Issued with your card">
+      <label for="fEmail">Your work email</label>
+      <input id="fEmail" name="email" type="email" autocomplete="email" autocapitalize="off"
+             spellcheck="false" required placeholder="you@yourcompany.com">
 
-      <button class="enter" id="enterBtn" type="submit">Open my card →</button>
+      <button class="enter" id="enterBtn" type="submit">Open the door →</button>
       <div class="err" id="err" role="alert"></div>
     </form>
 
-    <p class="hint">You were <b>issued</b> a Dingo Card — sign in and you land on it.<br>
-      Just looking? Sign in as <b>Guest</b> with passcode <b>guest</b> for the sample card.</p>
+    <p class="hint">This door knows the <b>family</b> by email.<br>
+      Cardholders land on their card; everyone else lands in the Library while their card is prepared.</p>
   </div>
 </div>
 
@@ -148,14 +149,27 @@
 
   function cardURL(card) { return 'card.html?card=' + encodeURIComponent(card); }
 
+  var MEMBER_NOTE = 'Your Dingo card is being prepared — reply DEAL ME IN to ' +
+    'Maria’s newsletter to raise your hand.';
+
   /* ---- Phase-4.5 front-door routing (BLUEPRINT-AMENDMENTS A5/A6) ----
-     1) a pending Acceptance Ceremony round for THIS caller's card takes over
-        first (ACCEPTANCE-CEREMONY-SPEC §1 wire-in; ceremony.html owns the rite);
-     2) otherwise the Flypaper landing greets every login (Maria's catch desk),
-        carrying the card in ?next= — flypaper.html honors it for its
-        "to my card" actions and the autoSkip setting. */
+     Role decides the landing; the Flypaper (Maria's catch desk) greets every
+     login, carrying the destination in ?next= — flypaper.html honors it for
+     its "to my card" actions and the autoSkip setting.
+       caller → flypaper → THEIR card (a pending Acceptance Ceremony round
+                for the card takes over first; ceremony.html owns the rite)
+       admin  → flypaper → index.html (the whole engine room)
+       member → flypaper → library.html (card being prepared; warm note
+                stored under hb1000-member-note for flypaper/library) */
   function successURL(hit) {
-    var dest = cardURL(hit.card);
+    if (hit.role === 'admin') {
+      return 'flypaper.html?next=' + encodeURIComponent('index.html');
+    }
+    if (hit.role === 'member' || !hit.card) {
+      try { localStorage.setItem('hb1000-member-note', MEMBER_NOTE); }
+      catch (e) { /* private mode — the landing still lands */ }
+      return 'flypaper.html?next=' + encodeURIComponent('library.html');
+    }
     try {
       var acc = JSON.parse(localStorage.getItem('hb1000-acceptance')) || {};
       var a = acc[hit.card];
@@ -164,16 +178,21 @@
         return 'ceremony.html?card=' + encodeURIComponent(hit.card);
       }
     } catch (e) { /* no acceptance ledger yet — straight to the Flypaper */ }
-    return 'flypaper.html?next=' + encodeURIComponent(dest);
+    return 'flypaper.html?next=' + encodeURIComponent(cardURL(hit.card));
+  }
+
+  function continueURL(sess) {
+    if (sess.card) return cardURL(sess.card);
+    return (sess.role === 'admin') ? 'index.html' : 'library.html';
   }
 
   /* ---- already signed in? offer the shortcut, never force it ---- */
   var existing = null;
   try { existing = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* fresh */ }
-  if (existing && existing.name && existing.card) {
+  if (existing && existing.name && existing.role) {
     var al = $('already');
     al.innerHTML = 'Signed in as <b>' + esc(existing.name) + '</b> — ' +
-      '<a href="' + esc(cardURL(existing.card)) + '">continue to your card →</a> ' +
+      '<a href="' + esc(continueURL(existing)) + '">continue →</a> ' +
       'or <button type="button" id="switchBtn">sign in as someone else</button>';
     al.classList.add('show');
     $('switchBtn').addEventListener('click', function () {
@@ -183,8 +202,9 @@
     });
   }
 
-  /* ---- the gate: validated against data/cardholders.json (real seed data;
-          light access-gate, not security — real auth = Phase 5 Firebase) ---- */
+  /* ---- the gate: your work email, checked against data/cardholders.json
+          (the family roster; light access-gate, not security — real auth =
+          Phase 5 Firebase) ---- */
   var holdersP = null;
   function loadHolders() {
     if (!holdersP) {
@@ -213,26 +233,26 @@
     ev.preventDefault();
     $('err').classList.remove('show');
     var name = $('fName').value.trim();
-    var pass = $('fPass').value;
-    if (!name || !pass) { fail('Both fields, please — name and passcode, as issued.'); return; }
+    var email = $('fEmail').value.trim().toLowerCase();
+    if (!name || !email) { fail('Both fields, please — your name and your work email.'); return; }
     $('enterBtn').disabled = true;
 
     loadHolders().then(function (holders) {
       var hit = null;
       for (var i = 0; i < holders.length; i++) {
-        if (holders[i].name.toLowerCase() === name.toLowerCase() &&
-            holders[i].passcode === pass) { hit = holders[i]; break; }
+        if (String(holders[i].email || '').toLowerCase() === email) { hit = holders[i]; break; }
       }
       if (!hit) {
-        fail('No match. Check the name and passcode on your issued card — or sign in as Guest / guest.');
+        fail('This door knows the family by name — if you should be on the list, ' +
+             'reply to Maria’s newsletter.');
         return;
       }
-      var session = { name: hit.name, card: hit.card, role: hit.role };
+      var session = { name: name, email: hit.email, card: hit.card, role: hit.role };
       try { localStorage.setItem(KEY, JSON.stringify(session)); }
-      catch (e) { /* private mode — the redirect still lands on the card */ }
-      location.href = successURL(hit);
+      catch (e) { /* private mode — the redirect still lands */ }
+      location.href = successURL({ name: name, email: hit.email, card: hit.card, role: hit.role });
     }).catch(function (err) {
-      fail('Could not read the cardholder registry (' + err.message + '). Is the app being served?');
+      fail('Could not read the family roster (' + err.message + '). Is the app being served?');
     });
   });
 })();

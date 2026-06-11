@@ -1,43 +1,375 @@
 {
   "meta": {
-    "what": "Issued Dingo Cards — who holds one, which card they land on, and the passcode that opens the front door (login.html).",
-    "note": "Light access-gate, not security; real auth = Phase 5 Firebase. Passcodes are plain text on purpose — this is a front door with a doorbell, not a lock. Direct URLs still work; the guard banner on every page says what is simulated.",
-    "doctrine": "People are ISSUED Dingo cards. They sign in, they land on THEIR card — the back engine stays hidden.",
-    "key": "localStorage hb1000-cardholder = { name, card, role }",
+    "what": "The HB1000 family roster — who the front door (login.html) knows by email, and which Dingo Card (if any) is already issued to them.",
+    "note": "Light access-gate, not security; real auth = Phase 5 Firebase. The door checks your work email against this list — personalization, not a lock. Direct URLs still work; the guard banner on every page says what is simulated.",
+    "doctrine": "People are ISSUED Dingo cards. They sign in with their work email, they land on THEIR card — the back engine stays hidden.",
+    "key": "localStorage hb1000-cardholder = { name, email, card, role }",
     "roles": {
-      "caller": "Dingo Caller — lands on their card; nav reduces to My Card · My Promises · Take the walk · Sign out",
+      "caller": "Dingo Caller — has an issued card; lands on it; nav reduces to My Card · My Promises · Take the walk · Sign out",
       "admin": "ALL-ACCESS — full 14-page nav, the whole engine room",
-      "guest": "sample view — same reduced nav, on the reference card"
+      "member": "Family on the roster, card being prepared — lands in the Library; reply DEAL ME IN to Maria's newsletter to raise your hand"
     }
   },
   "cardholders": [
     {
-      "name": "Lauren",
-      "passcode": "pp01",
-      "card": "pawn-princess-pp01",
-      "role": "caller",
-      "title": "Dingo Caller — Pawn Princess PP-01 (store manager, one neck to choke)"
+      "email": "samantha@businessasaforceforgood.ca",
+      "name": "Samantha",
+      "card": null,
+      "role": "member"
     },
     {
-      "name": "Casey",
-      "passcode": "seba",
-      "card": "seba-hub-occupancy",
-      "role": "caller",
-      "title": "Dingo Caller — Seba Hub Occupancy Engine (no empty night, no empty seat)"
+      "email": "jesse@businessasaforceforgood.ca",
+      "name": "Jesse",
+      "card": null,
+      "role": "member"
     },
     {
+      "email": "fidel@businessasaforceforgood.ca",
+      "name": "Fidel",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "diana@businessasaforceforgood.ca",
+      "name": "Diana",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "esmeralda@businessasaforceforgood.ca",
+      "name": "Esmeralda",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "abigail@businessasaforceforgood.ca",
+      "name": "Abigail",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "almira@businessasaforceforgood.ca",
+      "name": "Almira",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "efrenalyn@businessasaforceforgood.ca",
+      "name": "Efrenalyn",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "iara@businessasaforceforgood.ca",
+      "name": "Iara",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "johaillah@businessasaforceforgood.ca",
+      "name": "Johaillah",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "josephine@businessasaforceforgood.ca",
+      "name": "Josephine",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "kimberly@businessasaforceforgood.ca",
+      "name": "Kimberly",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "marilou@businessasaforceforgood.ca",
+      "name": "Marilou",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "katayoun@businessasaforceforgood.ca",
+      "name": "Katayoun",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "maellen@businessasaforceforgood.ca",
+      "name": "Maellen",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "jonnah@businessasaforceforgood.ca",
+      "name": "Jonnah",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "mcraig@cashcofinancial.com",
+      "name": "Mcraig",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "smeunier@cashcofinancial.com",
+      "name": "Smeunier",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "bhong@cashcofinancial.com",
+      "name": "Bhong",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "jmoores@cashcofinancial.com",
+      "name": "Jmoores",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "akumar@cashcofinancial.com",
+      "name": "Akumar",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "cgraham@cashcofinancial.com",
+      "name": "Cgraham",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "roisinb@cashcofinancial.com",
+      "name": "Roisinb",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "tburns@cashcofinancial.com",
+      "name": "Tburns",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "abeckett@cashcofinancial.com",
+      "name": "Abeckett",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "vbhatti@cashcofinancial.com",
+      "name": "Vbhatti",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "msidhu@cashcofinancial.com",
+      "name": "Msidhu",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "tim.latimer@cashcofinancial.com",
       "name": "Tim",
-      "passcode": "prime",
-      "card": "pawn-princess-pp01",
-      "role": "admin",
-      "title": "ALL-ACCESS — Prime North Star holder; full nav, every room"
+      "card": null,
+      "role": "admin"
     },
     {
-      "name": "Guest",
-      "passcode": "guest",
+      "email": "nathanielgarneau@freedomcannabis.ca",
+      "name": "Nathanielgarneau",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "johnfrankpotestio@freedomcannabis.ca",
+      "name": "Johnfrankpotestio",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "juliepotestio@freedomcannabis.ca",
+      "name": "Juliepotestio",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "ricopotestio@freedomcannabis.ca",
+      "name": "Ricopotestio",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "bryangibb@freedomcannabis.ca",
+      "name": "Bryangibb",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "chrisscott@freedomcannabis.ca",
+      "name": "Chrisscott",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "gagegorda@freedomcannabis.ca",
+      "name": "Gagegorda",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "ninaackah@freedomcannabis.ca",
+      "name": "Ninaackah",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "scottsinclair@freedomcannabis.ca",
+      "name": "Scottsinclair",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "justinambar@freedomcannabis.ca",
+      "name": "Justinambar",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "marissagarneau@freedomcannabis.ca",
+      "name": "Marissagarneau",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "davidgamage@freedomcannabis.ca",
+      "name": "Davidgamage",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "gianfranco@freedomcannabis.ca",
+      "name": "Gianfranco",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "lodenlheureux@freedomcannabis.ca",
+      "name": "Lodenlheureux",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "lorainelapada@freedomcannabis.ca",
+      "name": "Lorainelapada",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "lauren@pawnprincess.com",
+      "name": "Lauren",
       "card": "pawn-princess-pp01",
-      "role": "guest",
-      "title": "Sample view — the reference Pawn Princess card, read-only by convention"
+      "role": "caller"
+    },
+    {
+      "email": "jgordon@pawnprincess.com",
+      "name": "Jgordon",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "casey@sebahub.com",
+      "name": "Casey",
+      "card": "seba-hub-occupancy",
+      "role": "caller"
+    },
+    {
+      "email": "thomas@sebahub.com",
+      "name": "Thomas",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "murphy@sebahub.com",
+      "name": "Murphy",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "shelby@sebahub.ca",
+      "name": "Shelby",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "jason@sebahub.ca",
+      "name": "Jason",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "karen@sebahub.ca",
+      "name": "Karen",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "info@kokaneespringsrv.com",
+      "name": "Info",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "forestweddings@villagevows.com",
+      "name": "Forestweddings",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "timjlatimer@gmail.com",
+      "name": "Tim",
+      "card": null,
+      "role": "admin"
+    },
+    {
+      "email": "robert.reyerse@gmail.com",
+      "name": "Robert Reyerse",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "claydouglass@gmail.com",
+      "name": "Claydouglass",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "pilipcasey@gmail.com",
+      "name": "Pilipcasey",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "andre@timberbuilthomes.ca",
+      "name": "Andre",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "davec@bluecoppercapital.com",
+      "name": "Davec",
+      "card": null,
+      "role": "member"
+    },
+    {
+      "email": "tim@businessasaforceforgood.ca",
+      "name": "Tim",
+      "card": null,
+      "role": "admin"
     }
   ]
 }
