@@ -1,0 +1,2488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>PEARL Diamond 3D — Sugar and Spice and Everything Nice</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a14; overflow: hidden; font-family: 'Courier New', monospace; color: #e0e0e0; }
+canvas { display: block; }
+
+#controls {
+  position: fixed; top: 90px; right: 12px; z-index: 100;
+  display: flex; flex-direction: column; gap: 5px;
+  max-height: calc(100vh - 70px); overflow-y: auto;
+}
+.ctrl-btn {
+  padding: 7px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 3px;
+  background: rgba(10,10,20,0.85); color: #e0e0e0; font-family: 'Courier New', monospace;
+  font-size: 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+  transition: all 0.2s; user-select: none; white-space: nowrap;
+}
+.ctrl-btn:hover { background: rgba(30,30,60,0.9); border-color: rgba(255,255,255,0.4); }
+.ctrl-btn.active { border-color: #00ffcc; color: #00ffcc; background: rgba(0,255,204,0.08); }
+.ctrl-btn.off { border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.25); }
+
+#layer-panel {
+  position: fixed; top: 90px; left: 12px; z-index: 100;
+  display: flex; flex-direction: column; gap: 3px;
+  max-height: calc(100vh - 70px); overflow-y: auto;
+}
+#layer-panel.collapsed { display: none; }
+#controls.collapsed { display: none; }
+
+/* Mobile hamburger buttons */
+.panel-toggle {
+  position: fixed; z-index: 110; width: 36px; height: 36px;
+  background: rgba(10,10,20,0.92); border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px; color: #e0e0e0; font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Courier New', monospace; user-select: none;
+}
+.panel-toggle:hover { border-color: #00ffcc; color: #00ffcc; }
+.panel-toggle.active { border-color: #00ffcc; color: #00ffcc; background: rgba(0,255,204,0.08); }
+#toggle-layers { top: 48px; left: 12px; }
+#toggle-controls { top: 48px; right: 12px; }
+
+@media (min-width: 769px) {
+  .panel-toggle { display: none; }
+  #layer-panel { top: 52px; }
+  #controls { top: 52px; }
+  #layer-panel.collapsed { display: flex; }
+  #controls.collapsed { display: flex; }
+}
+.layer-toggle {
+  padding: 5px 8px; border: 1px solid rgba(255,255,255,0.12); border-radius: 2px;
+  background: rgba(10,10,20,0.85); font-family: 'Courier New', monospace;
+  font-size: 9px; cursor: pointer; transition: all 0.2s; user-select: none;
+  display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px;
+}
+.layer-toggle:hover { background: rgba(30,30,60,0.9); }
+.layer-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.layer-toggle.off .layer-label { color: rgba(255,255,255,0.25); text-decoration: line-through; }
+
+/* Cross-navigation bar */
+#cross-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: rgba(10,10,20,0.95); border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px; backdrop-filter: blur(12px);
+}
+.cross-nav-btn {
+  padding: 8px 18px; border: 2px solid rgba(255,255,255,0.2); border-radius: 6px;
+  background: rgba(30,30,50,0.8); color: #e0e0e0; font-family: 'Courier New', monospace;
+  font-size: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;
+  text-decoration: none; transition: all 0.25s; user-select: none; font-weight: bold;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.cross-nav-btn:hover { background: rgba(60,60,100,0.9); border-color: #e8b54d; color:#e8b54d; transform: translateY(-1px); }
+.cross-nav-btn.current { border-color: #e8b54d; color: #e8b54d; background: rgba(232,181,77,0.14); cursor: default; box-shadow:0 0 0 1px #e8b54d inset, 0 0 14px rgba(232,181,77,0.25); }
+.cross-nav-btn.current:hover { transform:none; }
+.cross-nav-back { margin-right: auto; font-size: 11px; padding: 6px 12px; border-color: rgba(232,181,77,0.4); color: #e8b54d; }
+.cross-nav-back:hover { color: #ffd877; border-color: #e8b54d; background:rgba(232,181,77,0.1); }
+@media (max-width: 600px) {
+  .cross-nav-btn { font-size: 9px; padding: 6px 10px; letter-spacing: 0.5px; }
+  #cross-nav { gap: 4px; padding: 6px 8px; }
+}
+
+#funnel-target {
+  position: fixed; top: 48px; left: 50%; transform: translateX(-50%); z-index: 100;
+  background: rgba(10,10,20,0.9); border: 1px solid #d4a574; border-radius: 3px;
+  padding: 6px 12px; display: block; font-size: 10px;
+}
+#funnel-target select {
+  background: transparent; color: #d4a574; border: none; font-family: 'Courier New', monospace;
+  font-size: 10px; cursor: pointer; outline: none;
+}
+#funnel-target select option { background: #0a0a14; color: #e0e0e0; }
+
+#info-panel {
+  position: fixed; bottom: 12px; left: 12px; right: 12px; z-index: 100;
+  background: rgba(10,10,20,0.92); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px; padding: 12px 16px; display: none; max-width: 520px;
+}
+#info-panel h3 { font-size: 13px; margin-bottom: 5px; letter-spacing: 2px; }
+#info-panel p { font-size: 10px; line-height: 1.5; opacity: 0.8; white-space: pre-line; }
+#info-close { position: absolute; top: 6px; right: 10px; cursor: pointer; font-size: 14px; opacity: 0.5; }
+#info-close:hover { opacity: 1; }
+
+#inspect-overlay {
+  position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); z-index: 110;
+  background: rgba(10,10,20,0.95); border: 1px solid #00ffcc; border-radius: 6px;
+  padding: 10px 20px; display: none; text-align: center; max-width: 90vw;
+}
+#inspect-overlay .inspect-title { font-size: 12px; color: #00ffcc; letter-spacing: 2px; margin-bottom: 6px; }
+#inspect-overlay .inspect-actions { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+#inspect-overlay .inspect-btn {
+  padding: 6px 12px; border: 1px solid rgba(255,255,255,0.3); border-radius: 3px;
+  background: rgba(20,20,40,0.9); color: #e0e0e0; font-family: 'Courier New', monospace;
+  font-size: 9px; cursor: pointer; letter-spacing: 1px;
+}
+#inspect-overlay .inspect-btn:hover { border-color: #00ffcc; color: #00ffcc; }
+#inspect-overlay .inspect-btn.primary { border-color: #00ffcc; color: #00ffcc; background: rgba(0,255,204,0.1); }
+#inspect-overlay .inspect-btn.butterfly { border-color: #cc88ff; color: #cc88ff; background: rgba(204,136,255,0.1); }
+#inspect-overlay .inspect-btn.news { border-color: #ffcc00; color: #ffcc00; background: rgba(255,204,0,0.1); }
+
+/* Passcode modal */
+#passcode-modal {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200;
+  background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center;
+}
+#passcode-box {
+  background: rgba(10,10,20,0.95); border: 1px solid #00ffcc; border-radius: 6px;
+  padding: 20px 30px; text-align: center; max-width: 320px;
+}
+#passcode-box h3 { font-size: 14px; color: #00ffcc; letter-spacing: 2px; margin-bottom: 10px; }
+#passcode-box p { font-size: 10px; opacity: 0.6; margin-bottom: 12px; }
+#passcode-input {
+  background: rgba(20,20,40,0.9); border: 1px solid rgba(255,255,255,0.3); border-radius: 3px;
+  color: #00ffcc; font-family: 'Courier New', monospace; font-size: 14px; padding: 8px 12px;
+  width: 100%; text-align: center; letter-spacing: 3px; outline: none;
+}
+#passcode-input:focus { border-color: #00ffcc; }
+#passcode-error { color: #ff4444; font-size: 10px; margin-top: 6px; display: none; }
+#passcode-btns { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+#passcode-btns button {
+  padding: 6px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 3px;
+  background: rgba(20,20,40,0.9); color: #e0e0e0; font-family: 'Courier New', monospace;
+  font-size: 10px; cursor: pointer;
+}
+#passcode-btns button.primary { border-color: #00ffcc; color: #00ffcc; }
+
+/* Cloud Butterfly submission modal */
+#butterfly-modal {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200;
+  background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center;
+}
+#butterfly-box {
+  background: rgba(10,10,20,0.95); border: 1px solid #cc88ff; border-radius: 6px;
+  padding: 20px 24px; text-align: center; max-width: 360px; width: 90vw;
+}
+#butterfly-box h3 { font-size: 13px; color: #cc88ff; letter-spacing: 2px; margin-bottom: 4px; }
+#butterfly-box .subtitle { font-size: 9px; opacity: 0.5; margin-bottom: 12px; }
+#butterfly-format-btns { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+#butterfly-format-btns button {
+  padding: 8px 16px; border: 1px solid rgba(204,136,255,0.4); border-radius: 3px;
+  background: rgba(20,20,40,0.9); color: #cc88ff; font-family: 'Courier New', monospace;
+  font-size: 11px; cursor: pointer; flex: 1;
+}
+#butterfly-format-btns button.selected { background: rgba(204,136,255,0.2); border-color: #cc88ff; }
+#butterfly-textarea {
+  background: rgba(20,20,40,0.9); border: 1px solid rgba(255,255,255,0.2); border-radius: 3px;
+  color: #e0e0e0; font-family: 'Courier New', monospace; font-size: 11px; padding: 10px;
+  width: 100%; height: 100px; resize: none; outline: none;
+}
+#butterfly-textarea:focus { border-color: #cc88ff; }
+#butterfly-submit-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+#butterfly-submit-btns button {
+  padding: 6px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 3px;
+  background: rgba(20,20,40,0.9); color: #e0e0e0; font-family: 'Courier New', monospace;
+  font-size: 10px; cursor: pointer;
+}
+#butterfly-submit-btns button.primary { border-color: #cc88ff; color: #cc88ff; }
+
+#title-bar {
+  position: fixed; bottom: 10px; right: 12px; z-index: 90;
+  text-align: right; pointer-events: none;
+}
+#title-bar h1 { font-size: 12px; letter-spacing: 2px; color: #d4a574; }
+#title-bar h2 { font-size: 9px; letter-spacing: 1.5px; color: rgba(255,255,255,0.35); }
+
+#swarm-mode-panel {
+  position: fixed; top: 50%; right: 12px; transform: translateY(-50%); z-index: 95;
+  display: none; text-align: right;
+}
+#swarm-mode-panel .mode-label {
+  font-size: 10px; letter-spacing: 2px; padding: 4px 10px;
+  border-right: 2px solid; margin-bottom: 2px;
+}
+.mode-chorus { color: #00cccc; border-color: #00cccc !important; }
+.mode-hybrid { color: #ffcc00; border-color: #ffcc00 !important; }
+.mode-squadron { color: #ff4488; border-color: #ff4488 !important; }
+
+#hint {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  text-align: center; pointer-events: none; z-index: 80;
+  transition: opacity 2s;
+}
+#hint p { font-size: 13px; color: rgba(255,255,255,0.3); }
+#hint .big { font-size: 18px; color: rgba(255,255,255,0.45); }
+
+/* ─── BINGO CARD DETAIL PANEL ─── */
+#bingo-detail-panel {
+  position: fixed; top: 0; right: -440px; width: 420px; height: 100vh; z-index: 150;
+  background: rgba(8,8,18,0.97); border-left: 1px solid rgba(255,255,255,0.15);
+  transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column; overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+#bingo-detail-panel.open { right: 0; }
+@media (max-width: 500px) {
+  #bingo-detail-panel { width: 100vw; right: -100vw; }
+}
+
+#bingo-panel-header {
+  padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+#bingo-panel-header .card-title {
+  font-size: 14px; letter-spacing: 2px; font-weight: bold;
+}
+#bingo-panel-header .close-btn {
+  width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.2);
+  background: transparent; color: #e0e0e0; font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Courier New', monospace;
+}
+#bingo-panel-header .close-btn:hover { border-color: #ff4444; color: #ff4444; }
+
+#bingo-panel-meta {
+  padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  flex-shrink: 0;
+}
+.meta-item { font-size: 9px; letter-spacing: 1px; }
+.meta-label { color: rgba(255,255,255,0.4); text-transform: uppercase; }
+.meta-value { color: #e0e0e0; margin-top: 2px; font-size: 11px; }
+
+#bingo-panel-health {
+  padding: 8px 20px; display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;
+}
+.health-bar-bg {
+  flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 0;
+}
+.health-bar-fill { height: 100%; transition: width 0.3s; }
+.health-pct { font-size: 14px; font-weight: bold; letter-spacing: 1px; min-width: 40px; text-align: right; }
+
+#bingo-panel-grid {
+  padding: 16px 20px; flex: 1; overflow-y: auto;
+}
+#bingo-panel-grid h4 {
+  font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.4);
+  margin-bottom: 10px; text-transform: uppercase;
+}
+.bingo-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+  margin-bottom: 16px;
+}
+.bingo-square {
+  aspect-ratio: 1; border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(20,20,40,0.8); cursor: pointer; position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 3px; transition: all 0.15s; font-family: 'Courier New', monospace;
+  overflow: hidden;
+}
+.bingo-square:hover { border-color: rgba(255,255,255,0.4); background: rgba(30,30,60,0.9); }
+.bingo-square.complete { border-color: #22cc44; background: rgba(34,204,68,0.12); }
+.bingo-square.in_progress { border-color: #ffaa00; background: rgba(255,170,0,0.08); }
+.bingo-square.blocked { border-color: #ff4444; background: rgba(255,68,68,0.08); }
+.bingo-square .sq-num { font-size: 7px; color: rgba(255,255,255,0.25); position: absolute; top: 2px; left: 3px; }
+.bingo-square .sq-title { font-size: 7px; color: rgba(255,255,255,0.7); text-align: center; line-height: 1.2; word-break: break-word; }
+.bingo-square .sq-check { font-size: 14px; color: #22cc44; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); opacity: 0; }
+.bingo-square.complete .sq-check { opacity: 1; }
+.bingo-square.complete .sq-title { opacity: 0.4; }
+
+#bingo-square-detail {
+  padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0; display: none; max-height: 200px; overflow-y: auto;
+}
+#bingo-square-detail h5 {
+  font-size: 11px; letter-spacing: 1px; margin-bottom: 6px;
+}
+#bingo-square-detail .sq-desc {
+  font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 8px;
+}
+#bingo-square-detail .sq-actions {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+#bingo-square-detail .sq-action-btn {
+  padding: 4px 10px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(20,20,40,0.9); color: #e0e0e0; font-family: 'Courier New', monospace;
+  font-size: 9px; cursor: pointer; letter-spacing: 1px;
+}
+#bingo-square-detail .sq-action-btn:hover { border-color: #00ffcc; color: #00ffcc; }
+#bingo-square-detail .sq-action-btn.active { border-color: #22cc44; color: #22cc44; background: rgba(34,204,68,0.1); }
+#bingo-square-detail .sq-notes-input {
+  width: 100%; background: rgba(20,20,40,0.9); border: 1px solid rgba(255,255,255,0.15);
+  color: #e0e0e0; font-family: 'Courier New', monospace; font-size: 10px;
+  padding: 6px 8px; margin-top: 6px; resize: none; outline: none; height: 50px;
+}
+#bingo-square-detail .sq-notes-input:focus { border-color: #00ffcc; }
+
+#bingo-panel-footer {
+  padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap;
+}
+#bingo-panel-footer .footer-btn {
+  padding: 6px 12px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(20,20,40,0.9); color: #e0e0e0; font-family: 'Courier New', monospace;
+  font-size: 9px; cursor: pointer; letter-spacing: 1px; flex: 1; text-align: center;
+}
+#bingo-panel-footer .footer-btn:hover { border-color: #00ffcc; color: #00ffcc; }
+#bingo-panel-footer .footer-btn.primary { border-color: #00ffcc; color: #00ffcc; background: rgba(0,255,204,0.08); }
+</style>
+<meta property="og:type" content="website">
+		<meta property="og:url" content="https://learning-loop.manus.space/pearl-diamond-3d.html">
+		<meta property="og:title" content="Learning Loop Mission Control">
+		<meta property="og:description" content="A real-time dashboard for monitoring the progress of Learning Loop Protocol V9.1 executions. Displays phase progress, live activity logs, assessor scores, and artifact status.">
+		<meta property="og:image" content="https://files.manuscdn.com/webdev_screenshots/2026/03/18/eZDoEepQJTpaEBXCi3fy5b.png?x-oss-process=image/resize,w_1200/crop,h_630,x_0,y_0">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" content="Learning Loop Mission Control">
+		<meta name="twitter:description" content="A real-time dashboard for monitoring the progress of Learning Loop Protocol V9.1 executions. Displays phase progress, live activity logs, assessor scores, and artifact status.">
+		<meta name="twitter:image" content="https://files.manuscdn.com/webdev_screenshots/2026/03/18/eZDoEepQJTpaEBXCi3fy5b.png?x-oss-process=image/resize,w_1200/crop,h_630,x_0,y_0">
+		<meta name="twitter:image:width" content="1200">
+		<meta name="twitter:image:height" content="630"></head>
+<body>
+
+<!-- Cross-navigation bar — hop across all four views -->
+<div id="cross-nav">
+  <a href="index.html" class="cross-nav-btn cross-nav-back" title="Back to the Model map">← Back to the Model</a>
+  <a href="index.html" class="cross-nav-btn" title="The Map (model diagram)">🗺️ The Map</a>
+  <a class="cross-nav-btn current" title="You are here">◆ Pearl Diamond 3D</a>
+  <a href="pearl-2d.html" class="cross-nav-btn" title="View 2D Diamond Map">◇ Pearl Diamond 2D</a>
+  <a href="city.html" class="cross-nav-btn" title="Enter Dingo City">🏙️ Dingo City</a>
+</div>
+
+<!-- Mobile toggle buttons -->
+<div class="panel-toggle" id="toggle-layers" onclick="togglePanel('layers')">&#9776;</div>
+<div class="panel-toggle" id="toggle-controls" onclick="togglePanel('controls')">&#9881;</div>
+
+<div id="layer-panel" class="collapsed"></div>
+
+<div id="controls" class="collapsed">
+  <div class="ctrl-btn active" id="btn-funnel" onclick="toggle('funnel')">&#9729; FUNNEL: ON</div>
+  <div class="ctrl-btn active" id="btn-butterflies" onclick="toggle('butterflies')">BUTTERFLIES: ON</div>
+  <div class="ctrl-btn active" id="btn-swarms" onclick="toggle('swarms')">SWARMS: ON</div>
+  <div class="ctrl-btn active" id="btn-brain" onclick="toggle('brain')">BRAIN: ON</div>
+  <div class="ctrl-btn active" id="btn-joy" onclick="toggle('joy')">JOY ATMOS: ON</div>
+  <div class="ctrl-btn" id="btn-spin" onclick="toggle('spin')">AUTO-SPIN: OFF</div>
+  <div class="ctrl-btn" id="btn-toolsets" onclick="showToolsetInfo()">TOOLSETS (SOON)</div>
+  <div class="ctrl-btn" id="btn-swarm-only" onclick="toggleSwarmOnly()" style="margin-top:8px;border-color:#00cccc;">SWARM-ONLY VIEW</div>
+  <div class="ctrl-btn" id="btn-swarm-mode" onclick="cycleSwarmMode()" style="border-color:#00cccc;">MODE: EXPLORING</div>
+  <div class="ctrl-btn active" id="btn-marketing" onclick="toggle('marketing')" style="margin-top:8px;border-color:#ff8800;color:#ff8800;background:rgba(255,136,0,0.12);">&#x1F525; MARKETING FLOW: ON</div>
+  <div class="ctrl-btn active" id="btn-bingo" onclick="toggle('bingo')" style="border-color:#ff8833;">BINGO CARDS: ON</div>
+  <div class="ctrl-btn" id="btn-news-overlay" onclick="toggleOverlay('news')" style="border-color:#ffcc00;">NEWS: OFF</div>
+  <div class="ctrl-btn" id="btn-kpi-overlay" onclick="toggleOverlay('kpi')" style="border-color:#44ddaa;">KPIs: OFF</div>
+  <div class="ctrl-btn active" id="btn-labels" onclick="toggleLabels()" style="margin-top:8px;border-color:#d4a574;color:#d4a574;">LABELS: ON</div>
+  <div class="ctrl-btn active" id="btn-hemispheres" onclick="toggleHemispheres3D()" style="border-color:#8b7aff;color:#8b7aff;background:rgba(139,122,255,0.12);">&#9684; HEMISPHERES: ON</div>
+  <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;display:flex;flex-direction:column;gap:4px;">
+    <a href="/cloud-butterflies" class="ctrl-btn" style="text-decoration:none;text-align:center;border-color:#ff66aa;color:#ff66aa;">&#127803; BUTTERFLY GALLERY</a>
+    <a href="/news" class="ctrl-btn" style="text-decoration:none;text-align:center;border-color:#ffcc00;color:#ffcc00;">&#128240; NEWS CHANNEL</a>
+    <a href="/kpi-dashboard" class="ctrl-btn" style="text-decoration:none;text-align:center;border-color:#44ddaa;color:#44ddaa;">&#128202; KPI DASHBOARD</a>
+    <a href="/play" class="ctrl-btn" style="text-decoration:none;text-align:center;border-color:#ff8833;color:#ff8833;background:rgba(255,136,51,0.12);font-size:12px;padding:10px 12px;margin-top:6px;">&#127961; ENTER BINGO CITY</a>
+  </div>
+</div>
+
+<div id="funnel-target">
+  <label style="color:rgba(255,255,255,0.4);letter-spacing:1px;">FUNNEL &rarr; </label>
+  <select id="funnel-select" onchange="moveFunnel(this.value)">
+    <option value="all">WHOLE DIAMOND</option>
+    <option value="0">Aspirational Apex</option>
+    <option value="1">North Star Compass</option>
+    <option value="2">🟠 Movement Marketing</option>
+    <option value="3">THE HB1000</option>
+    <option value="4">🟠 Initiative Marketing</option>
+    <option value="5">Blue Seal Prime</option>
+    <option value="6">Learning Loop V14</option>
+    <option value="7">Blue Seal Local</option>
+    <option value="8">Source of Truth</option>
+    <option value="9">QA & Regulatory</option>
+    <option value="10">Local 4 Imperative</option>
+    <option value="11">JOY Substrate</option>
+  </select>
+</div>
+
+<div id="info-panel">
+  <span id="info-close" onclick="closeInfo()">&times;</span>
+  <h3 id="info-title"></h3>
+  <p id="info-desc"></p>
+</div>
+
+<div id="inspect-overlay">
+  <div class="inspect-title" id="inspect-name">INSPECTING</div>
+  <div class="inspect-actions" id="inspect-actions">
+    <div class="inspect-btn primary" id="inspect-view-btn" onclick="inspectView()">VIEW DETAILS</div>
+    <div class="inspect-btn" id="inspect-edit-btn" onclick="inspectEdit()" style="display:none;">EDIT CARD</div>
+    <div class="inspect-btn butterfly" id="inspect-butterfly-btn" onclick="openButterflySubmit()" style="display:none;">&#127803; CLOUD BUTTERFLY</div>
+    <div class="inspect-btn news" id="inspect-news-btn" onclick="openNewsSubmit()" style="display:none;">&#128240; SUBMIT NEWS</div>
+    <div class="inspect-btn" onclick="exitInspect()">RELEASE</div>
+  </div>
+</div>
+
+<!-- Passcode Modal -->
+<div id="passcode-modal">
+  <div id="passcode-box">
+    <h3>ACCESS CONTROL</h3>
+    <p id="passcode-prompt">Enter passcode to edit</p>
+    <input type="password" id="passcode-input" placeholder="&#8226;&#8226;&#8226;&#8226;" maxlength="8">
+    <div id="passcode-error">Invalid passcode</div>
+    <div id="passcode-btns">
+      <button onclick="closePasscode()">CANCEL</button>
+      <button class="primary" onclick="submitPasscode()">ENTER</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cloud Butterfly Submission Modal -->
+<div id="butterfly-modal">
+  <div id="butterfly-box">
+    <h3>&#127803; SUBMIT CLOUD BUTTERFLY</h3>
+    <div class="subtitle" id="butterfly-context">FROM: HB1000</div>
+    <div id="butterfly-format-btns">
+      <button class="selected" onclick="selectButterflyFormat('raw')">RAW</button>
+      <button onclick="selectButterflyFormat('organized')">ORGANIZED</button>
+    </div>
+    <textarea id="butterfly-textarea" placeholder="Throw EVERYTHING here — ideas, thoughts, observations, questions. Raw or organized, your choice. Maria sorts it all."></textarea>
+    <div id="butterfly-submit-btns">
+      <button onclick="closeButterflyModal()">CANCEL</button>
+      <button class="primary" onclick="submitButterfly()">SUBMIT &#127803;</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bingo Card Detail Panel (slides in from right) -->
+<div id="bingo-detail-panel">
+  <div id="bingo-panel-header">
+    <div>
+      <div class="card-title" id="bp-title">BINGO CARD</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-top:2px;" id="bp-level">PRIME DIRECTIVE</div>
+    </div>
+    <button class="close-btn" onclick="closeBingoPanel()">&times;</button>
+  </div>
+  <div id="bingo-panel-meta">
+    <div class="meta-item"><div class="meta-label">OWNER</div><div class="meta-value" id="bp-owner">--</div></div>
+    <div class="meta-item"><div class="meta-label">AI PARTNER</div><div class="meta-value" id="bp-ai">--</div></div>
+    <div class="meta-item"><div class="meta-label">INITIATIVE</div><div class="meta-value" id="bp-initiative">--</div></div>
+    <div class="meta-item"><div class="meta-label">HEALTH</div><div class="meta-value" id="bp-health">--</div></div>
+  </div>
+  <div id="bingo-panel-health">
+    <div class="health-bar-bg"><div class="health-bar-fill" id="bp-bar"></div></div>
+    <div class="health-pct" id="bp-pct">0%</div>
+  </div>
+  <div id="bingo-panel-grid">
+    <h4>5&times;5 BINGO GRID &mdash; CLICK A SQUARE TO WORK ON IT</h4>
+    <div class="bingo-grid" id="bp-grid"></div>
+    <div id="bp-loading" style="text-align:center;color:rgba(255,255,255,0.3);font-size:10px;padding:20px;">Loading squares from database...</div>
+    <div id="bp-empty" style="display:none;text-align:center;color:rgba(255,255,255,0.3);font-size:10px;padding:20px;">No squares defined yet. Open the Bingo Cards page to add squares.</div>
+  </div>
+  <div id="bingo-square-detail">
+    <h5 id="bsd-title">SQUARE DETAIL</h5>
+    <div class="sq-desc" id="bsd-desc">Select a square above to see details.</div>
+    <div class="sq-actions" id="bsd-actions"></div>
+    <textarea class="sq-notes-input" id="bsd-notes" placeholder="Add notes..."></textarea>
+  </div>
+  <div id="bingo-panel-footer">
+    <div class="footer-btn" onclick="openBingoFullPage()">OPEN FULL PAGE</div>
+    <div class="footer-btn" onclick="openButterflyFromPanel()">&#127803; BUTTERFLY</div>
+    <div class="footer-btn primary" onclick="closeBingoPanel()">CLOSE &amp; RESUME</div>
+  </div>
+</div>
+
+<div id="title-bar">
+  <h1>SUGAR AND SPICE AND EVERYTHING NICE</h1>
+  <h2>CLOUD BUTTERFLY HUNT FUNNEL &mdash; HB1000 PEARL DIAMOND v4.3</h2>
+  <h2 style="font-size:8px;color:rgba(255,255,255,0.25);margin-top:2px;">[P]=PRIME IMPERATIVE &middot; [=]=PIVOT &middot; [L]=LOCAL IMPERATIVE</h2>
+  <h2 style="font-size:8px;color:rgba(0,204,204,0.4);margin-top:1px;">SWARM MODES: EXPLORING (unified) &middot; INVESTIGATING (transitional) &middot; EXECUTING (specialized)</h2>
+</div>
+
+<div id="swarm-mode-panel">
+  <div class="mode-label mode-chorus" id="mode-indicator">EXPLORING &mdash; UNIFIED SWARM</div>
+  <div style="font-size:8px;color:rgba(255,255,255,0.3);padding:2px 10px;">Click MODE button to cycle</div>
+</div>
+
+<div id="hint">
+  <p class="big">Drag to Rotate &middot; Scroll to Zoom</p>
+  <p>Tap any bingo card to inspect &middot; Double-tap layer to isolate</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// ═══════════════════════════════════════════════════
+// PEARL DIAMOND v4.3 — INTERACTIVE BINGO CARDS + BAKED RING TEXTURES + BRAIN WITH HB1000™
+// Labels are now TEXTURE-MAPPED directly onto torus ring materials
+// Brain sprite has HB1000™ composited into the image itself
+// No more floating label badges — everything is painted on geometry
+// ═══════════════════════════════════════════════════
+
+// ─── ACCESS CONTROL ───
+const SUPER_PASSCODE = '1958';
+let currentAccessLevel = null;
+let pendingEditTarget = null;
+
+// ─── LAYER DEFINITIONS (12 layers — includes 2 Marketing Rings) ───
+const L = [
+  { name:"Aspirational Apex",     color:0xffd700, gov:"Vision",         tier:"PRIME", keeper:null, isMarketing:false, desc:'"Ding in the Universe" — 16 Moonshots — Wisdom Repository. PRIME IMPERATIVE: The overarching purpose that governs all 32 initiatives.' },
+  { name:"North Star Compass",    color:0x9966cc, gov:"Strategic",      tier:"PRIME", keeper:null, isMarketing:false, desc:"N=Purpose, E=BHAG, S=Prime Directive, W=Core Values. PRIME NORTH STAR: \"It's expensive to be poor. We think that's a crime in society, and we're trying to change it.\"" },
+  { name:"Movement Marketing",    color:0xff8800, gov:"Advocacy",       tier:"PRIME", keeper:null, isMarketing:true,  desc:"ABOVE THE LINE — Movement marketing, advocacy campaigns, brand narrative, partnership marketing. Serves the MOONSHOT. Jolene Protocol governs all output. The Herald coordinates cross-building intelligence." },
+  { name:"THE HB1000",            color:0x00aaff, gov:"Operational",    tier:"PIVOT", keeper:null, isMarketing:false, desc:"The Pivot Point — Human Brain + AI Brain. 4 Inputs, 4 Outputs, Covey Protocol. The WIDEST point — where Prime meets Local. The marriage of human intelligence + artificial intelligence." },
+  { name:"Initiative Marketing",  color:0xff6600, gov:"Delivery",       tier:"LOCAL", keeper:null, isMarketing:true,  desc:"BELOW THE LINE — Building-specific marketing: community storytelling (Maven), viral irreverence (Effn Duck), trust & dignity (CashCo), local events (Digger Cafe), knowledge sharing (Seba Hub). Each building's F3 Workshop houses its marketing engine." },
+  { name:"Blue Seal Prime",       color:0x2255bb, gov:"Governance",     tier:"PRIME", keeper:null, isMarketing:false, desc:"THE CONSTITUTION — The Sacred Covenant between HB1000 and AI Agent. 11 Articles, 23 Standing Directives, 4-Layer Enforcement (Fireproof Safe → Village Crier → Checkpoint → Watchtower). SUPREME authority. Cannot be overridden." },
+  { name:"Learning Loop V14",     color:0x00aa99, gov:"Execution",      tier:"LOCAL", keeper:null, isMarketing:false, desc:"The Crystallizer — 9 phases, database-enforced. LOCAL IMPERATIVE: Each initiative calibrates its own North Star here." },
+  { name:"Blue Seal Local",       color:0x22aa44, gov:"Quality",        tier:"LOCAL", keeper:null, isMarketing:false, desc:"Initiative-specific standards — inherits from Prime. Each of ~32 initiatives gets its own quality seal and LOCAL North Star." },
+  { name:"Source of Truth",       color:0xffdd44, gov:"Accountability", tier:"LOCAL", keeper:"CFO (Samantha)", isMarketing:false, desc:"The financial and operational KPI anchor. Each initiative has an assigned Source of Truth keeper (e.g., CFO of the family office). Financial KPIs, operational KPIs, and truth verification live here." },
+  { name:"QA & Regulatory",       color:0xff6644, gov:"Compliance",     tier:"LOCAL", keeper:null, isMarketing:false, desc:"Quality Assurance, Licensing, and Regulatory compliance. Not all initiatives have a dedicated QA person or regulator, but every initiative has SOME licensing/regulatory consideration. Always present, always considered." },
+  { name:"Local 4 Imperative",    color:0xcc8833, gov:"Tactical",       tier:"LOCAL", keeper:null, isMarketing:false, desc:"Lean Canvas, Move 37, Bingo Cards, AI Agents. LOCAL: Ruby Red is ONE example North Star (Maven). Other initiatives have different local targets." },
+  { name:"JOY Substrate",         color:0xff66aa, gov:"Foundation",     tier:"LOCAL", keeper:null, isMarketing:false, desc:"4 Base Items (always active) + 8 Choice Items. Grace Never Judges. Cash-Flow Friendly. The inviolable foundation — OPEN to the JOY Atmosphere below. 7 JOY Gate checks including Human Connection Check." }
+];
+
+const RADII = [0.4, 1.5, 2.7, 3.0, 2.7, 2.5, 2.0, 1.6, 1.35, 1.15, 1.0, 0.85];
+const SPACING = 0.85;
+const Y = [];
+for(let i=0;i<12;i++) Y.push(4.7 - i*SPACING);
+
+// ─── SCENE ───
+const scene = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 500);
+cam.position.set(0, 1, 16);
+const ren = new THREE.WebGLRenderer({antialias:true});
+ren.setSize(innerWidth, innerHeight);
+ren.setPixelRatio(Math.min(devicePixelRatio, 2));
+document.body.appendChild(ren.domElement);
+
+const orb = new THREE.OrbitControls(cam, ren.domElement);
+orb.enableDamping = true; orb.dampingFactor = 0.06;
+orb.minDistance = 4; orb.maxDistance = 30;
+
+scene.add(new THREE.AmbientLight(0x223344, 0.7));
+const dLight = new THREE.DirectionalLight(0xffffff, 0.35);
+dLight.position.set(5,8,5); scene.add(dLight);
+const scenePLight = new THREE.PointLight(0x00ddff, 0.6, 15);
+scenePLight.position.set(0, Y[3], 0); scene.add(scenePLight);
+
+// ─── GROUPS ───
+const G = {
+  diamond: new THREE.Group(),
+  funnel:  new THREE.Group(),
+  butter:  new THREE.Group(),
+  swarms:  new THREE.Group(),
+  brain:   new THREE.Group(),
+  joy:     new THREE.Group(),
+  bingo:   new THREE.Group(),
+  news:    new THREE.Group(),
+  kpi:     new THREE.Group(),
+  marketing: new THREE.Group()
+};
+Object.values(G).forEach(g => scene.add(g));
+G.news.visible = false;
+G.kpi.visible = false;
+
+// ─── HELPER: Create canvas texture for embedded text on cards/swarms ───
+function makeTextTexture(text, opts={}){
+  const fontSize = opts.fontSize || 24;
+  const fontFace = opts.fontFace || 'Courier New';
+  const textColor = opts.textColor || '#ffffff';
+  const bgColor = opts.bgColor || 'rgba(10,10,20,0.75)';
+  const borderColor = opts.borderColor || 'rgba(255,255,255,0.3)';
+  const padding = opts.padding || 8;
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = `bold ${fontSize}px ${fontFace}`;
+  const metrics = ctx.measureText(text);
+  const w = metrics.width + padding*2;
+  const h = fontSize + padding;
+  canvas.width = Math.ceil(w);
+  canvas.height = Math.ceil(h);
+
+  if(bgColor !== 'transparent'){
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  if(borderColor !== 'none'){
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+  }
+  ctx.font = `bold ${fontSize}px ${fontFace}`;
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, canvas.width/2, canvas.height/2);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  return {tex, aspect: canvas.width/canvas.height};
+}
+
+// ─── HELPER: Create embedded text mesh (for bingo cards, swarm labels) ───
+function makeEmbeddedLabel(text, opts={}){
+  const {tex, aspect} = makeTextTexture(text, opts);
+  const scale = opts.scale || 0.3;
+  const geo = new THREE.PlaneGeometry(scale*aspect, scale);
+  const mat = new THREE.MeshBasicMaterial({map:tex, transparent:true, side:THREE.DoubleSide, depthTest:true});
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.userData.isLabel = true;
+  return mesh;
+}
+
+// ═══════════════════════════════════════════════════
+// BAKED RING TEXTURE SYSTEM
+// Creates a canvas texture with text, then applies it as the
+// torus ring's own material map. Text is literally part of the ring surface.
+// ═══════════════════════════════════════════════════
+
+function createRingTexture(text, ringColor, opts={}){
+  // Canvas wraps around the torus tube circumference (height) and ring circumference (width)
+  const canvasW = opts.canvasW || 2048;
+  const canvasH = opts.canvasH || 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvasW;
+  canvas.height = canvasH;
+  const ctx = canvas.getContext('2d');
+
+  // Fill with the ring's base color (slightly transparent for glow effect)
+  const hexColor = typeof ringColor === 'number' ? '#' + ringColor.toString(16).padStart(6, '0') : ringColor;
+  ctx.fillStyle = hexColor;
+  ctx.globalAlpha = 0.35;
+  ctx.fillRect(0, 0, canvasW, canvasH);
+  ctx.globalAlpha = 1.0;
+
+  // Draw the text — repeated around the ring so it's visible from multiple angles
+  const fontSize = opts.fontSize || 42;
+  ctx.font = `bold ${fontSize}px 'Courier New', monospace`;
+  ctx.fillStyle = hexColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Measure text width to determine how many repetitions fit
+  const textWidth = ctx.measureText(text).width;
+  const spacing = textWidth + 120; // gap between repetitions
+  const repetitions = Math.max(2, Math.ceil(canvasW / spacing));
+
+  for(let i = 0; i < repetitions; i++){
+    const x = (i + 0.5) * (canvasW / repetitions);
+    // Draw glow/shadow behind text
+    ctx.shadowColor = hexColor;
+    ctx.shadowBlur = 12;
+    ctx.fillText(text, x, canvasH / 2);
+    ctx.shadowBlur = 0;
+    // Draw crisp text on top
+    ctx.fillStyle = '#ffffff';
+    ctx.globalAlpha = 0.95;
+    ctx.fillText(text, x, canvasH / 2);
+    ctx.globalAlpha = 1.0;
+    ctx.fillStyle = hexColor;
+  }
+
+  // Add subtle horizontal line accents at top and bottom edges
+  ctx.strokeStyle = hexColor;
+  ctx.globalAlpha = 0.5;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, 2); ctx.lineTo(canvasW, 2);
+  ctx.moveTo(0, canvasH - 2); ctx.lineTo(canvasW, canvasH - 2);
+  ctx.stroke();
+  ctx.globalAlpha = 1.0;
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+}
+
+// ─── BUILD DIAMOND WITH BAKED TEXTURES ───
+const layerMeshes = [];
+L.forEach((l,i) => {
+  const r = RADII[i];
+  const tierTag = l.tier==='PRIME'?'[P]':l.tier==='LOCAL'?'[L]':'[=]';
+  const labelText = `${tierTag} ${l.name.toUpperCase()}`;
+
+  // Create texture with text baked in
+  const ringTex = createRingTexture(labelText, l.color, {
+    fontSize: r > 1.5 ? 48 : r > 0.8 ? 38 : 28,
+    canvasW: 2048,
+    canvasH: r > 1.5 ? 128 : 96
+  });
+
+  // Torus with baked text texture
+  const tubeR = 0.08;
+  const geo = new THREE.TorusGeometry(r, tubeR, 16, 64);
+  const mat = new THREE.MeshPhongMaterial({
+    map: ringTex,
+    color: l.color,
+    emissive: l.color,
+    emissiveIntensity: 0.3,
+    transparent: true,
+    opacity: 0.85
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.y = Y[i];
+  mesh.rotation.x = Math.PI/2;
+  mesh.userData = {idx:i, type:'layer'};
+  G.diamond.add(mesh);
+  layerMeshes.push(mesh);
+
+  // Wireframe (subtle structural lines)
+  const wMat = new THREE.MeshBasicMaterial({color:l.color, wireframe:true, transparent:true, opacity:0.12});
+  const w = new THREE.Mesh(new THREE.TorusGeometry(r, 0.1, 12, 6), wMat);
+  w.position.y = Y[i]; w.rotation.x = Math.PI/2;
+  G.diamond.add(w);
+
+  // Source of Truth keeper — bake into a second smaller torus below the main ring
+  if(l.keeper){
+    const keeperTex = createRingTexture(`KEEPER: ${l.keeper.toUpperCase()}`, 0xffdd44, {
+      fontSize: 28, canvasW: 1024, canvasH: 64
+    });
+    const keeperGeo = new THREE.TorusGeometry(r * 0.85, 0.03, 8, 48);
+    const keeperMat = new THREE.MeshPhongMaterial({
+      map: keeperTex, color: 0xffdd44, emissive: 0xffdd44, emissiveIntensity: 0.25,
+      transparent: true, opacity: 0.7
+    });
+    const keeperMesh = new THREE.Mesh(keeperGeo, keeperMat);
+    keeperMesh.position.y = Y[i] - 0.15;
+    keeperMesh.rotation.x = Math.PI/2;
+    G.diamond.add(keeperMesh);
+  }
+
+  // Struts
+  if(i < 11){
+    const nr = RADII[i+1], ny = Y[i+1];
+    for(let s=0; s<6; s++){
+      const a = s/6*Math.PI*2;
+      const pts = [
+        new THREE.Vector3(Math.cos(a)*r, Y[i], Math.sin(a)*r),
+        new THREE.Vector3(Math.cos(a)*nr, ny, Math.sin(a)*nr)
+      ];
+      const lg = new THREE.BufferGeometry().setFromPoints(pts);
+      const strutMat = new THREE.LineDashedMaterial({
+        color:l.color, transparent:true, opacity:0.35,
+        dashSize:0.2, gapSize:0.1
+      });
+      const strutLine = new THREE.Line(lg, strutMat);
+      strutLine.computeLineDistances();
+      G.diamond.add(strutLine);
+    }
+  }
+});
+
+// ─── BRAIN — GOLDEN BRAIN WITH HB1000™ COMPOSITED INTO TEXTURE ───
+const brainCore = new THREE.Group();
+
+// Load the brain texture (now has HB1000™ text baked into the image)
+const brainTexLoader = new THREE.TextureLoader();
+const brainTex = brainTexLoader.load('https://d2xsxph8kpxj0f.cloudfront.net/310519663303496813/MgX2WjZcUSWDSyEu4F3Mhm/brain-texture-new_daf00d02.png');
+
+// Front-facing brain billboard (sprite) — SMALLER than before
+const brainSpriteMat = new THREE.SpriteMaterial({
+  map: brainTex,
+  transparent: true,
+  opacity: 0.95,
+  depthTest: true,
+  depthWrite: false
+});
+const brainSprite = new THREE.Sprite(brainSpriteMat);
+brainSprite.scale.set(0.7, 0.7, 0.7);  // Reduced from 1.2 to 0.7
+brainSprite.position.y = 0.05;
+brainCore.add(brainSprite);
+
+// Subtle inner glow sphere behind the brain
+const innerGlow = new THREE.Mesh(
+  new THREE.SphereGeometry(0.25, 16, 16),
+  new THREE.MeshBasicMaterial({color:0xffaa44, transparent:true, opacity:0.08})
+);
+innerGlow.position.y = 0.05;
+brainCore.add(innerGlow);
+
+// Point light to illuminate the brain warmly
+const brainLight = new THREE.PointLight(0xffcc66, 0.5, 2.5);
+brainLight.position.set(0, 0.2, 0.3);
+brainCore.add(brainLight);
+
+// Neural pathway lines radiating from brain (shorter to match smaller brain)
+const neuralMat = new THREE.LineBasicMaterial({color:0x00ffcc, transparent:true, opacity:0.12});
+for(let i=0; i<12; i++){
+  const a = (i/12)*Math.PI*2;
+  const elev = (Math.random()-0.3)*0.3;
+  const len = 0.3 + Math.random()*0.3;
+  const pts = [new THREE.Vector3(0, 0.05, 0)];
+  const endX = Math.cos(a)*len;
+  const endY = elev;
+  const endZ = Math.sin(a)*len;
+  pts.push(new THREE.Vector3(endX*0.5, elev*0.5, endZ*0.5));
+  pts.push(new THREE.Vector3(endX, endY, endZ));
+  brainCore.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), neuralMat.clone()));
+  if(i % 4 === 0){
+    const dot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.01, 6, 6),
+      new THREE.MeshBasicMaterial({color:0x00ffcc, transparent:true, opacity:0.3})
+    );
+    dot.position.set(endX, endY, endZ);
+    brainCore.add(dot);
+  }
+}
+
+// Pulsing energy rings around the brain
+const neuralRings = [];
+for(let i=0; i<3; i++){
+  const ringGeo = new THREE.TorusGeometry(0.18+i*0.07, 0.003, 8, 32);
+  const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({
+    color:0xffcc44, transparent:true, opacity:0.1
+  }));
+  ring.rotation.x = Math.PI/2 + (i-1)*0.3;
+  ring.rotation.z = i * 0.5;
+  ring.position.y = 0.05;
+  brainCore.add(ring);
+  neuralRings.push(ring);
+}
+
+brainCore.position.y = Y[3];
+G.brain.add(brainCore);
+
+// NO separate HB1000™ label — it's now part of the brain texture image
+
+// ─── JOY ATMOSPHERE ───
+const joyGlow = new THREE.Mesh(
+  new THREE.SphereGeometry(5, 32, 32),
+  new THREE.MeshBasicMaterial({color:0xff3388, transparent:true, opacity:0.05, side:THREE.BackSide})
+);
+joyGlow.position.y = Y[11] - 3;
+G.joy.add(joyGlow);
+
+const botR = RADII[11];
+for(let i=0;i<24;i++){
+  const a = i/24*Math.PI*2;
+  const p = new THREE.Mesh(new THREE.SphereGeometry(0.035, 6, 6),
+    new THREE.MeshBasicMaterial({color:0xff66aa, transparent:true, opacity:0.5}));
+  p.position.set(Math.cos(a)*botR, Y[11]-0.3, Math.sin(a)*botR);
+  G.joy.add(p);
+}
+
+const joyParts = [];
+for(let i=0;i<50;i++){
+  const a = Math.random()*Math.PI*2;
+  const d = Math.random()*botR*0.85;
+  const p = new THREE.Mesh(new THREE.SphereGeometry(0.025+Math.random()*0.03, 6, 6),
+    new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setHSL(0.9+Math.random()*0.1, 0.7, 0.55+Math.random()*0.15),
+      transparent:true, opacity:0.35+Math.random()*0.25
+    }));
+  const startY = Y[11] - 1.5 - Math.random()*3;
+  p.position.set(Math.cos(a)*d, startY, Math.sin(a)*d);
+  p.userData = {bx:Math.cos(a)*d, bz:Math.sin(a)*d, spd:0.15+Math.random()*0.35, off:Math.random()*10};
+  G.joy.add(p);
+  joyParts.push(p);
+}
+// ─── MARKETING CIRCULATORY SYSTEM ────
+// Orange veins connecting both marketing rings through the brain to all layers
+const mktParticles = [];
+const MKT_ORANGE = 0xff8800;
+const MKT_DEEP = 0xff6600;
+
+// Glowing aura around both marketing rings
+[2, 4].forEach(mktIdx => {
+  const auraGeo = new THREE.TorusGeometry(RADII[mktIdx] + 0.15, 0.12, 16, 64);
+  const auraMat = new THREE.MeshBasicMaterial({
+    color: MKT_ORANGE, transparent: true, opacity: 0.15, side: THREE.DoubleSide
+  });
+  const aura = new THREE.Mesh(auraGeo, auraMat);
+  aura.position.y = Y[mktIdx];
+  aura.rotation.x = Math.PI / 2;
+  G.marketing.add(aura);
+});
+
+// Vertical orange tubes connecting marketing rings through the brain
+const tubeSegments = [
+  // Upper marketing ring down to brain
+  {from: Y[2], to: Y[3], radius: 0.04, color: MKT_ORANGE},
+  // Brain down to lower marketing ring
+  {from: Y[3], to: Y[4], radius: 0.04, color: MKT_DEEP},
+  // Lower marketing ring down through all local layers
+  {from: Y[4], to: Y[11], radius: 0.025, color: MKT_DEEP},
+  // Upper marketing ring up through prime layers
+  {from: Y[2], to: Y[0], radius: 0.025, color: MKT_ORANGE}
+];
+
+// Create 6 vertical tube paths (hexagonal arrangement)
+for(let s = 0; s < 6; s++) {
+  const angle = (s / 6) * Math.PI * 2;
+  const dist = 0.6;
+  const x = Math.cos(angle) * dist;
+  const z = Math.sin(angle) * dist;
+  tubeSegments.forEach(seg => {
+    const pts = [];
+    const steps = 12;
+    for(let t = 0; t <= steps; t++) {
+      const frac = t / steps;
+      const py = seg.from + (seg.to - seg.from) * frac;
+      // Slight spiral
+      const spiralR = dist + Math.sin(frac * Math.PI * 2) * 0.1;
+      pts.push(new THREE.Vector3(
+        Math.cos(angle + frac * 0.3) * spiralR,
+        py,
+        Math.sin(angle + frac * 0.3) * spiralR
+      ));
+    }
+    const curve = new THREE.CatmullRomCurve3(pts);
+    const tubeGeo = new THREE.TubeGeometry(curve, 20, seg.radius, 6, false);
+    const tubeMat = new THREE.MeshPhongMaterial({
+      color: seg.color, emissive: seg.color, emissiveIntensity: 0.4,
+      transparent: true, opacity: 0.35
+    });
+    const tube = new THREE.Mesh(tubeGeo, tubeMat);
+    G.marketing.add(tube);
+  });
+}
+
+// Horizontal orange ring connectors at each non-marketing layer
+for(let i = 0; i < 12; i++) {
+  if(L[i].isMarketing) continue; // marketing rings already glow
+  const connGeo = new THREE.TorusGeometry(0.6, 0.008, 8, 32);
+  const connMat = new THREE.MeshBasicMaterial({
+    color: MKT_ORANGE, transparent: true, opacity: 0.2
+  });
+  const conn = new THREE.Mesh(connGeo, connMat);
+  conn.position.y = Y[i];
+  conn.rotation.x = Math.PI / 2;
+  G.marketing.add(conn);
+}
+
+// Animated orange particles flowing through the tubes
+for(let i = 0; i < 80; i++) {
+  const pGeo = new THREE.SphereGeometry(0.025 + Math.random() * 0.015, 6, 6);
+  const pMat = new THREE.MeshBasicMaterial({
+    color: new THREE.Color().setHSL(0.07 + Math.random() * 0.04, 1.0, 0.55 + Math.random() * 0.15),
+    transparent: true, opacity: 0.6 + Math.random() * 0.3
+  });
+  const particle = new THREE.Mesh(pGeo, pMat);
+  const tubeIdx = Math.floor(Math.random() * 6);
+  const angle = (tubeIdx / 6) * Math.PI * 2;
+  const goingUp = Math.random() > 0.5;
+  const topY = goingUp ? Y[0] : Y[2];
+  const botY = goingUp ? Y[2] : Y[11];
+  particle.userData = {
+    tubeAngle: angle,
+    dist: 0.6,
+    t: Math.random(),
+    speed: 0.003 + Math.random() * 0.004,
+    topY: topY,
+    botY: botY,
+    goingUp: goingUp
+  };
+  const frac = particle.userData.t;
+  const py = topY + (botY - topY) * frac;
+  particle.position.set(
+    Math.cos(angle) * 0.6,
+    py,
+    Math.sin(angle) * 0.6
+  );
+  G.marketing.add(particle);
+  mktParticles.push(particle);
+}
+
+// Herald cross-building connection arcs (between buildings at rooftop level)
+const heraldY = Y[4] + 0.3;
+const heraldR = RADII[4] + 0.5;
+for(let i = 0; i < 6; i++) {
+  const a1 = (i / 6) * Math.PI * 2;
+  const a2 = ((i + 1) / 6) * Math.PI * 2;
+  const pts = [];
+  for(let t = 0; t <= 20; t++) {
+    const frac = t / 20;
+    const a = a1 + (a2 - a1) * frac;
+    const arcR = heraldR + Math.sin(frac * Math.PI) * 0.8;
+    const arcY = heraldY + Math.sin(frac * Math.PI) * 0.4;
+    pts.push(new THREE.Vector3(Math.cos(a) * arcR, arcY, Math.sin(a) * arcR));
+  }
+  const arcGeo = new THREE.BufferGeometry().setFromPoints(pts);
+  const arcMat = new THREE.LineDashedMaterial({
+    color: MKT_ORANGE, transparent: true, opacity: 0.4,
+    dashSize: 0.15, gapSize: 0.08
+  });
+  const arcLine = new THREE.Line(arcGeo, arcMat);
+  arcLine.computeLineDistances();
+  G.marketing.add(arcLine);
+}
+
+// ─── BINGO CARDS ───
+const BINGO_CARDS = [
+  {name:'Effn Duck',       pct:35, health:'amber', level:'prime', color:0x00cccc, warrant:'Innovation Lead', initiative:'effn-duck'},
+  {name:'Digger Cafe',     pct:20, health:'green', level:'prime', color:0xffcc00, warrant:'Operations Lead', initiative:'digger-cafe'},
+  {name:'Seba Hub',        pct:45, health:'green', level:'prime', color:0x00ccaa, warrant:'Community Lead', initiative:'seba-hub'},
+  {name:'CashCo',          pct:10, health:'red',   level:'prime', color:0xff8833, warrant:'Finance Lead', initiative:'cashco'},
+  {name:'Maven',           pct:60, health:'green', level:'prime', color:0xff4488, warrant:'Product Lead', initiative:'maven'},
+  {name:'Guardian Banker',  pct:15, health:'amber', level:'local', color:0x44ddaa, warrant:'Compliance Lead', initiative:'guardian-banker'}
+];
+const HEALTH_COLORS = {green:0x22cc44, amber:0xffaa00, red:0xff4444};
+const bingoCardMeshes = [];
+
+BINGO_CARDS.forEach((bc, i) => {
+  const cardGroup = new THREE.Group();
+  const cw = 0.7, ch = 0.9;
+
+  const cardGeo = new THREE.PlaneGeometry(cw, ch);
+  const cardMat = new THREE.MeshBasicMaterial({
+    color: 0x111122, transparent: true, opacity: 0.85, side: THREE.DoubleSide
+  });
+  cardGroup.add(new THREE.Mesh(cardGeo, cardMat));
+
+  const borderGeo = new THREE.EdgesGeometry(cardGeo);
+  const borderMat = new THREE.LineBasicMaterial({color: HEALTH_COLORS[bc.health], transparent: true, opacity: 0.8});
+  cardGroup.add(new THREE.LineSegments(borderGeo, borderMat));
+
+  // 5x5 mini grid
+  const gridSize = 5;
+  const cellW = (cw - 0.12) / gridSize;
+  const cellH = (ch * 0.45) / gridSize;
+  const gridStartX = -(cw - 0.12) / 2 + cellW / 2;
+  const gridStartY = -(ch * 0.02);
+  const filledCount = Math.round(bc.pct / 100 * 25);
+
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      const idx = r * gridSize + c;
+      const isFilled = idx < filledCount;
+      const cellGeo = new THREE.PlaneGeometry(cellW * 0.85, cellH * 0.85);
+      const cellMat = new THREE.MeshBasicMaterial({
+        color: isFilled ? HEALTH_COLORS[bc.health] : 0x222244,
+        transparent: true, opacity: isFilled ? 0.7 : 0.3, side: THREE.DoubleSide
+      });
+      const cell = new THREE.Mesh(cellGeo, cellMat);
+      cell.position.set(gridStartX + c * cellW, gridStartY - r * cellH, 0.001);
+      cardGroup.add(cell);
+    }
+  }
+
+  // Title label ON card face
+  const titleLabel = makeEmbeddedLabel(bc.name.toUpperCase(), {
+    textColor: '#'+new THREE.Color(bc.color).getHexString(),
+    borderColor: 'none', bgColor: 'rgba(0,0,0,0.6)', scale: 0.12, fontSize: 18
+  });
+  titleLabel.position.set(0, ch/2 - 0.07, 0.002);
+  cardGroup.add(titleLabel);
+
+  // Warrant label
+  const warrantLabel = makeEmbeddedLabel(bc.warrant.toUpperCase(), {
+    textColor: 'rgba(255,255,255,0.6)', borderColor: 'none', bgColor: 'transparent', scale: 0.06, fontSize: 12
+  });
+  warrantLabel.position.set(0, ch/2 - 0.16, 0.002);
+  cardGroup.add(warrantLabel);
+
+  // Percentage label
+  const pctLabel = makeEmbeddedLabel(`${bc.pct}%`, {
+    textColor: '#'+new THREE.Color(HEALTH_COLORS[bc.health]).getHexString(),
+    borderColor: 'none', bgColor: 'transparent', scale: 0.08, fontSize: 16
+  });
+  pctLabel.position.set(0, -ch/2 + 0.07, 0.002);
+  cardGroup.add(pctLabel);
+
+  // Percentage bar
+  const pctBarBg = new THREE.Mesh(
+    new THREE.PlaneGeometry(cw * 0.8, 0.03),
+    new THREE.MeshBasicMaterial({color: 0x222244, transparent: true, opacity: 0.5, side: THREE.DoubleSide})
+  );
+  pctBarBg.position.set(0, -ch/2 + 0.14, 0.001);
+  cardGroup.add(pctBarBg);
+
+  const pctBarFill = new THREE.Mesh(
+    new THREE.PlaneGeometry(cw * 0.8 * (bc.pct / 100), 0.03),
+    new THREE.MeshBasicMaterial({color: HEALTH_COLORS[bc.health], transparent: true, opacity: 0.8, side: THREE.DoubleSide})
+  );
+  pctBarFill.position.set(-(cw * 0.8 * (1 - bc.pct / 100)) / 2, -ch/2 + 0.14, 0.002);
+  cardGroup.add(pctBarFill);
+
+  // Position cards orbiting at Layer 8 area
+  const angle = (i / BINGO_CARDS.length) * Math.PI * 2;
+  const orbitR = 3.8;
+  const cardY = Y[10] + 0.3 + (i % 2) * 0.5;
+  cardGroup.position.set(Math.cos(angle) * orbitR, cardY, Math.sin(angle) * orbitR);
+  cardGroup.userData = {...bc, type: 'bingo', angle, orbitR, baseY: cardY, idx: i};
+
+  // Tether
+  const ringR = RADII[10];
+  const ringY = Y[10];
+  const anchorX = Math.cos(angle) * ringR;
+  const anchorZ = Math.sin(angle) * ringR;
+  const tetherPts = [
+    new THREE.Vector3(anchorX, ringY, anchorZ),
+    new THREE.Vector3(Math.cos(angle) * orbitR, cardY, Math.sin(angle) * orbitR)
+  ];
+  const tetherGeo = new THREE.BufferGeometry().setFromPoints(tetherPts);
+  const tetherMat = new THREE.LineDashedMaterial({
+    color: HEALTH_COLORS[bc.health], transparent: true, opacity: 0.6,
+    dashSize: 0.2, gapSize: 0.1
+  });
+  const tetherLine = new THREE.Line(tetherGeo, tetherMat);
+  tetherLine.computeLineDistances();
+  tetherLine.userData = {cardIdx: i, anchorAngle: angle, ringR, ringY};
+  G.bingo.add(tetherLine);
+  cardGroup.userData.tether = tetherLine;
+
+  const dotGeo = new THREE.SphereGeometry(0.06, 8, 8);
+  const dotMat = new THREE.MeshBasicMaterial({color: HEALTH_COLORS[bc.health], transparent: true, opacity: 0.7});
+  const anchorDot = new THREE.Mesh(dotGeo, dotMat);
+  anchorDot.position.set(anchorX, ringY, anchorZ);
+  G.bingo.add(anchorDot);
+  cardGroup.userData.anchorDot = anchorDot;
+
+  G.bingo.add(cardGroup);
+  bingoCardMeshes.push(cardGroup);
+});
+
+// ─── FUNNEL ───
+let funnelBaseY = Y[0] + 0.5;
+const FH = 3.5, FTR = 4.5, FBR = 0.4;
+
+const fMesh = new THREE.Mesh(
+  new THREE.CylinderGeometry(FBR, FTR, FH, 6, 1, true),
+  new THREE.MeshBasicMaterial({color:0xd4a574, transparent:true, opacity:0.1, side:THREE.DoubleSide, wireframe:true})
+);
+fMesh.position.y = funnelBaseY + FH/2;
+G.funnel.add(fMesh);
+
+const fSolid = new THREE.Mesh(
+  new THREE.CylinderGeometry(FBR, FTR, FH, 32, 1, true),
+  new THREE.MeshPhongMaterial({color:0xd4a574, transparent:true, opacity:0.04, side:THREE.DoubleSide})
+);
+fSolid.position.y = funnelBaseY + FH/2;
+G.funnel.add(fSolid);
+
+const fParts = [];
+for(let i=0;i<70;i++){
+  const p = new THREE.Mesh(new THREE.SphereGeometry(0.03+Math.random()*0.025, 6, 6),
+    new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setHSL(0.08+Math.random()*0.06, 0.8, 0.55),
+      transparent:true, opacity:0.4+Math.random()*0.3
+    }));
+  resetFP(p);
+  G.funnel.add(p);
+  fParts.push(p);
+}
+function resetFP(p){
+  const t = Math.random();
+  const a = Math.random()*Math.PI*2;
+  p.userData = {t, a, spd:0.08+Math.random()*0.12};
+}
+
+// ─── CLOUD BUTTERFLIES ───
+const bflies = [];
+for(let i=0;i<35;i++){
+  const bg = new THREE.Group();
+  const wc = new THREE.Color().setHSL(0.74+Math.random()*0.16, 0.55, 0.6);
+  const wm = new THREE.MeshBasicMaterial({color:wc, transparent:true, opacity:0.55, side:THREE.DoubleSide});
+  const lwg = new THREE.CircleGeometry(0.13, 5);
+  const lw = new THREE.Mesh(lwg, wm); lw.position.x = -0.08;
+  const rw = new THREE.Mesh(lwg.clone(), wm); rw.position.x = 0.08;
+  const bd = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.1, 4),
+    new THREE.MeshBasicMaterial({color:0xccccff}));
+  bd.rotation.z = Math.PI/2;
+  bg.add(lw, rw, bd);
+
+  const ang = Math.random()*Math.PI*2;
+  const dist = 5.5+Math.random()*4.5;
+  const by = Y[0]+2+Math.random()*4;
+  bg.position.set(Math.cos(ang)*dist, by, Math.sin(ang)*dist);
+  bg.userData = {ang, dist, by, ws:3+Math.random()*4, ds:0.08+Math.random()*0.18, wo:Math.random()*10, lw, rw};
+  G.butter.add(bg);
+  bflies.push(bg);
+}
+
+// ─── SWARMS (with embedded labels) ───
+const SD = [
+  {name:"Effn Duck",      state:"PARALLEL", mode:"EXECUTING",     n:45, color:0x00cccc, a:0},
+  {name:"Digger Cafe",    state:"TORUS",    mode:"INVESTIGATING", n:30, color:0xffcc00, a:Math.PI/3},
+  {name:"Seba Hub",       state:"PARALLEL", mode:"EXECUTING",     n:40, color:0x00ccaa, a:2*Math.PI/3},
+  {name:"CashCo",         state:"SWARM",    mode:"EXPLORING",     n:25, color:0xff8833, a:Math.PI},
+  {name:"Maven",          state:"PARALLEL", mode:"EXECUTING",     n:55, color:0xff4488, a:4*Math.PI/3},
+  {name:"Guardian Banker", state:"TORUS",   mode:"INVESTIGATING", n:20, color:0x44ddaa, a:5*Math.PI/3}
+];
+const SQC = [0x00cccc, 0xffd700, 0xff8833, 0xff4488, 0x44ddaa];
+const swClusters = [];
+
+SD.forEach((s,si) => {
+  const cl = new THREE.Group();
+  const oR = 5.2;
+  const spread = s.state==="SWARM"?1.1 : s.state==="TORUS"?0.65 : 0.45;
+  const count = Math.min(s.n, 28);
+  for(let a=0;a<count;a++){
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6),
+      new THREE.MeshBasicMaterial({color:SQC[a%5], transparent:true, opacity:0.65}));
+    dot.position.set((Math.random()-0.5)*spread*2, (Math.random()-0.5)*spread, (Math.random()-0.5)*spread*2);
+    dot.userData = {bp:dot.position.clone(), ws:0.4+Math.random(), wo:Math.random()*10, sqIdx:a%5};
+    cl.add(dot);
+  }
+
+  // EMBEDDED LABEL — attached to swarm cluster, moves with it
+  const swarmLabel = makeEmbeddedLabel(s.name.toUpperCase(), {
+    textColor: '#'+new THREE.Color(s.color).getHexString(),
+    borderColor: '#'+new THREE.Color(s.color).getHexString()+'66',
+    bgColor: 'rgba(10,10,20,0.7)',
+    scale: 0.25,
+    fontSize: 16
+  });
+  swarmLabel.position.set(0, spread + 0.3, 0);
+  cl.add(swarmLabel);
+
+  cl.position.set(Math.cos(s.a)*oR, Y[3]+(si-2.5)*0.7, Math.sin(s.a)*oR);
+  cl.userData = {...s, type:'swarm'};
+  const tp = [new THREE.Vector3(0,0,0), cl.position.clone().normalize().multiplyScalar(-1.5)];
+  cl.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(tp),
+    new THREE.LineBasicMaterial({color:s.color, transparent:true, opacity:0.12})));
+  G.swarms.add(cl);
+  swClusters.push(cl);
+});
+
+// ─── NEWS OVERLAY CARDS ───
+const NEWS_ITEMS = [
+  {title:'DAILY STANDUP', summary:'Team sync — all initiatives reporting', layer:6, color:0xffcc00},
+  {title:'MAVEN MILESTONE', summary:'Ruby Red persona validated with 50 users', layer:10, color:0xff4488},
+  {title:'CASHCO UPDATE', summary:'Revenue model draft v2 submitted for review', layer:8, color:0xff8833},
+  {title:'EFFN DUCK SPRINT', summary:'AI swarm prototype passing 12/15 tests', layer:6, color:0x00cccc},
+  {title:'QA ALERT', summary:'Regulatory review needed for Guardian Banker', layer:9, color:0xff6644},
+  {title:'LEARNING LOOP', summary:'V14 protocol crystallized — 9 phases locked', layer:6, color:0x00aa99}
+];
+const newsCardMeshes = [];
+
+NEWS_ITEMS.forEach((ni, i) => {
+  const cardGroup = new THREE.Group();
+  const cw = 0.6, ch = 0.45;
+
+  const cardMat = new THREE.MeshBasicMaterial({color: 0x1a1a0a, transparent: true, opacity: 0.9, side: THREE.DoubleSide});
+  cardGroup.add(new THREE.Mesh(new THREE.PlaneGeometry(cw, ch), cardMat));
+
+  const borderMat = new THREE.LineBasicMaterial({color: 0xffcc00, transparent: true, opacity: 0.7});
+  cardGroup.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(cw, ch)), borderMat));
+
+  const titleLabel = makeEmbeddedLabel(ni.title, {
+    textColor: '#ffcc00', borderColor: 'none', bgColor: 'transparent', scale: 0.08, fontSize: 14
+  });
+  titleLabel.position.set(0, ch/2 - 0.06, 0.002);
+  cardGroup.add(titleLabel);
+
+  const summaryLabel = makeEmbeddedLabel(ni.summary.substring(0, 30), {
+    textColor: 'rgba(255,255,255,0.7)', borderColor: 'none', bgColor: 'transparent', scale: 0.05, fontSize: 10
+  });
+  summaryLabel.position.set(0, 0, 0.002);
+  cardGroup.add(summaryLabel);
+
+  for(let ln=0; ln<3; ln++){
+    const lineMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(cw*0.7, 0.008),
+      new THREE.MeshBasicMaterial({color:0x555544, transparent:true, opacity:0.4, side:THREE.DoubleSide})
+    );
+    lineMesh.position.set(0, -0.04 - ln*0.03, 0.001);
+    cardGroup.add(lineMesh);
+  }
+
+  const angle = (i / NEWS_ITEMS.length) * Math.PI * 2 + 0.5;
+  const orbitR = RADII[ni.layer] + 1.8;
+  const cardY = Y[ni.layer];
+  cardGroup.position.set(Math.cos(angle)*orbitR, cardY, Math.sin(angle)*orbitR);
+  cardGroup.userData = {...ni, type:'news', angle, orbitR, baseY:cardY, idx:i};
+  G.news.add(cardGroup);
+  newsCardMeshes.push(cardGroup);
+});
+
+// ─── KPI OVERLAY CARDS ───
+const KPI_ITEMS = [
+  {title:'REVENUE', value:'$12.4K', target:'$25K', pct:49, initiative:'CashCo', color:0xff8833},
+  {title:'USERS', value:'847', target:'2000', pct:42, initiative:'Maven', color:0xff4488},
+  {title:'NPS SCORE', value:'72', target:'80', pct:90, initiative:'Seba Hub', color:0x00ccaa},
+  {title:'BURN RATE', value:'$8.2K/mo', target:'$6K/mo', pct:73, initiative:'All', color:0xffdd44},
+  {title:'SPRINT VEL', value:'34pts', target:'40pts', pct:85, initiative:'Effn Duck', color:0x00cccc},
+  {title:'COMPLIANCE', value:'88%', target:'95%', pct:93, initiative:'Guardian Banker', color:0x44ddaa}
+];
+const kpiCardMeshes = [];
+
+KPI_ITEMS.forEach((kpi, i) => {
+  const cardGroup = new THREE.Group();
+  const cw = 0.55, ch = 0.4;
+
+  const cardMat = new THREE.MeshBasicMaterial({color: 0x0a1a0a, transparent: true, opacity: 0.9, side: THREE.DoubleSide});
+  cardGroup.add(new THREE.Mesh(new THREE.PlaneGeometry(cw, ch), cardMat));
+
+  const borderMat = new THREE.LineBasicMaterial({color: 0x44ddaa, transparent: true, opacity: 0.7});
+  cardGroup.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(cw, ch)), borderMat));
+
+  const titleLabel = makeEmbeddedLabel(kpi.title, {
+    textColor: '#44ddaa', borderColor: 'none', bgColor: 'transparent', scale: 0.06, fontSize: 12
+  });
+  titleLabel.position.set(0, ch/2 - 0.05, 0.002);
+  cardGroup.add(titleLabel);
+
+  const valueLabel = makeEmbeddedLabel(kpi.value, {
+    textColor: '#ffffff', borderColor: 'none', bgColor: 'transparent', scale: 0.1, fontSize: 18
+  });
+  valueLabel.position.set(0, 0.02, 0.002);
+  cardGroup.add(valueLabel);
+
+  const targetLabel = makeEmbeddedLabel(`TARGET: ${kpi.target}`, {
+    textColor: 'rgba(255,255,255,0.4)', borderColor: 'none', bgColor: 'transparent', scale: 0.04, fontSize: 10
+  });
+  targetLabel.position.set(0, -0.08, 0.002);
+  cardGroup.add(targetLabel);
+
+  const barBg = new THREE.Mesh(
+    new THREE.PlaneGeometry(cw*0.7, 0.02),
+    new THREE.MeshBasicMaterial({color:0x222244, transparent:true, opacity:0.5, side:THREE.DoubleSide})
+  );
+  barBg.position.set(0, -ch/2+0.04, 0.001);
+  cardGroup.add(barBg);
+
+  const barFill = new THREE.Mesh(
+    new THREE.PlaneGeometry(cw*0.7*(kpi.pct/100), 0.02),
+    new THREE.MeshBasicMaterial({color:kpi.color, transparent:true, opacity:0.8, side:THREE.DoubleSide})
+  );
+  barFill.position.set(-(cw*0.7*(1-kpi.pct/100))/2, -ch/2+0.04, 0.002);
+  cardGroup.add(barFill);
+
+  const angle = (i / KPI_ITEMS.length) * Math.PI * 2 + 1.0;
+  const orbitR = RADII[8] + 2.2;
+  const cardY = Y[8] + (i%2===0 ? 0.2 : -0.2);
+  cardGroup.position.set(Math.cos(angle)*orbitR, cardY, Math.sin(angle)*orbitR);
+  cardGroup.userData = {...kpi, type:'kpi', angle, orbitR, baseY:cardY, idx:i};
+  G.kpi.add(cardGroup);
+  kpiCardMeshes.push(cardGroup);
+});
+
+// ─── LEFT PANEL: LAYER TOGGLES ───
+const lp = document.getElementById('layer-panel');
+let isolatedLayer = -1;
+L.forEach((l,i) => {
+  const d = document.createElement('div');
+  d.className = 'layer-toggle';
+  const tierTag = l.tier==='PRIME'?' [P]':l.tier==='LOCAL'?' [L]':' [=]';
+  d.innerHTML = `<span class="layer-dot" style="background:#${new THREE.Color(l.color).getHexString()}"></span><span class="layer-label">${l.name}${tierTag}</span>`;
+  d.onclick = () => { layerMeshes[i].visible = !layerMeshes[i].visible; d.classList.toggle('off', !layerMeshes[i].visible); };
+  d.ondblclick = (e) => {
+    e.stopPropagation();
+    if(isolatedLayer === i){
+      layerMeshes.forEach((m,j) => { m.visible = true; lp.children[j].classList.remove('off'); });
+      isolatedLayer = -1;
+    } else {
+      layerMeshes.forEach((m,j) => {
+        m.visible = (j === i);
+        lp.children[j].classList.toggle('off', j !== i);
+      });
+      isolatedLayer = i;
+      animateCamera(
+        new THREE.Vector3(0, Y[i], RADII[i] + 5),
+        new THREE.Vector3(0, Y[i], 0),
+        600
+      );
+    }
+  };
+  lp.appendChild(d);
+});
+
+// ─── INSPECT MODE ───
+let inspectMode = false;
+let inspectedObject = null;
+let savedCamPos = null;
+let savedCamTarget = null;
+
+function enterInspect(obj, type){
+  inspectMode = true;
+  inspectedObject = obj;
+  savedCamPos = cam.position.clone();
+  savedCamTarget = orb.target.clone();
+
+  const objPos = new THREE.Vector3();
+  obj.getWorldPosition(objPos);
+  const dir = objPos.clone().sub(cam.position).normalize();
+  const dist = type === 'bingo' ? 3 : type === 'news' || type === 'kpi' ? 3.5 : 5;
+  const newCamPos = objPos.clone().sub(dir.multiplyScalar(dist));
+  animateCamera(newCamPos, objPos, 600);
+
+  const overlay = document.getElementById('inspect-overlay');
+  const nameEl = document.getElementById('inspect-name');
+  const editBtn = document.getElementById('inspect-edit-btn');
+  const butterflyBtn = document.getElementById('inspect-butterfly-btn');
+  const newsBtn = document.getElementById('inspect-news-btn');
+
+  editBtn.style.display = 'none';
+  butterflyBtn.style.display = 'none';
+  newsBtn.style.display = 'none';
+
+  if(type === 'bingo'){
+    nameEl.textContent = 'INSPECTING: ' + obj.userData.name.toUpperCase();
+    editBtn.style.display = 'block';
+    butterflyBtn.style.display = 'block';
+    newsBtn.style.display = 'block';
+  } else if(type === 'layer'){
+    nameEl.textContent = 'INSPECTING: ' + L[obj.userData.idx].name.toUpperCase();
+    butterflyBtn.style.display = 'block';
+  } else if(type === 'swarm'){
+    nameEl.textContent = 'INSPECTING: SWARM ' + obj.userData.name.toUpperCase();
+    butterflyBtn.style.display = 'block';
+  } else if(type === 'news'){
+    nameEl.textContent = 'NEWS: ' + obj.userData.title;
+  } else if(type === 'kpi'){
+    nameEl.textContent = 'KPI: ' + obj.userData.title + ' — ' + obj.userData.value;
+  }
+  overlay.style.display = 'block';
+}
+
+function animateCamera(targetPos, targetLook, duration){
+  const startPos = cam.position.clone();
+  const startTarget = orb.target.clone();
+  const startTime = performance.now();
+  function step(now){
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed / duration, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    cam.position.lerpVectors(startPos, targetPos, ease);
+    orb.target.lerpVectors(startTarget, targetLook, ease);
+    if(t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function exitInspect(){
+  if(!inspectMode) return;
+  inspectMode = false;
+  inspectedObject = null;
+  document.getElementById('inspect-overlay').style.display = 'none';
+  if(savedCamPos && savedCamTarget){
+    animateCamera(savedCamPos, savedCamTarget, 500);
+  }
+}
+
+function inspectView(){
+  if(!inspectedObject) return;
+  const d = inspectedObject.userData;
+  if(d.type === 'bingo') openBingoPanel(d);
+  else if(d.type === 'layer') showInfo(d.idx);
+  else if(d.type === 'swarm') showSwarm(d);
+  else if(d.type === 'news') showNewsDetail(d);
+  else if(d.type === 'kpi') showKpiDetail(d);
+}
+
+function inspectEdit(){
+  if(!inspectedObject) return;
+  const d = inspectedObject.userData;
+  if(d.type === 'bingo'){
+    openBingoPanel(d);
+  }
+}
+
+// ─── BINGO CARD DETAIL PANEL SYSTEM ───
+let bingoPanelOpen = false;
+let bingoPanelData = null;
+let bingoPanelSquares = [];
+let selectedSquareIdx = null;
+
+// Map initiative names to cardIds used in the database
+const INITIATIVE_TO_CARD_ID = {
+  'effn-duck': 'effn-duck',
+  'digger-cafe': 'digger-cafe',
+  'seba-hub': 'seba-hub',
+  'cashco': 'cashco',
+  'maven': 'maven',
+  'guardian-banker': 'guardian-banker'
+};
+
+function openBingoPanel(d){
+  bingoPanelOpen = true;
+  bingoPanelData = d;
+  selectedSquareIdx = null;
+  
+  const panel = document.getElementById('bingo-detail-panel');
+  const titleColor = '#' + new THREE.Color(d.color).getHexString();
+  
+  document.getElementById('bp-title').textContent = d.name.toUpperCase();
+  document.getElementById('bp-title').style.color = titleColor;
+  document.getElementById('bp-level').textContent = d.level.toUpperCase() + ' DIRECTIVE';
+  document.getElementById('bp-owner').textContent = d.warrant || '--';
+  document.getElementById('bp-ai').textContent = 'Pearl (AI Partner)';
+  document.getElementById('bp-initiative').textContent = d.initiative || '--';
+  
+  const healthLabel = d.health === 'green' ? 'ON TRACK' : d.health === 'amber' ? 'NEEDS ATTENTION' : 'AT RISK';
+  const healthColor = d.health === 'green' ? '#22cc44' : d.health === 'amber' ? '#ffaa00' : '#ff4444';
+  document.getElementById('bp-health').textContent = healthLabel;
+  document.getElementById('bp-health').style.color = healthColor;
+  
+  document.getElementById('bp-bar').style.width = d.pct + '%';
+  document.getElementById('bp-bar').style.background = healthColor;
+  document.getElementById('bp-pct').textContent = d.pct + '%';
+  document.getElementById('bp-pct').style.color = healthColor;
+  
+  // Clear grid and show loading
+  document.getElementById('bp-grid').innerHTML = '';
+  document.getElementById('bp-loading').style.display = 'block';
+  document.getElementById('bp-empty').style.display = 'none';
+  document.getElementById('bingo-square-detail').style.display = 'none';
+  
+  panel.classList.add('open');
+  
+  // Fetch real data from API
+  fetchBingoCardData(d.initiative);
+}
+
+async function fetchBingoCardData(initiative){
+  const cardId = INITIATIVE_TO_CARD_ID[initiative] || initiative;
+  try {
+    // Use tRPC batch format to call bingo.getCard
+    const resp = await fetch(`/api/trpc/bingo.getCard?batch=1&input=${encodeURIComponent(JSON.stringify({"0":{"json":{"cardId":cardId}}}))}`)
+    const json = await resp.json();
+    const result = json[0]?.result?.data;
+    
+    if(result && result.json){
+      const cardData = result.json;
+      bingoPanelSquares = cardData.squares || [];
+      
+      // Update panel with real data
+      if(cardData.card){
+        document.getElementById('bp-owner').textContent = cardData.card.ownerName || bingoPanelData.warrant;
+        document.getElementById('bp-ai').textContent = cardData.card.aiPartner || 'Pearl';
+        if(cardData.card.description){
+          document.getElementById('bp-level').textContent = 
+            (bingoPanelData.level.toUpperCase()) + ' \u2014 ' + cardData.card.description.substring(0,60);
+        }
+      }
+      
+      renderBingoGrid();
+    } else {
+      // No data from DB — render placeholder grid
+      renderPlaceholderGrid();
+    }
+  } catch(e){
+    console.log('Bingo API not available, using placeholder grid', e);
+    renderPlaceholderGrid();
+  }
+}
+
+function renderBingoGrid(){
+  const grid = document.getElementById('bp-grid');
+  const loading = document.getElementById('bp-loading');
+  const empty = document.getElementById('bp-empty');
+  grid.innerHTML = '';
+  loading.style.display = 'none';
+  
+  if(bingoPanelSquares.length === 0){
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  
+  // Build 25-slot grid (fill missing positions with empty)
+  const slots = new Array(25).fill(null);
+  bingoPanelSquares.forEach(sq => {
+    const pos = (sq.position || 1) - 1;
+    if(pos >= 0 && pos < 25) slots[pos] = sq;
+  });
+  
+  slots.forEach((sq, i) => {
+    const div = document.createElement('div');
+    div.className = 'bingo-square' + (sq ? ' ' + (sq.status || 'not_started') : '');
+    div.innerHTML = `
+      <span class="sq-num">${i+1}</span>
+      <span class="sq-title">${sq ? sq.title : ''}</span>
+      <span class="sq-check">\u2713</span>
+    `;
+    div.onclick = () => selectSquare(i, sq);
+    grid.appendChild(div);
+  });
+}
+
+function renderPlaceholderGrid(){
+  const grid = document.getElementById('bp-grid');
+  const loading = document.getElementById('bp-loading');
+  grid.innerHTML = '';
+  loading.style.display = 'none';
+  
+  // Generate placeholder based on the card's pct
+  const filledCount = Math.round((bingoPanelData.pct || 0) / 100 * 25);
+  const healthColor = bingoPanelData.health === 'green' ? '#22cc44' : bingoPanelData.health === 'amber' ? '#ffaa00' : '#ff4444';
+  
+  for(let i = 0; i < 25; i++){
+    const isFilled = i < filledCount;
+    const div = document.createElement('div');
+    div.className = 'bingo-square' + (isFilled ? ' complete' : '');
+    div.innerHTML = `
+      <span class="sq-num">${i+1}</span>
+      <span class="sq-title">${isFilled ? 'Task ' + (i+1) : ''}</span>
+      <span class="sq-check">\u2713</span>
+    `;
+    div.onclick = () => selectSquare(i, isFilled ? {position:i+1, title:'Task '+(i+1), status:'complete', description:'Placeholder — open full Bingo Cards page to define squares.'} : null);
+    grid.appendChild(div);
+  }
+}
+
+function selectSquare(idx, sq){
+  selectedSquareIdx = idx;
+  const detail = document.getElementById('bingo-square-detail');
+  
+  // Highlight selected square
+  document.querySelectorAll('.bingo-square').forEach((el, i) => {
+    el.style.outline = i === idx ? '2px solid #00ffcc' : 'none';
+  });
+  
+  if(!sq){
+    document.getElementById('bsd-title').textContent = `SQUARE ${idx+1} — EMPTY`;
+    document.getElementById('bsd-desc').textContent = 'This square has no task assigned yet. Open the full Bingo Cards page to define it.';
+    document.getElementById('bsd-actions').innerHTML = '';
+    document.getElementById('bsd-notes').value = '';
+    detail.style.display = 'block';
+    return;
+  }
+  
+  const titleColor = bingoPanelData ? '#' + new THREE.Color(bingoPanelData.color).getHexString() : '#00ffcc';
+  document.getElementById('bsd-title').textContent = `SQUARE ${idx+1}: ${sq.title.toUpperCase()}`;
+  document.getElementById('bsd-title').style.color = titleColor;
+  document.getElementById('bsd-desc').textContent = sq.description || 'No description provided.';
+  document.getElementById('bsd-notes').value = sq.notes || '';
+  
+  // Status action buttons
+  const statuses = ['not_started', 'in_progress', 'complete', 'blocked'];
+  const statusLabels = {'not_started':'NOT STARTED', 'in_progress':'IN PROGRESS', 'complete':'COMPLETE', 'blocked':'BLOCKED'};
+  const actions = document.getElementById('bsd-actions');
+  actions.innerHTML = '';
+  
+  statuses.forEach(s => {
+    const btn = document.createElement('div');
+    btn.className = 'sq-action-btn' + (sq.status === s ? ' active' : '');
+    btn.textContent = statusLabels[s];
+    btn.onclick = () => updateSquareStatus(sq, s, btn);
+    actions.appendChild(btn);
+  });
+  
+  detail.style.display = 'block';
+}
+
+async function updateSquareStatus(sq, newStatus, btn){
+  if(!sq.id){
+    alert('This is a placeholder square. Open the full Bingo Cards page to manage real squares.');
+    return;
+  }
+  
+  try {
+    const body = {"0":{"json":{"squareId":sq.id, "status":newStatus}}};
+    const resp = await fetch('/api/trpc/bingo.updateSquareStatus?batch=1', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body),
+      credentials: 'include'
+    });
+    const json = await resp.json();
+    if(json[0]?.result?.data?.json?.success){
+      sq.status = newStatus;
+      // Update button states
+      document.querySelectorAll('#bsd-actions .sq-action-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Update grid square visual
+      const gridSquares = document.querySelectorAll('.bingo-square');
+      const pos = (sq.position || 1) - 1;
+      if(gridSquares[pos]){
+        gridSquares[pos].className = 'bingo-square ' + newStatus;
+        if(pos === selectedSquareIdx) gridSquares[pos].style.outline = '2px solid #00ffcc';
+      }
+      // Recalculate completion percentage
+      const completed = bingoPanelSquares.filter(s => s.status === 'complete').length;
+      const total = bingoPanelSquares.length || 25;
+      const newPct = Math.round(completed / total * 100);
+      document.getElementById('bp-pct').textContent = newPct + '%';
+      document.getElementById('bp-bar').style.width = newPct + '%';
+    }
+  } catch(e){
+    console.error('Failed to update square status:', e);
+    alert('Failed to update. Please try again.');
+  }
+}
+
+// Save notes on blur
+document.getElementById('bsd-notes').addEventListener('blur', async function(){
+  if(selectedSquareIdx === null) return;
+  const sq = bingoPanelSquares.find(s => (s.position || 1) - 1 === selectedSquareIdx);
+  if(!sq || !sq.id) return;
+  
+  try {
+    const body = {"0":{"json":{"squareId":sq.id, "status":sq.status, "notes":this.value}}};
+    await fetch('/api/trpc/bingo.updateSquareStatus?batch=1', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body),
+      credentials: 'include'
+    });
+    sq.notes = this.value;
+  } catch(e){
+    console.error('Failed to save notes:', e);
+  }
+});
+
+function closeBingoPanel(){
+  bingoPanelOpen = false;
+  document.getElementById('bingo-detail-panel').classList.remove('open');
+  document.getElementById('bingo-square-detail').style.display = 'none';
+  selectedSquareIdx = null;
+  // Resume orbit by exiting inspect
+  if(inspectMode) exitInspect();
+}
+
+function openBingoFullPage(){
+  window.open(window.location.origin + '/bingo-cards', '_blank');
+}
+
+function openButterflyFromPanel(){
+  if(bingoPanelData){
+    butterflyContext = bingoPanelData.name || 'HB1000';
+    document.getElementById('butterfly-context').textContent = `FROM: ${butterflyContext.toUpperCase()}`;
+    document.getElementById('butterfly-textarea').value = '';
+    document.getElementById('butterfly-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('butterfly-textarea').focus(), 100);
+  }
+}
+
+// ─── PASSCODE SYSTEM ───
+function openPasscode(){
+  document.getElementById('passcode-modal').style.display = 'flex';
+  document.getElementById('passcode-input').value = '';
+  document.getElementById('passcode-error').style.display = 'none';
+  if(pendingEditTarget){
+    document.getElementById('passcode-prompt').textContent =
+      `Enter passcode to edit ${pendingEditTarget.name.toUpperCase()}`;
+  }
+  setTimeout(() => document.getElementById('passcode-input').focus(), 100);
+}
+
+function closePasscode(){
+  document.getElementById('passcode-modal').style.display = 'none';
+  pendingEditTarget = null;
+}
+
+function submitPasscode(){
+  const code = document.getElementById('passcode-input').value;
+  if(code === SUPER_PASSCODE){
+    currentAccessLevel = 'super';
+    closePasscode();
+    if(pendingEditTarget){
+      window.open(window.location.origin + '/bingo-cards', '_blank');
+      pendingEditTarget = null;
+    }
+  } else if(pendingEditTarget && code === pendingEditTarget.initiative){
+    currentAccessLevel = pendingEditTarget.initiative;
+    closePasscode();
+    window.open(window.location.origin + '/bingo-cards', '_blank');
+    pendingEditTarget = null;
+  } else {
+    document.getElementById('passcode-error').style.display = 'block';
+    document.getElementById('passcode-input').value = '';
+  }
+}
+
+document.getElementById('passcode-input').addEventListener('keydown', e => {
+  if(e.key === 'Enter') submitPasscode();
+  if(e.key === 'Escape') closePasscode();
+});
+
+// ─── CLOUD BUTTERFLY SUBMISSION ───
+let butterflyFormat = 'raw';
+let butterflyContext = '';
+
+function openButterflySubmit(){
+  const d = inspectedObject ? inspectedObject.userData : {};
+  butterflyContext = d.name || d.title || 'HB1000';
+  document.getElementById('butterfly-context').textContent = `FROM: ${butterflyContext.toUpperCase()}`;
+  document.getElementById('butterfly-textarea').value = '';
+  document.getElementById('butterfly-textarea').placeholder = butterflyFormat === 'raw'
+    ? 'Throw EVERYTHING here — ideas, thoughts, observations, questions. Raw brain dump. We sort it all.'
+    : 'Organized submission — Title, Category, Details, Action Items. Structure your thoughts.';
+  document.getElementById('butterfly-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('butterfly-textarea').focus(), 100);
+}
+
+function selectButterflyFormat(fmt){
+  butterflyFormat = fmt;
+  document.querySelectorAll('#butterfly-format-btns button').forEach(b => b.classList.remove('selected'));
+  event.target.classList.add('selected');
+  document.getElementById('butterfly-textarea').placeholder = fmt === 'raw'
+    ? 'Throw EVERYTHING here — ideas, thoughts, observations, questions. Raw brain dump. We sort it all.'
+    : 'Organized submission — Title, Category, Details, Action Items. Structure your thoughts.';
+}
+
+function closeButterflyModal(){
+  document.getElementById('butterfly-modal').style.display = 'none';
+}
+
+function submitButterfly(){
+  const content = document.getElementById('butterfly-textarea').value.trim();
+  if(!content){ alert('Please enter your cloud butterfly content'); return; }
+  const butterfly = {
+    content, format: butterflyFormat, context: butterflyContext,
+    timestamp: new Date().toISOString(), id: Date.now()
+  };
+  let stored = JSON.parse(localStorage.getItem('hb1000_butterflies') || '[]');
+  stored.push(butterfly);
+  localStorage.setItem('hb1000_butterflies', JSON.stringify(stored));
+  closeButterflyModal();
+  spawnNewButterfly();
+  alert(`Cloud Butterfly submitted! (${butterflyFormat.toUpperCase()} format)\nFrom: ${butterflyContext}\n\nView all butterflies in the Cloud Butterfly Gallery.`);
+}
+
+function spawnNewButterfly(){
+  const bg = new THREE.Group();
+  const wc = new THREE.Color().setHSL(0.8, 0.7, 0.7);
+  const wm = new THREE.MeshBasicMaterial({color:wc, transparent:true, opacity:0.7, side:THREE.DoubleSide});
+  const lwg = new THREE.CircleGeometry(0.15, 5);
+  const lw = new THREE.Mesh(lwg, wm); lw.position.x = -0.09;
+  const rw = new THREE.Mesh(lwg.clone(), wm); rw.position.x = 0.09;
+  const bd = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.12, 4),
+    new THREE.MeshBasicMaterial({color:0xffccff}));
+  bd.rotation.z = Math.PI/2;
+  bg.add(lw, rw, bd);
+  const ang = Math.random()*Math.PI*2;
+  const dist = 6+Math.random()*3;
+  const by = Y[3]+Math.random()*3;
+  bg.position.set(Math.cos(ang)*dist, by, Math.sin(ang)*dist);
+  bg.userData = {ang, dist, by, ws:4+Math.random()*3, ds:0.1+Math.random()*0.15, wo:Math.random()*10, lw, rw};
+  G.butter.add(bg);
+  bflies.push(bg);
+}
+
+function openNewsSubmit(){
+  butterflyContext = inspectedObject ? inspectedObject.userData.name || 'HB1000' : 'HB1000';
+  document.getElementById('butterfly-box').querySelector('h3').textContent = '\uD83D\uDCF0 SUBMIT NEWS STORY';
+  document.getElementById('butterfly-context').textContent = `FROM: ${butterflyContext.toUpperCase()}`;
+  document.getElementById('butterfly-textarea').placeholder = 'Submit a news story — meeting notes, updates, milestones, announcements.';
+  document.getElementById('butterfly-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('butterfly-textarea').focus(), 100);
+}
+
+// ─── RAYCASTER (touch + click) ───
+const rc = new THREE.Raycaster(), ms = new THREE.Vector2();
+let _tapStart = null, _tapStartPos = {x:0,y:0};
+// Mobile-friendly thresholds: fingers are less precise than mouse pointers
+const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+const TAP_MAX_MS = isMobile ? 500 : 350;
+const TAP_MAX_PX = isMobile ? 40 : 15;
+
+function doRaycast(cx, cy){
+  // On mobile, use proximity-based detection for bingo cards
+  // since finger taps are imprecise and cards are small targets
+  if(isMobile){
+    // Find the closest bingo card to the tap point using screen-space distance
+    let closestCard = null, closestDist = Infinity;
+    const tapThreshold = 80; // pixels - generous tap target
+    for(const bc of bingoCardMeshes){
+      if(!bc.visible) continue;
+      const wp = new THREE.Vector3();
+      bc.getWorldPosition(wp);
+      const proj = wp.clone().project(cam);
+      if(proj.z > 1) continue; // behind camera
+      const sx = (proj.x + 1) / 2 * innerWidth;
+      const sy = -(proj.y - 1) / 2 * innerHeight;
+      const d = Math.sqrt((cx-sx)*(cx-sx) + (cy-sy)*(cy-sy));
+      if(d < closestDist && d < tapThreshold){
+        closestDist = d;
+        closestCard = bc;
+      }
+    }
+    if(closestCard){
+      if(inspectMode) exitInspect();
+      enterInspect(closestCard, 'bingo');
+      return;
+    }
+  }
+
+  // Standard raycaster for desktop (precise mouse clicks)
+  ms.x = (cx/innerWidth)*2-1;
+  ms.y = -(cy/innerHeight)*2+1;
+  rc.setFromCamera(ms, cam);
+  for(const bc of bingoCardMeshes){
+    if(rc.intersectObjects(bc.children, true).length>0){
+      if(inspectMode) exitInspect();
+      enterInspect(bc, 'bingo');
+      return;
+    }
+  }
+
+  if(G.news.visible){
+    for(const nc of newsCardMeshes){
+      if(rc.intersectObjects(nc.children, true).length>0){
+        if(inspectMode) exitInspect();
+        enterInspect(nc, 'news');
+        return;
+      }
+    }
+  }
+
+  if(G.kpi.visible){
+    for(const kc of kpiCardMeshes){
+      if(rc.intersectObjects(kc.children, true).length>0){
+        if(inspectMode) exitInspect();
+        enterInspect(kc, 'kpi');
+        return;
+      }
+    }
+  }
+
+  const lh = rc.intersectObjects(layerMeshes);
+  if(lh.length>0){
+    if(inspectMode) exitInspect();
+    enterInspect(lh[0].object, 'layer');
+    return;
+  }
+
+  for(const cl of swClusters){
+    if(rc.intersectObjects(cl.children, true).length>0){
+      if(inspectMode) exitInspect();
+      enterInspect(cl, 'swarm');
+      return;
+    }
+  }
+
+  if(inspectMode) exitInspect();
+}
+
+// Unified pointer tap detection (works on both desktop and mobile)
+// Uses pointerdown/pointerup which fire on all devices
+ren.domElement.addEventListener('pointerdown', e => {
+  _tapStart = Date.now();
+  _tapStartPos = {x: e.clientX, y: e.clientY};
+}, {passive: true});
+
+ren.domElement.addEventListener('pointerup', e => {
+  if(_tapStart === null) return;
+  const dt = Date.now() - _tapStart;
+  const dx = e.clientX - _tapStartPos.x;
+  const dy = e.clientY - _tapStartPos.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  _tapStart = null;
+  // Only treat as a tap if short duration and minimal movement
+  if(dt < TAP_MAX_MS && dist < TAP_MAX_PX){
+    doRaycast(e.clientX, e.clientY);
+  }
+}, {passive: true});
+
+// Mobile-specific: also listen for touchend as a fallback
+// Some mobile browsers don't fire pointerup reliably after OrbitControls
+if(isMobile){
+  let _touchStart = null, _touchStartPos = {x:0, y:0};
+  ren.domElement.addEventListener('touchstart', e => {
+    if(e.touches.length === 1){
+      _touchStart = Date.now();
+      _touchStartPos = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+    } else {
+      _touchStart = null;
+    }
+  }, {passive: true});
+  ren.domElement.addEventListener('touchend', e => {
+    if(_touchStart === null) return;
+    const dt = Date.now() - _touchStart;
+    const ct = e.changedTouches[0];
+    const dx = ct.clientX - _touchStartPos.x;
+    const dy = ct.clientY - _touchStartPos.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    _touchStart = null;
+    if(dt < TAP_MAX_MS && dist < TAP_MAX_PX){
+      // Delay slightly to let OrbitControls finish processing
+      setTimeout(() => doRaycast(ct.clientX, ct.clientY), 50);
+    }
+  }, {passive: true});
+}
+
+let hintShown = true;
+ren.domElement.addEventListener('pointerdown', () => {
+  if(hintShown){ document.getElementById('hint').style.opacity='0'; hintShown=false; }
+});
+
+// ─── INFO PANELS ───
+function showInfo(i){
+  const l = L[i];
+  document.getElementById('info-title').textContent = `LAYER ${i+1}: ${l.name.toUpperCase()}`;
+  document.getElementById('info-title').style.color = '#'+new THREE.Color(l.color).getHexString();
+  const tierLabel = l.tier==='PRIME'?'PRIME IMPERATIVE (Upper Diamond)':l.tier==='LOCAL'?'LOCAL IMPERATIVE (Lower Diamond)':'PIVOT POINT';
+  let desc = `[${l.gov}] [${tierLabel}]\n${l.desc}`;
+  if(l.keeper) desc += `\n\nSOURCE OF TRUTH KEEPER: ${l.keeper}`;
+  if(i === 3) desc += `\n\n→ VIEW FULL CONSTITUTION: /constitution`;
+  document.getElementById('info-desc').textContent = desc;
+  document.getElementById('info-panel').style.display = 'block';
+}
+function showSwarm(d){
+  document.getElementById('info-title').textContent = `SWARM: ${d.name.toUpperCase()}`;
+  document.getElementById('info-title').style.color = '#'+new THREE.Color(d.color).getHexString();
+  const modeDesc = d.mode==='EXPLORING'?'EXPLORING (Unified — all agents identical, scanning as one)':d.mode==='INVESTIGATING'?'INVESTIGATING (Transitional — core unified, 1-2 specialist scouts deployed)':'EXECUTING (Specialized — all 5 squadrons active with distinct roles)';
+  document.getElementById('info-desc').textContent = `Emergent State: ${d.state} | Mode: ${modeDesc} | Agents: ${d.n}\nSquadrons: Scouts (cyan) · Analysts (gold) · Builders (orange) · Guardians (pink) · Connectors (mint)\n\nSwarms on Everything: Any initiative, bingo card, project, idea, concept, or strategy can be swarmed.`;
+  document.getElementById('info-panel').style.display = 'block';
+}
+function showBingoCard(d){
+  document.getElementById('info-title').textContent = `BINGO CARD: ${d.name.toUpperCase()}`;
+  document.getElementById('info-title').style.color = '#'+new THREE.Color(d.color).getHexString();
+  const healthLabel = d.health==='green'?'ON TRACK':d.health==='amber'?'NEEDS ATTENTION':'AT RISK';
+  document.getElementById('info-desc').textContent = `Level: ${d.level.toUpperCase()} DIRECTIVE | Health: ${healthLabel} | Completion: ${d.pct}%\nWarrant: ${d.warrant} | Initiative: ${d.initiative}\n\n5x5 Bingo Grid — Each square is an accountable task.\nOne human owner + one AI partner per card.`;
+  document.getElementById('info-panel').style.display = 'block';
+}
+function showNewsDetail(d){
+  document.getElementById('info-title').textContent = `NEWS: ${d.title}`;
+  document.getElementById('info-title').style.color = '#ffcc00';
+  document.getElementById('info-desc').textContent = `${d.summary}\n\nRelated Layer: ${L[d.layer].name}\nSource: HB1000 News Channel`;
+  document.getElementById('info-panel').style.display = 'block';
+}
+function showKpiDetail(d){
+  document.getElementById('info-title').textContent = `KPI: ${d.title}`;
+  document.getElementById('info-title').style.color = '#44ddaa';
+  document.getElementById('info-desc').textContent = `Current: ${d.value} | Target: ${d.target} | Progress: ${d.pct}%\nInitiative: ${d.initiative}\n\nFed from Source of Truth ring in real-time.`;
+  document.getElementById('info-panel').style.display = 'block';
+}
+function showToolsetInfo(){
+  document.getElementById('info-title').textContent = 'TOOLSETS — COMING SOON';
+  document.getElementById('info-title').style.color = '#d4a574';
+  document.getElementById('info-desc').textContent = 'Toolsets will be movable tool palettes attachable to any ring.';
+  document.getElementById('info-panel').style.display = 'block';
+}
+function closeInfo(){ document.getElementById('info-panel').style.display='none'; }
+
+// ─── TOGGLES ───
+const state = {funnel:true, butterflies:true, swarms:true, brain:true, joy:true, bingo:true, marketing:true, spin:false};
+const overlayState = {news:false, kpi:false};
+let swarmOnlyMode = false;
+let currentSwarmMode = 0;
+const SWARM_MODES = ['EXPLORING','INVESTIGATING','EXECUTING'];
+const SWARM_MODE_LABELS = ['EXPLORING — UNIFIED SWARM','INVESTIGATING — TRANSITIONAL','EXECUTING — SPECIALIZED'];
+const SWARM_MODE_CLASSES = ['mode-chorus','mode-hybrid','mode-squadron'];
+const groupMap = {funnel:G.funnel, butterflies:G.butter, swarms:G.swarms, brain:G.brain, joy:G.joy, bingo:G.bingo, marketing:G.marketing};
+
+function toggle(key){
+  state[key] = !state[key];
+  const btn = document.getElementById('btn-'+key);
+  if(key==='spin'){
+    btn.textContent = state[key] ? 'AUTO-SPIN: ON' : 'AUTO-SPIN: OFF';
+    btn.classList.toggle('active', state[key]);
+    return;
+  }
+  if(groupMap[key]) groupMap[key].visible = state[key];
+  const labels = {funnel:'FUNNEL', butterflies:'BUTTERFLIES', swarms:'SWARMS', brain:'BRAIN', joy:'JOY ATMOS', bingo:'BINGO CARDS', marketing:'MARKETING FLOW'};
+  const prefix = key==='funnel'?'\u2601 ':key==='marketing'?'\uD83D\uDD25 ':'';
+  btn.textContent = prefix + (labels[key]||key.toUpperCase()) + ': ' + (state[key]?'ON':'OFF');
+  btn.classList.toggle('active', state[key]);
+  btn.classList.toggle('off', !state[key]);
+  if(key==='funnel') document.getElementById('funnel-target').style.display = state[key]?'block':'none';
+}
+
+function toggleOverlay(key){
+  overlayState[key] = !overlayState[key];
+  const btn = document.getElementById('btn-'+key+'-overlay');
+  if(key==='news'){
+    G.news.visible = overlayState[key];
+    btn.textContent = 'NEWS: ' + (overlayState[key]?'ON':'OFF');
+  } else if(key==='kpi'){
+    G.kpi.visible = overlayState[key];
+    btn.textContent = 'KPIs: ' + (overlayState[key]?'ON':'OFF');
+  }
+  btn.classList.toggle('active', overlayState[key]);
+  btn.classList.toggle('off', !overlayState[key]);
+}
+
+let labelsVisible = true;
+function toggleLabels(){
+  labelsVisible = !labelsVisible;
+  const btn = document.getElementById('btn-labels');
+  btn.textContent = 'LABELS: ' + (labelsVisible?'ON':'OFF');
+  btn.classList.toggle('active', labelsVisible);
+  btn.classList.toggle('off', !labelsVisible);
+  // For baked ring textures, we toggle the texture map visibility
+  // by swapping between textured and plain materials
+  layerMeshes.forEach((m, i) => {
+    if(labelsVisible){
+      m.material.map = m.userData.bakedTex || m.material.map;
+    } else {
+      if(!m.userData.bakedTex) m.userData.bakedTex = m.material.map;
+      m.material.map = null;
+    }
+    m.material.needsUpdate = true;
+  });
+  // Toggle bingo card labels
+  bingoCardMeshes.forEach(bc => {
+    bc.children.forEach(ch => { if(ch.userData && ch.userData.isLabel) ch.visible = labelsVisible; });
+  });
+  // Toggle swarm labels
+  swClusters.forEach(cl => {
+    cl.children.forEach(ch => { if(ch.userData && ch.userData.isLabel) ch.visible = labelsVisible; });
+  });
+}
+
+function toggleSwarmOnly(){
+  swarmOnlyMode = !swarmOnlyMode;
+  const btn = document.getElementById('btn-swarm-only');
+  if(swarmOnlyMode){
+    G.diamond.visible = false; G.funnel.visible = false; G.butter.visible = false;
+    G.brain.visible = false; G.joy.visible = false; G.marketing.visible = false; G.swarms.visible = true;
+    btn.textContent = 'SWARM-ONLY: ON';
+    btn.classList.add('active');
+    document.getElementById('swarm-mode-panel').style.display = 'block';
+    cam.position.set(0, Y[3], 12);
+    orb.target.set(0, Y[3], 0);
+  } else {
+    G.diamond.visible = true; G.funnel.visible = state.funnel;
+    G.butter.visible = state.butterflies; G.brain.visible = state.brain;
+    G.marketing.visible = state.marketing;
+    G.joy.visible = state.joy; G.swarms.visible = state.swarms;
+    btn.textContent = 'SWARM-ONLY VIEW';
+    btn.classList.remove('active');
+    document.getElementById('swarm-mode-panel').style.display = 'none';
+    cam.position.set(0, 1, 16); orb.target.set(0, 0, 0);
+  }
+}
+
+function cycleSwarmMode(){
+  currentSwarmMode = (currentSwarmMode + 1) % 3;
+  const modeName = SWARM_MODES[currentSwarmMode];
+  const btn = document.getElementById('btn-swarm-mode');
+  btn.textContent = 'MODE: ' + modeName;
+  const ind = document.getElementById('mode-indicator');
+  ind.textContent = SWARM_MODE_LABELS[currentSwarmMode];
+  ind.className = 'mode-label ' + SWARM_MODE_CLASSES[currentSwarmMode];
+  swClusters.forEach(cl => {
+    cl.children.forEach(ch => {
+      if(!ch.userData.bp) return;
+      if(modeName === 'EXPLORING'){
+        ch.material.color.setHex(0x00cccc); ch.material.opacity = 0.65;
+      } else if(modeName === 'INVESTIGATING'){
+        const isScout = Math.random() < 0.15;
+        ch.material.color.setHex(isScout ? 0xff4488 : 0x00cccc);
+        ch.material.opacity = isScout ? 0.9 : 0.55;
+      } else {
+        ch.material.color.setHex(SQC[ch.userData.sqIdx || 0]);
+        ch.material.opacity = 0.65;
+      }
+    });
+  });
+}
+
+function moveFunnel(val){
+  const idx = val==='all' ? 0 : parseInt(val);
+  const targetY = val==='all' ? Y[0]+0.5 : Y[idx]+0.5;
+  fMesh.position.y = targetY + FH/2;
+  fSolid.position.y = targetY + FH/2;
+  funnelBaseY = targetY;
+}
+
+// ─── MOBILE PANEL TOGGLE ───
+function togglePanel(which){
+  if(which === 'layers'){
+    const lp = document.getElementById('layer-panel');
+    const btn = document.getElementById('toggle-layers');
+    lp.classList.toggle('collapsed');
+    btn.classList.toggle('active', !lp.classList.contains('collapsed'));
+    if(!lp.classList.contains('collapsed')){
+      document.getElementById('controls').classList.add('collapsed');
+      document.getElementById('toggle-controls').classList.remove('active');
+    }
+  } else {
+    const cp = document.getElementById('controls');
+    const btn = document.getElementById('toggle-controls');
+    cp.classList.toggle('collapsed');
+    btn.classList.toggle('active', !cp.classList.contains('collapsed'));
+    if(!cp.classList.contains('collapsed')){
+      document.getElementById('layer-panel').classList.add('collapsed');
+      document.getElementById('toggle-layers').classList.remove('active');
+    }
+  }
+}
+if(window.innerWidth >= 769){
+  document.getElementById('layer-panel').classList.remove('collapsed');
+  document.getElementById('controls').classList.remove('collapsed');
+}
+
+// Store baked textures for label toggle
+layerMeshes.forEach(m => { m.userData.bakedTex = m.material.map; });
+
+// ═══════════════════════════════════════════════════
+// HEMISPHERE SYSTEM — Dark Side (Left) / Light Side (Right)
+// Matches the 2D diamond's light/dark hemisphere split
+// Dark = AI/Agent zone (purple/blue), Light = HB1000 Working (gold)
+// ═══════════════════════════════════════════════════
+
+const hemisphereGroup = new THREE.Group();
+scene.add(hemisphereGroup);
+
+// Dark hemisphere plane (left side — purple/blue)
+const hemiDarkGeo = new THREE.PlaneGeometry(30, 30);
+const hemiDarkMat = new THREE.MeshBasicMaterial({
+  color: 0x1a0a30,
+  transparent: true,
+  opacity: 0.12,
+  side: THREE.DoubleSide,
+  depthWrite: false
+});
+const hemiDarkPlane = new THREE.Mesh(hemiDarkGeo, hemiDarkMat);
+hemiDarkPlane.position.set(-7.5, 0, 0);
+hemiDarkPlane.rotation.y = Math.PI / 2;
+hemisphereGroup.add(hemiDarkPlane);
+
+// Light hemisphere plane (right side — warm gold)
+const hemiLightGeo = new THREE.PlaneGeometry(30, 30);
+const hemiLightMat = new THREE.MeshBasicMaterial({
+  color: 0x2a1f0a,
+  transparent: true,
+  opacity: 0.08,
+  side: THREE.DoubleSide,
+  depthWrite: false
+});
+const hemiLightPlane = new THREE.Mesh(hemiLightGeo, hemiLightMat);
+hemiLightPlane.position.set(7.5, 0, 0);
+hemiLightPlane.rotation.y = Math.PI / 2;
+hemisphereGroup.add(hemiLightPlane);
+
+// Terminator line (center divider) — vertical glowing line
+const terminatorPts = [
+  new THREE.Vector3(0, Y[0] + 1.5, 0),
+  new THREE.Vector3(0, Y[11] - 3, 0)
+];
+const terminatorGeo = new THREE.BufferGeometry().setFromPoints(terminatorPts);
+const terminatorMat = new THREE.LineBasicMaterial({
+  color: 0x8888aa,
+  transparent: true,
+  opacity: 0.15
+});
+const terminatorLine = new THREE.Line(terminatorGeo, terminatorMat);
+hemisphereGroup.add(terminatorLine);
+
+// Hemisphere-colored point lights
+const darkHemiLight = new THREE.PointLight(0x6644cc, 0.3, 12);
+darkHemiLight.position.set(-4, Y[3], 0);
+hemisphereGroup.add(darkHemiLight);
+
+const lightHemiLight = new THREE.PointLight(0xd4a853, 0.25, 12);
+lightHemiLight.position.set(4, Y[3], 0);
+hemisphereGroup.add(lightHemiLight);
+
+// Constellation stars orbiting through both hemispheres
+const hemiStars = [];
+const hemiStarGroup = new THREE.Group();
+hemisphereGroup.add(hemiStarGroup);
+
+for(let i = 0; i < 40; i++) {
+  const starGeo = new THREE.SphereGeometry(0.015 + Math.random() * 0.02, 4, 4);
+  const starMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.3 + Math.random() * 0.4
+  });
+  const star = new THREE.Mesh(starGeo, starMat);
+  const dist = 3 + Math.random() * 5;
+  const angle = Math.random() * Math.PI * 2;
+  const yPos = Y[11] - 2 + Math.random() * (Y[0] - Y[11] + 4);
+  star.position.set(Math.cos(angle) * dist, yPos, Math.sin(angle) * dist);
+  star.userData = {
+    dist: dist,
+    angle: angle,
+    yBase: yPos,
+    speed: 0.05 + Math.random() * 0.15,
+    flickerSpeed: 1 + Math.random() * 3,
+    flickerPhase: Math.random() * Math.PI * 2
+  };
+  hemiStarGroup.add(star);
+  hemiStars.push(star);
+}
+
+// Hemisphere labels as sprites
+function makeHemiLabel(text, color, x, y) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 256;
+  canvas.height = 64;
+  ctx.font = 'bold 16px Courier New';
+  ctx.fillStyle = '#' + new THREE.Color(color).getHexString();
+  ctx.globalAlpha = 0.5;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 128, 24);
+  ctx.font = '10px Courier New';
+  ctx.globalAlpha = 0.3;
+  ctx.fillText(text === 'THE AGENTS' ? 'Dark Side of the Moon' : 'The Light Side', 128, 44);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(3, 0.75, 1);
+  sprite.position.set(x, y, 0);
+  return sprite;
+}
+
+const darkLabel = makeHemiLabel('THE AGENTS', 0x8b7aff, -5, Y[3] + 3);
+const lightLabel = makeHemiLabel('HB1000 WORKING', 0xd4a853, 5, Y[3] + 3);
+hemisphereGroup.add(darkLabel);
+hemisphereGroup.add(lightLabel);
+
+let hemispheresVisible = true;
+
+function toggleHemispheres3D() {
+  hemispheresVisible = !hemispheresVisible;
+  const btn = document.getElementById('btn-hemispheres');
+  hemisphereGroup.visible = hemispheresVisible;
+  btn.textContent = '\u25D4 HEMISPHERES: ' + (hemispheresVisible ? 'ON' : 'OFF');
+  btn.classList.toggle('active', hemispheresVisible);
+  btn.classList.toggle('off', !hemispheresVisible);
+  if (hemispheresVisible) {
+    btn.style.background = 'rgba(139,122,255,0.12)';
+    btn.style.borderColor = '#8b7aff';
+    btn.style.color = '#8b7aff';
+  } else {
+    btn.style.background = 'transparent';
+    btn.style.borderColor = 'rgba(255,255,255,0.08)';
+    btn.style.color = 'rgba(255,255,255,0.25)';
+  }
+}
+
+// ─── ANIMATE ───
+const clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  if(state.spin) scene.rotation.y += 0.002;
+
+  // Brain pulse
+  innerGlow.material.opacity = 0.12 + Math.sin(t*2)*0.08;
+  scenePLight.intensity = 0.4 + Math.sin(t*2)*0.25;
+
+  // Funnel particles
+  fParts.forEach(p => {
+    p.userData.t += p.userData.spd*0.012;
+    if(p.userData.t>1) resetFP(p);
+    const tt = p.userData.t;
+    const r = FTR*(1-tt) + FBR*tt;
+    const fy = fMesh.position.y + FH/2 - tt*FH;
+    p.position.set(Math.cos(p.userData.a+t*0.25)*r*0.85, fy, Math.sin(p.userData.a+t*0.25)*r*0.85);
+  });
+
+  // JOY rising
+  joyParts.forEach(p => {
+    p.position.y += p.userData.spd*0.012;
+    p.position.x = p.userData.bx + Math.sin(t*0.4+p.userData.off)*0.25;
+    p.position.z = p.userData.bz + Math.cos(t*0.4+p.userData.off)*0.25;
+    if(p.position.y > Y[3]) p.position.y = Y[11]-1.5-Math.random()*3;
+  });
+
+  // Butterflies
+  bflies.forEach(b => {
+    const d = b.userData;
+    d.ang += d.ds*0.002;
+    b.position.x = Math.cos(d.ang)*d.dist;
+    b.position.z = Math.sin(d.ang)*d.dist;
+    b.position.y = d.by + Math.sin(t*0.4+d.wo)*0.4;
+    const flap = Math.sin(t*d.ws)*0.55;
+    d.lw.rotation.y = -flap;
+    d.rw.rotation.y = flap;
+    b.lookAt(0, b.position.y, 0);
+  });
+
+  // Swarm wobble
+  const modeKey = SWARM_MODES[currentSwarmMode];
+  swClusters.forEach(cl => {
+    cl.children.forEach(ch => {
+      if(ch.userData.bp){
+        const wobbleScale = modeKey==='EXPLORING'?0.06 : modeKey==='INVESTIGATING'?0.10 : 0.14;
+        const speedScale = modeKey==='EXPLORING'?1.5 : modeKey==='INVESTIGATING'?1.0 : 0.7;
+        ch.position.x = ch.userData.bp.x + Math.sin(t*ch.userData.ws*speedScale+ch.userData.wo)*wobbleScale;
+        ch.position.y = ch.userData.bp.y + Math.cos(t*ch.userData.ws*speedScale*0.7+ch.userData.wo)*wobbleScale*0.7;
+        ch.position.z = ch.userData.bp.z + Math.sin(t*ch.userData.ws*speedScale*0.5+ch.userData.wo+1)*wobbleScale;
+      }
+    });
+  });
+
+  // Bingo card orbit
+  bingoCardMeshes.forEach(bc => {
+    const d = bc.userData;
+    if(!inspectMode || inspectedObject !== bc) d.angle += 0.003;
+    bc.position.x = Math.cos(d.angle) * d.orbitR;
+    bc.position.z = Math.sin(d.angle) * d.orbitR;
+    bc.position.y = d.baseY + Math.sin(t * 0.5 + d.idx) * 0.15;
+    bc.lookAt(bc.position.x * 2, bc.position.y, bc.position.z * 2);
+
+    if(d.tether){
+      const ringR = d.tether.userData.ringR;
+      const ringY = d.tether.userData.ringY;
+      const anchorX = Math.cos(d.angle) * ringR;
+      const anchorZ = Math.sin(d.angle) * ringR;
+      const newPts = [
+        new THREE.Vector3(anchorX, ringY, anchorZ),
+        new THREE.Vector3(bc.position.x, bc.position.y, bc.position.z)
+      ];
+      d.tether.geometry.dispose();
+      d.tether.geometry = new THREE.BufferGeometry().setFromPoints(newPts);
+      d.tether.computeLineDistances();
+      if(d.anchorDot) d.anchorDot.position.set(anchorX, ringY, anchorZ);
+    }
+  });
+
+  // News card orbit
+  newsCardMeshes.forEach(nc => {
+    const d = nc.userData;
+    if(!inspectMode || inspectedObject !== nc) d.angle += 0.004;
+    nc.position.x = Math.cos(d.angle) * d.orbitR;
+    nc.position.z = Math.sin(d.angle) * d.orbitR;
+    nc.position.y = d.baseY + Math.sin(t * 0.3 + d.idx) * 0.1;
+    nc.lookAt(nc.position.x * 2, nc.position.y, nc.position.z * 2);
+  });
+
+  // KPI card orbit
+  kpiCardMeshes.forEach(kc => {
+    const d = kc.userData;
+    if(!inspectMode || inspectedObject !== kc) d.angle += 0.0035;
+    kc.position.x = Math.cos(d.angle) * d.orbitR;
+    kc.position.z = Math.sin(d.angle) * d.orbitR;
+    kc.position.y = d.baseY + Math.sin(t * 0.4 + d.idx) * 0.12;
+    kc.lookAt(kc.position.x * 2, kc.position.y, kc.position.z * 2);
+  });
+
+  // Layer breathing
+  layerMeshes.forEach((m,i) => { m.material.emissiveIntensity = 0.25+Math.sin(t*0.7+i*0.5)*0.08; });
+
+  // Brain neural rings pulse
+  neuralRings.forEach((ring, i) => {
+    ring.material.opacity = 0.08 + Math.sin(t*1.5 + i*2.1)*0.06;
+    ring.rotation.z += 0.003 * (i+1);
+  });
+  // Hemisphere constellation stars
+  if(hemispheresVisible) {
+    hemiStars.forEach(star => {
+      const d = star.userData;
+      d.angle += d.speed * 0.003;
+      star.position.x = Math.cos(d.angle) * d.dist;
+      star.position.z = Math.sin(d.angle) * d.dist;
+      star.position.y = d.yBase + Math.sin(t * 0.3 + d.flickerPhase) * 0.3;
+      // Color transitions: purple when on left, gold when on right
+      const xPos = star.position.x;
+      const blend = Math.max(0, Math.min(1, (xPos + 4) / 8)); // 0=left(dark), 1=right(light)
+      const darkCol = new THREE.Color(0x8b7aff);
+      const lightCol = new THREE.Color(0xd4a853);
+      star.material.color.copy(darkCol).lerp(lightCol, blend);
+      star.material.opacity = 0.2 + Math.sin(t * d.flickerSpeed + d.flickerPhase) * 0.25;
+    });
+    // Subtle hemisphere light pulse
+    darkHemiLight.intensity = 0.25 + Math.sin(t * 0.5) * 0.1;
+    lightHemiLight.intensity = 0.2 + Math.sin(t * 0.5 + Math.PI) * 0.08;
+  }
+
+  // Marketing particles flow
+  mktParticles.forEach(p => {
+    const d = p.userData;
+    d.t += d.speed;
+    if(d.t > 1) {
+      d.t = 0;
+      d.goingUp = !d.goingUp;
+      if(d.goingUp) { d.topY = Y[0]; d.botY = Y[2]; }
+      else { d.topY = Y[2]; d.botY = Y[11]; }
+    }
+    const py = d.topY + (d.botY - d.topY) * d.t;
+    const spiralR = d.dist + Math.sin(d.t * Math.PI * 3 + t) * 0.12;
+    p.position.set(
+      Math.cos(d.tubeAngle + d.t * 0.5 + t * 0.1) * spiralR,
+      py,
+      Math.sin(d.tubeAngle + d.t * 0.5 + t * 0.1) * spiralR
+    );
+    p.material.opacity = 0.4 + Math.sin(t * 3 + d.t * 10) * 0.3;
+  });
+  orb.update();
+  ren.render(scene, cam);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  cam.aspect = innerWidth/innerHeight;
+  cam.updateProjectionMatrix();
+  ren.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>Guest Book — The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* =====================================================================
+     THE GUEST BOOK — the suggestion box on the way out (Open House).
+     Not one of the 16 rooms; just a small table by the door with a pen.
+     Draft-only doctrine holds: the mailto opens THEIR mail client —
+     nothing auto-sends, ever. A local copy lands in hb1000-guestbook.
+     ===================================================================== */
+  main{max-width:880px}
+
+  .gb-head{margin-bottom:6px}
+  .gb-head h1{margin-bottom:6px}
+  .gb-lede{font-size:15px; color:var(--ink); line-height:1.65; max-width:680px}
+  .gb-lede b{color:var(--gold)}
+  .gb-window{
+    margin:12px 0 0; padding:9px 14px; display:inline-block;
+    border:1px solid rgba(54,194,180,.45); border-radius:999px;
+    background:rgba(54,194,180,.07); font-size:12.5px; color:var(--teal);
+  }
+  .gb-window b{color:var(--teal)}
+
+  .gb-lbl{
+    display:block; font-size:11px; font-weight:800; text-transform:uppercase;
+    letter-spacing:.1em; color:var(--soft); margin:18px 2px 6px;
+  }
+  .gb-lbl .opt{font-weight:600; letter-spacing:.02em; text-transform:none; color:var(--soft)}
+  input.gb, textarea.gb{
+    width:100%; box-sizing:border-box; padding:11px 14px; font:inherit;
+    font-size:16px; /* ≥16px — no iOS zoom-jump (site convention) */
+    color:var(--ink); background:var(--panel-2); border:1px solid var(--line);
+    border-radius:var(--radius); outline:none; line-height:1.55;
+  }
+  input.gb:focus, textarea.gb:focus{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset}
+  textarea.gb{min-height:130px; resize:vertical}
+
+  /* ---- the walk-summary panel (rendered from localStorage hb1000-openhouse) ---- */
+  .walksum{margin-top:22px}
+  .ws-row{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+  .ws-big{font-size:15px; color:var(--ink)}
+  .ws-big b{color:var(--gold); font-size:18px}
+  .ws-started{font-size:12.5px; color:var(--muted); margin-top:2px}
+  .ws-rooms{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 2px}
+  .ws-none{font-size:13px; color:var(--muted); font-style:italic; margin:6px 0 2px}
+  .ws-line{font-size:12px; color:var(--gold-glass); font-style:italic; margin:10px 0 0}
+  .ws-dealmein{font-size:11.5px; color:var(--soft); margin:6px 0 0}
+
+  /* ---- send row + status ---- */
+  .gb-actions{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:20px}
+  .gb-status{min-height:20px; font-size:13px; color:var(--green); font-weight:600; margin-top:10px}
+  .gb-status.quiet{color:var(--muted); font-weight:500}
+  @media (max-width:640px){
+    .gb-actions .btn{flex:1; text-align:center; padding:13px 18px} /* thumb-zone target */
+  }
+
+  /* ---- mailto fallback (revealed after Send; copy always available) ---- */
+  .fallback{margin-top:18px}
+  .fallback .fb-note{font-size:12.5px; color:var(--muted); margin:0 0 8px; line-height:1.55}
+  .fallback .fb-note b{color:var(--ink)}
+  .fallback textarea{
+    width:100%; box-sizing:border-box; min-height:220px; padding:12px 14px;
+    font-family:'JetBrains Mono',ui-monospace,Consolas,monospace; font-size:12.5px;
+    line-height:1.6; color:var(--ink); background:var(--panel-2);
+    border:1px dashed var(--line); border-radius:var(--radius); resize:vertical; outline:none;
+  }
+  .fallback textarea:focus{border-color:var(--gold)}
+
+  /* ---- the gentle DEAL ME IN nudge ---- */
+  .dealmein{margin-top:26px}
+  .dealmein p{font-size:13.5px; color:var(--ink); line-height:1.65}
+  .dealmein b{color:var(--gold)}
+</style>
+</head>
+<body>
+<main>
+
+  <div class="gb-head">
+    <h1>📖 The <b>Guest Book</b> — a note on your way out</h1>
+    <p class="gb-lede">Thanks for walking through. Leave a note — <b>what you saw, what
+      you’d add, what you’d ask</b>. Every note is read. Every field is optional;
+      this is an open house — walk through any room, touch nothing you don’t want
+      to, no participation required.</p>
+    <span class="gb-window">🏠 Open House through <b>Sunday June 14</b> · we go live
+      <b>Monday June 15</b> — Dingo cards begin</span>
+  </div>
+
+  <form id="gbForm" novalidate>
+
+    <label class="gb-lbl" for="gName">Your name <span class="opt">— so Tim knows whose note this is</span></label>
+    <input class="gb" id="gName" type="text" autocomplete="name" autocapitalize="words"
+           spellcheck="false" placeholder="Who walked through?">
+
+    <label class="gb-lbl" for="gStood">What stood out? <span class="opt">— optional</span></label>
+    <textarea class="gb" id="gStood"
+      placeholder="A room, a line, an idea — anything that stuck with you on the way through."></textarea>
+
+    <label class="gb-lbl" for="gAdd">What would you add or change? <span class="opt">— optional</span></label>
+    <textarea class="gb" id="gAdd"
+      placeholder="Missing rooms, rough edges, better words — the suggestion box is exactly for this."></textarea>
+
+    <label class="gb-lbl" for="gAsk">Questions for Tim &amp; Maria <span class="opt">— optional</span></label>
+    <textarea class="gb" id="gAsk"
+      placeholder="Ask anything — about the Dingo Card, PTK, the fleet, the Cloud Butterflies, or where this is all going."></textarea>
+
+    <!-- the walk summary rides along with the note — rendered visibly, never hidden -->
+    <div class="panel walksum" id="walkPanel" aria-label="Walk summary — included with your note">
+      <div class="ph">Walk summary — included with your note</div>
+      <div id="wsBody"><!-- rendered from localStorage hb1000-openhouse --></div>
+      <p class="ws-line">Your walk-through map is included with your note — that’s how
+        Tim learns which rooms need love.</p>
+      <p class="ws-dealmein" id="wsDealmein" hidden>Your DEAL ME IN status rides along too.</p>
+    </div>
+
+    <div class="gb-actions">
+      <button type="submit" class="btn gold-cta" id="sendBtn">✉️ Send my note</button>
+      <button type="button" class="btn" id="copyBtn" title="Copy the full note as plain text">📋 Copy this note</button>
+    </div>
+    <div class="gb-status" id="gbStatus" role="status" aria-live="polite"></div>
+
+    <div class="fallback" id="fallback" hidden>
+      <p class="fb-note">If your mail app didn’t open (some browsers block mailto links),
+        no harm done — <b>copy the note below</b> and email it to
+        <b>tim@businessasaforceforgood.ca</b> whenever suits you. A copy is already
+        saved in this browser.</p>
+      <textarea id="fbText" readonly aria-label="Your full note as plain text"></textarea>
+    </div>
+
+  </form>
+
+  <!-- the gentle nudge on the way out — zero pressure, door stays open -->
+  <div class="panel dealmein">
+    <div class="ph">On your way out — no pressure, truly</div>
+    <p>If the house felt like somewhere you’d want a seat — a <b>Dingo card</b> with
+      your name on it, a Dingo Caller’s chair, agents doing the heavy lifting —
+      reply <b>DEAL ME IN</b> to Maria’s newsletter, or just say it in your note
+      above. That’s the whole ritual. And if you’d rather keep wandering the rooms
+      until Sunday, that’s a fine answer too.</p>
+    <p class="footnote">Open House through Sunday June 14 · we go live Monday June 15 —
+      Dingo cards begin.</p>
+  </div>
+
+  <p class="footnote">The guest book is the suggestion box by the door — it doesn’t
+    count as one of the 16 rooms. Your note is composed in <i>your</i> mail app;
+    nothing auto-sends.</p>
+
+</main>
+
+<script src="assets/shell.js"></script>
+<script>
+'use strict';
+Shell.init('guestbook'); /* not one of the 16 rooms — no nav highlight, on purpose */
+
+(function () {
+  var GB_KEY = 'hb1000-guestbook';   /* local copies of notes left here */
+  var OH_KEY = 'hb1000-openhouse';   /* the walk-through map (written by the open-house tracker) */
+  var MN_KEY = 'hb1000-member-note'; /* DEAL ME IN status (written by login.html) */
+  var TO = 'tim@businessasaforceforgood.ca';
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Shell.esc;
+
+  /* ---- room dictionary, derived from the shell (16 rooms; guestbook excluded) ---- */
+  var ROOM_TOTAL = Shell.pages.length; /* computed, never asserted — 16 today */
+  var ID_BY_FILE = {}, LABEL_BY_ID = {};
+  Shell.pages.forEach(function (p) {
+    ID_BY_FILE[String(p.file).toLowerCase().replace(/[?#].*$/, '')] = p.id;
+    LABEL_BY_ID[p.id] = p.label;
+  });
+
+  /* normalize a room entry — accepts a page id ('ptk'), a file ('ptk.html'),
+     a path ('…/ptk.html?x=1'), or an object ({ id:'ptk', at:… });
+     'index' maps to 'model' */
+  function roomId(entry) {
+    if (entry && typeof entry === 'object') {
+      entry = entry.id || entry.room || entry.page || entry.file || '';
+    }
+    var s = String(entry == null ? '' : entry).toLowerCase().trim();
+    s = s.replace(/[?#].*$/, '').replace(/^.*[\\\/]/, '');
+    if (ID_BY_FILE[s]) return ID_BY_FILE[s];
+    s = s.replace(/\.html?$/, '');
+    if (s === 'index' || s === '') return s === 'index' ? 'model' : null;
+    return s;
+  }
+
+  /* ---- read the walk-through map, defensively (shape may evolve) ---- */
+  function openhouseLoad() {
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem(OH_KEY)); } catch (e) { /* fresh visit */ }
+    if (!raw || typeof raw !== 'object') raw = {};
+    var rooms = raw.rooms || raw.visited || raw.seen || [];
+    if (rooms && !(rooms instanceof Array) && typeof rooms === 'object') rooms = Object.keys(rooms);
+    if (!(rooms instanceof Array)) rooms = [];
+    var started = raw.started || raw.startedAt || raw.started_at || raw.startedDate ||
+                  raw.start || raw.first_visit || null;
+
+    var seen = {}, known = [], stray = [];
+    rooms.forEach(function (r) {
+      var id = roomId(r);
+      if (!id || seen[id]) return;
+      seen[id] = 1;
+      if (LABEL_BY_ID[id]) known.push(id); else stray.push(String(r));
+    });
+    /* count known rooms against the 16; if the tracker speaks a dialect we
+       don't recognize, count its unique entries rather than claiming zero */
+    var visited = known.length || Math.min(stray.length, ROOM_TOTAL);
+    return {
+      knownIds: known,
+      labels: known.map(function (id) { return LABEL_BY_ID[id]; }).concat(known.length ? [] : stray),
+      visited: visited,
+      total: ROOM_TOTAL,
+      pct: Math.round((visited / ROOM_TOTAL) * 100),
+      started: started
+    };
+  }
+
+  function fmtStarted(v) {
+    if (v == null || v === '') return null;
+    var t = (typeof v === 'number') ? v : Date.parse(v);
+    if (!t || isNaN(t)) return String(v); /* unparseable but present — show it raw */
+    return new Date(t).toLocaleDateString(undefined,
+      { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  function memberNote() {
+    try { return localStorage.getItem(MN_KEY) || null; } catch (e) { return null; }
+  }
+
+  /* ---- render the visible walk-summary panel ---- */
+  function renderWalk() {
+    var w = openhouseLoad();
+    var startedStr = fmtStarted(w.started);
+    var html = '';
+    if (w.visited > 0) {
+      html += '<div class="ws-row">' +
+        '<div class="scoreRing sm" style="--val:' + w.pct + '" role="img" aria-label="' +
+          w.pct + ' percent of the rooms visited"><span class="val">' + w.pct + '%</span></div>' +
+        '<div><div class="ws-big">You’ve walked <b>' + w.visited + ' of ' + w.total +
+          '</b> rooms</div>' +
+        (startedStr ? '<div class="ws-started">Walk started ' + esc(startedStr) + '</div>' : '') +
+        '</div></div>';
+      if (w.labels.length) {
+        html += '<div class="ws-rooms">' + w.labels.map(function (l) {
+          return Shell.pill(l, 'gold');
+        }).join('') + '</div>';
+      }
+    } else {
+      html += '<p class="ws-none">No rooms on your map yet — and that’s fine. The door ' +
+        'was open; that’s enough. Your note will simply say it was a quiet walk-through.</p>' +
+        (startedStr ? '<div class="ws-started">Walk started ' + esc(startedStr) + '</div>' : '');
+    }
+    $('wsBody').innerHTML = html;
+    $('wsDealmein').hidden = !memberNote();
+    return w;
+  }
+
+  /* ---- compose the plain-text note (mailto body + local copy + fallback) ---- */
+  function answer(id) { return $(id).value.trim(); }
+
+  function composeBody(name, w) {
+    var L = [];
+    L.push('OPEN HOUSE GUEST NOTE — The HB1000 Operating System');
+    L.push('From: ' + name);
+    L.push('Left at the door: ' + new Date().toLocaleString());
+    L.push('');
+    L.push('WHAT STOOD OUT?');
+    L.push(answer('gStood') || '(left blank — that’s fine)');
+    L.push('');
+    L.push('WHAT WOULD YOU ADD OR CHANGE?');
+    L.push(answer('gAdd') || '(left blank — that’s fine)');
+    L.push('');
+    L.push('QUESTIONS FOR TIM & MARIA');
+    L.push(answer('gAsk') || '(left blank — that’s fine)');
+    L.push('');
+    L.push('WALK SUMMARY — this guest’s walk-through map');
+    if (w.visited > 0) {
+      L.push('Rooms visited: ' + w.visited + ' of ' + w.total + ' (' + w.pct + '%)');
+      w.labels.forEach(function (l) { L.push('  · ' + l); });
+    } else {
+      L.push('Rooms visited: none recorded — a quiet walk-through.');
+    }
+    var startedStr = fmtStarted(w.started);
+    if (startedStr) L.push('Walk started: ' + startedStr);
+    L.push('(The guest book doesn’t count as a room.)');
+    var mn = memberNote();
+    if (mn) {
+      L.push('');
+      L.push('DEAL ME IN status: ' + mn);
+    }
+    L.push('');
+    L.push('— Sent from the guest’s own mail client. Nothing auto-sends; this note left');
+    L.push('  the building only because the guest pressed Send.');
+    return L.join('\n');
+  }
+
+  /* ---- save a local copy (hb1000-guestbook = array of notes) ---- */
+  function saveLocal(name, w, body) {
+    var arr = [];
+    try { arr = JSON.parse(localStorage.getItem(GB_KEY)) || []; } catch (e) { /* fresh book */ }
+    if (!(arr instanceof Array)) arr = [];
+    arr.push({
+      at: new Date().toISOString(),
+      name: name,
+      answers: {
+        stood_out: answer('gStood'),
+        add_change: answer('gAdd'),
+        questions: answer('gAsk')
+      },
+      walk: { visited: w.visited, total: w.total, pct: w.pct,
+              rooms: w.knownIds, started: w.started || null },
+      member_note: memberNote(),
+      body: body
+    });
+    try { localStorage.setItem(GB_KEY, JSON.stringify(arr)); return true; }
+    catch (e) { return false; } /* private mode — the mailto still opens */
+  }
+
+  function fullText(name, body) {
+    return 'To: ' + TO + '\nSubject: Open House guest note — ' + name + '\n\n' + body;
+  }
+
+  function setStatus(msg, quiet) {
+    var s = $('gbStatus');
+    s.textContent = msg;
+    s.className = 'gb-status' + (quiet ? ' quiet' : '');
+  }
+
+  /* ---- clipboard with old-engine fallback ---- */
+  function copyText(text, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); },
+        function () { done(copyLegacy(text)); });
+    } else {
+      done(copyLegacy(text));
+    }
+  }
+  function copyLegacy(text) {
+    var ta = $('fbText'), wasHidden = $('fallback').hidden;
+    $('fallback').hidden = false;
+    ta.value = text;
+    ta.focus(); ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { /* manual copy remains */ }
+    if (wasHidden && ok) $('fallback').hidden = true;
+    return ok;
+  }
+
+  /* ---- wire it up ---- */
+  /* prefill the name from the front-door session, if someone is signed in */
+  var ch = Shell.cardholder();
+  if (ch && ch.name && !$('gName').value) $('gName').value = ch.name;
+
+  $('gbForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var name = answer('gName') || 'a guest';
+    var w = renderWalk(); /* re-read the map at send time — freshest truth */
+    var body = composeBody(name, w);
+    var saved = saveLocal(name, w, body);
+
+    /* fallback is always offered — mailto blocking can't be detected reliably */
+    $('fbText').value = fullText(name, body);
+    $('fallback').hidden = false;
+
+    setStatus(saved
+      ? 'saved locally ✓ — and your mail app should be opening with the note addressed to Tim.'
+      : 'your mail app should be opening — couldn’t keep a local copy (private browsing, maybe).');
+
+    var url = 'mailto:' + TO +
+      '?subject=' + encodeURIComponent('Open House guest note — ' + name) +
+      '&body=' + encodeURIComponent(body.replace(/\r?\n/g, '\r\n'));
+    location.href = url; /* opens THEIR mail client — nothing auto-sends */
+  });
+
+  $('copyBtn').addEventListener('click', function () {
+    var name = answer('gName') || 'a guest';
+    var w = renderWalk();
+    var text = fullText(name, composeBody(name, w));
+    $('fbText').value = text;
+    copyText(text, function (ok) {
+      setStatus(ok
+        ? 'copied ✓ — paste it into any email to ' + TO + ' whenever suits you.'
+        : 'select the text below and copy it by hand — then email it to ' + TO + '.', !ok);
+      if (!ok) $('fallback').hidden = false;
+    });
+  });
+
+  /* live-refresh the map if the open-house tracker writes while we're open */
+  window.addEventListener('storage', function (ev) {
+    if (ev.key === OH_KEY || ev.key === MN_KEY) renderWalk();
+  });
+
+  renderWalk();
+})();
+</script>
+</body>
+</html>

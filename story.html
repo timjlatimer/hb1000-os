@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Story of This House · The HB1000 Operating System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ============ The Story Room — Open House edition ============
+   Plain words, warm light, zero pressure. Theme tokens only. */
+
+.hero{display:grid;grid-template-columns:1.45fr 1fr;gap:26px;align-items:center;margin:8px 0 18px}
+.hero img{border-radius:var(--radius-lg);border:1px solid var(--line);width:100%}
+.hero .kicker{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--gold);margin-bottom:8px}
+.hero h1{font-size:40px;margin-bottom:10px}
+.hero .sub{font-size:15.5px;color:var(--muted);max-width:560px;line-height:1.6}
+@media (max-width:900px){.hero{grid-template-columns:1fr}.hero h1{font-size:30px}}
+
+/* the open-house promise */
+.welcome{
+  background:rgba(232,181,77,.06);border:1px solid rgba(232,181,77,.4);
+  border-radius:var(--radius-lg);padding:18px 22px;margin:14px 0 6px;
+}
+.welcome p{font-size:15px;line-height:1.65;margin:.3em 0}
+.welcome b{color:var(--gold)}
+
+/* chapters */
+.chapter{margin:34px 0}
+.ch-kicker{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.18em;color:var(--gold);margin-bottom:5px}
+.chapter h2{font-size:24px;margin-bottom:10px}
+.ch-grid{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+.ch-grid figure{margin:0}
+.ch-grid figure img{width:100%;border-radius:var(--radius-lg);border:1px solid var(--line);display:block}
+.ch-grid figcaption{margin-top:6px}
+@media (max-width:900px){.ch-grid{grid-template-columns:1fr}}
+.chapter p{font-size:15px;line-height:1.7;color:var(--ink)}
+.chapter p.softer{color:var(--muted)}
+
+/* Tim's verbatim lines — gold-lit, never re-voiced */
+.tim-line{
+  font-size:19px;line-height:1.55;font-style:italic;color:var(--gold-glass);
+  background:var(--panel);border:1px solid rgba(232,181,77,.45);border-radius:var(--radius-lg);
+  padding:16px 22px;margin:16px 0;
+  box-shadow:0 0 26px rgba(232,181,77,.06), inset 0 0 32px rgba(232,181,77,.04);
+}
+.tim-line .attr{display:block;font-size:12px;font-style:normal;color:var(--soft);margin-top:7px}
+
+/* the genealogy chain — names changed, the dream never did */
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;font-weight:700;margin:14px 0}
+.chain .node{background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:5px 14px;color:var(--ink)}
+.chain .node.now{border-color:var(--gold);color:var(--gold)}
+.chain .arr{color:var(--soft)}
+.chain .lbl{flex-basis:100%;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--soft)}
+
+.section{margin:30px 0}
+
+/* words you'll hear in the halls */
+.gloss .lc-d{font-size:12.5px;line-height:1.55}
+.gloss .link-card:hover{transform:none;border-color:var(--line)}
+
+/* the week ahead */
+.days{margin:14px 0}
+.day{
+  display:flex;gap:16px;align-items:flex-start;padding:13px 16px;margin:8px 0;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);
+  border-left-width:3px;border-left-color:var(--soft);
+}
+.day.open-house{border-left-color:var(--teal)}
+.day.go-live{border-left-color:var(--gold)}
+.day.first-answer{border-left-color:var(--green)}
+.day .when{flex:0 0 150px;font-weight:800;font-size:13px;color:#fff;line-height:1.4}
+.day .when small{display:block;font-weight:600;color:var(--soft);font-size:11px}
+.day .what{font-size:13.5px;line-height:1.6;color:var(--ink)}
+.day .what b{color:var(--gold)}
+@media (max-width:640px){.day{flex-direction:column;gap:5px}.day .when{flex-basis:auto}}
+
+/* closing — the guest book by the door */
+.guestbook-cta{text-align:center;padding:26px 18px 8px}
+.guestbook-cta .big{font-size:17px;color:var(--ink);max-width:620px;margin:0 auto 16px;line-height:1.65}
+
+@media print{
+  #hb-sidebar,.guard-banner,#hb-nav-toggle,#hb-catch-btn,#hb-catch-sheet,#hb-catch-scrim{display:none!important}
+  body{padding-left:0;background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- ======================= HERO — The Story of This House ======================= -->
+  <header class="hero">
+    <div>
+      <div class="kicker">Open House · now through Sunday, June 14</div>
+      <h1>The Story of <b>This House</b></h1>
+      <p class="sub">You've been invited to walk through something Tim has been building for a
+        long time. This page tells you how it came to be — in plain words.
+        No homework. No test at the end. Just a story, and an open door.</p>
+      <div class="row" style="margin-top:14px">
+        <span class="pill gold">☕ Come as you are</span>
+        <span class="pill info">🚪 Every room is open</span>
+        <span class="pill good">🙂 No participation required</span>
+      </div>
+    </div>
+    <img src="assets/img/login-front-door.webp"
+         alt="The front door of the house at dawn — warm gold light in the windows, morning sky behind, the day the doors opened">
+  </header>
+
+  <!-- ======================= THE OPEN-HOUSE PROMISE ======================= -->
+  <section class="welcome" role="note">
+    <p><b>This is an open house.</b> Walk through any room, touch nothing you don't want to, no participation required.
+      Stay five minutes or stay an hour. Click anything that looks interesting — nothing breaks,
+      and nothing gets sent anywhere. The house is just glad you came.</p>
+  </section>
+
+  <!-- ======================= CHAPTER ONE ======================= -->
+  <section class="chapter panel">
+    <div class="ch-kicker">Chapter One</div>
+    <h2>Sixteen months of <b>catching ideas</b></h2>
+    <div class="ch-grid">
+      <div>
+        <p>Tim has been building something for sixteen months. Not in one notebook — in many.
+          He worked with one AI helper, then another, then another, and every time he started
+          fresh, the picture got a little clearer. There were more than thirty fresh starts.
+          Most people would call that failure. Hold that thought — it isn't.</p>
+        <p>All the while, ideas kept arriving. At the lake. In the truck. At three in the
+          morning. Tim saved them anywhere he could — emails to himself, screenshots,
+          notes typed half-asleep in the dark.</p>
+        <p class="tim-line">"Butterflies are like hearing light — name it before it's gone."
+          <span class="attr">— Tim</span></p>
+        <p>That's Tim's name for those ideas: <b style="color:var(--gold)">Cloud Butterflies</b>.
+          They land suddenly, glow brightly, and fly off just as fast if nobody writes them down.</p>
+        <p class="softer">After sixteen months, the butterflies were scattered across a dozen
+          different places. And a quiet fear crept in: <i>what if the best of it was gone?</i></p>
+      </div>
+      <figure>
+        <img src="assets/img/flypaper-lantern.webp"
+             alt="A warm lantern glowing at dusk, butterflies gathering in its light — the place where ideas land safely">
+        <figcaption class="footnote">The lantern that catches them — today every butterfly
+          has a safe place to land, the moment it arrives.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= CHAPTER TWO ======================= -->
+  <section class="chapter panel">
+    <div class="ch-kicker">Chapter Two</div>
+    <h2>Nothing <b>was lost</b></h2>
+    <p>This spring, we went looking. Old folders. Saved emails. Forgotten archives.
+      Thousands of family photos. Every place an idea might have landed.</p>
+    <p>Here is what we found: <b style="color:var(--gold)">nothing was lost.</b>
+      Not one version. Not one butterfly.</p>
+    <p>Better than that — every "abandoned" start had quietly fed the next one.
+      An early dream called Seacan grew into Big Mama's village. Big Mama grew into Maven.
+      And one late night of storytelling, set in Verona, Italy, became Maria — the warm
+      Italian voice who now greets visitors at this very front door.
+      The names changed. The dream never did.</p>
+    <div class="chain" aria-label="How the versions fed each other">
+      <span class="lbl">The same dream, growing</span>
+      <span class="node">Seacan</span><span class="arr">→</span>
+      <span class="node">Big Mama</span><span class="arr">→</span>
+      <span class="node now">Maven</span>
+      <span class="lbl" style="margin-top:4px">And one evening in Verona…</span>
+      <span class="node">A night of stories</span><span class="arr">→</span>
+      <span class="node now">Maria, at the front door</span>
+    </div>
+    <p>And the butterflies came home. <b style="color:var(--gold)">Two hundred and
+      twenty-five</b> of them — rescued, named, and written into the house's library,
+      each one still carrying the name of the person who first caught it.
+      That's a house rule here: <b style="color:var(--gold)">every idea keeps its founder's
+      name. Forever.</b></p>
+    <blockquote>The truest discovery of the whole rescue wasn't a file.
+      It was this: Tim's pattern was never failure. Every version fed the next.</blockquote>
+  </section>
+
+  <!-- ======================= CHAPTER THREE ======================= -->
+  <section class="chapter panel">
+    <div class="ch-kicker">Chapter Three</div>
+    <h2>The day it became <b>one house</b></h2>
+    <div class="ch-grid">
+      <div>
+        <p>Then, one day this June, it all became one thing.</p>
+        <p>Every rescued idea, every earlier version, every butterfly was gathered into a
+          single place — a house with rooms you can actually walk through. Today.
+          The doors in the menu beside this page are real; open any of them.</p>
+        <p>The house runs on something refreshingly simple: a card. One card per project —
+          the <b style="color:var(--gold)">Dingo Card</b> (DINGO stands for
+          <i>Do It Now, Go</i>). Twenty-five squares, each one a job. One person owns each
+          card — the <b style="color:var(--gold)">Dingo Caller</b> — and friendly AI does
+          the heavy lifting, so the Caller can bring the part only a human can.
+          In the gold centre square lives <b style="color:var(--gold)">PTK — Promises to Keep</b> —
+          because a kept promise is the heart of everything here.</p>
+        <blockquote>"The Dingo Card IS the operating system. Everything else is a field on it,
+          a feed into it, or a score from it."</blockquote>
+        <p>And one last thing about this house: it doesn't wait for perfect.</p>
+        <blockquote>"Ship it ugly. Use it daily. Success = 'the card was used yesterday' —
+          NOT 'the card is complete.'"</blockquote>
+      </div>
+      <figure>
+        <img src="assets/img/showme-dingo-card.png"
+             alt="A Dingo Card — a five-by-five grid of small glowing squares with a gold square shining at its centre">
+        <figcaption class="footnote">A Dingo Card — 25 squares, one owner,
+          and the gold PTK square at the heart of it.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= WORDS YOU'LL HEAR IN THE HALLS ======================= -->
+  <section class="section panel">
+    <div class="ph">Words you'll hear in the halls — a friendly pocket guide</div>
+    <div class="hub-grid gloss">
+      <div class="link-card" style="cursor:default">
+        <div class="lc-t">🦋 Cloud <b>Butterfly</b></div>
+        <div class="lc-d">An idea that arrives suddenly and leaves just as fast if no one
+          writes it down. Anyone can catch one — the gold butterfly button at the bottom
+          of every page is always open, and your idea keeps your name on it.</div>
+      </div>
+      <div class="link-card" style="cursor:default">
+        <div class="lc-t">🃏 Dingo <b>Card</b> &amp; Dingo <b>Caller</b></div>
+        <div class="lc-d">One card per project: 25 squares, each a job with a simple
+          green-yellow-red light. The Dingo Caller is the one person who owns the card.
+          DINGO = <i>Do It Now, Go.</i></div>
+      </div>
+      <div class="link-card" style="cursor:default">
+        <div class="lc-t">🤝 <b>PTK</b> — Promises to Keep</div>
+        <div class="lc-d">The gold centre square of every card. Promises made to others,
+          and promises made to yourself — written down, remembered, and kept.
+          The moral heart of the house.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= WHAT HAPPENS TUESDAY ======================= -->
+  <section class="section panel">
+    <div class="ph">What happens Tuesday</div>
+    <p style="font-size:14.5px;line-height:1.65">The open house runs all week —
+      then the house quietly starts its real life. Here's the calendar, no surprises:</p>
+    <div class="days">
+      <div class="day open-house">
+        <div class="when">Now → Sunday<small>June 14</small></div>
+        <div class="what"><b>The Open House.</b> Wander the rooms. Read the story.
+          Catch a butterfly if one lands on you. Or just look around — looking is plenty.</div>
+      </div>
+      <div class="day go-live">
+        <div class="when">Monday<small>June 15</small></div>
+        <div class="what"><b>We go live Monday June 15 — Dingo cards begin.</b>
+          The first cards go into the first hands, one at a time, each with its own Caller.</div>
+      </div>
+      <div class="day first-answer">
+        <div class="when">Tuesday<small>June 16</small></div>
+        <div class="what"><b>The first real morning.</b> Tuesday is the first day the house
+          can ask its favourite question and get a true answer:
+          <i>was the card used yesterday?</i> Not finished — used. That's the whole measure,
+          every day from here on.</div>
+      </div>
+    </div>
+    <p class="footnote">Nothing is asked of you this week. If a card ever interests you,
+      there will be room. If watching is enough, watching is plenty.</p>
+  </section>
+
+  <!-- ======================= THE GUEST BOOK, BY THE DOOR ======================= -->
+  <section class="section">
+    <div class="guestbook-cta">
+      <div class="sec-h" style="margin-top:0">Before you wander on…</div>
+      <p class="big">The <b style="color:var(--gold)">guest book</b> is by the door.
+        Leave a hello, a memory, an idea, or just your name — whatever feels right.
+        Tim reads every line.</p>
+      <a class="btn gold-cta" href="guestbook.html">✍️ Sign the guest book</a>
+    </div>
+    <div class="sec-h">Or keep exploring the house</div>
+    <div class="hub-grid">
+      <a class="link-card" href="index.html">
+        <div class="lc-t">See the <b>whole house</b> at once</div>
+        <div class="lc-d">The big picture — how every room connects, from the dream at the
+          top to the cards at the base.</div>
+        <div class="lc-k">The Model</div>
+      </a>
+      <a class="link-card" href="flypaper.html">
+        <div class="lc-t">Catch a <b>butterfly</b> of your own</div>
+        <div class="lc-d">Maria keeps the lantern lit. Name your idea, say it in your own
+          words, and it's safe — with your name on it.</div>
+        <div class="lc-k">The Flypaper</div>
+      </a>
+      <a class="link-card" href="library.html">
+        <div class="lc-t">Browse the <b>225 rescued ideas</b></div>
+        <div class="lc-d">The library of Cloud Butterflies that came home — every one
+          credited to the person who caught it.</div>
+        <div class="lc-k">The Library</div>
+      </a>
+      <button class="link-card" type="button" id="story-walk" aria-haspopup="dialog"
+              style="text-align:left;font-family:inherit;width:100%;cursor:pointer">
+        <div class="lc-t">◈ Take the <b>guided walk</b></div>
+        <div class="lc-d">Seven friendly stops through the whole house, about three minutes,
+          with a tour guide who never rushes you.</div>
+        <div class="lc-k">Take the walk</div>
+      </button>
+    </div>
+    <p class="footnote" style="text-align:center;margin-top:18px">
+      Welcome home. This story was sixteen months in the making — and it turns out
+      not a single chapter was ever lost.</p>
+  </section>
+
+</main>
+
+<script src="assets/shell.js"></script>
+<script>
+'use strict';
+/* The Story Room renders entirely from this file — no data fetches, so it
+   works the same on the live site and on a local double-click. The shell
+   brings the shared nav, the guard banner, and the butterfly catch button. */
+Shell.init('story');
+
+/* "Take the guided walk" card → the shell's 7-stop walk overlay */
+(function () {
+  var b = document.getElementById('story-walk');
+  if (b) b.addEventListener('click', function () { Shell.walk(); });
+})();
+</script>
+</body>
+</html>

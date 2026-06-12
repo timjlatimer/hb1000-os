@@ -13,15 +13,18 @@
      cardholders are ISSUED Dingo cards; they sign in and land on THEIR
      card — the back engine stays hidden behind this door).
      ===================================================================== */
-  html, body{height:100%}
-  body{display:flex; flex-direction:column; align-items:center; justify-content:center; padding:22px 16px}
+  html, body{min-height:100%}
+  /* Top-aligned (not centre) so the door + button never overflow above the fold
+     on short windows — the submit button must be reachable without scrolling. */
+  body{display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:18px 16px 24px}
 
   .door{
     position:relative; width:100%; max-width:440px;
     background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg);
     overflow:hidden; box-shadow:0 22px 70px rgba(0,0,0,.55);
   }
-  .door-hero{position:relative; height:230px}
+  /* Compact hero so the form + "Open the door" button sit above ~560px. */
+  .door-hero{position:relative; height:128px}
   .door-hero img{width:100%; height:100%; object-fit:cover; object-position:center 58%; display:block; opacity:.92}
   .door-hero .veil{
     position:absolute; inset:0;
@@ -34,16 +37,16 @@
   .door-hero .brand .t b{color:var(--gold)}
   .door-hero .brand .tag{font-size:11.5px; color:var(--muted); margin-top:3px}
 
-  .door-body{padding:20px 26px 24px}
+  .door-body{padding:16px 26px 20px}
 
   .soul{
-    margin:0 0 18px; padding:10px 14px; border-left:3px solid var(--gold);
+    margin:0 0 12px; padding:8px 13px; border-left:3px solid var(--gold);
     background:rgba(232,181,77,.06); border-radius:0 var(--radius) var(--radius) 0;
-    font-size:12.5px; line-height:1.6; color:var(--muted); font-style:italic;
+    font-size:12px; line-height:1.5; color:var(--muted); font-style:italic;
   }
   .soul b{color:var(--gold); font-style:normal}
 
-  label{display:block; font-size:11.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:14px 2px 6px}
+  label{display:block; font-size:11.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:11px 2px 5px}
   input{
     width:100%; box-sizing:border-box; padding:11px 14px; font:inherit; font-size:15px;
     color:var(--ink); background:var(--panel-2); border:1px solid var(--line);
@@ -52,7 +55,7 @@
   input:focus{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset}
 
   .enter{
-    width:100%; margin-top:20px; padding:12px 18px; font:inherit; font-weight:800; font-size:15px;
+    width:100%; margin-top:16px; padding:12px 18px; font:inherit; font-weight:800; font-size:15px;
     color:var(--gold); background:rgba(232,181,77,.1); border:1px solid var(--gold);
     border-radius:40px; cursor:pointer; letter-spacing:.02em;
   }
@@ -277,6 +280,21 @@
       fail('Could not read the family roster (' + err.message + '). Is the app being served?');
     });
   });
+})();
+</script>
+<script>
+/* ---- Open House visit-stamp (door edition) — doors do NOT count toward the
+       16 rooms; this only starts the open-house clock, null-safe, never throws
+       (private mode / direct URL visitors who never logged in are fine). ---- */
+(function () {
+  try {
+    var k = 'hb1000-openhouse';
+    var s = JSON.parse(localStorage.getItem(k));
+    if (!s || typeof s !== 'object') s = {};
+    if (!s.pages || typeof s.pages !== 'object') s.pages = {};
+    if (!s.started) s.started = new Date().toISOString();
+    localStorage.setItem(k, JSON.stringify(s));
+  } catch (e) { /* fresh store / private mode — the door still opens */ }
 })();
 </script>
 </body>

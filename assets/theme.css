@@ -601,3 +601,77 @@ body.walk-open{overflow:hidden}
   #hb-catch-btn, #hb-catch-scrim, #hb-catch-sheet, #hb-catch-toast{transition:none}
   #hb-catch-btn:hover{transform:none}
 }
+
+/* ---------- THE OPEN HOUSE LAYER (shell.js · hb1000-openhouse) ----------
+   Open House window: now → Sunday June 14; we go live Monday June 15 — Dingo
+   cards begin. Walk through any room, touch nothing you don't want to, no
+   participation required. The cap-tracker bar sits fixed at the bottom of
+   every shelled page: the HB1000 cap walks the track as room coverage grows
+   (16 rooms; the doors — login/flypaper — never count). Clicking the bar
+   opens the guest book. z-order: bar 270 < catch button 280 (the scrim
+   covers the bar when the quick-catch sheet is open). */
+
+/* the one-line Open House note inside the guard banner (order keeps it last) */
+.guard-banner .oh-line{
+  order:9; flex-basis:100%; font-size:12px; color:var(--muted);
+  border-top:1px dashed rgba(232,181,77,.3); padding-top:7px; margin-top:3px;
+}
+.guard-banner .oh-line b{color:var(--gold)}
+
+#hb-oh-bar{
+  position:fixed; left:var(--sidebar-w); right:0; bottom:0; z-index:270;
+  display:flex; align-items:center; gap:14px;
+  padding:7px 18px calc(7px + env(safe-area-inset-bottom, 0px));
+  background:rgba(13,20,29,.96); border-top:1px solid var(--line);
+  backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+  font-size:12px; color:var(--muted); text-decoration:none;
+  transition:border-color .15s, color .15s;
+}
+#hb-oh-bar:hover{border-top-color:rgba(232,181,77,.55); color:var(--ink)}
+#hb-oh-bar b{color:var(--gold)}
+#hb-oh-bar .oh-txt{flex:0 0 auto; white-space:nowrap}
+#hb-oh-bar .oh-track{
+  position:relative; flex:1; min-width:60px; height:6px; border-radius:999px;
+  background:var(--panel-2); border:1px solid var(--line);
+}
+#hb-oh-bar .oh-fill{
+  position:absolute; left:0; top:0; bottom:0; border-radius:999px;
+  background:linear-gradient(90deg, rgba(232,181,77,.22), rgba(232,181,77,.7));
+  transition:width .8s ease;
+}
+#hb-oh-bar .oh-cap{
+  position:absolute; top:50%; transform:translate(-50%,-58%); line-height:0;
+  transition:left .8s ease;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.65));
+}
+#hb-oh-bar .oh-cap-svg{display:block}
+
+/* 100% — the whole house seen: a tiny celebration, never a demand */
+#hb-oh-bar.done{border-top-color:rgba(232,181,77,.65); box-shadow:0 -4px 18px rgba(232,181,77,.18)}
+#hb-oh-bar.done .oh-cap-svg{animation:oh-cap-cheer 1.5s ease-in-out 2}
+@keyframes oh-cap-cheer{
+  0%,100%{transform:translateY(0) rotate(0)}
+  30%{transform:translateY(-4px) rotate(-9deg)}
+  60%{transform:translateY(0) rotate(0)}
+  80%{transform:translateY(-2px) rotate(7deg)}
+}
+
+/* the bar lifts the catch button + toast clear of the bottom edge */
+body.hb-openhouse #hb-catch-btn{bottom:calc(56px + env(safe-area-inset-bottom, 0px))}
+body.hb-openhouse #hb-catch-toast{bottom:calc(60px + env(safe-area-inset-bottom, 0px))}
+
+@media (max-width:900px){
+  #hb-oh-bar{left:0} /* the sidebar is a top bar here — the track gets the full width */
+}
+@media (max-width:640px){
+  /* compact: tighter, smaller type, the "Open House: " prefix folds away */
+  #hb-oh-bar{gap:10px; padding:5px 12px calc(5px + env(safe-area-inset-bottom, 0px)); font-size:11px}
+  #hb-oh-bar .oh-pre{display:none}
+  #hb-oh-bar .oh-cap-svg{width:18px; height:12px}
+  body.hb-openhouse #hb-catch-btn{bottom:calc(106px + env(safe-area-inset-bottom, 0px))}
+  body.hb-openhouse #hb-catch-toast{bottom:calc(178px + env(safe-area-inset-bottom, 0px))}
+}
+@media (prefers-reduced-motion:reduce){
+  #hb-oh-bar, #hb-oh-bar .oh-fill, #hb-oh-bar .oh-cap{transition:none}
+  #hb-oh-bar.done .oh-cap-svg{animation:none}
+}

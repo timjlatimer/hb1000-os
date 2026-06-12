@@ -20,6 +20,33 @@
   .viewtabs{display:flex; gap:8px; margin:16px 0 12px}
   .viewtabs .btn.on{border-color:var(--gold); color:var(--gold); background:rgba(232,181,77,.12)}
 
+  /* ---------- the headline VIEW TOGGLE: hop across all four looks ---------- */
+  .viewswitch{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    max-width:1000px; margin:16px 0 6px; padding:12px 14px;
+    background:linear-gradient(180deg,var(--panel),var(--panel-2));
+    border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 0 0 1px rgba(232,181,77,.12) inset, 0 6px 22px rgba(0,0,0,.35);
+  }
+  .viewswitch .vs-label{
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--soft); margin-right:2px; font-weight:700; white-space:nowrap;
+  }
+  .viewswitch a.vs-pill{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:9px 16px; border-radius:999px; font-size:14px; font-weight:600;
+    color:var(--ink); background:var(--panel-2); border:1px solid var(--line);
+    text-decoration:none; transition:border-color .15s, color .15s, background .15s;
+  }
+  .viewswitch a.vs-pill:hover{border-color:var(--gold); color:var(--gold); background:rgba(232,181,77,.07)}
+  .viewswitch a.vs-pill .vs-ico{font-size:15px; line-height:1}
+  .viewswitch a.vs-pill[aria-current="page"]{
+    border-color:var(--gold); color:var(--gold);
+    background:rgba(232,181,77,.14);
+    box-shadow:0 0 0 1px var(--gold) inset, 0 0 14px rgba(232,181,77,.22);
+  }
+  @media (max-width:560px){ .viewswitch .vs-label{width:100%; margin-bottom:2px} }
+
   #stage3d{
     position:relative; height:62vh; min-height:430px;
     background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius-lg);
@@ -59,6 +86,16 @@
     5 floors × 5 wide, all the same height, <b style="color:var(--gold)">PTK</b> glowing gold at the centre.
     The <b style="color:var(--ink)">Hunting Funnel</b> is the descent between them.
   </p>
+
+  <!-- ==================== THE HEADLINE VIEW TOGGLE — switch between all the looks ==================== -->
+  <nav class="viewswitch" aria-label="Switch between all four views of the model">
+    <span class="vs-label">Switch the view</span>
+    <a class="vs-pill" href="index.html"><span class="vs-ico">🗺️</span> The Map</a>
+    <a class="vs-pill" href="pearl-3d.html"><span class="vs-ico">◆</span> Pearl Diamond 3D</a>
+    <a class="vs-pill" href="pearl-2d.html"><span class="vs-ico">◇</span> Pearl Diamond 2D</a>
+    <a class="vs-pill" href="city.html" aria-current="page"><span class="vs-ico">🏙️</span> Dingo City <span style="color:var(--soft);font-weight:500">(this page)</span></a>
+  </nav>
+
   <div class="flowstrip" aria-label="The graduation pipeline">
     <span class="step">Capture — Flypaper</span><span class="arrow">→</span>
     <span class="step">Nursery (inner ring)</span><span class="arrow">→</span>

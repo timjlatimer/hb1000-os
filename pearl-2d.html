@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEARL Diamond 2D — HB1000 Architecture — Light & Dark Hemispheres</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0908; color: #e8e0d0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; }
+
+/* ═══════════════════════════════════════════════════════════
+   HEMISPHERE SYSTEM — Dark Side (Left) / Light Side (Right)
+   ═══════════════════════════════════════════════════════════ */
+#hemisphere-overlay {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+  transition: opacity 0.5s ease;
+}
+#hemisphere-dark {
+  position: absolute; top: 0; left: 0;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, rgba(4, 3, 6, 0.7) 0%, rgba(8, 6, 12, 0.5) 60%, rgba(10, 9, 8, 0.15) 100%);
+  pointer-events: none;
+}
+#hemisphere-light {
+  position: absolute; top: 0; right: 0;
+  width: 50%; height: 100%;
+  background: linear-gradient(270deg, rgba(45, 38, 25, 0.5) 0%, rgba(35, 30, 20, 0.35) 60%, rgba(10, 9, 8, 0.05) 100%);
+  pointer-events: none;
+}
+#terminator-line {
+  position: absolute; top: 0; left: 50%;
+  width: 2px; height: 100%;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(212, 168, 83, 0.08) 10%,
+    rgba(212, 168, 83, 0.2) 30%,
+    rgba(212, 168, 83, 0.35) 50%,
+    rgba(212, 168, 83, 0.2) 70%,
+    rgba(212, 168, 83, 0.08) 90%,
+    transparent 100%);
+  pointer-events: none; z-index: 2;
+  transform: translateX(-50%);
+}
+
+/* Hemisphere labels */
+.hemisphere-label {
+  position: absolute; top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 4px; text-transform: uppercase;
+  pointer-events: none; z-index: 3;
+  opacity: 0.5;
+}
+.hemisphere-label-dark {
+  left: 30px; color: #8b7aff;
+  text-shadow: 0 0 20px rgba(139, 122, 255, 0.3);
+}
+.hemisphere-label-light {
+  right: 30px; color: #d4a853;
+  transform: translateY(-50%) rotate(180deg);
+  text-shadow: 0 0 20px rgba(212, 168, 83, 0.3);
+}
+.hemisphere-sublabel {
+  position: absolute; top: 58%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 8px; letter-spacing: 2px;
+  text-transform: uppercase;
+  pointer-events: none; z-index: 3;
+  opacity: 0.3;
+}
+.hemisphere-sublabel-dark {
+  left: 48px; color: #6b5adf;
+}
+.hemisphere-sublabel-light {
+  right: 48px; color: #b8922e;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Constellation particles */
+#constellation-canvas {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Agent glow on dark side */
+.agent-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none; z-index: 1;
+  opacity: 0;
+  animation: agentPulse 4s ease-in-out infinite;
+}
+@keyframes agentPulse {
+  0%, 100% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+/* Node hemisphere tinting */
+.node.hemisphere-dark .node-inner {
+  border-color: rgba(139, 122, 255, 0.15);
+  background: rgba(8, 6, 20, 0.6);
+}
+.node.hemisphere-dark:hover .node-inner {
+  border-color: rgba(139, 122, 255, 0.5);
+  background: rgba(139, 122, 255, 0.06);
+  box-shadow: 0 0 25px rgba(139, 122, 255, 0.12);
+}
+.node.hemisphere-light .node-inner {
+  border-color: rgba(212, 168, 83, 0.18);
+  background: rgba(30, 25, 15, 0.5);
+}
+.node.hemisphere-light:hover .node-inner {
+  border-color: rgba(212, 168, 83, 0.6);
+  background: rgba(212, 168, 83, 0.06);
+  box-shadow: 0 0 25px rgba(212, 168, 83, 0.15);
+}
+/* Center nodes — spanning both hemispheres */
+.node.hemisphere-center .node-inner {
+  border-color: rgba(180, 160, 120, 0.15);
+  background: rgba(15, 12, 10, 0.55);
+  border-left: 2px solid rgba(139, 122, 255, 0.12);
+  border-right: 2px solid rgba(212, 168, 83, 0.12);
+}
+.node.hemisphere-center:hover .node-inner {
+  border-color: rgba(180, 160, 120, 0.5);
+  background: rgba(180, 160, 120, 0.04);
+  box-shadow: -8px 0 20px rgba(139, 122, 255, 0.08), 8px 0 20px rgba(212, 168, 83, 0.08);
+  border-left-color: rgba(139, 122, 255, 0.4);
+  border-right-color: rgba(212, 168, 83, 0.4);
+}
+
+/* Hemisphere indicator dot on nodes */
+.hemisphere-dot {
+  position: absolute; top: 3px; right: 3px;
+  width: 5px; height: 5px;
+  border-radius: 50%; opacity: 0.6;
+  pointer-events: none;
+}
+.hemisphere-dark .hemisphere-dot { background: #8b7aff; }
+.hemisphere-light .hemisphere-dot { background: #d4a853; }
+.hemisphere-center .hemisphere-dot {
+  background: linear-gradient(90deg, #8b7aff 0%, #d4a853 100%);
+  width: 8px; border-radius: 3px;
+}
+
+/* Hemisphere filter buttons */
+#hemisphere-filter {
+  position: fixed; top: 44px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 2px; z-index: 55;
+  background: rgba(10, 9, 8, 0.92);
+  border: 1px solid rgba(212, 168, 83, 0.12);
+  border-radius: 16px; padding: 3px;
+  backdrop-filter: blur(10px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+#hemisphere-filter.hidden {
+  opacity: 0; pointer-events: none;
+  transform: translateX(-50%) translateY(-10px);
+}
+.hemi-filter-btn {
+  padding: 4px 12px; border: none;
+  background: transparent; color: #706050;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; border-radius: 12px;
+  transition: all 0.2s;
+}
+.hemi-filter-btn:hover { color: #e8e0d0; background: rgba(255,255,255,0.06); }
+.hemi-filter-btn.active { color: #e8e0d0; background: rgba(212, 168, 83, 0.2); }
+.hemi-filter-btn.active[data-filter="dark"] { color: #8b7aff; background: rgba(139, 122, 255, 0.2); }
+.hemi-filter-btn.active[data-filter="light"] { color: #d4a853; background: rgba(212, 168, 83, 0.2); }
+.hemi-filter-btn.active[data-filter="center"] { color: #b8a878; background: rgba(180, 160, 120, 0.2); }
+
+/* Filtered node states */
+.node.hemisphere-filtered-out {
+  opacity: 0.08 !important;
+  pointer-events: none;
+  filter: grayscale(1);
+  transition: opacity 0.4s, filter 0.4s;
+}
+.node.hemisphere-filtered-in {
+  opacity: 1 !important;
+  transition: opacity 0.4s, filter 0.4s;
+}
+
+/* Hemisphere stats badge */
+#hemisphere-stats {
+  position: fixed; top: 80px; left: 50%;
+  transform: translateX(-50%);
+  display: none; gap: 12px; z-index: 55;
+  background: rgba(10, 9, 8, 0.88);
+  border: 1px solid rgba(212, 168, 83, 0.1);
+  border-radius: 8px; padding: 6px 14px;
+  backdrop-filter: blur(10px);
+  font-size: 9px; letter-spacing: 1px;
+  color: #706050;
+}
+#hemisphere-stats.visible { display: flex; }
+.hemi-stat { display: flex; align-items: center; gap: 4px; }
+.hemi-stat-dot { width: 6px; height: 6px; border-radius: 50%; }
+.hemi-stat-count { font-weight: 600; color: #e8e0d0; }
+
+#container {
+  width: 100vw; height: 100vh;
+  position: relative; overflow: hidden;
+}
+
+#viewport {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  cursor: grab;
+}
+#viewport.dragging { cursor: grabbing; }
+
+#canvas-wrap {
+  position: absolute;
+  transform-origin: 0 0;
+  width: 1000px; height: 1800px;
+}
+
+/* Diamond background shape */
+#diamond-bg {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+/* Layer zones */
+.layer-zone {
+  position: absolute;
+  border: 1px solid rgba(212, 168, 83, 0.08);
+  border-radius: 2px;
+  transition: border-color 0.3s, background 0.3s;
+}
+.layer-zone:hover {
+  border-color: rgba(212, 168, 83, 0.15);
+  background: rgba(212, 168, 83, 0.02);
+}
+
+/* Interactive nodes */
+.node {
+  position: absolute;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 5;
+}
+.node:hover { z-index: 20; }
+
+.node-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  border: 1px solid rgba(212, 168, 83, 0.12);
+  border-radius: 4px;
+  padding: 8px 10px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  background: rgba(15, 12, 10, 0.5);
+  backdrop-filter: blur(4px);
+}
+.node:hover .node-inner {
+  border-color: rgba(212, 168, 83, 0.7);
+  background: rgba(212, 168, 83, 0.06);
+  box-shadow: 0 0 25px rgba(212, 168, 83, 0.12), inset 0 0 20px rgba(212, 168, 83, 0.03);
+}
+
+.node-label {
+  font-size: 9px; font-weight: 600;
+  color: #d4a853;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.node-sublabel {
+  font-size: 7px; color: #8a7a60;
+  margin-top: 3px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Node badge number */
+.node-badge {
+  position: absolute; top: -5px; left: -5px;
+  width: 18px; height: 18px;
+  background: linear-gradient(135deg, #d4a853, #b8922e);
+  border: 1px solid rgba(212, 168, 83, 0.6);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7px; font-weight: 700;
+  color: #0a0908;
+  z-index: 10;
+  box-shadow: 0 0 8px rgba(212, 168, 83, 0.3);
+}
+
+/* Category-specific colors */
+.node[data-cat="aspirational"] .node-inner { border-color: rgba(212, 168, 83, 0.2); }
+.node[data-cat="aspirational"]:hover .node-inner { border-color: rgba(212, 168, 83, 0.6); background: rgba(212, 168, 83, 0.06); }
+.node[data-cat="aspirational"] .node-label { color: #d4a853; }
+.node[data-cat="north-star"] .node-inner { border-color: rgba(201, 168, 76, 0.2); }
+.node[data-cat="north-star"]:hover .node-inner { border-color: rgba(201, 168, 76, 0.6); background: rgba(201, 168, 76, 0.06); }
+.node[data-cat="north-star"] .node-label { color: #c9a84c; }
+.node[data-cat="hb1000"] .node-inner { border-color: rgba(241, 196, 15, 0.25); background: rgba(241, 196, 15, 0.03); }
+.node[data-cat="hb1000"]:hover .node-inner { border-color: rgba(241, 196, 15, 0.6); background: rgba(241, 196, 15, 0.08); }
+.node[data-cat="hb1000"] .node-label { color: #f1c40f; }
+.node[data-cat="hb1000-inputs"] .node-inner { border-color: rgba(230, 126, 34, 0.2); }
+.node[data-cat="hb1000-inputs"]:hover .node-inner { border-color: rgba(230, 126, 34, 0.6); background: rgba(230, 126, 34, 0.06); }
+.node[data-cat="hb1000-inputs"] .node-label { color: #e67e22; }
+.node[data-cat="hb1000-inputs"] .node-badge { background: linear-gradient(135deg, #e67e22, #c0651a); }
+.node[data-cat="hb1000-outputs"] .node-inner { border-color: rgba(39, 174, 96, 0.2); }
+.node[data-cat="hb1000-outputs"]:hover .node-inner { border-color: rgba(39, 174, 96, 0.6); background: rgba(39, 174, 96, 0.06); }
+.node[data-cat="hb1000-outputs"] .node-label { color: #27ae60; }
+.node[data-cat="hb1000-outputs"] .node-badge { background: linear-gradient(135deg, #27ae60, #1e8c4d); }
+.node[data-cat="blue-seal-prime"] .node-inner { border-color: rgba(74, 144, 217, 0.25); background: rgba(74, 144, 217, 0.02); }
+.node[data-cat="blue-seal-prime"]:hover .node-inner { border-color: rgba(74, 144, 217, 0.6); background: rgba(74, 144, 217, 0.06); }
+.node[data-cat="blue-seal-prime"] .node-label { color: #4a90d9; }
+.node[data-cat="blue-seal-prime"] .node-badge { background: linear-gradient(135deg, #4a90d9, #3570b0); }
+.node[data-cat="learning-loop"] .node-inner { border-color: rgba(74, 222, 128, 0.2); }
+.node[data-cat="learning-loop"]:hover .node-inner { border-color: rgba(74, 222, 128, 0.6); background: rgba(74, 222, 128, 0.06); }
+.node[data-cat="learning-loop"] .node-label { color: #4ade80; }
+.node[data-cat="learning-loop"] .node-badge { background: linear-gradient(135deg, #4ade80, #2eb860); }
+.node[data-cat="blue-seal-local"] .node-inner { border-color: rgba(91, 163, 230, 0.2); }
+.node[data-cat="blue-seal-local"]:hover .node-inner { border-color: rgba(91, 163, 230, 0.6); background: rgba(91, 163, 230, 0.06); }
+.node[data-cat="blue-seal-local"] .node-label { color: #5ba3e6; }
+.node[data-cat="blue-seal-local"] .node-badge { background: linear-gradient(135deg, #5ba3e6, #4080c0); }
+.node[data-cat="local-4"] .node-inner { border-color: rgba(52, 211, 153, 0.2); }
+.node[data-cat="local-4"]:hover .node-inner { border-color: rgba(52, 211, 153, 0.6); background: rgba(52, 211, 153, 0.06); }
+.node[data-cat="local-4"] .node-label { color: #34d399; }
+.node[data-cat="local-4"] .node-badge { background: linear-gradient(135deg, #34d399, #20a878); }
+.node[data-cat="sidebar"] .node-inner { border-color: rgba(148, 163, 184, 0.15); background: rgba(148, 163, 184, 0.02); }
+.node[data-cat="sidebar"]:hover .node-inner { border-color: rgba(148, 163, 184, 0.4); background: rgba(148, 163, 184, 0.05); }
+.node[data-cat="sidebar"] .node-label { color: #94a3b8; }
+.node[data-cat="sidebar"] .node-badge { background: linear-gradient(135deg, #94a3b8, #6b7a8d); }
+.node[data-cat="badges"] .node-inner { border-color: rgba(192, 132, 252, 0.2); }
+.node[data-cat="badges"]:hover .node-inner { border-color: rgba(192, 132, 252, 0.6); background: rgba(192, 132, 252, 0.06); }
+.node[data-cat="badges"] .node-label { color: #c084fc; }
+.node[data-cat="badges"] .node-badge { background: linear-gradient(135deg, #c084fc, #9060d0); }
+.node[data-cat="pricing"] .node-inner { border-color: rgba(245, 158, 11, 0.2); }
+.node[data-cat="pricing"]:hover .node-inner { border-color: rgba(245, 158, 11, 0.6); background: rgba(245, 158, 11, 0.06); }
+.node[data-cat="pricing"] .node-label { color: #f59e0b; }
+.node[data-cat="pricing"] .node-badge { background: linear-gradient(135deg, #f59e0b, #c07d08); }
+
+/* Marketing overlay nodes */
+.node[data-cat="marketing"] .node-inner { border-color: rgba(255, 107, 53, 0.5); }
+.node[data-cat="marketing"]:hover .node-inner { border-color: #FF6B35; background: rgba(255, 107, 53, 0.12); }
+.node[data-cat="marketing"] .node-label { color: #FF6B35; }
+.node[data-cat="marketing"] .node-badge { background: #FF6B35; border-color: #FF8855; }
+
+/* Diamond shape SVG overlay */
+#diamond-shape {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Inner/Outer Ring visualization around brain */
+#initiative-rings {
+  position: absolute;
+  width: 500px; height: 500px;
+  left: 50%; top: 34%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+.ring-orbit {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px dashed;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+}
+.ring-inner {
+  width: 280px; height: 280px;
+  border-color: rgba(212, 168, 83, 0.4);
+}
+.ring-outer {
+  width: 420px; height: 420px;
+  border-color: rgba(120, 100, 80, 0.25);
+}
+.ring-label {
+  position: absolute;
+  font-size: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+.ring-label-inner {
+  color: rgba(212, 168, 83, 0.6);
+  top: -12px; left: 50%;
+  transform: translateX(-50%);
+}
+.ring-label-outer {
+  color: rgba(120, 100, 80, 0.4);
+  top: -12px; left: 50%;
+  transform: translateX(-50%);
+}
+.ring-node {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.ring-node:hover {
+  transform: scale(2);
+  z-index: 10;
+}
+.ring-node-inner {
+  background: rgba(212, 168, 83, 0.8);
+  box-shadow: 0 0 8px rgba(212, 168, 83, 0.5);
+}
+.ring-node-outer {
+  background: rgba(120, 100, 80, 0.4);
+  box-shadow: 0 0 4px rgba(120, 100, 80, 0.2);
+}
+.ring-node-tooltip {
+  position: absolute;
+  background: rgba(10, 10, 20, 0.95);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  color: #d4a853;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 4px 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 20;
+  top: -24px; left: 50%;
+  transform: translateX(-50%);
+}
+.ring-node:hover .ring-node-tooltip {
+  opacity: 1;
+}
+
+/* Brain glow */
+#brain-glow {
+  position: absolute;
+  width: 200px; height: 160px;
+  left: 50%; top: 34%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+}
+#brain-glow img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 40px rgba(212, 168, 83, 0.5)) drop-shadow(0 0 80px rgba(212, 168, 83, 0.25)) drop-shadow(0 0 120px rgba(212, 168, 83, 0.1));
+}
+#brain-glow::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(212, 168, 83, 0.12) 0%, rgba(212, 168, 83, 0.04) 40%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Marketing flow lines */
+.marketing-flow-line {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Orange marketing pulse animation */
+@keyframes orangePulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+.marketing-pulse {
+  animation: orangePulse 2s ease-in-out infinite;
+}
+
+/* Detail panel */
+#detail-panel {
+  position: fixed;
+  top: 60px; right: 20px;
+  width: 380px; max-height: calc(100vh - 100px);
+  background: rgba(10, 9, 8, 0.95);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  border-radius: 4px;
+  padding: 0;
+  z-index: 100;
+  overflow-y: auto;
+  transform: translateX(420px);
+  transition: transform 0.3s ease;
+  backdrop-filter: blur(20px);
+}
+#detail-panel.open { transform: translateX(0); }
+#detail-panel::-webkit-scrollbar { width: 4px; }
+#detail-panel::-webkit-scrollbar-track { background: transparent; }
+#detail-panel::-webkit-scrollbar-thumb { background: rgba(212, 168, 83, 0.3); border-radius: 2px; }
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+  position: sticky; top: 0;
+  background: rgba(10, 9, 8, 0.98);
+  z-index: 5;
+}
+.panel-category {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px;
+  color: #d4a853; margin-bottom: 4px;
+}
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700;
+  color: #f0e6d0;
+  line-height: 1.2;
+}
+.panel-subtitle {
+  font-size: 11px; color: #a89070;
+  margin-top: 4px;
+}
+.panel-close {
+  position: absolute; top: 12px; right: 12px;
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 2px;
+  color: #a89070; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.panel-close:hover { background: rgba(255,255,255,0.1); color: #e8e0d0; }
+
+.panel-body { padding: 16px 20px; }
+.panel-description {
+  font-size: 12px; line-height: 1.7;
+  color: #c8b8a0;
+}
+.panel-keypoints {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(212, 168, 83, 0.05);
+  border-left: 2px solid rgba(212, 168, 83, 0.3);
+  border-radius: 0 3px 3px 0;
+}
+.panel-keypoints h4 {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+  color: #d4a853; margin-bottom: 8px;
+}
+.panel-keypoints li {
+  font-size: 11px; color: #a89070;
+  margin-bottom: 4px; padding-left: 12px;
+  position: relative; line-height: 1.5;
+  list-style: none;
+}
+.panel-keypoints li::before {
+  content: '›'; position: absolute; left: 0;
+  color: #d4a853;
+}
+.panel-source {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 9px; color: #706050;
+  letter-spacing: 0.5px;
+}
+.panel-link {
+  display: inline-block; margin-top: 8px;
+  padding: 6px 14px;
+  background: rgba(212, 168, 83, 0.1);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  border-radius: 3px;
+  color: #d4a853;
+  font-size: 10px; text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+.panel-link:hover { background: rgba(212, 168, 83, 0.2); }
+.panel-share-btn {
+  display: block; width: 100%; padding: 8px 12px; margin-top: 8px;
+  background: rgba(212, 168, 83, 0.1); border: 1px solid rgba(212, 168, 83, 0.3);
+  color: #d4a853; font-size: 11px; font-family: 'Inter', sans-serif;
+  cursor: pointer; border-radius: 4px; text-align: center; transition: all 0.2s;
+}
+.panel-share-btn:hover { background: rgba(212, 168, 83, 0.25); }
+.panel-share-btn.copied { background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.4); color: #4ade80; }
+
+/* Header bar */
+#header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 44px;
+  background: rgba(10, 9, 8, 0.9);
+  border-bottom: 1px solid rgba(212, 168, 83, 0.15);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+  z-index: 50;
+  backdrop-filter: blur(10px);
+}
+#header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px; color: #d4a853;
+  letter-spacing: 1px;
+}
+#header-subtitle {
+  font-size: 9px; color: #706050;
+  letter-spacing: 1px; margin-left: 12px;
+}
+
+/* Toolbar */
+/* Cross-navigation bar */
+#cross-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: rgba(10, 9, 8, 0.95); border-bottom: 1px solid rgba(212, 168, 83, 0.15);
+  padding: 8px 16px; backdrop-filter: blur(12px);
+}
+.cross-nav-btn {
+  padding: 8px 18px; border: 2px solid rgba(255,255,255,0.2); border-radius: 6px;
+  background: rgba(30,25,20,0.8); color: #e0e0e0; font-family: 'Courier New', monospace;
+  font-size: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;
+  text-decoration: none; transition: all 0.25s; user-select: none; font-weight: bold;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.cross-nav-btn:hover { background: rgba(60,50,40,0.9); border-color: #e8b54d; color:#e8b54d; transform: translateY(-1px); }
+.cross-nav-btn.current { border-color: #e8b54d; color: #e8b54d; background: rgba(232,181,77,0.14); cursor: default; box-shadow:0 0 0 1px #e8b54d inset, 0 0 14px rgba(232,181,77,0.25); }
+.cross-nav-btn.current:hover { transform:none; }
+.cross-nav-back { margin-right: auto; font-size: 11px; padding: 6px 12px; border-color: rgba(232,181,77,0.4); color: #e8b54d; }
+.cross-nav-back:hover { color: #ffd877; border-color: #e8b54d; background:rgba(232,181,77,0.1); }
+@media (max-width: 600px) {
+  .cross-nav-btn { font-size: 9px; padding: 6px 10px; letter-spacing: 0.5px; }
+  #cross-nav { gap: 4px; padding: 6px 8px; }
+}
+
+#toolbar {
+  position: fixed; bottom: 16px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(10, 9, 8, 0.9);
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  border-radius: 24px;
+  padding: 6px 14px;
+  z-index: 50;
+  backdrop-filter: blur(10px);
+}
+.toolbar-btn {
+  width: 30px; height: 30px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  color: #a89070;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.toolbar-btn:hover { background: rgba(255,255,255,0.08); color: #e8e0d0; border-color: rgba(212, 168, 83, 0.4); }
+.toolbar-btn.active { background: rgba(255, 107, 53, 0.15); border-color: #FF6B35; color: #FF6B35; }
+#zoom-display {
+  font-size: 10px; color: #706050;
+  min-width: 36px; text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.toolbar-sep {
+  width: 1px; height: 20px;
+  background: rgba(255,255,255,0.1);
+  margin: 0 4px;
+}
+
+/* Search overlay */
+#search-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 9, 8, 0.85);
+  z-index: 200;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 120px;
+  backdrop-filter: blur(5px);
+}
+#search-overlay.open { display: flex; }
+#search-box {
+  width: 500px; max-width: 90vw;
+  background: rgba(20, 18, 16, 0.98);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+}
+#search-input {
+  width: 100%; padding: 16px 20px;
+  background: transparent;
+  border: none; border-bottom: 1px solid rgba(212, 168, 83, 0.15);
+  color: #e8e0d0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+#search-input::placeholder { color: #504030; }
+#search-results {
+  max-height: 400px; overflow-y: auto;
+  padding: 8px;
+}
+.search-result {
+  padding: 10px 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.search-result:hover { background: rgba(212, 168, 83, 0.08); }
+.search-result-label { font-size: 12px; color: #d4a853; font-weight: 500; }
+.search-result-cat { font-size: 9px; color: #706050; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Marketing flow toggle */
+#marketing-toggle {
+  position: fixed; top: 52px; right: 16px;
+  z-index: 50;
+}
+#marketing-toggle button {
+  padding: 6px 14px;
+  background: rgba(255, 107, 53, 0.1);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  border-radius: 3px;
+  color: #FF6B35;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+#marketing-toggle button:hover { background: rgba(255, 107, 53, 0.2); }
+#marketing-toggle button.active { background: rgba(255, 107, 53, 0.25); border-color: #FF6B35; }
+
+/* Side labels */
+.side-label {
+  position: absolute;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.side-label-sub {
+  position: absolute;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 8px;
+  letter-spacing: 1px;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.4;
+  text-transform: uppercase;
+}
+
+/* Marketing flow SVG overlay */
+#marketing-overlay {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+#marketing-overlay.visible { opacity: 1; }
+
+/* Concept index */
+#concept-index {
+  position: fixed; top: 44px; left: 0;
+  width: 280px; height: calc(100vh - 44px);
+  background: rgba(10, 9, 8, 0.95);
+  border-right: 1px solid rgba(212, 168, 83, 0.15);
+  z-index: 60;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+}
+#concept-index.open { transform: translateX(0); }
+#concept-index::-webkit-scrollbar { width: 4px; }
+#concept-index::-webkit-scrollbar-thumb { background: rgba(212, 168, 83, 0.2); border-radius: 2px; }
+.index-header {
+  padding: 16px; position: sticky; top: 0;
+  background: rgba(10, 9, 8, 0.98);
+  border-bottom: 1px solid rgba(212, 168, 83, 0.1);
+}
+.index-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px; color: #d4a853;
+}
+.index-category {
+  padding: 8px 16px 4px;
+  font-size: 8px; text-transform: uppercase;
+  letter-spacing: 1.5px; color: #706050;
+  margin-top: 8px;
+}
+.index-item {
+  padding: 6px 16px;
+  font-size: 11px; color: #a89070;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.index-item:hover { background: rgba(212, 168, 83, 0.06); color: #d4a853; }
+
+/* Back link */
+#back-link {
+  position: fixed; top: 8px; left: 16px;
+  z-index: 55;
+  color: #706050;
+  text-decoration: none;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+#back-link:hover { color: #d4a853; }
+
+/* Layer legend */
+.layer-legend-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 1px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+/* ═══ GUIDE PANEL — How This Works ═══ */
+#guide-panel {
+  position: fixed; top: 0; right: -480px;
+  width: 460px; max-width: 90vw; height: 100vh;
+  background: rgba(10,9,8,0.97);
+  border-left: 1px solid rgba(212,168,83,0.2);
+  z-index: 1000; overflow-y: auto;
+  transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
+  padding: 0;
+  backdrop-filter: blur(20px);
+}
+#guide-panel.open { right: 0; }
+#guide-panel .guide-close {
+  position: sticky; top: 0;
+  background: rgba(10,9,8,0.95);
+  padding: 16px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid rgba(212,168,83,0.15);
+  z-index: 2;
+}
+#guide-panel .guide-close h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 600;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: #d4a853;
+}
+#guide-panel .guide-close button {
+  background: none; border: 1px solid rgba(255,255,255,0.15);
+  color: #999; font-size: 18px; cursor: pointer;
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+#guide-panel .guide-close button:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+.guide-content { padding: 24px; }
+.guide-section {
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.guide-section:last-child { border-bottom: none; }
+.guide-section h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: #d4a853; margin-bottom: 12px;
+}
+.guide-section p {
+  font-size: 13px; line-height: 1.7;
+  color: #b8b0a0; margin-bottom: 8px;
+}
+.guide-section .guide-layer {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.guide-section .guide-layer:last-child { border-bottom: none; }
+.guide-layer-dot {
+  width: 10px; height: 10px; border-radius: 2px;
+  flex-shrink: 0; margin-top: 4px;
+}
+.guide-layer-info h4 {
+  font-size: 12px; font-weight: 600;
+  color: #e8e0d0; margin-bottom: 2px;
+}
+.guide-layer-info p {
+  font-size: 11px; color: #888; margin: 0; line-height: 1.5;
+}
+.guide-hemi-box {
+  display: flex; gap: 12px; margin-top: 12px;
+}
+.guide-hemi-card {
+  flex: 1; padding: 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.guide-hemi-card h4 {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.guide-hemi-card p {
+  font-size: 11px; color: #888; margin: 0; line-height: 1.5;
+}
+.guide-tip {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px;
+  background: rgba(212,168,83,0.06);
+  border: 1px solid rgba(212,168,83,0.12);
+  border-radius: 8px;
+  margin-top: 8px;
+}
+.guide-tip-icon {
+  font-size: 16px; flex-shrink: 0;
+}
+.guide-tip p {
+  font-size: 11px; color: #b8b0a0; margin: 0; line-height: 1.5;
+}
+#guide-backdrop {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 999; display: none;
+}
+#guide-backdrop.open { display: block; }
+</style>
+<meta property="og:type" content="website">
+		<meta property="og:url" content="https://learning-loop.manus.space/pearl-diamond-2d.html">
+		<meta property="og:title" content="Learning Loop Mission Control">
+		<meta property="og:description" content="A real-time dashboard for monitoring the progress of Learning Loop Protocol V9.1 executions. Displays phase progress, live activity logs, assessor scores, and artifact status.">
+		<meta property="og:image" content="https://files.manuscdn.com/webdev_screenshots/2026/03/18/eZDoEepQJTpaEBXCi3fy5b.png?x-oss-process=image/resize,w_1200/crop,h_630,x_0,y_0">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" content="Learning Loop Mission Control">
+		<meta name="twitter:description" content="A real-time dashboard for monitoring the progress of Learning Loop Protocol V9.1 executions. Displays phase progress, live activity logs, assessor scores, and artifact status.">
+		<meta name="twitter:image" content="https://files.manuscdn.com/webdev_screenshots/2026/03/18/eZDoEepQJTpaEBXCi3fy5b.png?x-oss-process=image/resize,w_1200/crop,h_630,x_0,y_0">
+		<meta name="twitter:image:width" content="1200">
+		<meta name="twitter:image:height" content="630"></head>
+<body>
+
+<!-- Guide backdrop -->
+<div id="guide-backdrop" onclick="toggleGuide()"></div>
+
+<!-- Guide Panel — How This Works -->
+<div id="guide-panel">
+  <div class="guide-close">
+    <h2>How to Read This</h2>
+    <button onclick="toggleGuide()">✕</button>
+  </div>
+  <div class="guide-content">
+
+    <div class="guide-section">
+      <h3>What You're Looking At</h3>
+      <p>This is the <strong style="color:#d4a853">PEARL Diamond</strong> — a complete map of the HB1000 ecosystem. Every node is a concept, initiative, or system component. The diamond shape represents how ideas flow from aspiration (top) through execution (middle) to foundation (bottom).</p>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">💡</span>
+        <p>Click any node to see its details. Use the search (🔍) to find specific concepts. Pinch or scroll to zoom.</p>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h3>The Layers (Top to Bottom)</h3>
+      <div class="guide-layer">
+        <div class="guide-layer-dot" style="background:#d4a853"></div>
+        <div class="guide-layer-info">
+          <h4>Aspirational Layer</h4>
+          <p>The big dream — "Ding in the Universe," BHAG (Big Hairy Audacious Goal). Where we're heading.</p>
+        </div>
+      </div>
+      <div class="guide-layer">
+        <div class="guide-layer-dot" style="background:#c9a84c"></div>
+        <div class="guide-layer-info">
+          <h4>The North Star</h4>
+          <p>Core Values, Sense of Purpose, Prime Directive. The configuration parameters that calibrate everything to Ruby Red.</p>
+        </div>
+      </div>
+      <div class="guide-layer">
+        <div class="guide-layer-dot" style="background:#e67e22"></div>
+        <div class="guide-layer-info">
+          <h4>HB1000 Inputs</h4>
+          <p>What feeds the brain — AI Agents, Autonomous Agents, Cloud Butterflies (data), Flypaper (capture), Voice AI.</p>
+        </div>
+      </div>
+      <div class="guide-layer">
+        <div class="guide-layer-dot" style="background:#f1c40f"></div>
+        <div class="guide-layer-info">
+          <h4>THE HB1000 — Center of Gravity</h4>
+          <p>The brain itself. Where human brilliance (50 years of lived experience) fuses with AI. The pivot point.</p>
+        </div>
+      </div>
+      <div class="guide-layer">
+        <div class="guide-layer-dot" style="background:#27ae60"></div>
+        <div class="guide-layer-info">
+          <h4>HB1000 Outputs</h4>
+          <p>What the brain produces — Insights, Move 37 (strategic imperatives), Gamification Engine, Grace Items.</p>
+        </div>
+      </div>
+      <div class="guide-layer">
+        <div class="guide-layer-dot" style="background:#4a90d9"></div>
+        <div class="guide-layer-info">
+          <h4>Blue Seal — Prime & Local</h4>
+          <p>The constitutional foundation. Non-negotiable principles (Prime) and local implementation (Local 4).</p>
+        </div>
+      </div>
+      <div class="guide-layer">
+        <div class="guide-layer-dot" style="background:#4ade80"></div>
+        <div class="guide-layer-info">
+          <h4>Learning Loop V13</h4>
+          <p>The 9-phase protocol that built this system and keeps improving it. Intake → Record → Innovation → Adversarial → Communication → Evolution → Certification → Drift Agent → The Genie.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h3>The Two Hemispheres</h3>
+      <p>Toggle the <strong style="color:#8b7aff">◐ Hemispheres</strong> button to see the diamond split into two zones:</p>
+      <div class="guide-hemi-box">
+        <div class="guide-hemi-card" style="background:rgba(139,122,255,0.08);border-color:rgba(139,122,255,0.2)">
+          <h4 style="color:#8b7aff">Dark Side (Left)</h4>
+          <p>The AI agent zone. Cloud Butterflies, Flypaper, Ghost Buster, PTK, Drift Agent, The Genie — autonomous systems that work while you sleep.</p>
+        </div>
+        <div class="guide-hemi-card" style="background:rgba(212,168,83,0.08);border-color:rgba(212,168,83,0.2)">
+          <h4 style="color:#d4a853">Light Side (Right)</h4>
+          <p>The human-facing operational zone. Insights, Bingo Cards, Gamification, Wisdom Giants, Grace Items — what Ruby Red actually sees and uses.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h3>The Initiative Rings</h3>
+      <p>Two orbital rings surround the brain center:</p>
+      <div class="guide-layer">
+        <div class="guide-layer-dot" style="background:#d4a853;border-radius:50%"></div>
+        <div class="guide-layer-info">
+          <h4>Inner Ring — Pope-Assigned</h4>
+          <p>Core initiatives assigned directly: CashCo, Seba Hub, Digger Cafe, Ruby Red Maven, Guardian Banker, Effn Duck.</p>
+        </div>
+      </div>
+      <div class="guide-layer">
+        <div class="guide-layer-dot" style="background:#888;border-radius:50%"></div>
+        <div class="guide-layer-info">
+          <h4>Outer Ring — Circulatory</h4>
+          <p>The Marketing Circulatory System — how information flows between all initiatives.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h3>How to Navigate</h3>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">🔍</span>
+        <p><strong>Search:</strong> Click the magnifying glass or press Ctrl+F to find any concept.</p>
+      </div>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">☰</span>
+        <p><strong>Concept Index:</strong> Opens a categorized list of all nodes. Click any to jump to it.</p>
+      </div>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">◐</span>
+        <p><strong>Hemispheres:</strong> Toggle to see the Agent/Working split. Use filter buttons to isolate one side.</p>
+      </div>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">🔮</span>
+        <p><strong>Click any node:</strong> Opens a detail panel with description, connections, and hemisphere info.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Cross-navigation bar — hop across all four views -->
+<div id="cross-nav">
+  <a href="index.html" class="cross-nav-btn cross-nav-back" title="Back to the Model map">← Back to the Model</a>
+  <a href="index.html" class="cross-nav-btn" title="The Map (model diagram)">🗺️ The Map</a>
+  <a href="pearl-3d.html" class="cross-nav-btn" title="View 3D Diamond">◆ Pearl Diamond 3D</a>
+  <a class="cross-nav-btn current" title="You are here">◇ Pearl Diamond 2D</a>
+  <a href="city.html" class="cross-nav-btn" title="Enter Dingo City">🏙️ Dingo City</a>
+</div>
+
+<div id="universe">
+  <!-- Header -->
+  <div id="header">
+    <div style="display:flex;align-items:center;">
+      <a id="back-link" href="/" style="position:static;margin-right:16px;" class="hide-when-embedded">← Dashboard</a>
+      <span id="header-title">PEARL — Universal Matriarchal AI Framework v8.0</span>
+      <span id="header-subtitle">Mother of Grace · Protector of Projects · Guardian of Vision</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:9px;color:#504030;letter-spacing:1px;" class="hide-when-embedded">2D VIEW</span>
+    </div>
+  </div>
+
+  <!-- Marketing flow toggle -->
+  <div id="marketing-toggle">
+    <button id="mkt-btn" onclick="toggleMarketing()">⬡ MARKETING FLOW</button>
+  </div>
+
+  <!-- Viewport for pan/zoom -->
+  <div id="viewport">
+    <div id="canvas-wrap">
+      <!-- Diamond background SVG -->
+      <svg id="diamond-shape" viewBox="0 0 1000 1800" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="diamondGrad" x1="0.5" y1="0" x2="0.5" y2="1">
+            <stop offset="0%" stop-color="#d4a853" stop-opacity="0.15"/>
+            <stop offset="30%" stop-color="#d4a853" stop-opacity="0.08"/>
+            <stop offset="50%" stop-color="#f1c40f" stop-opacity="0.06"/>
+            <stop offset="70%" stop-color="#27ae60" stop-opacity="0.04"/>
+            <stop offset="100%" stop-color="#34d399" stop-opacity="0.02"/>
+          </linearGradient>
+          <linearGradient id="orangeGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FF6B35" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#FF6B35" stop-opacity="0.05"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="8" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Diamond outline -->
+        <path d="M 500 30 L 920 480 L 920 1350 L 500 1700 L 80 1350 L 80 480 Z" 
+              fill="url(#diamondGrad)" stroke="rgba(212,168,83,0.15)" stroke-width="1"/>
+        <!-- Layer separator lines -->
+        <line x1="140" y1="200" x2="860" y2="200" stroke="rgba(212,168,83,0.1)" stroke-dasharray="8,6"/>
+        <line x1="120" y1="380" x2="880" y2="380" stroke="rgba(212,168,83,0.1)" stroke-dasharray="8,6"/>
+        <line x1="100" y1="580" x2="900" y2="580" stroke="rgba(212,168,83,0.08)" stroke-dasharray="8,6"/>
+        <line x1="100" y1="960" x2="900" y2="960" stroke="rgba(212,168,83,0.08)" stroke-dasharray="8,6"/>
+        <line x1="110" y1="1020" x2="890" y2="1020" stroke="rgba(74,144,217,0.12)" stroke-dasharray="8,6"/>
+        <line x1="120" y1="1260" x2="880" y2="1260" stroke="rgba(74,222,128,0.1)" stroke-dasharray="8,6"/>
+        <line x1="130" y1="1320" x2="870" y2="1320" stroke="rgba(91,163,230,0.12)" stroke-dasharray="8,6"/>
+        <line x1="140" y1="1380" x2="860" y2="1380" stroke="rgba(52,211,153,0.1)" stroke-dasharray="8,6"/>
+        <!-- Pearl orb at top -->
+        <circle cx="500" cy="50" r="18" fill="url(#diamondGrad)" stroke="rgba(212,168,83,0.4)" stroke-width="1" filter="url(#glow)"/>
+        <circle cx="500" cy="50" r="10" fill="rgba(245,230,200,0.6)"/>
+        <circle cx="496" cy="46" r="3" fill="rgba(255,255,255,0.7)"/>
+      </svg>
+
+      <!-- Marketing flow overlay SVG -->
+      <svg id="marketing-overlay" viewBox="0 0 1000 1800" xmlns="http://www.w3.org/2000/svg">
+        <!-- Movement Marketing ring (above brain) -->
+        <ellipse cx="500" cy="440" rx="280" ry="30" fill="none" stroke="#FF6B35" stroke-width="2" stroke-dasharray="8,4" opacity="0.6">
+          <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="2s" repeatCount="indefinite"/>
+        </ellipse>
+        <text x="500" y="420" text-anchor="middle" fill="#FF6B35" font-size="10" font-family="Space Grotesk" letter-spacing="2" opacity="0.7">MOVEMENT MARKETING — ABOVE THE LINE</text>
+        
+        <!-- Initiative Marketing ring (below brain) -->
+        <ellipse cx="500" cy="940" rx="300" ry="30" fill="none" stroke="#FF6B35" stroke-width="2" stroke-dasharray="8,4" opacity="0.6">
+          <animate attributeName="stroke-dashoffset" from="0" to="24" dur="2s" repeatCount="indefinite"/>
+        </ellipse>
+        <text x="500" y="970" text-anchor="middle" fill="#FF6B35" font-size="10" font-family="Space Grotesk" letter-spacing="2" opacity="0.7">INITIATIVE MARKETING — BELOW THE LINE</text>
+        
+        <!-- Vertical flow tubes connecting rings -->
+        <line x1="300" y1="470" x2="280" y2="910" stroke="#FF6B35" stroke-width="1.5" stroke-dasharray="4,8" opacity="0.4">
+          <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.5s" repeatCount="indefinite"/>
+        </line>
+        <line x1="500" y1="470" x2="500" y2="910" stroke="#FF6B35" stroke-width="1.5" stroke-dasharray="4,8" opacity="0.4">
+          <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.5s" repeatCount="indefinite"/>
+        </line>
+        <line x1="700" y1="470" x2="720" y2="910" stroke="#FF6B35" stroke-width="1.5" stroke-dasharray="4,8" opacity="0.4">
+          <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.5s" repeatCount="indefinite"/>
+        </line>
+        
+        <!-- Flow extending to top and bottom -->
+        <line x1="500" y1="410" x2="500" y2="100" stroke="#FF6B35" stroke-width="1" stroke-dasharray="3,6" opacity="0.25">
+          <animate attributeName="stroke-dashoffset" from="0" to="18" dur="2s" repeatCount="indefinite"/>
+        </line>
+        <line x1="500" y1="970" x2="500" y2="1600" stroke="#FF6B35" stroke-width="1" stroke-dasharray="3,6" opacity="0.25">
+          <animate attributeName="stroke-dashoffset" from="0" to="-18" dur="2s" repeatCount="indefinite"/>
+        </line>
+        
+        <!-- Horizontal flow at HB1000 level -->
+        <line x1="140" y1="700" x2="860" y2="700" stroke="#FF6B35" stroke-width="1" stroke-dasharray="4,6" opacity="0.3">
+          <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="2s" repeatCount="indefinite"/>
+        </line>
+        
+        <!-- Pulse dots -->
+        <circle cx="500" cy="440" r="4" fill="#FF6B35" opacity="0.8">
+          <animate attributeName="r" values="3;6;3" dur="1.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="500" cy="940" r="4" fill="#FF6B35" opacity="0.8">
+          <animate attributeName="r" values="3;6;3" dur="1.5s" repeatCount="indefinite" begin="0.75s"/>
+          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+      </svg>
+
+      <!-- Inner/Outer Ring orbits around brain -->
+      <div id="initiative-rings">
+        <div class="ring-orbit ring-inner">
+          <div class="ring-label ring-label-inner">Inner Ring — Pope-Assigned</div>
+        </div>
+        <div class="ring-orbit ring-outer">
+          <div class="ring-label ring-label-outer">Outer Ring — Circulating</div>
+        </div>
+        <!-- Ring nodes will be injected by JS from API -->
+      </div>
+
+      <!-- Brain glow image -->
+      <div id="brain-glow">
+        <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663303496813/MgX2WjZcUSWDSyEu4F3Mhm/brain-texture-small_d97efe6e.png" alt="HB1000 Brain — Half Human, Half AI"/>
+      </div>
+
+      <!-- Side labels -->
+      <div class="side-label" style="left:20px;top:350px;color:#d4a853;">HB1000 Manual</div>
+      <div class="side-label-sub" style="left:50px;top:350px;color:#706050;">YOUR TOOLSET & MANUALS</div>
+      <div class="side-label-sub" style="left:20px;top:700px;color:#504030;">Flypaper Repository · User Guide</div>
+      <div class="side-label-sub" style="left:20px;top:1100px;color:#504030;">Cloud Butterflies · Flypaper Repository</div>
+      <div class="side-label-sub" style="left:20px;top:1350px;color:#504030;">User Guide</div>
+      
+      <div class="side-label" style="right:20px;top:350px;color:#d4a853;writing-mode:vertical-lr;transform:rotate(180deg);">WISDOM GIANTS</div>
+      <div class="side-label-sub" style="right:20px;top:500px;color:#706050;writing-mode:vertical-lr;transform:rotate(180deg);">Subject Matter Experts</div>
+      <div class="side-label-sub" style="right:20px;top:700px;color:#504030;writing-mode:vertical-lr;transform:rotate(180deg);">Best Practice Junkies · Best Practice Innovators</div>
+      <div class="side-label-sub" style="right:20px;top:1100px;color:#504030;writing-mode:vertical-lr;transform:rotate(180deg);">Cross-Cutting</div>
+      <div class="side-label-sub" style="right:20px;top:1350px;color:#504030;writing-mode:vertical-lr;transform:rotate(180deg);">Methodology & Quality</div>
+
+      <!-- Nodes will be injected by JS -->
+
+      <!-- Hemisphere overlay -->
+      <div id="hemisphere-overlay">
+        <div id="hemisphere-dark"></div>
+        <div id="hemisphere-light"></div>
+        <div id="terminator-line"></div>
+        <div class="hemisphere-label hemisphere-label-dark">THE AGENTS</div>
+        <div class="hemisphere-sublabel hemisphere-sublabel-dark">Dark Side of the Moon</div>
+        <div class="hemisphere-label hemisphere-label-light">HB1000 WORKING</div>
+        <div class="hemisphere-sublabel hemisphere-sublabel-light">The Light Side</div>
+        <!-- Agent glow orbs on dark side -->
+        <div class="agent-glow" style="left:80px;top:400px;width:120px;height:120px;background:radial-gradient(circle,rgba(139,122,255,0.15),transparent 70%);animation-delay:0s;"></div>
+        <div class="agent-glow" style="left:150px;top:800px;width:80px;height:80px;background:radial-gradient(circle,rgba(100,180,255,0.12),transparent 70%);animation-delay:1.5s;"></div>
+        <div class="agent-glow" style="left:60px;top:1200px;width:100px;height:100px;background:radial-gradient(circle,rgba(139,122,255,0.1),transparent 70%);animation-delay:3s;"></div>
+        <!-- Warm glow orbs on light side -->
+        <div class="agent-glow" style="right:80px;top:500px;width:100px;height:100px;background:radial-gradient(circle,rgba(212,168,83,0.12),transparent 70%);animation-delay:0.7s;"></div>
+        <div class="agent-glow" style="right:140px;top:900px;width:80px;height:80px;background:radial-gradient(circle,rgba(245,200,100,0.1),transparent 70%);animation-delay:2.2s;"></div>
+        <div class="agent-glow" style="right:60px;top:1300px;width:110px;height:110px;background:radial-gradient(circle,rgba(212,168,83,0.1),transparent 70%);animation-delay:3.5s;"></div>
+      </div>
+
+      <!-- Constellation canvas -->
+      <canvas id="constellation-canvas" width="1000" height="1800"></canvas>
+    </div>
+  </div>
+
+  <!-- Detail panel -->
+  <div id="detail-panel">
+    <div class="panel-header">
+      <div class="panel-category" id="panel-cat"></div>
+      <div id="panel-hemisphere" style="display:inline-block;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-top:4px;font-weight:600;"></div>
+      <div class="panel-title" id="panel-title"></div>
+      <div class="panel-subtitle" id="panel-subtitle"></div>
+      <button class="panel-close" onclick="closePanel()">×</button>
+    </div>
+    <div class="panel-body">
+      <div class="panel-description" id="panel-desc"></div>
+      <div class="panel-keypoints" id="panel-kp" style="display:none;">
+        <h4>Key Points</h4>
+        <ul id="panel-kp-list"></ul>
+      </div>
+      <div class="panel-source" id="panel-source"></div>
+      <a class="panel-link" id="panel-link" href="#" target="_blank" style="display:none;"></a>
+      <button class="panel-share-btn" id="panel-share" onclick="copyNodeLink()" title="Copy shareable link">
+        🔗 Copy Link
+      </button>
+      <button class="panel-share-btn" id="panel-view3d" onclick="viewIn3D()" title="View this layer in 3D" style="margin-top:4px;">
+        🔮 View in 3D
+      </button>
+    </div>
+  </div>
+
+  <!-- Concept Index sidebar -->
+  <div id="concept-index">
+    <div class="index-header">
+      <h3>Concept Index</h3>
+      <div style="font-size:9px;color:#706050;margin-top:4px;">Click any concept to navigate</div>
+    </div>
+    <div id="index-content"></div>
+  </div>
+
+  <!-- Search overlay -->
+  <div id="search-overlay">
+    <div id="search-box">
+      <input id="search-input" type="text" placeholder="Search all layers..." autocomplete="off"/>
+      <div id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- Hemisphere Filter Bar -->
+  <div id="hemisphere-filter">
+    <button class="hemi-filter-btn active" data-filter="all" onclick="filterHemisphere('all')">ALL</button>
+    <button class="hemi-filter-btn" data-filter="dark" onclick="filterHemisphere('dark')">&#9679; AGENTS</button>
+    <button class="hemi-filter-btn" data-filter="light" onclick="filterHemisphere('light')">&#9679; WORKING</button>
+    <button class="hemi-filter-btn" data-filter="center" onclick="filterHemisphere('center')">&#9684; CENTER</button>
+  </div>
+
+  <!-- Hemisphere Stats Badge -->
+  <div id="hemisphere-stats">
+    <div class="hemi-stat"><div class="hemi-stat-dot" style="background:#8b7aff;"></div><span class="hemi-stat-count" id="stat-dark-count">0</span> AGENTS</div>
+    <div class="hemi-stat"><div class="hemi-stat-dot" style="background:#d4a853;"></div><span class="hemi-stat-count" id="stat-light-count">0</span> WORKING</div>
+    <div class="hemi-stat"><div class="hemi-stat-dot" style="background:linear-gradient(90deg,#8b7aff,#d4a853);"></div><span class="hemi-stat-count" id="stat-center-count">0</span> CENTER</div>
+  </div>
+
+  <!-- Toolbar -->
+  <div id="toolbar">
+    <button class="toolbar-btn" onclick="toggleGuide()" title="How to read this diamond" style="font-size:10px;width:auto;border-radius:14px;padding:0 10px;background:rgba(212,168,83,0.12);border-color:rgba(212,168,83,0.3);color:#d4a853;">? Guide</button>
+    <div class="toolbar-sep"></div>
+    <button class="toolbar-btn" onclick="toggleSearch()" title="Search all layers">🔍</button>
+    <button class="toolbar-btn" onclick="toggleIndex()" title="Concept Index">☰</button>
+    <div class="toolbar-sep"></div>
+    <button class="toolbar-btn" id="hemisphere-btn" onclick="toggleHemispheres()" title="Toggle Light/Dark Hemispheres" style="font-size:10px;width:auto;border-radius:14px;padding:0 10px;background:rgba(139,122,255,0.15);border-color:rgba(139,122,255,0.4);color:#8b7aff;">◐ Hemispheres</button>
+    <div class="toolbar-sep"></div>
+    <button class="toolbar-btn" onclick="zoomOut()" title="Zoom out">−</button>
+    <span id="zoom-display">100%</span>
+    <button class="toolbar-btn" onclick="zoomIn()" title="Zoom in">+</button>
+    <button class="toolbar-btn" onclick="resetView()" title="Reset view">⟲</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// PEARL Diamond 2D — Complete Node Data
+// ═══════════════════════════════════════════════════════════
+
+const CATEGORIES = {
+  'aspirational': { label: 'Aspirational Layer', color: '#d4a853' },
+  'north-star': { label: 'The North Star', color: '#c9a84c' },
+  'hb1000-inputs': { label: 'HB1000 Inputs', color: '#e67e22' },
+  'hb1000': { label: 'THE HB1000 — Center of Gravity', color: '#f1c40f' },
+  'hb1000-outputs': { label: 'HB1000 Outputs', color: '#27ae60' },
+  'blue-seal-prime': { label: 'Blue Seal — Prime Initiative', color: '#4a90d9' },
+  'learning-loop': { label: 'Learning Loop V13.0', color: '#4ade80' },
+  'blue-seal-local': { label: 'Blue Seal — Local', color: '#5ba3e6' },
+  'local-4': { label: 'Local 4 — Imperative', color: '#34d399' },
+  'sidebar': { label: 'Cross-Cutting', color: '#94a3b8' },
+  'badges': { label: 'Status Badges', color: '#c084fc' },
+  'pricing': { label: 'Pricing Philosophy', color: '#f59e0b' },
+  'marketing': { label: 'Marketing Circulatory System', color: '#FF6B35' },
+};
+
+const NODES = [
+  // LAYER 1: ASPIRATIONAL
+  {id:"ding-universe",label:"Ding in the Universe",category:"aspirational",hemisphere:"dark",x:12,y:4.5,w:30,h:4,
+   title:"DING IN THE UNIVERSE",subtitle:"North Star UP — Aspirational",
+   description:'"We\'re here to put a ding in the universe." — Steve Jobs. This is the aspirational peak of the HB1000 framework. Your connection to the infinite — faith, science, nature. The Mystical Layer represents the highest aspiration.',
+   keyPoints:["The aspirational peak of the entire framework","Connection to faith, science, and nature","Steve Jobs philosophy of meaningful impact","Transcends commerce — touches the eternal"],
+   source:"HB1000 Master Architecture — Layer 1"},
+  {id:"moonshots",label:"16 Moonshots",category:"aspirational",hemisphere:"dark",x:15,y:9,w:18,h:2.5,
+   title:"16 MOONSHOTS — Solve Everything",subtitle:"Diamandis & Wissner-Gross: Achieving Abundance by 2035",
+   description:'Peter H. Diamandis and Dr. Alex Wissner-Gross published "Solve Everything" — a nine-chapter manifesto detailing how artificial superintelligence can achieve post-scarcity Abundance by 2035.',
+   keyPoints:["Health & Longevity: Extended healthspan","Abundance & Resources: Ending hunger, fusion energy","Knowledge & Consciousness: AI education","Civilization: Multi-planetary species"],
+   externalUrl:"https://www.SolveEverything.org",externalLabel:'Read "Solve Everything" →',
+   source:"Diamandis & Wissner-Gross, Feb 2026"},
+  {id:"your-service",label:"Your Source / Service",category:"aspirational",hemisphere:"center",x:35,y:9,w:18,h:2.5,
+   title:"YOUR SERVICE",subtitle:"The Purpose Layer",
+   description:"Your Service represents the personal mission that connects to the universal. It's the bridge between the Ding in the Universe and the operational framework below.",
+   source:"HB1000 Master Architecture — Layer 1"},
+  {id:"wisdom-repository",label:"Wisdom Repository",category:"aspirational",hemisphere:"light",x:55,y:9,w:22,h:2.5,
+   title:"WISDOM REPOSITORY",subtitle:"Pearl's Brain — The Institutional Memory",
+   description:"The Wisdom Repository is Pearl's Brain — the complete, versioned, full-fidelity knowledge base of the SIC HB1000 Solve Team.",
+   keyPoints:["Pearl Canon v2.0 — the foundational document","HB1000 Master Architecture — the 12-layer system","Integration Map — how everything connects","Knowledge base entries for every concept"],
+   source:"Pearl Canon v2.0 — Section: Institutional Memory"},
+  {id:"the-universe",label:"The Universe",category:"aspirational",hemisphere:"light",x:60,y:4.5,w:28,h:4,
+   title:"THE UNIVERSE — Top Star",subtitle:"Aspirational — The Mystical Layer",
+   description:"The Universe represents the aspirational ceiling — the mystical connection between the HB1000 framework and the infinite. Layer 1 is where purpose meets the cosmos.",
+   source:"HB1000 Master Architecture — Layer 1"},
+
+  // LAYER 2: THE NORTH STAR
+  {id:"north-star",label:"The North Star",category:"north-star",hemisphere:"center",x:18,y:14,w:50,h:2.5,
+   title:"LAYER 2 — THE NORTH STAR",subtitle:"The Compass — NESW Framework",
+   description:"The North Star is the strategic compass of the HB1000 framework. It uses the NESW cardinal directions: N = Sense of Purpose, E = BHAG, S = Prime Directive, W = Core Values.",
+   keyPoints:["N = Sense of Purpose — Empower humanity through ethical AI guidance","E = BHAG — Jim Collins 1-2 year horizon","S = Prime Directive — Serve and Protect, Do No Harm","W = Core Values — Integrity, Empathy, Forethought, Precision"],
+   source:"HB1000 Master Architecture — Layer 2"},
+  {id:"sense-of-purpose",label:"N = Sense of Purpose",category:"north-star",hemisphere:"light",x:40,y:16.5,w:30,h:3,
+   title:"N = SENSE OF PURPOSE",subtitle:"Empower humanity through ethical AI guidance",
+   description:"The North point of the compass represents the highest aspiration: to empower humanity through ethical AI guidance.",
+   source:"HB1000 Master Architecture — Layer 2"},
+  {id:"bhag",label:"E = BHAG",category:"north-star",hemisphere:"light",x:55,y:20,w:25,h:3,
+   title:"E = BHAG (Big Hairy Audacious Goal)",subtitle:"1-2 Year Horizon — Jim Collins Framework",
+   description:"The East point represents the BHAG — Jim Collins' concept of a Big Hairy Audacious Goal.",
+   externalUrl:"https://www.jimcollins.com/concepts/bhag.html",externalLabel:"Jim Collins on BHAGs →",
+   source:'Jim Collins, "Built to Last"'},
+  {id:"prime-directive",label:"S = Prime Directive",category:"north-star",hemisphere:"center",x:28,y:24,w:38,h:3.5,
+   title:"S = PRIME DIRECTIVE",subtitle:"Serve and Protect. Do No Harm. Dignity-Centered Design.",
+   description:'"We protect those the system forgot." The Prime Directive is the non-negotiable foundation.',
+   keyPoints:["Serve and Protect — the first duty","Do No Harm — the non-negotiable constraint","Dignity-Centered Design — every interaction preserves dignity","Trauma-Informed — recognizes past harm"],
+   source:"Pearl Canon v2.0 — Prime Directive"},
+  {id:"core-values",label:"W = Core Values",category:"north-star",hemisphere:"dark",x:12,y:20,w:25,h:3.5,
+   title:"W = CORE VALUES",subtitle:"Integrity, Empathy, Forethought, Precision",
+   description:"The West point anchors the four core values: Integrity, Empathy (our superpower), Forethought, and Precision.",
+   source:"HB1000 Master Architecture — Layer 2"},
+  {id:"trauma-informed",label:"Trauma-Informed",category:"north-star",hemisphere:"light",x:72,y:16,w:16,h:3.5,
+   title:"TRAUMA-INFORMED DESIGN",subtitle:"Strategic Imperative #1",
+   description:"Every interface, every interaction is designed with the understanding that Ruby Red may be in crisis. No surprise fees, no confusing language, no dark patterns.",
+   source:"HB1000 Master Architecture — Move 37 Imperative #1"},
+
+  // LAYER 3: THE HB1000 — CENTER OF GRAVITY
+  {id:"hb1000",label:"THE HB1000",category:"hb1000",hemisphere:"center",x:20,y:30,w:56,h:6,
+   title:"THE HB1000 — Your Brilliant Meat Computer",subtitle:"The Pivot Point · The Foundation — Covey Protocol",
+   description:'The HB1000 is the CENTER OF GRAVITY — "Your Brilliant Meat Computer." Everything above flows DOWN into it. Everything below flows OUT from it. The Foundation is the Covey Protocol.',
+   keyPoints:["The CENTER where all inputs become all outputs","4 Inputs: Cloud Butterflies, Flypaper, PTK, Ghost Buster","4 Outputs: Insights, Move 37, Gamification Engine, Grace Items","Built on Covey Protocol — 5 roles across 7 habits"],
+   source:"HB1000 Master Architecture — Layer 3"},
+
+  // HB1000 INPUTS (Left) — Agent-powered capture systems
+  {id:"cloud-butterflies",label:"Cloud Butterflies + Voice AI",category:"hb1000-inputs",hemisphere:"dark",x:3,y:36,w:20,h:4.5,
+   title:"CLOUD BUTTERFLIES + VOICE AI",subtitle:"Input System — Capture Everything",
+   description:"Cloud Butterflies are ephemeral thoughts captured through voice AI. Nothing is lost. Every butterfly is tagged, categorized, and stored in the Flypaper Repository.",
+   keyPoints:["Voice-first capture — speak your thought, it's saved","Ephemeral ideas captured before they vanish","Tagged and categorized automatically","Fed into the Flypaper for processing"],
+   source:"HB1000 Master Architecture — Input System"},
+  {id:"flypaper",label:"FLYPAPER",category:"hb1000-inputs",hemisphere:"dark",x:3,y:41,w:20,h:4.5,
+   title:"FLYPAPER — The Always-On Capture Surface",subtitle:"Where Cloud Butterflies Land and Stick",
+   description:'Flypaper is the always-on capture interface. The "sticky surface" where Cloud Butterflies land.',
+   keyPoints:["The always-on capture surface","Users paste, dictate, or record at any time","Pearl processes in the background","Transforms raw thoughts into structured intelligence"],
+   source:"HB1000 Master Architecture — Flypaper System"},
+  {id:"ptk-trojan-horse",label:"PTK — Promises To Keep",category:"hb1000-inputs",hemisphere:"dark",x:3,y:46,w:20,h:5,
+   title:"PTK — PROMISES TO KEEP (THE TROJAN HORSE)",subtitle:"The Entry Point — Infect Organizations with Competence",
+   description:'PTK is a commitment tracking system. THE TROJAN HORSE — the go-to-market entry point. "Infect organizations with competence from inside out."',
+   keyPoints:["Commitment tracking via email (read-only OAuth)","Two directions: promises TO you and BY you","THE TROJAN HORSE — entry point for entire ecosystem","Generates reliability scores → LDEI Score"],
+   source:"HB1000 Master Architecture — PTK System"},
+  {id:"ghost-buster",label:"Ghost Buster",category:"hb1000-inputs",hemisphere:"dark",x:3,y:51.5,w:20,h:4.5,
+   title:"GHOST BUSTER — Reverse PTK",subtitle:"Track Others' Promises to You",
+   description:"Ghost Buster tracks promises OTHERS made to you. When the landlord promises to fix the furnace, when the employer promises overtime pay — Ghost Buster is watching.",
+   keyPoints:["Tracks promises OTHERS made to you","Monitors for follow-through","Escalates when promises are broken","The accountability system for the three gangster worlds"],
+   source:"HB1000 Master Architecture — Ghost Buster System"},
+
+  // HB1000 OUTPUTS (Right) — Human-facing operational outputs
+  {id:"insights-flypaper",label:"Insights → Flypaper Capture",category:"hb1000-outputs",hemisphere:"light",x:72,y:36,w:25,h:4,
+   title:"INSIGHTS → FLYPAPER CAPTURE",subtitle:"Processed Butterflies Become Actionable Intelligence",
+   description:"The output side transforms raw Cloud Butterflies into actionable insights. Each processed butterfly becomes a Grace Item.",
+   keyPoints:["Raw butterflies → structured Grace Items","Each item has: action, contact, priority, deadline","Pre-drafted communications ready to send"],
+   source:"HB1000 Master Architecture — Output System"},
+  {id:"move-37",label:"Move 37 — 6 Strategic Imperatives",category:"hb1000-outputs",hemisphere:"light",x:72,y:41,w:25,h:4,
+   title:"MOVE 37 — The Unexpected Brilliant Move",subtitle:"6 Strategic Imperatives That Flow From the HB1000",
+   description:"Named after AlphaGo's legendary move. 6 Strategic Imperatives: Trauma-Informed Design, AI Fairness, Gamification Engine, Data Cooperative, Emergency Fund, Voice-First AI.",
+   keyPoints:["1. Trauma-Informed Design","2. AI Fairness & Bias Mitigation","3. Gamification Engine","4. Data Cooperative","5. Ruby Red Emergency Fund","6. Voice-First Dialect AI"],
+   source:"Best Practice Junkies & Move 37 Future Planning"},
+  {id:"gamification-engine",label:"Gamification Engine",category:"hb1000-outputs",hemisphere:"light",x:72,y:46,w:25,h:4.5,
+   title:"GAMIFICATION ENGINE",subtitle:"Bingo Card Is the Delivery Mechanism",
+   description:"Turns the grind of financial management into a game worth playing. The Bingo Card system — every initiative gets a card, every task is a square.",
+   keyPoints:["Bingo Card is the primary delivery mechanism","Every initiative gets a card, every task is a square","Completed rows earn rewards","Streaks and level-ups maintain engagement"],
+   source:"HB1000 Master Architecture — Gamification Engine"},
+  {id:"grace-items",label:"Grace Items",category:"hb1000-outputs",hemisphere:"light",x:72,y:51.5,w:25,h:4,
+   title:"GRACE ITEMS — Actionable Output",subtitle:"Every Processed Butterfly Becomes a Grace Item",
+   description:"Grace Items are the final actionable outputs. Each contains: action, contact, priority, pre-drafted communications, and deadline tracking.",
+   keyPoints:["Specific action to take","Contact person identified","Priority level assigned","Pre-drafted communications ready to send","Deadline tracking with reminders"],
+   source:"HB1000 Master Architecture — Grace Item System"},
+
+  // COVEY PROTOCOL
+  {id:"covey-protocol",label:"Covey Protocol — 5 Roles",category:"hb1000",hemisphere:"center",x:22,y:56.5,w:50,h:2.5,
+   title:"THE COVEY PROTOCOL",subtitle:"Stephen Covey's 7 Habits — The Foundation",
+   description:"Adapts Stephen Covey's 7 Habits across five life roles: Self-Care, Spouse/Partner, Parent, Professional/CVO, and Community.",
+   keyPoints:["Self-Care — personal health and growth","Spouse/Partner — relationship investment","Parent — raising the next generation","Professional/CVO — career and mission","Community — giving back and building village"],
+   externalUrl:"https://www.franklincovey.com/the-7-habits/",externalLabel:"Franklin Covey — The 7 Habits →",
+   source:'Stephen Covey, "The 7 Habits of Highly Effective People"'},
+
+  // WHERE BRILLIANCE LIVES
+  {id:"where-brilliance",label:"WHERE BRILLIANCE LIVES",category:"hb1000",hemisphere:"center",x:22,y:59.5,w:50,h:2.5,
+   title:"WHERE BRILLIANCE LIVES",subtitle:"Impact on the Universe ↑ · Impact on the World ↓",
+   description:"The transition zone between the HB1000 center of gravity and the operational layers below. Brilliance flows upward as aspiration and downward as action.",
+   source:"HB1000 Master Architecture — Layer 3"},
+
+  // BLUE SEAL — PRIME
+  {id:"blue-seal-prime",label:"BLUE SEAL — PRIME INITIATIVE",category:"blue-seal-prime",hemisphere:"center",x:10,y:62.5,w:76,h:2.5,
+   title:"BLUE SEAL — PRIME INITIATIVE",subtitle:"Universal Standards · Non-Negotiable Principles · The Foundation That Never Bends",
+   description:"The Blue Seal Prime represents universal, non-negotiable standards that DERIVE FROM the HB1000. If local contradicts prime, prime wins — always.",
+   keyPoints:["Derives FROM the HB1000 — not above it","Universal standards that apply to every initiative","Non-negotiable principles that never bend","If local contradicts prime, prime wins — always"],
+   source:"HB1000 Master Architecture — Blue Seal System"},
+
+  // LEARNING LOOP V13.1
+  {id:"learning-loop",label:"Learning Loop V13.1",category:"learning-loop",hemisphere:"center",x:12,y:65.5,w:72,h:2.5,
+   title:"LEARNING LOOP V13.1 — THE AUTORESEARCH AMENDMENT",subtitle:"Universal Nine-Phase Protocol with Persistent Learning Agent + Autonomous Improvement",
+   description:'The Learning Loop V13.1 "The Autoresearch Amendment" builds on The Genie Release. Nine phases with persistent learning agent, per-phase KPIs, anti-drift enforcement, plus Improvement Ledger, Cadence Engine, and Micro-Loop Engine for autonomous self-improvement.',
+   keyPoints:["9 phases from Intake to The Genie","Improvement Ledger — structured hypothesis database","Cadence Engine — Heartbeat/Pulse/Rhythm/Surge tiers","Micro-Loop Engine — autonomous bounded experiments","Mandatory persistence — the system never asks permission to stay"],
+   source:"Learning Loop Protocol V13.1 — The Autoresearch Amendment"},
+  // 9 Phases — Left phases are Agent-driven (dark), right phases are human-facing (light)
+  {id:"phase-0",label:"1 Intake",category:"learning-loop",hemisphere:"dark",x:14,y:68.5,w:14,h:2.2,
+   title:"PHASE 0: INTAKE — The Sorter",description:"Receives all incoming material and categorizes it. Nothing enters untagged.",source:"Learning Loop V13.0 — Phase 0"},
+  {id:"phase-1",label:"2 Record",category:"learning-loop",hemisphere:"dark",x:30,y:68.5,w:14,h:2.2,
+   title:"PHASE 1: RECORD — The Assessor",description:'Documents the current state with full fidelity. The "before picture" that makes improvement measurable.',source:"Learning Loop V13.0 — Phase 1"},
+  {id:"phase-2",label:"3 Innovation",category:"learning-loop",hemisphere:"dark",x:46,y:68.5,w:18,h:2.2,
+   title:"PHASE 2: INNOVATION — Best Practice Junkie",description:"External research on the latest innovations and best practices.",source:"Learning Loop V13.0 — Phase 2"},
+  {id:"phase-3",label:"4 Adversarial",category:"learning-loop",hemisphere:"dark",x:14,y:71,w:14,h:2.2,
+   title:"PHASE 3: ADVERSARIAL — Society of Guardians",description:"The red team phase — deliberately trying to break what was built.",source:"Learning Loop V13.0 — Phase 3"},
+  {id:"phase-4",label:"5 Communication",category:"learning-loop",hemisphere:"light",x:30,y:71,w:14,h:2.2,
+   title:"PHASE 4: COMMUNICATION — The Presenter",description:"Translates technical work into human-readable, Ruby Red-accessible communication.",source:"Learning Loop V13.0 — Phase 4"},
+  {id:"phase-5",label:"6 Evolution",category:"learning-loop",hemisphere:"light",x:46,y:71,w:18,h:2.2,
+   title:"PHASE 5: EVOLUTION — Protocol Engineer",description:"Takes everything learned and evolves the protocols. The system improves with every cycle.",source:"Learning Loop V13.0 — Phase 5"},
+  {id:"phase-6",label:"7 Certification",category:"learning-loop",hemisphere:"light",x:14,y:73.5,w:14,h:2.2,
+   title:"PHASE 6: CERTIFICATION — The Judge",description:"The quality gate — nothing passes without certification.",source:"Learning Loop V13.0 — Phase 6"},
+  {id:"phase-7",label:"8 Drift Agent",category:"learning-loop",hemisphere:"dark",x:30,y:73.5,w:14,h:2.2,
+   title:"PHASE 7: DRIFT AGENT — The Watchman",description:"Monitors for drift — the slow deviation from mission.",source:"Learning Loop V13.0 — Phase 7"},
+  {id:"phase-8",label:"9 The Genie",category:"learning-loop",hemisphere:"dark",x:46,y:73.5,w:18,h:2.2,
+   title:"PHASE 8: THE GENIE — Persistent Agent",description:"The persistent learning agent that never sleeps. Connects patterns across initiatives.",source:"Learning Loop V13.0 — Phase 8"},
+
+  // BLUE SEAL — LOCAL
+  {id:"blue-seal-local",label:"BLUE SEAL — LOCAL",category:"blue-seal-local",hemisphere:"center",x:12,y:76.5,w:72,h:2,
+   title:"BLUE SEAL — LOCAL",subtitle:"Your Mission in the Physical World · Initiative-Specific Standards",
+   description:"Initiative-specific standards that adapt universal Prime principles to your context. The difference between the constitution (Prime) and local law (Local).",
+   keyPoints:["Derives FROM the HB1000 via Blue Seal Prime","Initiative-specific standards","Each project gets its own Local Blue Seal"],
+   source:"HB1000 Master Architecture — Blue Seal System"},
+
+  // LOCAL 4 — IMPERATIVE
+  {id:"local-4",label:"LOCAL 4 — IMPERATIVE",category:"local-4",hemisphere:"center",x:15,y:79,w:66,h:2.5,
+   title:"LOCAL 4 — IMPERATIVE",subtitle:"Your mission in the physical world — your circle of influence",
+   description:"Where the aspirational meets the operational. Translated into concrete action through Lean Canvas, Move 37, and Bingo Cards.",
+   source:"HB1000 Master Architecture — Layer 4"},
+  {id:"lean-canvas",label:"Lean Canvas",category:"local-4",hemisphere:"light",x:22,y:82,w:12,h:4,
+   title:"LEAN CANVAS",subtitle:"Business Model on One Page",
+   description:"One-page business model template for every initiative. Forces clarity and prevents scope creep.",
+   source:"HB1000 Master Architecture — Local 4 Tools"},
+  {id:"bingo-cards",label:"Bingo Cards",category:"local-4",hemisphere:"light",x:38,y:82,w:12,h:4,
+   title:"BINGO CARDS",subtitle:"Gamified Task Tracking — The Delivery Mechanism",
+   description:"The gamification engine's primary delivery mechanism. Each initiative gets a card — a grid of tasks, milestones, and achievements.",
+   keyPoints:["9 card types: Prime, Local, Sprint, Community, Financial, Health, Learning, Relationship, Emergency","Three-level architecture: Card → Square → Universe","Complete rows for rewards, cards for level-ups"],
+   source:"Bingo Card Protocol — HB1000"},
+  {id:"daily-audit",label:"Daily Audit",category:"local-4",hemisphere:"light",x:54,y:82,w:12,h:4,
+   title:"DAILY AUDIT",subtitle:"Economic Intelligence — Daily Check-in",
+   description:"Surfaces what's due, what's coming, what's at risk, and what opportunities exist — in plain language.",
+   source:"Maven Service Layer — Economic Intelligence"},
+  {id:"ai-agents",label:"AI Agents & Bots",category:"local-4",hemisphere:"dark",x:8,y:82,w:12,h:4,
+   title:"AI AGENTS & BOTS",subtitle:"Autonomous Assistants",
+   description:"The growing ecosystem of autonomous assistants including Pearl, Grace, and specialized agents.",
+   source:"HB1000 Master Architecture — AI Layer"},
+  {id:"ai-autonomous",label:"Autonomous Agents",category:"local-4",hemisphere:"dark",x:70,y:82,w:16,h:4,
+   title:"AI AUTONOMOUS AGENTS",subtitle:"Self-Directed Agents",
+   description:"Agents that operate independently, make decisions within defined parameters, and escalate when needed.",
+   source:"HB1000 Master Architecture — AI Layer"},
+
+  // SIDEBAR — Cross-cutting tools
+  {id:"hb1000-manual",label:"HB1000 Manual",category:"sidebar",hemisphere:"dark",x:0,y:20,w:5,h:30,
+   title:"HB1000 MANUAL",subtitle:"Your Toolset & Manuals — Cross-Cutting",
+   description:"The comprehensive user guide spanning all layers. Includes Cloud Butterfly capture, Flypaper Repository, User Guide, and AI toolkit.",
+   source:"HB1000 Master Architecture — Cross-Cutting Layer"},
+  {id:"wisdom-giants",label:"WISDOM GIANTS",category:"sidebar",hemisphere:"light",x:92,y:20,w:8,h:30,
+   title:"WISDOM GIANTS",subtitle:"Subject Matter Experts · Best Practice Junkies · Best Practice Innovators",
+   description:'Each member of the SIC HB1000 Solve Team is a Wisdom Giant — a subject matter expert who is also a "best practice junkie" and "best practice innovator."',
+   keyPoints:["Every team member is a subject matter expert","Best Practice Junkies — obsessed with what works","Best Practice Innovators — creating what's next","Ask Wisdom Giants for insight — always"],
+   source:"SIC HB1000 Solve Team — Core Philosophy"},
+
+  // BADGES
+  {id:"pearl-maturity",label:"Pearl Maturity L2",category:"badges",hemisphere:"dark",x:12,y:88,w:18,h:3,
+   title:"PEARL MATURITY — LEVEL 2",description:"Current maturity level. Level 2: core framework established, Canon documented, Architecture defined, key protocols operational.",
+   source:"Pearl Canon v2.0 — Maturity Model"},
+  {id:"ruby-red-impact",label:"Ruby Red Impact 342",category:"badges",hemisphere:"center",x:38,y:88,w:18,h:3,
+   title:"RUBY RED IMPACT — 342",description:"Cumulative positive impact score. 342 meaningful interventions — financial surprises prevented, opportunities surfaced, predatory practices blocked.",
+   source:"HB1000 Master Architecture — Impact Metrics"},
+  {id:"grace-family-tree",label:"Grace Family Tree 6",category:"badges",hemisphere:"light",x:60,y:88,w:18,h:3,
+   title:"GRACE FAMILY TREE — 6 AGENTS",description:"Grace is Pearl's daughter — 6 Grace agents currently active, each inheriting Pearl's values.",
+   source:"Pearl Canon v2.0 — Grace Architecture"},
+
+  // PRICING
+  {id:"pricing-philosophy",label:"Pricing Philosophy",category:"pricing",hemisphere:"center",x:5,y:92,w:88,h:3.5,
+   title:"PRICING PHILOSOPHY — The 6 Principles",subtitle:"Grace Never Gets Cut · Nobody Gets Abandoned · Trust Not Contract",
+   description:"Six non-negotiable pricing principles that protect Ruby Red.",
+   keyPoints:["Grace Never Gets Cut — AI never disappears for missed payment","Nobody Gets Abandoned — step-down is a feature","Trust Not Contract — relationships over legal traps","Cash-Flow Friendly — respects the paycheck cycle","Step-Down Is a Feature — graceful degradation","Need Milk Money Is a Hand Up — emergency micro-loans"],
+   source:"Maven Pricing Strategy V2"},
+
+  // MARKETING NODES — Circulatory system
+  {id:"mkt-movement",label:"Movement Marketing",category:"marketing",hemisphere:"dark",x:20,y:28,w:25,h:2,
+   title:"MOVEMENT MARKETING — ABOVE THE LINE",subtitle:"Strategic Brand · Advocacy · Partnerships · Moonshot Campaigns",
+   description:"Movement Marketing operates above the brain — it's the aspirational, moonshot-level marketing that builds the brand as a movement. Advocacy campaigns, strategic partnerships, thought leadership, and brand storytelling that positions SIC as a force for systemic change.",
+   keyPoints:["Brand as movement, not product","Strategic partnerships and advocacy","Thought leadership and media presence","Moonshot campaign narratives"],
+   source:"HB1000 Marketing Placement — Above the Line"},
+  {id:"mkt-initiative",label:"Initiative Marketing",category:"marketing",hemisphere:"light",x:55,y:28,w:25,h:2,
+   title:"INITIATIVE MARKETING — BELOW THE LINE",subtitle:"Local Campaigns · Community Storytelling · Building-Specific",
+   description:"Initiative Marketing operates below the brain — it's the local, tactical marketing that drives adoption within specific communities. Community storytelling, local events, word-of-mouth campaigns, and building-specific promotions.",
+   keyPoints:["Community-driven storytelling","Local events and grassroots campaigns","Building-specific promotional strategies","Word-of-mouth and referral programs"],
+   source:"HB1000 Marketing Placement — Below the Line"},
+];
+
+// ═══════════════════════════════════════════════════════════
+// RENDERING ENGINE
+// ═══════════════════════════════════════════════════════════
+
+const canvasWrap = document.getElementById('canvas-wrap');
+const viewport = document.getElementById('viewport');
+let scale = 0.55;
+let panX = 0, panY = 0;
+let isDragging = false;
+let dragStartX, dragStartY, panStartX, panStartY;
+let marketingVisible = false;
+
+function renderNodes() {
+  const cw = 1000, ch = 1800;
+  let badgeNum = 1;
+  
+  NODES.forEach((node, idx) => {
+    const el = document.createElement('div');
+    el.className = 'node';
+    el.dataset.cat = node.category;
+    el.dataset.id = node.id;
+    el.style.left = (node.x / 100 * cw) + 'px';
+    el.style.top = (node.y / 100 * ch) + 'px';
+    el.style.width = (node.w / 100 * cw) + 'px';
+    el.style.height = (node.h / 100 * ch) + 'px';
+    
+    if (node.category === 'marketing') {
+      el.classList.add('marketing-node');
+      el.style.display = marketingVisible ? 'block' : 'none';
+    }
+    
+    el.innerHTML = `
+      <div class="node-badge">${badgeNum}</div>
+      <div class="node-inner">
+        <div class="hemisphere-dot"></div>
+        <div class="node-label">${node.label}</div>
+        ${node.subtitle ? `<div class="node-sublabel">${node.subtitle}</div>` : ''}
+      </div>
+    `;
+    
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openPanel(node);
+    });
+    
+    canvasWrap.appendChild(el);
+    badgeNum++;
+  });
+}
+
+function openPanel(node) {
+  const panel = document.getElementById('detail-panel');
+  const cat = CATEGORIES[node.category] || { label: 'Unknown', color: '#d4a853' };
+  
+  document.getElementById('panel-cat').textContent = cat.label;
+  document.getElementById('panel-cat').style.color = cat.color;
+  document.getElementById('panel-title').textContent = node.title;
+  document.getElementById('panel-subtitle').textContent = node.subtitle || '';
+  
+  // Hemisphere badge
+  const hemiEl = document.getElementById('panel-hemisphere');
+  const hemi = node.hemisphere || 'center';
+  if (hemi === 'dark') {
+    hemiEl.textContent = '● Agent Zone — Dark Side';
+    hemiEl.style.background = 'rgba(139, 122, 255, 0.15)';
+    hemiEl.style.color = '#8b7aff';
+    hemiEl.style.border = '1px solid rgba(139, 122, 255, 0.3)';
+  } else if (hemi === 'light') {
+    hemiEl.textContent = '● HB1000 Working — Light Side';
+    hemiEl.style.background = 'rgba(212, 168, 83, 0.15)';
+    hemiEl.style.color = '#d4a853';
+    hemiEl.style.border = '1px solid rgba(212, 168, 83, 0.3)';
+  } else {
+    hemiEl.textContent = '◐ Center — Both Hemispheres';
+    hemiEl.style.background = 'rgba(180, 160, 120, 0.1)';
+    hemiEl.style.color = '#b8a878';
+    hemiEl.style.border = '1px solid rgba(180, 160, 120, 0.2)';
+  }
+  document.getElementById('panel-desc').textContent = node.description;
+  document.getElementById('panel-source').textContent = 'Source: ' + (node.source || '');
+  
+  const kpSection = document.getElementById('panel-kp');
+  const kpList = document.getElementById('panel-kp-list');
+  if (node.keyPoints && node.keyPoints.length > 0) {
+    kpList.innerHTML = node.keyPoints.map(kp => `<li>${kp}</li>`).join('');
+    kpSection.style.display = 'block';
+  } else {
+    kpSection.style.display = 'none';
+  }
+  
+  const linkEl = document.getElementById('panel-link');
+  if (node.externalUrl) {
+    linkEl.href = node.externalUrl;
+    linkEl.textContent = node.externalLabel || 'Learn more →';
+    linkEl.style.display = 'inline-block';
+  } else {
+    linkEl.style.display = 'none';
+  }
+  
+  panel.classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('detail-panel').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAN & ZOOM
+// ═══════════════════════════════════════════════════════════
+
+function updateTransform() {
+  canvasWrap.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  document.getElementById('zoom-display').textContent = Math.round(scale * 100) + '%';
+}
+
+function centerView() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  panX = (vw - 1000 * scale) / 2;
+  panY = (vh - 1800 * scale) / 2 + 20;
+  updateTransform();
+}
+
+function zoomIn() { scale = Math.min(2, scale * 1.2); centerView(); }
+function zoomOut() { scale = Math.max(0.2, scale / 1.2); centerView(); }
+function resetView() { scale = 0.55; centerView(); }
+
+viewport.addEventListener('mousedown', (e) => {
+  if (e.target.closest('.node') || e.target.closest('#detail-panel')) return;
+  isDragging = true;
+  dragStartX = e.clientX;
+  dragStartY = e.clientY;
+  panStartX = panX;
+  panStartY = panY;
+  viewport.classList.add('dragging');
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  panX = panStartX + (e.clientX - dragStartX);
+  panY = panStartY + (e.clientY - dragStartY);
+  updateTransform();
+});
+
+window.addEventListener('mouseup', () => {
+  isDragging = false;
+  viewport.classList.remove('dragging');
+});
+
+viewport.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  scale = Math.max(0.2, Math.min(2, scale * delta));
+  updateTransform();
+}, { passive: false });
+
+// ═══════════════════════════════════════════════════════════
+// GUIDE PANEL
+// ═══════════════════════════════════════════════════════════
+
+function toggleGuide() {
+  const panel = document.getElementById('guide-panel');
+  const backdrop = document.getElementById('guide-backdrop');
+  panel.classList.toggle('open');
+  backdrop.classList.toggle('open');
+}
+
+// Auto-show guide for first-time visitors
+(function() {
+  if (!localStorage.getItem('pearl-2d-guide-seen')) {
+    setTimeout(() => {
+      toggleGuide();
+      localStorage.setItem('pearl-2d-guide-seen', '1');
+    }, 1500);
+  }
+})();
+
+// ═══════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════
+
+function toggleSearch() {
+  const overlay = document.getElementById('search-overlay');
+  overlay.classList.toggle('open');
+  if (overlay.classList.contains('open')) {
+    document.getElementById('search-input').focus();
+  }
+}
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase();
+  const results = document.getElementById('search-results');
+  if (q.length < 2) { results.innerHTML = ''; return; }
+  
+  const matches = NODES.filter(n => 
+    n.label.toLowerCase().includes(q) || 
+    n.title.toLowerCase().includes(q) || 
+    (n.description && n.description.toLowerCase().includes(q))
+  );
+  
+  results.innerHTML = matches.slice(0, 10).map(n => {
+    const cat = CATEGORIES[n.category] || { label: 'Unknown' };
+    return `<div class="search-result" onclick="navigateToNode('${n.id}')">
+      <div class="search-result-label">${n.title}</div>
+      <div class="search-result-cat">${cat.label}</div>
+    </div>`;
+  }).join('');
+});
+
+document.getElementById('search-overlay').addEventListener('click', (e) => {
+  if (e.target.id === 'search-overlay') toggleSearch();
+});
+
+function navigateToNode(id) {
+  const node = NODES.find(n => n.id === id);
+  if (!node) return;
+  toggleSearch();
+  openPanel(node);
+  // Highlight the node
+  const el = document.querySelector(`.node[data-id="${id}"]`);
+  if (el) {
+    el.style.outline = '2px solid #d4a853';
+    setTimeout(() => { el.style.outline = ''; }, 2000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONCEPT INDEX
+// ═══════════════════════════════════════════════════════════
+
+function toggleIndex() {
+  document.getElementById('concept-index').classList.toggle('open');
+}
+
+function buildIndex() {
+  const content = document.getElementById('index-content');
+  const grouped = {};
+  NODES.forEach(n => {
+    const cat = CATEGORIES[n.category] || { label: 'Unknown', color: '#999' };
+    if (!grouped[n.category]) grouped[n.category] = { label: cat.label, color: cat.color, nodes: [] };
+    grouped[n.category].nodes.push(n);
+  });
+  
+  // Hemisphere indicator colors
+  const hemiColors = { dark: '#8b7aff', light: '#d4a853', center: '#b8a878' };
+  const hemiLabels = { dark: '●', light: '●', center: '◐' };
+  
+  let html = '';
+  Object.entries(grouped).forEach(([key, group]) => {
+    html += `<div class="index-category"><span class="layer-legend-dot" style="background:${group.color}"></span>${group.label}</div>`;
+    group.nodes.forEach(n => {
+      const hc = hemiColors[n.hemisphere || 'center'];
+      const hl = hemiLabels[n.hemisphere || 'center'];
+      html += `<div class="index-item" onclick="navigateToNode('${n.id}');toggleIndex();" style="display:flex;align-items:center;gap:6px;"><span style="color:${hc};font-size:6px;flex-shrink:0;">${hl}</span>${n.label}</div>`;
+    });
+  });
+  content.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MARKETING TOGGLE
+// ═══════════════════════════════════════════════════════════
+
+function toggleMarketing() {
+  marketingVisible = !marketingVisible;
+  const btn = document.getElementById('mkt-btn');
+  const overlay = document.getElementById('marketing-overlay');
+  btn.classList.toggle('active', marketingVisible);
+  overlay.classList.toggle('visible', marketingVisible);
+  
+  document.querySelectorAll('.marketing-node').forEach(el => {
+    el.style.display = marketingVisible ? 'block' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════════
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closePanel();
+    document.getElementById('search-overlay').classList.remove('open');
+    document.getElementById('concept-index').classList.remove('open');
+  }
+  if (e.key === '/' && !e.target.closest('input')) {
+    e.preventDefault();
+    toggleSearch();
+  }
+});
+
+// Click outside to close panel
+viewport.addEventListener('click', (e) => {
+  if (!e.target.closest('.node') && !e.target.closest('#detail-panel')) {
+    closePanel();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+// CROSS-LINKING: postMessage to parent (PearlDiamond.tsx)
+// ═══════════════════════════════════════════════════════════
+let currentNodeId = null;
+let currentNodeCategory = null;
+
+const originalOpenPanel = openPanel;
+openPanel = function(node) {
+  currentNodeId = node.id;
+  currentNodeCategory = node.category;
+  originalOpenPanel(node);
+  // Notify parent about node selection
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({
+      type: 'pearl-2d-node-selected',
+      nodeId: node.id,
+      category: node.category,
+      label: node.label,
+      title: node.title
+    }, '*');
+  }
+};
+
+// Listen for messages from parent (e.g., "highlight this node")
+window.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'pearl-highlight-node') {
+    const node = NODES.find(n => n.id === e.data.nodeId);
+    if (node) {
+      navigateToNode(node.id);
+    }
+  }
+  if (e.data && e.data.type === 'pearl-open-node') {
+    const node = NODES.find(n => n.id === e.data.nodeId);
+    if (node) {
+      navigateToNode(node.id);
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// DEEP LINKING: Read ?node= from URL
+// ═══════════════════════════════════════════════════════════
+function checkDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+  const nodeId = params.get('node');
+  if (nodeId) {
+    setTimeout(() => navigateToNode(nodeId), 300);
+  }
+}
+
+function copyNodeLink() {
+  if (!currentNodeId) return;
+  // Build the shareable URL
+  const baseUrl = window.location.origin + '/pearl-diamond';
+  const shareUrl = `${baseUrl}?node=${currentNodeId}&tab=master`;
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    const btn = document.getElementById('panel-share');
+    btn.classList.add('copied');
+    btn.textContent = '✓ Link Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '🔗 Copy Link';
+    }, 2000);
+  }).catch(() => {
+    // Fallback for iframe context
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'pearl-copy-link',
+        nodeId: currentNodeId,
+        tab: 'master'
+      }, '*');
+    }
+  });
+}
+
+function viewIn3D() {
+  if (!currentNodeCategory) return;
+  // Map 2D categories to 3D layer indices
+  const categoryTo3DLayer = {
+    'aspirational': 0,
+    'north-star': 1,
+    'marketing': 2, // Movement Marketing
+    'hb1000': 3, 'hb1000-inputs': 3, 'hb1000-outputs': 3,
+    'blue-seal-prime': 5,
+    'learning-loop': 6,
+    'blue-seal-local': 7,
+    'local-4': 10,
+    'badges': 8,
+    'pricing': 9,
+    'sidebar': 3
+  };
+  const layerIdx = categoryTo3DLayer[currentNodeCategory];
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({
+      type: 'pearl-switch-to-3d',
+      layerIndex: layerIdx !== undefined ? layerIdx : null,
+      nodeId: currentNodeId,
+      category: currentNodeCategory
+    }, '*');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+
+renderNodes();
+buildIndex();
+centerView();
+checkDeepLink();
+
+// ═══════════════════════════════════════════════════════════
+// INNER/OUTER RING — Fetch Bingo Cards and render as orbital nodes
+// ═══════════════════════════════════════════════════════════
+(async function loadRingNodes() {
+  try {
+    // Try to fetch from the API (works when embedded in the dashboard)
+    const baseUrl = window.location.origin;
+    const res = await fetch(baseUrl + '/api/trpc/bingo.listCards', {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!res.ok) return;
+    const json = await res.json();
+    const cards = json?.result?.data?.json ?? json?.result?.data ?? [];
+    if (!Array.isArray(cards) || cards.length === 0) return;
+
+    const ringsContainer = document.getElementById('initiative-rings');
+    if (!ringsContainer) return;
+
+    const innerCards = cards.filter(c => c.ring === 'inner');
+    const outerCards = cards.filter(c => c.ring === 'outer');
+
+    function placeNodes(cardList, ringClass, radius) {
+      const count = cardList.length;
+      if (count === 0) return;
+      cardList.forEach((card, i) => {
+        const angle = (2 * Math.PI * i / count) - Math.PI / 2;
+        const x = 250 + radius * Math.cos(angle) - 4; // 250 = center of 500px container, 4 = half node size
+        const y = 250 + radius * Math.sin(angle) - 4;
+        const node = document.createElement('div');
+        node.className = 'ring-node ' + (ringClass === 'inner' ? 'ring-node-inner' : 'ring-node-outer');
+        node.style.left = x + 'px';
+        node.style.top = y + 'px';
+        node.title = card.title + (card.ownerName ? ' (' + card.ownerName + ')' : '');
+        // Tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'ring-node-tooltip';
+        tooltip.textContent = card.title;
+        node.appendChild(tooltip);
+        // Click to navigate to Bingo Gateway
+        node.addEventListener('click', () => {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'navigate', path: '/bingo-city?card=' + card.cardId }, '*');
+          } else {
+            window.location.href = '/bingo-city?card=' + card.cardId;
+          }
+        });
+        ringsContainer.appendChild(node);
+      });
+    }
+
+    placeNodes(innerCards, 'inner', 140); // inner ring radius
+    placeNodes(outerCards, 'outer', 210); // outer ring radius
+
+    // Update ring labels with counts
+    const innerLabel = ringsContainer.querySelector('.ring-label-inner');
+    const outerLabel = ringsContainer.querySelector('.ring-label-outer');
+    if (innerLabel) innerLabel.textContent = 'Inner Ring \u2014 ' + innerCards.length + ' Pope-Assigned';
+    if (outerLabel) outerLabel.textContent = 'Outer Ring \u2014 ' + outerCards.length + ' Circulating';
+  } catch (e) {
+    // Silently fail if API not available (e.g., standalone viewing)
+    console.log('Ring nodes: API not available, showing static rings only');
+  }
+})();
+
+// Responsive resize
+window.addEventListener('resize', centerView);
+
+// Hide elements when embedded in iframe
+if (window !== window.top) {
+  document.querySelectorAll('.hide-when-embedded').forEach(el => el.style.display = 'none');
+}
+
+// ═══════════════════════════════════════════════════════════
+// HEMISPHERE FILTER MODE
+// ═══════════════════════════════════════════════════════════
+
+let currentHemiFilter = 'all';
+
+function filterHemisphere(filter) {
+  currentHemiFilter = filter;
+  
+  // Update button states
+  document.querySelectorAll('.hemi-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  
+  // Apply filter to nodes
+  document.querySelectorAll('.node').forEach(el => {
+    const nodeId = el.dataset.id;
+    const node = NODES.find(n => n.id === nodeId);
+    if (!node) return;
+    const hemi = node.hemisphere || 'center';
+    
+    if (filter === 'all') {
+      el.classList.remove('hemisphere-filtered-out', 'hemisphere-filtered-in');
+    } else if (hemi === filter) {
+      el.classList.remove('hemisphere-filtered-out');
+      el.classList.add('hemisphere-filtered-in');
+    } else {
+      el.classList.remove('hemisphere-filtered-in');
+      el.classList.add('hemisphere-filtered-out');
+    }
+  });
+  
+  // Show/hide stats badge
+  const statsEl = document.getElementById('hemisphere-stats');
+  if (filter !== 'all') {
+    statsEl.classList.add('visible');
+  } else {
+    statsEl.classList.remove('visible');
+  }
+  
+  // Update hemisphere overlay emphasis
+  const darkPlane = document.getElementById('hemisphere-dark');
+  const lightPlane = document.getElementById('hemisphere-light');
+  if (filter === 'dark') {
+    darkPlane.style.opacity = '1';
+    lightPlane.style.opacity = '0.3';
+  } else if (filter === 'light') {
+    darkPlane.style.opacity = '0.3';
+    lightPlane.style.opacity = '1';
+  } else {
+    darkPlane.style.opacity = '1';
+    lightPlane.style.opacity = '1';
+  }
+}
+
+// Compute and display hemisphere stats
+function updateHemisphereStats() {
+  let darkCount = 0, lightCount = 0, centerCount = 0;
+  NODES.forEach(n => {
+    if (n.category === 'marketing') return; // Skip marketing nodes from count
+    const h = n.hemisphere || 'center';
+    if (h === 'dark') darkCount++;
+    else if (h === 'light') lightCount++;
+    else centerCount++;
+  });
+  document.getElementById('stat-dark-count').textContent = darkCount;
+  document.getElementById('stat-light-count').textContent = lightCount;
+  document.getElementById('stat-center-count').textContent = centerCount;
+}
+updateHemisphereStats();
+
+// ═══════════════════════════════════════════════════════════
+// HEMISPHERE TOGGLE
+// ═══════════════════════════════════════════════════════════
+
+let hemispheresVisible = true;
+
+function toggleHemispheres() {
+  hemispheresVisible = !hemispheresVisible;
+  const overlay = document.getElementById('hemisphere-overlay');
+  const canvas = document.getElementById('constellation-canvas');
+  const btn = document.getElementById('hemisphere-btn');
+  const filterBar = document.getElementById('hemisphere-filter');
+  
+  if (hemispheresVisible) {
+    overlay.style.opacity = '1';
+    canvas.style.opacity = '1';
+    btn.style.background = 'rgba(139,122,255,0.15)';
+    btn.style.borderColor = 'rgba(139,122,255,0.4)';
+    btn.style.color = '#8b7aff';
+    filterBar.classList.remove('hidden');
+    // Re-apply hemisphere tinting
+    document.querySelectorAll('.node.hemisphere-dark, .node.hemisphere-light, .node.hemisphere-center').forEach(el => {
+      el.style.opacity = '1';
+    });
+  } else {
+    overlay.style.opacity = '0';
+    canvas.style.opacity = '0';
+    btn.style.background = 'transparent';
+    btn.style.borderColor = 'rgba(255,255,255,0.1)';
+    btn.style.color = '#706050';
+    filterBar.classList.add('hidden');
+    // Reset filter when hemispheres are hidden
+    filterHemisphere('all');
+    document.getElementById('hemisphere-stats').classList.remove('visible');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HEMISPHERE SYSTEM — Constellation Animation
+// ═══════════════════════════════════════════════════════════
+
+(function initConstellation() {
+  const canvas = document.getElementById('constellation-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const CW = 1000, CH = 1800;
+  const CENTER_X = CW / 2; // The terminator line
+  
+  // Star particles that orbit through both hemispheres
+  const STAR_COUNT = 60;
+  const stars = [];
+  
+  // Each star orbits in an elliptical path around the center of the diamond
+  for (let i = 0; i < STAR_COUNT; i++) {
+    const orbitRx = 100 + Math.random() * 400; // horizontal radius
+    const orbitRy = 200 + Math.random() * 600; // vertical radius
+    const orbitCx = CENTER_X + (Math.random() - 0.5) * 100; // slight offset from center
+    const orbitCy = 400 + Math.random() * 800; // vertical center of orbit
+    const speed = 0.0002 + Math.random() * 0.0006; // radians per frame
+    const phase = Math.random() * Math.PI * 2; // starting angle
+    const size = 1 + Math.random() * 2.5;
+    
+    stars.push({
+      orbitRx, orbitRy, orbitCx, orbitCy,
+      speed, phase, angle: phase, size,
+      // Brightness flicker
+      flickerSpeed: 0.5 + Math.random() * 2,
+      flickerPhase: Math.random() * Math.PI * 2
+    });
+  }
+  
+  // Connection lines between nearby stars
+  const CONNECTION_DIST = 120;
+  
+  function animate(time) {
+    ctx.clearRect(0, 0, CW, CH);
+    
+    // Update star positions
+    stars.forEach(s => {
+      s.angle += s.speed;
+      s.x = s.orbitCx + Math.cos(s.angle) * s.orbitRx;
+      s.y = s.orbitCy + Math.sin(s.angle) * s.orbitRy;
+      
+      // Clamp to canvas
+      s.x = Math.max(10, Math.min(CW - 10, s.x));
+      s.y = Math.max(10, Math.min(CH - 10, s.y));
+    });
+    
+    // Draw connections between nearby stars
+    for (let i = 0; i < stars.length; i++) {
+      for (let j = i + 1; j < stars.length; j++) {
+        const dx = stars[i].x - stars[j].x;
+        const dy = stars[i].y - stars[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < CONNECTION_DIST) {
+          const alpha = (1 - dist / CONNECTION_DIST) * 0.15;
+          // Color based on which hemisphere the midpoint is in
+          const midX = (stars[i].x + stars[j].x) / 2;
+          if (midX < CENTER_X) {
+            // Dark side — purple/blue connections
+            ctx.strokeStyle = `rgba(139, 122, 255, ${alpha})`;
+          } else {
+            // Light side — gold/amber connections
+            ctx.strokeStyle = `rgba(212, 168, 83, ${alpha})`;
+          }
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(stars[i].x, stars[i].y);
+          ctx.lineTo(stars[j].x, stars[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    
+    // Draw stars with hemisphere-dependent coloring
+    stars.forEach(s => {
+      const flicker = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(time * 0.001 * s.flickerSpeed + s.flickerPhase));
+      
+      // Transition factor: 0 = far left (deep dark), 1 = far right (full light)
+      const t = Math.max(0, Math.min(1, s.x / CW));
+      
+      // Interpolate color: purple(dark) → gold(light)
+      const r = Math.round(139 + (212 - 139) * t);
+      const g = Math.round(122 + (168 - 122) * t);
+      const b = Math.round(255 + (83 - 255) * t);
+      
+      const alpha = flicker * 0.7;
+      
+      // Glow
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.15})`;
+      ctx.fill();
+      
+      // Core
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      ctx.fill();
+    });
+    
+    requestAnimationFrame(animate);
+  }
+  
+  requestAnimationFrame(animate);
+})();
+
+// ═══════════════════════════════════════════════════════════
+// HEMISPHERE NODE TINTING
+// Nodes are explicitly categorized by semantic role:
+//   dark  = AI/Agent-driven systems (inputs, autonomous, drift, genie)
+//   light = Human-facing operational systems (outputs, bingo, wisdom)
+//   center = Spanning both hemispheres (HB1000 brain, Blue Seal, North Star)
+// Center nodes get a subtle blend of both hemisphere tints
+// ═══════════════════════════════════════════════════════════
+
+(function tintNodesByHemisphere() {
+  const CW = 1000;
+  const CENTER = CW / 2;
+  
+  // Build a lookup from node id to hemisphere
+  const hemisphereMap = {};
+  NODES.forEach(n => { hemisphereMap[n.id] = n.hemisphere || 'center'; });
+  
+  document.querySelectorAll('.node').forEach(el => {
+    const nodeId = el.dataset.id;
+    const hemi = hemisphereMap[nodeId];
+    
+    if (hemi === 'dark') {
+      el.classList.add('hemisphere-dark');
+    } else if (hemi === 'light') {
+      el.classList.add('hemisphere-light');
+    } else {
+      // Center nodes: use position-based fallback with reduced intensity
+      el.classList.add('hemisphere-center');
+    }
+  });
+})();
+
+</script>
+</body>
+</html>

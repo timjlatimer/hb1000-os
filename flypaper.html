@@ -710,5 +710,21 @@
   });
 })();
 </script>
+<script>
+/* ---- Open House visit-stamp (door edition) — doors do NOT count toward the
+       16 rooms; this only starts the open-house clock, null-safe, never throws
+       (private mode / direct URL visitors who never logged in are fine). ---- */
+(function () {
+  'use strict';
+  try {
+    var k = 'hb1000-openhouse';
+    var s = JSON.parse(localStorage.getItem(k));
+    if (!s || typeof s !== 'object') s = {};
+    if (!s.pages || typeof s.pages !== 'object') s.pages = {};
+    if (!s.started) s.started = new Date().toISOString();
+    localStorage.setItem(k, JSON.stringify(s));
+  } catch (e) { /* fresh store / private mode — the trap still works */ }
+})();
+</script>
 </body>
 </html>

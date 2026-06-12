@@ -5,7 +5,9 @@
    Shell.loadJSON(path)    → fetch helper with cache-busting
    Helpers: Shell.pill(), Shell.rygDot(), Shell.splitBar(), Shell.esc(),
             Shell.acceptanceState(cardFile), Shell.flypaperCounts(),
-            Shell.catchOpen() / Shell.catchClose()
+            Shell.catchOpen() / Shell.catchClose(), Shell.openHouse()
+   Open House layer (through Sunday June 14 · live Monday June 15):
+            visit stamps in 'hb1000-openhouse' + the cap-tracker bar.
    Ground rules: draft-only — nothing sends; the human approves every move.
    ========================================================================== */
 (function () {
@@ -693,6 +695,116 @@
     });
   }
 
+  /* ========================================================================
+     THE OPEN HOUSE LAYER — window: now through Sunday June 14; we go live
+     Monday June 15 — Dingo cards begin. This is an OPEN HOUSE: walk through
+     any room, touch nothing you don't want to, no participation required.
+     The shell stamps each distinct room visited in localStorage
+     'hb1000-openhouse' = { pages: { roomId: firstVisitISO }, started: ISO }
+     and renders the cap-tracker bar — a slim fixed bar at the bottom of
+     every shelled page where the HB1000 cap walks the track as coverage
+     grows. Clicking the bar opens the guest book (guestbook.html).
+     The house = 16 rooms (OH_ROOMS). Doors (login.html, flypaper.html)
+     never count toward the 16. Coverage is computed, never asserted.
+     Null-safe for direct-URL visitors who never logged in (private mode,
+     fresh store, corrupt JSON → the bar still renders, nothing throws).
+     ======================================================================== */
+  var OH_KEY = 'hb1000-openhouse';
+  var OH_ROOMS = [
+    'index', 'card', 'city', 'command', 'nursery', 'north-star', 'purpose',
+    'life', 'ptk', 'culture', 'fleet', 'doctrine', 'loop', 'feed', 'library',
+    'story'
+  ];
+  var OH_TOTAL = OH_ROOMS.length;
+  /* Shell.init pageIds → room ids where they differ (index.html inits as 'model') */
+  var OH_ALIAS = { model: 'index' };
+
+  function ohLoad() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(OH_KEY)); } catch (e) { /* fresh / private mode */ }
+    if (!s || typeof s !== 'object') s = {};
+    if (!s.pages || typeof s.pages !== 'object') s.pages = {};
+    if (!s.started) s.started = new Date().toISOString();
+    return s;
+  }
+  function ohSave(s) {
+    try { localStorage.setItem(OH_KEY, JSON.stringify(s)); } catch (e) { /* private mode — the visit still shows this session */ }
+  }
+  function ohCount(s) {
+    var n = 0;
+    for (var i = 0; i < OH_ROOMS.length; i++) {
+      if (s && s.pages && s.pages[OH_ROOMS[i]]) n++;
+    }
+    return n;
+  }
+  /* Stamp this visit (first visit only) — non-room pages (e.g. ceremony)
+     still persist 'started' so the open-house clock has a beginning. */
+  function ohStamp(pageId) {
+    var room = OH_ALIAS[pageId] || pageId;
+    var s = ohLoad();
+    if (OH_ROOMS.indexOf(room) >= 0 && !s.pages[room]) {
+      s.pages[room] = new Date().toISOString();
+    }
+    ohSave(s);
+    return s;
+  }
+
+  /* the HB1000 CAP — inline SVG hard-hat, gold (var(--gold) #e8b54d) */
+  function ohCapSVG() {
+    return '<svg class="oh-cap-svg" viewBox="0 0 26 18" width="22" height="15" ' +
+        'xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' +
+      '<path d="M13 2.5 C8.2 2.5 5 6.6 5 12 L21 12 C21 6.6 17.8 2.5 13 2.5 Z" fill="var(--gold,#e8b54d)"/>' +
+      '<rect x="11.4" y="1" width="3.2" height="4.8" rx="1.4" fill="var(--gold-glass,#f5c76a)"/>' +
+      '<rect x="1.5" y="12" width="23" height="3.4" rx="1.7" fill="#a5762a"/>' +
+    '</svg>';
+  }
+
+  function buildOpenHouseBar(pageId) {
+    if (document.getElementById('hb-oh-bar')) return; /* idempotent */
+    var preN = ohCount(ohLoad());      /* coverage BEFORE this visit — the cap glides from here */
+    var s = ohStamp(pageId);
+    var n = ohCount(s);
+    var pct = Math.round(n / OH_TOTAL * 100);
+    var prePct = Math.round(preN / OH_TOTAL * 100);
+    var done = n >= OH_TOTAL;
+
+    var bar = document.createElement('a');
+    bar.id = 'hb-oh-bar';
+    bar.href = 'guestbook.html';
+    if (done) bar.className = 'done';
+    bar.title = 'Open House — wander freely, no pressure. This bar opens the guest book.';
+    bar.setAttribute('aria-label', done ?
+      'Open House: you have seen the whole house — all ' + OH_TOTAL + ' rooms. Sign the guest book?' :
+      'Open House: you have walked ' + n + ' of ' + OH_TOTAL + ' rooms — ' + pct +
+      ' percent. Opens the guest book.');
+    bar.innerHTML =
+      '<span class="oh-txt">' + (done ?
+        'You’ve seen the whole house! 🧢✨ <b>Sign the guest book?</b>' :
+        '<span class="oh-pre">Open House: </span>you’ve walked <b>' + n + '</b> of ' +
+        OH_TOTAL + ' rooms<span class="oh-pct"> — <b>' + pct + '%</b></span>') +
+      '</span>' +
+      '<span class="oh-track" aria-hidden="true">' +
+        '<span class="oh-fill" style="width:' + prePct + '%"></span>' +
+        '<span class="oh-cap" style="left:' + prePct + '%">' + ohCapSVG() + '</span>' +
+      '</span>';
+    document.body.appendChild(bar);
+    document.body.classList.add('hb-openhouse');
+
+    /* the cap MOVES: first paint lands at the previous coverage, then glides
+       to the new mark (CSS transition; prefers-reduced-motion turns it off) */
+    if (pct !== prePct) {
+      var glide = function () {
+        bar.querySelector('.oh-fill').style.width = pct + '%';
+        bar.querySelector('.oh-cap').style.left = pct + '%';
+      };
+      if (window.requestAnimationFrame) {
+        requestAnimationFrame(function () { requestAnimationFrame(glide); });
+      } else {
+        glide();
+      }
+    }
+  }
+
   function buildSidebar(pageId) {
     var aside = document.createElement('aside');
     aside.id = 'hb-sidebar';
@@ -768,7 +880,10 @@
     var div = document.createElement('div');
     div.className = 'guard-banner';
     div.setAttribute('role', 'note');
-    div.innerHTML = '<span class="lock" aria-hidden="true">🔒</span><span>' + GUARD_TEXT + '</span>';
+    div.innerHTML = '<span class="lock" aria-hidden="true">🔒</span><span>' + GUARD_TEXT + '</span>' +
+      /* Open House line — warm, zero-pressure; CSS order keeps it the last row */
+      '<span class="oh-line">🏠 <b>OPEN HOUSE</b> through Sunday — wander freely, no pressure. ' +
+      'We go live Monday, June 15.</span>';
     return div;
   }
 
@@ -813,6 +928,19 @@
             d.getDate() === t.getDate()) n++;
       });
       return { today: n, local: s.captures.length };
+    },
+
+    /** Open House coverage from 'hb1000-openhouse' — { walked, total, pct,
+        started, pages } (computed, never asserted). Doors don't count. */
+    openHouse: function () {
+      var s = ohLoad(), n = ohCount(s);
+      return {
+        walked: n,
+        total: OH_TOTAL,
+        pct: Math.round(n / OH_TOTAL * 100),
+        started: s.started,
+        pages: s.pages
+      };
     },
 
     /** Open the ambient quick-catch sheet (A5) programmatically. */
@@ -908,6 +1036,9 @@
 
         /* ---- THE AMBIENT CATCH BUTTON (A5) — on every shelled page ---- */
         catchBuild();
+
+        /* ---- THE OPEN HOUSE LAYER — visit stamp + cap-tracker bar ---- */
+        buildOpenHouseBar(pageId);
       };
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', go);

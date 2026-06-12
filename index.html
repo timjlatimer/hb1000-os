@@ -19,6 +19,33 @@
   .view{display:none}
   .view.active{display:block}
 
+  /* ---------- the headline VIEW TOGGLE: hop across all four looks ---------- */
+  .viewswitch{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    max-width:1000px; margin:18px auto 4px; padding:12px 14px;
+    background:linear-gradient(180deg,var(--panel),var(--panel-2));
+    border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 0 0 1px rgba(232,181,77,.12) inset, 0 6px 22px rgba(0,0,0,.35);
+  }
+  .viewswitch .vs-label{
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--soft); margin-right:2px; font-weight:700; white-space:nowrap;
+  }
+  .viewswitch a.vs-pill{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:9px 16px; border-radius:999px; font-size:14px; font-weight:600;
+    color:var(--ink); background:var(--panel-2); border:1px solid var(--line);
+    text-decoration:none; transition:border-color .15s, color .15s, background .15s;
+  }
+  .viewswitch a.vs-pill:hover{border-color:var(--gold); color:var(--gold); background:rgba(232,181,77,.07)}
+  .viewswitch a.vs-pill .vs-ico{font-size:15px; line-height:1}
+  .viewswitch a.vs-pill[aria-current="page"]{
+    border-color:var(--gold); color:var(--gold);
+    background:rgba(232,181,77,.14);
+    box-shadow:0 0 0 1px var(--gold) inset, 0 0 14px rgba(232,181,77,.22);
+  }
+  @media (max-width:560px){ .viewswitch .vs-label{width:100%; margin-bottom:2px} }
+
   /* ---------- the canonical diamond SVG ---------- */
   svg.osvg{
     width:100%; height:auto; max-width:1000px; display:block; margin:0 auto;
@@ -165,6 +192,15 @@
       <p class="art-credit">Masthead art recovered from the model tour (legacy) archive — the cockpit looking onto the constellation.</p>
     </div>
   </header>
+
+  <!-- ==================== THE HEADLINE VIEW TOGGLE — switch between all the looks ==================== -->
+  <nav class="viewswitch" aria-label="Switch between all four views of the model">
+    <span class="vs-label">Switch the view</span>
+    <a class="vs-pill" href="index.html" aria-current="page"><span class="vs-ico">🗺️</span> The Map <span style="color:var(--soft);font-weight:500">(this page)</span></a>
+    <a class="vs-pill" href="pearl-3d.html"><span class="vs-ico">◆</span> Pearl Diamond 3D</a>
+    <a class="vs-pill" href="pearl-2d.html"><span class="vs-ico">◇</span> Pearl Diamond 2D</a>
+    <a class="vs-pill" href="city.html"><span class="vs-ico">🏙️</span> Dingo City</a>
+  </nav>
 
   <div class="tabs" role="tablist" aria-label="Model views">
     <button class="tab active" id="tab-model" role="tab" aria-selected="true" onclick="showView('model',this)">◆ The Whole Model</button>
