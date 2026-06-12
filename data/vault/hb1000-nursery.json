@@ -1,0 +1,28 @@
+[
+  {
+    "id": "local-1781306838163",
+    "local": true,
+    "name": "Vault E2E Test Butterfly",
+    "core_insight": "Testing the vault commit round-trip — this is a test entry.",
+    "framework": "",
+    "thesis": "A test entry to verify the Vault sync layer works end-to-end.",
+    "bar_stool": "We need to make sure when you save something here, it shows up in the Vault and can be committed to GitHub.",
+    "context": {
+      "date": "2026-06-12",
+      "walk": "",
+      "hunt_note": ""
+    },
+    "tags": [],
+    "today_no": 1,
+    "ytd_no": 120,
+    "captured_at": "2026-06-12T23:27:18.164Z",
+    "first_seen": "2026-06-12",
+    "one_liner": "A test entry to verify the Vault sync layer works end-to-end.",
+    "era": "2026-app-capture",
+    "score": null,
+    "lean_canvas_flag": false,
+    "stage": "nursery",
+    "fork": "universal",
+    "owner_asks": []
+  }
+]
