@@ -29,7 +29,8 @@
     { id: 'doctrine',   file: 'doctrine.html',   label: 'The Doctrine',             sub: '80/20 · lanes · Standing Orders' },
     { id: 'loop',       file: 'loop.html',       label: 'Learning Loop V13.0',      sub: 'The Genie Release' },
     { id: 'life',       file: 'life.html',       label: 'Build Your Own Life',      sub: 'the agnostic mode' },
-    { id: 'feed',       file: 'feed.html',       label: 'Show Me Feed',             sub: 'live activity wall' }
+    { id: 'feed',       file: 'feed.html',       label: 'Show Me Feed',             sub: 'live activity wall' },
+    { id: 'vault',      file: 'vault.html',      label: 'The Vault',                sub: 'shared data layer · sync' }
   ];
 
   var SOUL_QUOTES = [
@@ -1098,4 +1099,12 @@
   };
 
   window.Shell = Shell;
+})();
+
+/* Phase 2 Slice 0.5 - vault hydration loader (see assets/vault-hydrate.js) */
+(function () {
+  var s = document.createElement('script');
+  s.src = 'assets/vault-hydrate.js';
+  s.defer = true;
+  document.head.appendChild(s);
 })();

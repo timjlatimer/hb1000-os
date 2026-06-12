@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Vault — HB1000 Operating System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070b10; --panel:#0f1620; --panel-2:#0d141d; --line:#20303f;
+  --ink:#e9eef4; --muted:#8aa0b4; --soft:#5c768a;
+  --gold:#e8b54d; --teal:#36c2b4; --cyan:#51a7f9;
+  --green:#46c66d; --yellow:#e8c24d; --red:#e0556b;
+  --radius:10px; --radius-lg:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Inter','Segoe UI',system-ui,sans-serif;min-height:100vh;padding:28px 20px 60px}
+.wrap{max-width:860px;margin:0 auto}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.back{font-size:13px;color:var(--muted)}
+h1{font-weight:900;font-size:28px;margin:14px 0 4px}
+h1 b{color:var(--gold);font-weight:900}
+.tagline{color:var(--muted);font-size:14px;font-style:italic;margin-bottom:18px}
+.guard{border:1px solid var(--line);background:var(--panel-2);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--muted);margin-bottom:22px}
+.guard b{color:var(--gold)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;margin-bottom:18px}
+.card:hover{border-color:#2c4254}
+.card h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input[type=password],input[type=text]{flex:1;min-width:240px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);color:var(--ink);padding:10px 12px;font-size:13px;font-family:inherit}
+button{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:40px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+button:hover{border-color:var(--gold);color:var(--gold)}
+button.primary{background:var(--gold);border-color:var(--gold);color:#101010}
+button.primary:hover{filter:brightness(1.08);color:#101010}
+button:disabled{opacity:.45;cursor:not-allowed}
+.hint{font-size:12px;color:var(--soft);margin-top:10px;line-height:1.6}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.key{font-weight:600}
+.bytes{color:var(--soft);font-size:12px}
+.pill{display:inline-block;border-radius:40px;padding:3px 12px;font-size:11px;font-weight:700;letter-spacing:.04em}
+.pill.synced{background:rgba(70,198,109,.12);color:var(--green);border:1px solid rgba(70,198,109,.4)}
+.pill.pending{background:rgba(232,194,77,.12);color:var(--yellow);border:1px solid rgba(232,194,77,.4)}
+.pill.local-only{background:rgba(81,167,249,.12);color:var(--cyan);border:1px solid rgba(81,167,249,.4)}
+.pill.vault-only{background:rgba(138,160,180,.12);color:var(--muted);border:1px solid rgba(138,160,180,.4)}
+td .act{padding:5px 12px;font-size:12px;margin-right:6px}
+.status-line{font-size:13px;color:var(--muted);min-height:18px;margin-top:12px}
+.status-line.ok{color:var(--green)}
+.status-line.err{color:var(--red)}
+.empty{color:var(--soft);font-size:13px;padding:14px 10px}
+.footnote{font-size:12px;color:var(--soft);line-height:1.7;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← The HB1000 Operating System</a>
+  <h1>The <b>Vault</b></h1>
+  <div class="tagline">"If it is not in the vault, it does not exist." — the shared data layer (Phase 2 · Slice 0)</div>
+
+  <div class="guard">🔒 <b>Nothing auto-commits.</b> Decisions made in the app live in this browser until <i>you</i> approve a push to the vault. Your GitHub token is stored in this browser only and is sent only to api.github.com. Restores overwrite local data — export first if unsure.</div>
+
+  <div class="card">
+    <h2>Setup — vault token</h2>
+    <div class="row">
+      <input type="password" id="tok" placeholder="Fine-grained personal access token (github_pat_…)" autocomplete="off">
+      <button class="primary" id="tokSave">Save token</button>
+      <button id="tokClear">Clear</button>
+    </div>
+    <div class="hint" id="tokState"></div>
+    <div class="hint">
+      Create one at <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>:
+      Repository access → <b>Only select repositories</b> → <code>timjlatimer/hb1000-os</code> · Permissions → <b>Contents: Read and write</b> · nothing else.
+      Reading vault status works without a token; committing requires one.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Decision stores — local ⇄ vault</h2>
+    <div class="row" style="margin-bottom:12px">
+      <button id="refresh">↻ Refresh status</button>
+      <button class="primary" id="commitAll" disabled>⬆ Commit all pending to vault</button>
+      <a style="margin-left:auto;font-size:12px" href="https://github.com/timjlatimer/hb1000-os/commits/main/data/vault" target="_blank" rel="noopener">vault history →</a>
+    </div>
+    <table>
+      <thead><tr><th>Store</th><th>Local</th><th>Vault</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
+    </table>
+    <div class="status-line" id="msg"></div>
+    <div class="footnote">
+      Every <code>hb1000-*</code> store this app keeps in <code>localStorage</code> (approvals, PTK entries, nursery scores, gate verdicts…) appears here automatically and syncs to <code>data/vault/&lt;store&gt;.json</code> on the <code>main</code> branch — one commit per approval, so the git history <i>is</i> the audit trail. localStorage stays as the offline cache; the vault is the source of truth.
+      <br>Slice 0.5 is live: pages hydrate <i>missing</i> stores from the vault on load, so any browser starts from shared state. Local data always wins — overwrites happen only via Restore here.
+    </div>
+  </div>
+</div>
+
+<script src="assets/vault.js"></script>
+<script>
+(function(){
+  'use strict';
+  var V = window.HB1000Vault;
+  var $ = function(id){ return document.getElementById(id); };
+  var current = [];
+
+  function fmtBytes(n){ return n==null ? '—' : (n<1024 ? n+' B' : (n/1024).toFixed(1)+' KB'); }
+  function msg(text, cls){ var m=$('msg'); m.textContent=text||''; m.className='status-line '+(cls||''); }
+  function tokState(){ $('tokState').textContent = V.getToken() ? '✓ Token saved in this browser.' : 'No token saved — read-only mode.'; }
+
+  function render(rows){
+    current = rows;
+    var tb = $('rows');
+    if (!rows.length){ tb.innerHTML = '<tr><td colspan="5" class="empty">No hb1000-* decision stores found yet — use the app (score a butterfly, log a PTK, run the Gate), then refresh.</td></tr>'; }
+    else {
+      tb.innerHTML = rows.map(function(r){
+        var canCommit = (r.state==='pending'||r.state==='local-only') ? '' : 'disabled';
+        var canRestore = (r.state==='pending'||r.state==='vault-only') ? '' : 'disabled';
+        return '<tr>'+
+          '<td class="key">'+r.key+'</td>'+
+          '<td class="bytes">'+fmtBytes(r.localBytes)+'</td>'+
+          '<td class="bytes">'+fmtBytes(r.vaultBytes)+'</td>'+
+          '<td><span class="pill '+r.state+'">'+r.state.replace('-',' ')+'</span></td>'+
+          '<td><button class="act" data-commit="'+r.key+'" '+canCommit+'>⬆ Commit</button>'+
+          '<button class="act" data-restore="'+r.key+'" '+canRestore+'>⬇ Restore</button></td>'+
+        '</tr>';
+      }).join('');
+    }
+    var pending = rows.filter(function(r){ return r.state==='pending'||r.state==='local-only'; }).length;
+    $('commitAll').disabled = pending===0 || !V.getToken();
+    $('commitAll').textContent = '⬆ Commit all pending to vault'+(pending?(' ('+pending+')'):'');
+  }
+
+  function refresh(){
+    msg('Checking vault…');
+    V.statusAll().then(function(rows){ render(rows); msg('Status as of '+new Date().toLocaleTimeString()+'.', 'ok'); })
+      .catch(function(e){ msg(e.message,'err'); });
+  }
+
+  document.addEventListener('click', function(ev){
+    var k = ev.target.getAttribute && ev.target.getAttribute('data-commit');
+    var rk = ev.target.getAttribute && ev.target.getAttribute('data-restore');
+    if (k){
+      if(!confirm('Approve: commit "'+k+'" to the vault (one git commit on main)?')) return;
+      msg('Committing '+k+'…');
+      V.vaultPut(k).then(function(){ msg('✓ '+k+' committed to the vault.','ok'); refresh(); })
+        .catch(function(e){ msg(e.message,'err'); });
+    }
+    if (rk){
+      if(!confirm('Overwrite local "'+rk+'" with the vault copy?')) return;
+      msg('Restoring '+rk+'…');
+      V.restore(rk).then(function(){ msg('✓ '+rk+' restored from the vault.','ok'); refresh(); })
+        .catch(function(e){ msg(e.message,'err'); });
+    }
+  });
+
+  $('tokSave').addEventListener('click', function(){ V.setToken($('tok').value); $('tok').value=''; tokState(); refresh(); });
+  $('tokClear').addEventListener('click', function(){ V.setToken(''); tokState(); refresh(); });
+  $('refresh').addEventListener('click', refresh);
+  $('commitAll').addEventListener('click', function(){
+    var pend = current.filter(function(r){ return r.state==='pending'||r.state==='local-only'; });
+    if(!pend.length) return;
+    if(!confirm('Approve: commit '+pend.length+' store(s) to the vault?')) return;
+    (function next(i){
+      if(i>=pend.length){ msg('✓ All pending stores committed.','ok'); refresh(); return; }
+      msg('Committing '+pend[i].key+' ('+(i+1)+'/'+pend.length+')…');
+      V.vaultPut(pend[i].key).then(function(){ next(i+1); }).catch(function(e){ msg(e.message,'err'); });
+    })(0);
+  });
+
+  tokState();
+  refresh();
+})();
+</script>
+</body>
+</html>
