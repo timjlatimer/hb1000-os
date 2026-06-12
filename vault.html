@@ -91,7 +91,7 @@ td .act{padding:5px 12px;font-size:12px;margin-right:6px}
     <div class="status-line" id="msg"></div>
     <div class="footnote">
       Every <code>hb1000-*</code> store this app keeps in <code>localStorage</code> (approvals, PTK entries, nursery scores, gate verdicts…) appears here automatically and syncs to <code>data/vault/&lt;store&gt;.json</code> on the <code>main</code> branch — one commit per approval, so the git history <i>is</i> the audit trail. localStorage stays as the offline cache; the vault is the source of truth.
-      <br>Next slice (0.5): pages hydrate from the vault on load so any browser sees the same state.
+      <br>Slice 0.5 is live: pages hydrate <i>missing</i> stores from the vault on load, so any browser starts from shared state. Local data always wins — overwrites happen only via Restore here.
     </div>
   </div>
 </div>
